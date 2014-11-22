@@ -2,8 +2,8 @@
 layout: post
 title: "2014-11-20-Download-Stock-Data-2"
 description: ""
-category: r
-tags: [r, knitr]
+category: R
+tags: [R, Knitr]
 ---
 {% include JB/setup %}
 

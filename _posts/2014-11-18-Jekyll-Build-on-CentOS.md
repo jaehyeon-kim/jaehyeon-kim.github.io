@@ -2,8 +2,8 @@
 layout: post
 title: "2014-11-18-Jekyll-Build-on-CentOS"
 description: ""
-category: intro
-tags: [jekyll, CentOS]
+category: Intro
+tags: [Jekyll, CentOS]
 ---
 {% include JB/setup %}
 
