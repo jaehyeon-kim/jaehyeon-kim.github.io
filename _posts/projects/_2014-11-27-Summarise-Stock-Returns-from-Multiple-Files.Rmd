@@ -7,7 +7,7 @@ tags: [knitr,lubridate,stringr,reshape2,plyr,dplyr]
 ---
 {% include JB/setup %}
 
-This is a slight extension of the previous two articles ( [2014-11-20-Download-Stock-Data-1](http://jaehyeon-kim.github.io/r/2014/11/20/Download-Stock-Data-1/), [2014-11-20-Download-Stock-Data-2](http://jaehyeon-kim.github.io/r/2014/11/20/Download-Stock-Data-2/) ) and it aims to produce daily returns, standard deviation and correlation of multiple shares.
+This is a slight extension of the previous two articles ( [2014-11-20-Download-Stock-Data-1](http://jaehyeon-kim.github.io/r/2014/11/20/Download-Stock-Data-1/), [2014-11-20-Download-Stock-Data-2](http://jaehyeon-kim.github.io/r/2014/11/20/Download-Stock-Data-2/) ) and it aims to produce gross returns, standard deviation and correlation of multiple shares.
 
 The following packages are used.
 
