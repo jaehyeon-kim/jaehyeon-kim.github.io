@@ -3,7 +3,7 @@ layout: post
 title: "2014-11-27-Summarise-Stock-Returns-from-Multiple-Files"
 description: ""
 category: R
-tags: [knitr,lubridate,stringr,plyr,dplyr]
+tags: [knitr,lubridate,stringr,reshape2,plyr,dplyr]
 ---
 {% include JB/setup %}
 
