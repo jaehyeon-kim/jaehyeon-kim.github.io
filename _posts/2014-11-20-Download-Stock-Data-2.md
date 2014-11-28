@@ -3,7 +3,7 @@ layout: post
 title: "2014-11-20-Download-Stock-Data-2"
 description: ""
 category: R
-tags: [R, Knitr]
+tags: [knitr,lubridate,stringr,plyr,dplyr]
 ---
 {% include JB/setup %}
 
@@ -68,12 +68,12 @@ Some of the values are shown below.
 
 |Date       |  Open|  High|   Low| Close|   Volume|Code |
 |:----------|-----:|-----:|-----:|-----:|--------:|:----|
+|2014-11-26 | 47.49| 47.99| 47.28| 47.75| 27164877|MSFT |
+|2014-11-25 | 47.66| 47.97| 47.45| 47.47| 28007993|MSFT |
+|2014-11-24 | 47.99| 48.00| 47.39| 47.59| 35434245|MSFT |
+|2014-11-21 | 49.02| 49.05| 47.57| 47.98| 42884795|MSFT |
 |2014-11-20 | 48.00| 48.70| 47.87| 48.70| 21510587|MSFT |
 |2014-11-19 | 48.66| 48.75| 47.93| 48.22| 26177450|MSFT |
-|2014-11-18 | 49.13| 49.32| 48.70| 48.74| 23996457|MSFT |
-|2014-11-17 | 49.41| 49.70| 49.14| 49.46| 30318648|MSFT |
-|2014-11-14 | 49.74| 50.04| 49.39| 49.58| 29081657|MSFT |
-|2014-11-13 | 48.81| 49.64| 48.70| 49.61| 26210433|MSFT |
 
 It took a bit longer to complete the script as I had to teach myself how to handle errors in R. And this is why I started to write articles in this blog.
 

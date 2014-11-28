@@ -3,7 +3,7 @@ layout: post
 title: "2014-11-19-R-Rroject-Setup"
 description: ""
 category: Intro
-tags: [R]
+tags: [knitr]
 ---
 {% include JB/setup %}
 

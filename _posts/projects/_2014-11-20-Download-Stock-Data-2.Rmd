@@ -3,7 +3,7 @@ layout: post
 title: "2014-11-20-Download-Stock-Data-2"
 description: ""
 category: R
-tags: [R, Knitr]
+tags: [knitr,lubridate,stringr,plyr,dplyr]
 ---
 {% include JB/setup %}
 

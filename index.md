@@ -22,7 +22,7 @@ Scala supports both the object oriented and functional programming so that a dev
 
 ### C#, F# or .NET in general?
 
-.NET and Visual Studio have been open and they can be fully cross platform in the future ([LINK](http://blogs.msdn.com/b/somasegar/archive/2014/11/12/opening-up-visual-studio-and-net-to-every-developer-any-application-net-server-core-open-source-and-cross-platform-visual-studio-community-2013-and-preview-of-visual-studio-2015-and-net-2015.aspx)). My current impression about the .NET ecosystem would be wrong and it would be necessary to keep eyes on it - anyway I use C# at work.
+.NET and Visual Studio have been open and they can be fully cross platform in the future ([LINK](http://blogs.msdn.com/b/somasegar/archive/2014/11/12/opening-up-visual-studio-and-net-to-every-developer-any-application-net-server-core-open-source-and-cross-platform-visual-studio-community-2013-and-preview-of-visual-studio-2015-and-net-2015.aspx)). Then my current impression about the .NET ecosystem may be no longer valid and it would be necessary to keep eyes on it.
 
 ### Machine Learning
 
@@ -32,7 +32,7 @@ Some of the steps in predictive analysis are relatively new to me (eg cross vali
 
 I hope the subsequent articles can give me a chance to learn by doing.
 
-Last updated on Nov 22, 2014
+Last updated on Nov 28, 2014
 
 ## Posts
 
