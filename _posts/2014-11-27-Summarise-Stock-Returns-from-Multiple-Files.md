@@ -195,7 +195,7 @@ correlation
 ## TCHC 0.1481043 1.0000000
 {% endhighlight %}
 
-Finally the data folder is downloaded.
+Finally the data folder is deleted.
 
 
 {% highlight r %}
