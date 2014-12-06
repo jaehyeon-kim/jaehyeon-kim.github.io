@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "2014-12-05-Test"
+title: "2014-12-06-Test-Article"
 description: ""
 category: R
-tags: [ggplot2, plyr]
+tags: [test]
 ---
 {% include JB/setup %}
 
@@ -14,11 +14,3 @@ When you click the **Knit** button a document will be generated that includes bo
 ```{r}
 summary(cars)
 ```
-
-You can also embed plots, for example:
-
-```{r, echo=FALSE}
-plot(cars)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "2014-12-05-Test"
+title: "2014-12-06-Test-Article"
 description: ""
 category: R
-tags: [ggplot2, plyr]
+tags: [test]
 ---
 {% include JB/setup %}
 
@@ -27,9 +27,3 @@ summary(cars)
 ##  3rd Qu.:19.0   3rd Qu.: 56.00  
 ##  Max.   :25.0   Max.   :120.00
 {% endhighlight %}
-
-You can also embed plots, for example:
-
-![center](figs/2014-12-05-Test/unnamed-chunk-2-1.png) 
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
