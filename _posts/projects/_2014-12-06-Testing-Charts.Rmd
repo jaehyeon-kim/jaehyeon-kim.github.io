@@ -27,12 +27,14 @@ p + geom_point() + scale_colour_manual(values=c("red","blue"))
 ```
 
 #### Scatter plot
+
 ```{r scatter, message=FALSE, warning=FALSE}
 #qplot(wt, mpg, data=mtcars)
 ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point()
 ```
 
 #### Line chart
+
 ```{r line1, message=FALSE, warning=FALSE}
 #qplot(temperature, pressure, data=pressure, geom="line")
 ggplot(pressure, aes(x=temperature, y=pressure)) + geom_line()
@@ -44,6 +46,7 @@ ggplot(pressure, aes(x=temperature, y=pressure)) + geom_line() + geom_point()
 ```
 
 #### Bar graph
+
 ```{r bar1, message=FALSE, warning=FALSE}
 BOD <- mutate(BOD, Time=as.factor(Time))
 names(BOD) <- tolower(names(BOD))
@@ -59,12 +62,14 @@ ggplot(mtcars, aes(x=factor(cyl))) + geom_bar()
 ```
 
 #### Histogram
+
 ```{r histogram, message=FALSE, warning=FALSE}
 #qplot(mpg, data=mtcars, binwidth=4) # default: binwidth = range/30
 ggplot(mtcars, aes(x=mpg)) + geom_histogram(binwidth=4)
 ```
 
 #### Box plot
+
 ````{r box1, message=FALSE, warning=FALSE}
 tooth <- mutate(ToothGrowth, inter = interaction(supp, dose))
 #qplot(supp, len, data=tooth, geom="boxplot")
@@ -77,6 +82,7 @@ ggplot(tooth, aes(x=inter, y=len)) + geom_boxplot()
 ```
 
 #### Function curve
+
 ```{r function, message=FALSE, warning=FALSE}
 myFun <- function(var) { 1/(1 + exp(-var + 10)) }
 #qplot(c(0, 20), fun=myFun, stat="function", geom="line")

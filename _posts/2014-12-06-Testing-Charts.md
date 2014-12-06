@@ -30,21 +30,23 @@ p + geom_point() + scale_colour_manual(values=c("red","blue"))
 
 #### Scatter plot
 
+
 {% highlight r %}
 #qplot(wt, mpg, data=mtcars)
 ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point()
 {% endhighlight %}
 
-![center](../../../../figs/2014-12-06-Testing-Charts/scatter-1.png) 
+![center](../figs/2014-12-06-Testing-Charts/scatter-1.png) 
 
 #### Line chart
+
 
 {% highlight r %}
 #qplot(temperature, pressure, data=pressure, geom="line")
 ggplot(pressure, aes(x=temperature, y=pressure)) + geom_line()
 {% endhighlight %}
 
-![center](../../../../figs/2014-12-06-Testing-Charts/line1-1.png) 
+![center](../figs/2014-12-06-Testing-Charts/line1-1.png) 
 
 
 {% highlight r %}
@@ -52,19 +54,31 @@ ggplot(pressure, aes(x=temperature, y=pressure)) + geom_line()
 ggplot(pressure, aes(x=temperature, y=pressure)) + geom_line() + geom_point()
 {% endhighlight %}
 
-![center](../../../../figs/2014-12-06-Testing-Charts/line2-1.png) 
+![center](../figs/2014-12-06-Testing-Charts/line2-1.png) 
 
 #### Bar graph
 
+
 {% highlight r %}
 BOD <- mutate(BOD, Time=as.factor(Time))
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## Error in is.factor(x): object 'Time' not found
+{% endhighlight %}
+
+
+
+{% highlight r %}
 names(BOD) <- tolower(names(BOD))
 
 #qplot(time, demand, data=BOD, geom="bar", stat="identity")
 ggplot(BOD, aes(x=time, y=demand)) + geom_bar(stat="identity")
 {% endhighlight %}
 
-![center](../../../../figs/2014-12-06-Testing-Charts/bar1-1.png) 
+![center](../figs/2014-12-06-Testing-Charts/bar1-1.png) 
 
 
 {% highlight r %}
@@ -73,18 +87,20 @@ ggplot(BOD, aes(x=time, y=demand)) + geom_bar(stat="identity")
 ggplot(mtcars, aes(x=factor(cyl))) + geom_bar()
 {% endhighlight %}
 
-![center](../../../../figs/2014-12-06-Testing-Charts/bar2-1.png) 
+![center](../figs/2014-12-06-Testing-Charts/bar2-1.png) 
 
 #### Histogram
+
 
 {% highlight r %}
 #qplot(mpg, data=mtcars, binwidth=4) # default: binwidth = range/30
 ggplot(mtcars, aes(x=mpg)) + geom_histogram(binwidth=4)
 {% endhighlight %}
 
-![center](../../../../figs/2014-12-06-Testing-Charts/histogram-1.png) 
+![center](../figs/2014-12-06-Testing-Charts/histogram-1.png) 
 
 #### Box plot
+
 
 {% highlight r %}
 tooth <- mutate(ToothGrowth, inter = interaction(supp, dose))
@@ -92,7 +108,7 @@ tooth <- mutate(ToothGrowth, inter = interaction(supp, dose))
 ggplot(tooth, aes(x=supp, y=len)) + geom_boxplot()
 {% endhighlight %}
 
-![center](../../../../figs/2014-12-06-Testing-Charts/box1-1.png) 
+![center](../figs/2014-12-06-Testing-Charts/box1-1.png) 
 
 
 {% highlight r %}
@@ -100,9 +116,10 @@ ggplot(tooth, aes(x=supp, y=len)) + geom_boxplot()
 ggplot(tooth, aes(x=inter, y=len)) + geom_boxplot()
 {% endhighlight %}
 
-![center](../../../../figs/2014-12-06-Testing-Charts/box2-1.png) 
+![center](../figs/2014-12-06-Testing-Charts/box2-1.png) 
 
 #### Function curve
+
 
 {% highlight r %}
 myFun <- function(var) { 1/(1 + exp(-var + 10)) }
@@ -110,4 +127,4 @@ myFun <- function(var) { 1/(1 + exp(-var + 10)) }
 ggplot(data.frame(x=c(0, 20)), aes(x=x)) + stat_function(fun=myFun, geom="line")
 {% endhighlight %}
 
-![center](../../../../figs/2014-12-06-Testing-Charts/function-1.png) 
+![center](../figs/2014-12-06-Testing-Charts/function-1.png) 
