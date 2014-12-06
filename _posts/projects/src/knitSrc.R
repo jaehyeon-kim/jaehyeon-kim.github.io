@@ -19,4 +19,25 @@ knitPost <- function(title, base.url = "") {
   opts_chunk$set(fig.cap = "center")
   render_jekyll()
   knit(paste0("_",title,".Rmd"), paste0("../",title,".md"), envir = parent.frame())
+  
+  # move fig files
+  moveFigs(fig.path)
+}
+
+moveFigs <- function(fig.path, ...) {
+  # set working directory to be the project directory
+  setwd("/home/jaehyeon/jaehyeon-kim.github.io/_posts/projects")
+  
+  # create fig folder where a folder of each article will be moved
+  if(!file.exists("../../figs")) { dir.create("../../figs")}  
+  # create figure folder for an article
+  if(!file.exists(paste0("../../",fig.path))) { dir.create(paste0("../../",fig.path)) }
+  
+  # copy figures
+  from <- dir(fig.path, full.name = TRUE)
+  to <- paste0("../../",from)
+  mapply(file.copy, from=from, to=to) 
+  
+  # delete folder
+  unlink("figs", recursive = TRUE)
 }
