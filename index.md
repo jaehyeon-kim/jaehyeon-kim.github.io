@@ -30,7 +30,7 @@ Simply put, I am interested in making sense of data. While I was taught inferent
 
 Some of the steps in predictive analysis are relatively new to me (eg cross validation) and I need to focus more on them. Also it is quite important to perform analysis in an automated (or reproducible as used in academia) and a scalable way using the tools mentioned above.
 
-I hope the subsequent articles can give me a chance to learn by doing.
+I hope the subsequent articles can give me a chance to learn by doing. The source of this blog can be found [HERE](https://github.com/jaehyeon-kim/jaehyeon-kim.github.io).
 
 Last updated on Nov 28, 2014
 
