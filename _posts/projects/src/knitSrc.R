@@ -18,5 +18,5 @@ knitPost <- function(title, base.url = "") {
   opts_chunk$set(fig.path = fig.path)
   opts_chunk$set(fig.cap = "center")
   render_jekyll()
-  knit(paste0("_",title,".Rmd"), paste0(title,".md"), envir = parent.frame())
+  knit(paste0("_",title,".Rmd"), paste0("..//",title,".md"), envir = parent.frame())
 }
