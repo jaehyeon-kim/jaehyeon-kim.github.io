@@ -7,11 +7,9 @@ tags: [plyr, knitr]
 ---
 {% include JB/setup %}
 
-Purely programming point of view, 
-
-for-loops would be better to be avoided in R as 
-- the script can be more readable 
-- it is easier to handle errors 
+Purely programming point of view, I consider **for-loops** would be better to be avoided in R as 
+* the script can be more readable 
+* it is easier to handle errors 
 
 Some articles on the web indicate that looping functions (or apply family of functions) don't guarantee faster execution and sometimes even slower. Although, assuming that the experiments are correct, in my opinion, code readability itself is beneficial enough to avoid for-loops. Even worse, R's dynamic typing system coupled with poor readability can result in a frustrating consequence as the code grows. 
 
