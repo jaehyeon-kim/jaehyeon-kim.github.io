@@ -54,7 +54,7 @@ Any                                          <-- Nothing
 {% endhighlight %}
 
 - The Unit type is unlike the other core types here (numeric and non-numeric) in that instead of denoting a type of data it denotes the lack of data.
-- & and &&? - | (or | |) don't evaluate the second argument if the first is sufficient
+- `&` and `&&`? - `|` (or `||`) don't evaluate the second argument if the first is sufficient
 - Scala doesn't support automatic conversions to booleans eg non-null strings is not true, 0 is not false
 
 ##### type operations
