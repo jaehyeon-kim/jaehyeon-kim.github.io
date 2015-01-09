@@ -4,11 +4,6 @@ title: "2015-01-08-Embed-Custom-Javascript-Library"
 description: ""
 category: R
 tags: [rCharts, knitr]
-customJS:
-- jquery-1.9.1.min
-- highcharts
-- highcharts-more
-- exporting
 ---
 {% include JB/setup %}
 
@@ -71,12 +66,10 @@ Finally it is printed. Note that the `results` option should be set to be `'asis
 a$print('chart 1', include_assets = TRUE) # modified
 {% endhighlight %}
 
-{% if page.customJS %}
-  {% for file in page.customJS  %}
-  <script src='/assets/src/{{ file }}.js' type="text/javascript"></script>
-  {% endfor %}
-{% endif %}
-
+<script type='text/javascript' src=/home/jaehyeon/R/x86_64-redhat-linux-gnu-library/3.1/rCharts/libraries/highcharts/js/jquery-1.9.1.min.js></script>
+<script type='text/javascript' src=/home/jaehyeon/R/x86_64-redhat-linux-gnu-library/3.1/rCharts/libraries/highcharts/js/highcharts.js></script>
+<script type='text/javascript' src=/home/jaehyeon/R/x86_64-redhat-linux-gnu-library/3.1/rCharts/libraries/highcharts/js/highcharts-more.js></script>
+<script type='text/javascript' src=/home/jaehyeon/R/x86_64-redhat-linux-gnu-library/3.1/rCharts/libraries/highcharts/js/exporting.js></script> 
  <style>
   .rChart {
     display: block;
@@ -225,12 +218,9 @@ customJS:
 
 And the liquid logic used is as following.
 
-
-{% highlight r %}
-{% if page.customJS %}
-  {% for file in page.customJS  %}
-  <script src='/assets/src/{{ file }}.js' type="text/javascript"></script>
-  {% endfor %}
-{% endif %}
-{% endhighlight %}
+`{% if page.customJS %}`
+`  {% for file in page.customJS  %}`
+`  <script src='/assets/src/{{ file }}.js' type="text/javascript"></script>`
+`  {% endfor %}`
+`{% endif %}`
 
