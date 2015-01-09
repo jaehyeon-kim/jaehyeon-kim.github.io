@@ -4,6 +4,11 @@ title: "2015-01-08-India-Education"
 description: ""
 category: R
 tags: [rCharts, knitr]
+customJS:
+- jquery-1.9.1.min
+- highcharts
+- highcharts-more
+- exporting
 ---
 {% include JB/setup %}
 
@@ -66,10 +71,12 @@ Finally it is printed. Note that the `results` option should be set to be `'asis
 a$print('chart 1', include_assets = TRUE) # modified
 {% endhighlight %}
 
-<script type='text/javascript' src=/assets/src/jquery-1.9.1.min.js></script>
-<script type='text/javascript' src=/assets/src/highcharts.js></script>
-<script type='text/javascript' src=/assets/src/highcharts-more.js></script>
-<script type='text/javascript' src=/assets/src/exporting.js></script> 
+{% if page.customJS %}
+  {% for file in page.customJS  %}
+  <script src='/assets/src/{{ file }}.js' type="text/javascript"></script>
+  {% endfor %}
+{% endif %}
+
  <style>
   .rChart {
     display: block;
