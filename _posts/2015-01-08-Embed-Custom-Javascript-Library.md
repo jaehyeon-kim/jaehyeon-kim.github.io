@@ -223,11 +223,13 @@ customJS:
 ---
 {% endhighlight %}
 
-And the liquid logic used is as following (See the source if it doesn't appear correctly).
+And the liquid logic used is as following. Note that the quotation marks that wrap `%` should be stripped out. They are kept as the code is either executed or not apppear correctly together.
 
-*{% if page.customJS %}*
-*  {% for file in page.customJS  %}*
-*  <script src='/assets/src/{{ file }}.js' type="text/javascript"></script>*
-*  {% endfor %}*
-*{% endif %}*
 
+{% highlight r %}
+{'%' if page.customJS '%'}
+  {'%' for file in page.customJS '%'}
+    <script src='/assets/src/{{ file }}.js' type="text/javascript"></script>
+  {'%' endfor '%'}
+{'%' endif '%'}
+{% endhighlight %}
