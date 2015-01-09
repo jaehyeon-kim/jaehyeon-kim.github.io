@@ -1,0 +1,52 @@
+---
+layout: post
+title: "2015-01-08-India-Education"
+description: ""
+category: R
+tags: [rCharts, knitr]
+---
+{% include JB/setup %}
+
+This is a quick example of producing a multiple bar chart using [rCharts]() package via implementing [HighCharts]() library. The original tutorial can be found in [rChart Gallery](http://rcharts.io/gallery/) but some functions are outdated as can be checked [here](https://github.com/ramnathv/rCharts/issues/251) - They are updated here.
+
+Firstly _rCharts_ package needs to be installed from the GitHub repo if not installed.
+
+```{r installPackages, eval=FALSE }
+require(devtools)
+install_github('rCharts', 'ramnathv')
+```
+
+The library is loaded.
+
+```{r loadLibraries, message=FALSE, warning=FALSE}
+library(rCharts)
+library(knitr)
+```
+
+The data is shown below.
+
+```{r prepareData, message=FALSE, warning=FALSE}
+# Prepare data
+x <- data.frame(USPersonalExpenditure)
+colnames(x) <- substr(colnames(x), 2, 5)
+kable(x)
+```
+
+The chart can be created as following. Note that the modified part is commented.
+
+```{r createChart, message=FALSE, warning=FALSE}
+# Create chart
+a <- rCharts:::Highcharts$new() # modified
+a$chart(type = "column")
+a$title(text = "US Personal Expenditure")
+a$xAxis(categories = rownames(x))
+a$yAxis(title = list(text = "Billions of dollars"))
+a$data(x)
+```
+
+Finally it is printed. Note that the `results` option should be set to be `'asis'`.
+
+```{r printChart, message=FALSE, warning=FALSE, results='asis'}
+# Print chart
+a$print('chart 1', include_assets = TRUE) # modified
+```
