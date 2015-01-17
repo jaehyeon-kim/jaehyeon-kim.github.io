@@ -39,7 +39,6 @@ The following packages are loaded.
 
 
 {% highlight r %}
-library(knitr)
 library(ISLR)
 library(mlr)
 {% endhighlight %}
@@ -123,26 +122,28 @@ summary(glm.mod)
 {% highlight r %}
 # type = c("link","response","terms"), default - "link"
 glm.probs = predict(glm.mod, type="response")
-kable(head(glm.probs)) # check positive level (1): contrasts(Smarket$Direction)
+head(glm.probs) # check positive level (1): contrasts(Smarket$Direction)
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## Error in kable_markdown(x = structure(c("0.5070841", "0.4814679", "0.4811388", : the table must have a header (column names)
+##         1         2         3         4         5         6 
+## 0.5070841 0.4814679 0.4811388 0.5152224 0.5107812 0.5069565
 {% endhighlight %}
 
 
 
 {% highlight r %}
 glm.pred = sapply(glm.probs, function(p) { ifelse(p>.5,"Up","Down") })
-kable(head(glm.pred))
+head(glm.pred)
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## Error in kable_markdown(x = structure(c("Up", "Down", "Down", "Up", "Up", : the table must have a header (column names)
+##      1      2      3      4      5      6 
+##   "Up" "Down" "Down"   "Up"   "Up"   "Up"
 {% endhighlight %}
 
 ###### 5. Performance
@@ -150,15 +151,18 @@ kable(head(glm.pred))
 
 {% highlight r %}
 glm.cm = table(data.frame(response=glm.pred, truth=Smarket$Direction))
-kable(glm.cm) # confusion matrix
+glm.cm # confusion matrix
 {% endhighlight %}
 
 
 
-|     | Down|  Up|
-|:----|----:|---:|
-|Down |  145| 141|
-|Up   |  457| 507|
+{% highlight text %}
+##         truth
+## response Down  Up
+##     Down  145 141
+##     Up    457 507
+{% endhighlight %}
+
 
 
 {% highlight r %}
@@ -167,7 +171,11 @@ glm.mmse = 1 - sum(diag(glm.cm)) / sum(glm.cm)
 glm.mmse
 {% endhighlight %}
 
-[1] 0.4784
+
+
+{% highlight text %}
+## [1] 0.4784
+{% endhighlight %}
 
 ##### MLR
 
@@ -353,26 +361,28 @@ glm.mod.new
 
 {% highlight r %}
 glm.probs.new = predict(glm.mod.new, newdata=Smarket.test, type="response")
-kable(head(glm.probs.new))
+head(glm.probs.new)
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## Error in kable_markdown(x = structure(c("999", "1000", "1001", "1002", : the table must have a header (column names)
+##       999      1000      1001      1002      1003      1004 
+## 0.5282195 0.5156688 0.5226521 0.5138543 0.4983345 0.5010912
 {% endhighlight %}
 
 
 
 {% highlight r %}
 glm.pred.new = sapply(glm.probs.new, function(p) { ifelse(p>.5,"Up","Down") })
-kable(head(glm.pred.new))
+head(glm.pred.new)
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## Error in kable_markdown(x = structure(c("999", "1000", "1001", "1002", : the table must have a header (column names)
+##    999   1000   1001   1002   1003   1004 
+##   "Up"   "Up"   "Up"   "Up" "Down"   "Up"
 {% endhighlight %}
 
 ###### 5. Performance

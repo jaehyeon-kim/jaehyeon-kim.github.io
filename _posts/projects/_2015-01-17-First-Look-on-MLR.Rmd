@@ -37,7 +37,6 @@ devtools::install_github("berndbischl/mlr")
 The following packages are loaded.
 
 ```{r load_pkgs, message=FALSE, warning=FALSE}
-library(knitr)
 library(ISLR)
 library(mlr)
 ```
@@ -64,20 +63,20 @@ summary(glm.mod)
 
 ###### 4. Predict
 
-```{r islr_predict, warning=FALSE, message=FALSE, results='asis'}
+```{r islr_predict, warning=FALSE, message=FALSE}
 # type = c("link","response","terms"), default - "link"
 glm.probs = predict(glm.mod, type="response")
-kable(head(glm.probs)) # check positive level (1): contrasts(Smarket$Direction)
+head(glm.probs) # check positive level (1): contrasts(Smarket$Direction)
 
 glm.pred = sapply(glm.probs, function(p) { ifelse(p>.5,"Up","Down") })
-kable(head(glm.pred))
+head(glm.pred)
 ```
 
 ###### 5. Performance
 
-```{r islr_perf, warning=FALSE, message=FALSE, results='asis'}
+```{r islr_perf, warning=FALSE, message=FALSE}
 glm.cm = table(data.frame(response=glm.pred, truth=Smarket$Direction))
-kable(glm.cm) # confusion matrix
+glm.cm # confusion matrix
 
 # mean misclassificaton error rate 47.84%
 glm.mmse = 1 - sum(diag(glm.cm)) / sum(glm.cm)
@@ -150,12 +149,12 @@ glm.mod.new
 
 ###### 4. Predict
 
-```{r islr_predict_new, warning=FALSE, message=FALSE, results='asis'}
+```{r islr_predict_new, warning=FALSE, message=FALSE}
 glm.probs.new = predict(glm.mod.new, newdata=Smarket.test, type="response")
-kable(head(glm.probs.new))
+head(glm.probs.new)
 
 glm.pred.new = sapply(glm.probs.new, function(p) { ifelse(p>.5,"Up","Down") })
-kable(head(glm.pred.new))
+head(glm.pred.new)
 ```
 
 ###### 5. Performance
