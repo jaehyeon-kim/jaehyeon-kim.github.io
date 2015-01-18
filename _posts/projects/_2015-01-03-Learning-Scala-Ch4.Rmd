@@ -15,7 +15,7 @@ This post summarises notes and/or exercise solutions of _Chapter 4 Functions_ of
 
 ```{r, eval=FALSE}
 def safeTrim(s: String): String = {
-	if (s == null) return null // early termination
+  if (s == null) return null // early termination
 	s.trim()
 }
 def safeTrim1(s: String) = if (s == null) null else s.trim()
