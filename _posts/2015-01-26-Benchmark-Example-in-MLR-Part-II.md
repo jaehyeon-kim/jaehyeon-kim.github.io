@@ -260,7 +260,6 @@ res.bench
 {% endhighlight %}
 
 
-
 {% highlight text %}
 ##   task.id         learner.id mmce.test.mean
 ## 1      gc classif.ksvm.tuned        0.24950
