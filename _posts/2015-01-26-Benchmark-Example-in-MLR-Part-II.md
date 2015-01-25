@@ -278,8 +278,4 @@ res.bench
 
 I consider machine/statistical learning tasks are a combination of art (model/feature selection, feature engineering ...) and science (model/algorithm). While the latter part can be relatively straightforward, the former would require good practice, caution, experience, domain knowledge... (generally things that can easily mislead the researcher/practitioner). In other words, fitting models alone is hardly effective. In this regard, I tried benchmarking with some standard resampling strategies first although I'm yet to be aware of a variety of useful models. As having a whole project in mind when learning a new model would be a lot faster to be practical with it, I'll try to cover as much steps as I can in subsequent posts.
 
-{% if page.customJS %}
-  {% for file in page.customJS  %}
-  <script src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type="text/javascript"></script>
-  {% endfor %}
-{% endif %}
+<script src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type="text/javascript"></script>
