@@ -6,8 +6,6 @@ category: R
 tags: [mlr, kernlab, caret]
 customJS:
 - MathJax
-- MathMenu
-- MathZoom
 ---
 {% include JB/setup %}
 
@@ -282,6 +280,6 @@ I consider machine/statistical learning tasks are a combination of art (model/fe
 
 {% if page.customJS %}
   {% for file in page.customJS  %}
-  <script src='/assets/src/{{ file }}.js' type="text/javascript"></script>
+  <script src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type="text/javascript"></script>
   {% endfor %}
 {% endif %}
