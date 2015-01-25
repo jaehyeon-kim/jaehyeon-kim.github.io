@@ -4,8 +4,6 @@ title: "2015-01-26-Benchmark-Example-in-MLR-Part-II"
 description: ""
 category: R
 tags: [mlr, kernlab, caret]
-customJS:
-- MathJax
 ---
 {% include JB/setup %}
 
@@ -19,39 +17,38 @@ A potential issue on that approach is *the CV error can be optimistically biased
 
 *CV estimate of expected test error or CV error curve*
 
-$$latex
+$$
 CV(\theta)=\frac{1}{n}\sum_{k=1}^K\sum_{i\in C_{k}}L\left(y_{i},\hat{f}^{-k}\left(x_i,\theta\right)\right)
 $$
 
 *CV error in the kth fold or the error curve computed from the predictions in the kth fold*
 
-$$latex
+$$
 e_{k}(\theta)=\frac{1}{n_k}\sum_{i\in C_{k}}L\left(y_{i},\hat{f}^{-k}\left(x_i,\theta\right)\right)
 $$
 
 Therefore
 
-- $latex latex e_{k}(\hat{\theta})\approx CV(\hat{\theta})$
+- $$e_{k}(\hat{\theta})\approx CV(\hat{\theta})$$
     - Yes, since both are error curves evaluated at their minima.
-- For fixed $latex \theta$, $latex e_{k}(\hat{\theta})\approx E\Big[ L\left(y,\hat{f}\left(x,\hat{\theta}\right)\right)\Big]$
+- For fixed $$\theta$$, $$e_{k}(\hat{\theta})\approx E\Big[ L\left(y,\hat{f}\left(x,\hat{\theta}\right)\right)\Big]$$
     - **Not perfect.** 
-    - RHS: $latex \left(x,y\right)$ is stochastically independent of the training data and hence of $latex \hat{\theta}$.
-    - LHS: $latex \left(x_{i},y_{i}\right)$ has some dependence on $latex \hat{\theta}$ as $latex \hat{\theta}$ is chosen to minimize the validation error across all folds, including the kth fold.
+    - RHS: $$\left(x,y\right)$$ is stochastically independent of the training data and hence of $$\hat{\theta}$$.
+    - LHS: $$\left(x_{i},y_{i}\right)$$ has some dependence on $$\hat{\theta}$$ as $$\hat{\theta}$$ is chosen to minimize the validation error across all folds, including the kth fold.
 
-[Tibshirani and Tibshirani (2009)](http://www.stat.cmu.edu/~ryantibs/papers/cvbias.pdf) show that the bias itself is only an issue when $latex p\gg N$ and its magnitude varies considerably depending on the
-classifier. Therefore it can be misleading to compare the CV error rates when choosing between models.
+[Tibshirani and Tibshirani (2009)](http://www.stat.cmu.edu/~ryantibs/papers/cvbias.pdf) show that the bias itself is only an issue when $$p\gg N$$ and its magnitude varies considerably depending on the classifier. Therefore it can be misleading to compare the CV error rates when choosing between models.
 
 In order th tackle down this issue, [Varma & Simon (2006)](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1397873/) suggest **nested cross-validation** to eliminate the dependence in LHS. However this strategy is computationally intensive and can be impractical. 
 
 [Tibshirani and Tibshirani (2009)](http://www.stat.cmu.edu/~ryantibs/papers/cvbias.pdf) propose a method for the estimation of this bias that uses information from the cross-validation process. Specifically
 
-$$latex 
+$$ 
 \hat{Bias}=\frac{1}{K}\sum_{k=1}^K[e_{k}(\hat{\theta})-e_{k}(\hat{\theta}_k)]
 $$
 
-$latex CV(\hat{\theta})=\frac{1}{K}\sum_{k=1}^Ke_{k}(\hat{\theta})$ if the fold sizes are equal
+$$CV(\hat{\theta})=\frac{1}{K}\sum_{k=1}^Ke_{k}(\hat{\theta})$$ if the fold sizes are equal
 
-$$latex
+$$
 \Rightarrow CV(\hat{\theta})+\hat{Bias}=2CV(\hat{\theta})-\frac{1}{K}\sum_{k=1}^Ke_{k}(\hat{\theta}_k)
 $$
 
@@ -239,13 +236,13 @@ res.opt.grid
 
 {% highlight text %}
 ##       C  sigma kernel mmce.test.mean dob eol error.message exec.time
-## 1  0.25 0.0126 rbfdot        0.30000   1  NA          <NA>     3.651
-## 2  0.50 0.0126 rbfdot        0.28625   2  NA          <NA>     3.364
-## 3  1.00 0.0126 rbfdot        0.25700   3  NA          <NA>     3.359
-## 4  2.00 0.0126 rbfdot        0.25025   4  NA          <NA>     3.387
-## 5  4.00 0.0126 rbfdot        0.24200   5  NA          <NA>     3.283
-## 6  8.00 0.0126 rbfdot        0.25225   6  NA          <NA>     3.489
-## 7 16.00 0.0126 rbfdot        0.26225   7  NA          <NA>     3.726
+## 1  0.25 0.0126 rbfdot        0.30000   1  NA          <NA>     3.641
+## 2  0.50 0.0126 rbfdot        0.28625   2  NA          <NA>     3.372
+## 3  1.00 0.0126 rbfdot        0.25700   3  NA          <NA>     3.433
+## 4  2.00 0.0126 rbfdot        0.25025   4  NA          <NA>     3.852
+## 5  4.00 0.0126 rbfdot        0.24200   5  NA          <NA>     3.979
+## 6  8.00 0.0126 rbfdot        0.25225   6  NA          <NA>     4.168
+## 7 16.00 0.0126 rbfdot        0.26225   7  NA          <NA>     4.407
 {% endhighlight %}
 
 ## Benchmark
@@ -278,8 +275,4 @@ res.bench
 
 I consider machine/statistical learning tasks are a combination of art (model/feature selection, feature engineering ...) and science (model/algorithm). While the latter part can be relatively straightforward, the former would require good practice, caution, experience, domain knowledge... (generally things that can easily mislead the researcher/practitioner). In other words, fitting models alone is hardly effective. In this regard, I tried benchmarking with some standard resampling strategies first although I'm yet to be aware of a variety of useful models. As having a whole project in mind when learning a new model would be a lot faster to be practical with it, I'll try to cover as much steps as I can in subsequent posts.
 
-{% if page.customJS %}
-  {% for file in page.customJS  %}
-  <script src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type="text/javascript"></script>
-  {% endfor %}
-{% endif %}
+<script src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type="text/javascript"></script>
