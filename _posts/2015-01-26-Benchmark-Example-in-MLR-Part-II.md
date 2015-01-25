@@ -58,6 +58,8 @@ $$
 CV(\hat{\theta})+\hat{Bias}=2CV(\hat{\theta})-\frac{1}{K}\sum_{k=1}^Ke_{k}(\hat{\theta}_k)
 $$
 
+Let's get started.
+
 The bold-cased topics below are mainly covered.
 
 0. **Imputation, Processing ...**
@@ -137,7 +139,7 @@ normalizeFeatures(task, method="standardize")
 ## Positive class: Bad
 {% endhighlight %}
 
-## Control grid set up for tuing
+## Control grid set up for tuning
 
 As the original example, *sigma* (inverse kernel width) is estimated first using `sigest()` in the *kernlab* package. Then a control grid is made by varying values of *C* only. 
 
