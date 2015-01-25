@@ -29,9 +29,9 @@ $$
 
 Therefore
 
-- $$e_{k}(\hat{\theta})\approx CV(\hat{\theta})$$
+- first $$e_{k}(\hat{\theta})\approx CV(\hat{\theta})$$
     - Yes, since both are error curves evaluated at their minima.
-- For fixed $$\theta$$, $$e_{k}(\hat{\theta})\approx E\Big[ L\left(y,\hat{f}\left(x,\hat{\theta}\right)\right)\Big]$$
+- and, for fixed $$\theta$$, $$e_{k}(\hat{\theta})\approx E\Big[ L\left(y,\hat{f}\left(x,\hat{\theta}\right)\right)\Big]$$
     - **Not perfect.** 
     - RHS: $$\left(x,y\right)$$ is stochastically independent of the training data and hence of $$\hat{\theta}$$.
     - LHS: $$\left(x_{i},y_{i}\right)$$ has some dependence on $$\hat{\theta}$$ as $$\hat{\theta}$$ is chosen to minimize the validation error across all folds, including the kth fold.
@@ -46,10 +46,16 @@ $$
 \hat{Bias}=\frac{1}{K}\sum_{k=1}^K[e_{k}(\hat{\theta})-e_{k}(\hat{\theta}_k)]
 $$
 
-$$CV(\hat{\theta})=\frac{1}{K}\sum_{k=1}^Ke_{k}(\hat{\theta})$$ if the fold sizes are equal
+and if the fold sizes are equal
 
 $$
-\Rightarrow CV(\hat{\theta})+\hat{Bias}=2CV(\hat{\theta})-\frac{1}{K}\sum_{k=1}^Ke_{k}(\hat{\theta}_k)
+CV(\hat{\theta})=\frac{1}{K}\sum_{k=1}^Ke_{k}(\hat{\theta})
+$$
+
+then
+
+$$
+CV(\hat{\theta})+\hat{Bias}=2CV(\hat{\theta})-\frac{1}{K}\sum_{k=1}^Ke_{k}(\hat{\theta}_k)
 $$
 
 The bold-cased topics below are mainly covered.
@@ -236,13 +242,13 @@ res.opt.grid
 
 {% highlight text %}
 ##       C  sigma kernel mmce.test.mean dob eol error.message exec.time
-## 1  0.25 0.0126 rbfdot        0.30000   1  NA          <NA>     3.641
-## 2  0.50 0.0126 rbfdot        0.28625   2  NA          <NA>     3.372
-## 3  1.00 0.0126 rbfdot        0.25700   3  NA          <NA>     3.433
-## 4  2.00 0.0126 rbfdot        0.25025   4  NA          <NA>     3.852
-## 5  4.00 0.0126 rbfdot        0.24200   5  NA          <NA>     3.979
-## 6  8.00 0.0126 rbfdot        0.25225   6  NA          <NA>     4.168
-## 7 16.00 0.0126 rbfdot        0.26225   7  NA          <NA>     4.407
+## 1  0.25 0.0126 rbfdot        0.30000   1  NA          <NA>     3.794
+## 2  0.50 0.0126 rbfdot        0.28625   2  NA          <NA>     3.481
+## 3  1.00 0.0126 rbfdot        0.25700   3  NA          <NA>     3.488
+## 4  2.00 0.0126 rbfdot        0.25025   4  NA          <NA>     3.520
+## 5  4.00 0.0126 rbfdot        0.24200   5  NA          <NA>     3.408
+## 6  8.00 0.0126 rbfdot        0.25225   6  NA          <NA>     3.567
+## 7 16.00 0.0126 rbfdot        0.26225   7  NA          <NA>     4.158
 {% endhighlight %}
 
 ## Benchmark

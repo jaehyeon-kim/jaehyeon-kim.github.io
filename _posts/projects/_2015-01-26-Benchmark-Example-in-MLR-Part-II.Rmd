@@ -29,9 +29,9 @@ $$
 
 Therefore
 
-- $$e_{k}(\hat{\theta})\approx CV(\hat{\theta})$$
+- first $$e_{k}(\hat{\theta})\approx CV(\hat{\theta})$$
     - Yes, since both are error curves evaluated at their minima.
-- For fixed $$\theta$$, $$e_{k}(\hat{\theta})\approx E\Big[ L\left(y,\hat{f}\left(x,\hat{\theta}\right)\right)\Big]$$
+- and, for fixed $$\theta$$, $$e_{k}(\hat{\theta})\approx E\Big[ L\left(y,\hat{f}\left(x,\hat{\theta}\right)\right)\Big]$$
     - **Not perfect.** 
     - RHS: $$\left(x,y\right)$$ is stochastically independent of the training data and hence of $$\hat{\theta}$$.
     - LHS: $$\left(x_{i},y_{i}\right)$$ has some dependence on $$\hat{\theta}$$ as $$\hat{\theta}$$ is chosen to minimize the validation error across all folds, including the kth fold.
@@ -46,10 +46,16 @@ $$
 \hat{Bias}=\frac{1}{K}\sum_{k=1}^K[e_{k}(\hat{\theta})-e_{k}(\hat{\theta}_k)]
 $$
 
-$$CV(\hat{\theta})=\frac{1}{K}\sum_{k=1}^Ke_{k}(\hat{\theta})$$ if the fold sizes are equal
+and if the fold sizes are equal
 
 $$
-\Rightarrow CV(\hat{\theta})+\hat{Bias}=2CV(\hat{\theta})-\frac{1}{K}\sum_{k=1}^Ke_{k}(\hat{\theta}_k)
+CV(\hat{\theta})=\frac{1}{K}\sum_{k=1}^Ke_{k}(\hat{\theta})
+$$
+
+then
+
+$$
+CV(\hat{\theta})+\hat{Bias}=2CV(\hat{\theta})-\frac{1}{K}\sum_{k=1}^Ke_{k}(\hat{\theta}_k)
 $$
 
 The bold-cased topics below are mainly covered.
