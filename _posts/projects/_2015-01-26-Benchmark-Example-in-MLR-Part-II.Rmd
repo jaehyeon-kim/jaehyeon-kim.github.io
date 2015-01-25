@@ -6,6 +6,8 @@ category: R
 tags: [mlr, kernlab, caret]
 customJS:
 - MathJax
+- MathMenu
+- MathZoom
 ---
 {% include JB/setup %}
 
