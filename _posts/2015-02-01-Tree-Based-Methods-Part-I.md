@@ -23,7 +23,7 @@ The bold-cased sections of the [tutorial](http://topepo.github.io/caret/index.ht
 - Parallel Processing
 - Adaptive Resampling
 
-The pruning parameter in the **rpart** package is scaled so that its values is bound from 0 to 1. Specifically the formula is
+The pruning parameter in the **rpart** package is scaled so that its values are from 0 to 1. Specifically the formula is
 
 $$
 R_{cp}\left(T\right)\equiv R\left(T\right) + cp*|T|*R\left(T_{1}\right)
