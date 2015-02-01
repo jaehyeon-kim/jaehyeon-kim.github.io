@@ -29,7 +29,7 @@ $$
 R_{cp}\left(T\right)\equiv R\left(T\right) + cp*|T|*R\left(T_{1}\right)
 $$
 
-where $$T_{1}$$ is the tree with no splits, $$\mid T \mid$$ is the number of splits for a tree and *R* is the risk.
+where $$T_{1}$$ is the tree with no splits, $$\mid T\mid$$ is the number of splits for a tree and *R* is the risk.
 
 Due to the inclusion of $$R\left(T_{1}\right)$$, when *cp=1*, the tree will result in no splits while it is not pruned when *cp=0*. On the other hand, in the original setup without the term, the pruning parameter ($$\alpha$$) can range from 0 to infinity.
 
