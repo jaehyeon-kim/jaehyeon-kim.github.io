@@ -38,6 +38,7 @@ I hope the subsequent articles can give me a chance to learn by doing. The sourc
 Last updated on Jan 18, 2015
 
 ---
+
 ### Useful Sites
 
 - [R-bloggers](http://www.r-bloggers.com/)
