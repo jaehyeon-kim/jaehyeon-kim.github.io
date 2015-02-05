@@ -37,12 +37,6 @@ I hope the subsequent articles can give me a chance to learn by doing. The sourc
 
 Last updated on Jan 18, 2015
 
-## Posts
+## Useful Sites
 
-Here's the posts list.
-
-<ul class="posts">
-  {% for post in site.posts %}
-    <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ BASE_PATH }}{{ post.url }}">{{ post.title }}</a></li>
-  {% endfor %}
-</ul>
+- [R-bloggers](http://www.r-bloggers.com/)
