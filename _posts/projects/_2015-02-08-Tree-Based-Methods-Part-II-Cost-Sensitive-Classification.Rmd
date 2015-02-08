@@ -1,0 +1,52 @@
+---
+layout: post
+title: "2015-02-08-Tree-Based-Methods-Part-II-Cost-Sensitive-Classification"
+description: ""
+category: R
+tags: [dplyr, caret, rpart, rpart.plot]
+---
+{% include JB/setup %}
+
+In the previous article (Tree Based Methods Part I[http://jaehyeon-kim.github.io/r/2015/02/01/Tree-Based-Methods-Part-I/]), a decision tree is created on the *Carseats* data which is in the chapter 8 lab of [ISLR](http://www-bcf.usc.edu/~gareth/ISL/). The tree was built under the conditions that (1) *the costs of misclassification are the same across all classes* and (2) *the empirical distribution is taken as the prior distribution*. In practice, however, the costs can be different and the setup may have to be modified either by updating the prior distribution or by adding a loss matrix. Both of the options in the **rpart** package are implemented in this article.
+
+The bold-cased sections of the [tutorial](http://topepo.github.io/caret/index.html) are covered in this article.
+
+- Visualizations
+- Pre-Processing
+- **Data Splitting**
+- Miscellaneous Model Functions
+- **Model Training and Tuning**
+- Using Custom Models
+- Variable Importance
+- Feature Selection: RFE, Filters, GA, SA
+- Other Functions
+- Parallel Processing
+- Adaptive Resampling
+
+[here](https://gist.github.com/jaehyeon-kim/23bc73660e0e7b53a36f)
+
+---
+
+### Prior Probabilities and Costs
+
+#### Notation
+- *N* observations, *C* classes and *K* terminal nodes
+- Prior probability of being class *i*: $$\pi_{i}, \: i=1,2,...,C$$
+- Loss matrix of incorrectly classifying *i* as *j*: $$L \left(i,j \right)$$
+- True class for an observation *x*: $$\tau \left(x \right)$$
+- Class assigned to node *A* if it is a terminal node: $$\tau \left(A \right)$$
+- Number of observations of class *i*, node *A*, and *i* in *A*: $$N_{i}, \; N_{A}, \; and \; N_{iA}$$
+
+#### Relationships
+
+Probability of cases appearning in node *A* - the equality holds due to [the law of total probability](http://en.wikipedia.org/wiki/Law_of_total_probability)
+
+$$
+P(A) = \sum\limits_{i=1}^C \pi_{i} P \left[x \in A | \tau \left(x \right)=i \right] \; \left(est \approx \sum\limits_{i=1}^C \pi_{i} \frac{N_{iA}}{N_{i}} \right)
+$$
+
+Probability of class i given that a case is in node *A* - the equality holds due to [Bayes' theorem](http://en.wikipedia.org/wiki/Bayes%27_theorem)
+
+$$
+p\left(i | A\right) \left(=P \left[\tau \left(x \right) =i | x \in A \right] \right)= \pi_{i} \frac{P \left[x \in A | \tau \left(x \right)=i \right]}{P \left[x \in A\right]} \; \left(est \approx \pi_{i} \frac{\left(\frac{N_{iA}}{N_{i}} \right)}{\sum\limits_{i=1}^C \pi_{i} \frac{N_{iA}}{N_i} } \right)
+$$
