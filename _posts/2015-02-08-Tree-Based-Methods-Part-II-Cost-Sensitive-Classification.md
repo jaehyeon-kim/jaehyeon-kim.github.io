@@ -13,7 +13,7 @@ A comprehensive summary of this topic, as illustrated in [Berk (2008)](http://ww
 
       ... when the CART solution is determined solely by the data, the prior distribution is empirically determined, and the costs in the loss matrix of all classification errors are the same. Costs are being assigned even if the data analyst makes no conscious decision about them. Should the balance of false negatives to false positives that results be unsatisfactory, that balance can be changed. Either the costs in the loss matrix can be directly altered, leaving the prior distribution to be empirically determined, or the prior distribution can be altered leaving the default costs untouched. Much of the software currently available makes it easier to change the prior in the binary response case. When there are more than two response categories, it will usually be easier in practice to change the costs in the loss matrix directly.
 
-In this article, cost-sensitive classification is implemented, assuming that misclassifying the *High* class is twice as expensive, either by altering the priors and by adjusting the loss matrix.
+In this article, cost-sensitive classification is implemented, assuming that misclassifying the *High* class is twice as expensive, both by altering the priors and by adjusting the loss matrix.
 
 The following loss matrix is implemented.
 
