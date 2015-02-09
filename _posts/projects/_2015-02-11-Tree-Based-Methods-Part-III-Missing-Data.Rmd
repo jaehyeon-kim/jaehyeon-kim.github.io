@@ -1,0 +1,24 @@
+---
+layout: post
+title: "2015-02-11-Tree-Based-Methods-Part-III-Missing-Data"
+description: ""
+category: R
+tags: [dplyr, caret, rpart, rpart.plot]
+---
+{% include JB/setup %}
+
+### Missing Data
+
+CART tries to find a predictor and a split (*s*) for which the following is as large as possible.
+
+$$
+\triangle I\left(s,A\right)= I\left(A\right) - p\left(A_{L}\right) I\left(A_{L}\right) - p\left(A_{R}\right) I\left(A_{R}\right)
+$$
+
+- Parent impurity: $$I\left(A\right)$$
+- Probabilities of falling in the left and right node: ($$p\left(A_{L}\right), \; p\left(A_{R}\right)$$)
+
+1. Splits are determined without missing values while the probabilities are re-estimated.
+2. Actual splits of the missing values are performed by **surrogate variables**
+
+Supposed there are $$x_{1}$$ to $$x_{10}$$ perdictors. $$x_{1}$$ happens to be split and it has missing values.
