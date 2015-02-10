@@ -249,11 +249,20 @@ subset(fit.cl.boot$results,subset=cp==fit.cl.boot$bestTune$cp)
 
 The one from repeated cross-validation is taken to fit to the entire training data.
 
+**Updated on Feb 10, 2015**
+
+- As a value of *cp* is entered in `rpart()`, the function fits the model up to the value and takes the result. Therefore it produces a pruned tree.
+- If it is not set or set to be a low value (eg, 0), pruning can be done using the `prune()` function.
+
 
 {% highlight r %}
 ## refit the model to the entire training data
 cp.cl = fit.cl.recv$bestTune$cp
 fit.cl = rpart(High ~ ., data=trainData.cl, control=rpart.control(cp=cp.cl))
+
+# Updated on Feb 10, 2015
+# prune if cp not set or too low
+# fit.cl = prune(tree=fit.cl, cp=cp.cl)
 {% endhighlight %}
 
 The resulting tree is shown as following. The plot shows expected losses and node probabilities in the final nodes. For example, the leftmost node has
