@@ -355,6 +355,9 @@ kable(fit.reg.caret.cm)
 |Use Error    |         0.02|            0|          0.2|         0.27|            0|        0.12|
 
 
+
+
+
 {% highlight r %}
 # regression - rpart
 fit.reg.rpart.cm = regCM(trainData.reg$Sales, fit.reg.rpart, probs=probs, type="Fitted")
@@ -371,6 +374,9 @@ kable(fit.reg.rpart.cm)
 |actual: 80%- |            0|         0.00|        24.00|        40.00|            0|        0.38|
 |actual: 80%+ |            0|         0.00|         0.00|        33.00|           31|        0.52|
 |Use Error    |            0|         0.11|         0.37|         0.45|            0|        0.24|
+
+
+
 
 
 {% highlight r %}
@@ -426,6 +432,9 @@ kable(pred.reg.caret.cm)
 |Use Error    |          0|       0.25|       0.06|          0|       0.06|        0.09|
 
 
+
+
+
 {% highlight r %}
 # regression - rpart
 pred.reg.rpart.cm = regCM(testData.reg$Sales, pred.reg.rpart, probs=probs)
@@ -442,6 +451,9 @@ kable(pred.reg.rpart.cm)
 |actual: 80%- |          0|        0.0|        8.0|          6|       2.00|        0.62|
 |actual: 80%+ |          0|        0.0|        0.0|          0|      16.00|        0.00|
 |Use Error    |          0|        0.4|        0.5|          0|       0.11|        0.29|
+
+
+
 
 
 {% highlight r %}
@@ -523,7 +535,7 @@ prp(mod.reg.caret
 
 
 {% highlight text %}
-## cex 0.512   xlim c(0, 1)   ylim c(0, 1)
+## cex 0.65   xlim c(0, 1)   ylim c(0, 1)
 {% endhighlight %}
 
 ![center](/figs/2015-02-14-Tree-Based-Methods-Part-III-Regression/model_tree-1.png) 

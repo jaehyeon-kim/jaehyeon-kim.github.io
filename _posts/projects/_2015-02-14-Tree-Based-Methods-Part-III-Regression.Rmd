@@ -212,11 +212,17 @@ fit.reg.caret.cm = regCM(trainData.reg$Sales, fit.reg.caret, probs=probs, type="
 kable(fit.reg.caret.cm)
 ```
 
+
+
+
 ```{r fit_rpart_cm, message=FALSE, warning=FALSE}
 # regression - rpart
 fit.reg.rpart.cm = regCM(trainData.reg$Sales, fit.reg.rpart, probs=probs, type="Fitted")
 kable(fit.reg.rpart.cm)
 ```
+
+
+
 
 ```{r fitted_rmse, message=FALSE, warning=FALSE}
 # fitted RMSE
@@ -242,11 +248,17 @@ pred.reg.caret.cm = regCM(testData.reg$Sales, pred.reg.caret, probs=probs)
 kable(pred.reg.caret.cm)
 ```
 
+
+
+
 ```{r pred_rpart_cm, message=FALSE, warning=FALSE}
 # regression - rpart
 pred.reg.rpart.cm = regCM(testData.reg$Sales, pred.reg.rpart, probs=probs)
 kable(pred.reg.rpart.cm)
 ```
+
+
+
 
 ```{r pred_rmse, message=FALSE, warning=FALSE}
 pred.reg.caret.rmse = sqrt(sum(testData.reg$Sales-pred.reg.caret)^2/length(testData.reg$Sales))
@@ -260,7 +272,7 @@ Even on the test data, the model by the *caret* package performs well and it see
 
 Below shows some plots on the model by the *caret* package on the test data.
 
-```{r caret_test, message=FALSE, warning=FALSE}
+```{r caret_test, message=FALSE, warning=FALSE, fig.height=6}
 ## plot actual vs prediced and resid vs fitted
 mod.reg.caret.test = rpart(Sales ~ ., data=testData.reg, control=rpart.control(cp=cp.reg.caret))
 predDF = data.frame(actual=testData.reg$Sales
@@ -282,7 +294,7 @@ grid.arrange(actual.plot, resid.plot, ncol = 2)
 
 Finally the following shows the CART model tree on the training data.
 
-```{r model_tree, message=FALSE, warning=FALSE}
+```{r model_tree, message=FALSE, warning=FALSE, fig.width=9, fig.height=8}
 # plot tree
 cols <- ifelse(mod.reg.caret$frame$yval > 8,"green4","darkred") # green if high
 prp(mod.reg.caret
