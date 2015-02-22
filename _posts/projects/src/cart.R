@@ -11,10 +11,10 @@
 # https://gist.github.com/jaehyeon-kim/5622ae9fa982e0b46550
 # 
 # Their usage can be found in
-# link 1
+# http://jaehyeon-kim.github.io/r/2015/02/21/Quick-Trial-of-Turning-Analysis-into-S3-Object/
 # link 2
 #
-# last modified on Feb 21, 2015
+# last modified on Feb 22, 2015
 #
 cartRPART = function(trainData, testData=NULL, formula, ...) {
   if(class(trainData) != "data.frame" & ifelse(is.null(testData),TRUE,class(testData)=="data.frame"))
@@ -48,13 +48,14 @@ cartRPART = function(trainData, testData=NULL, formula, ...) {
       ftd = predict(fit, newdata=data, type="class")
       cm = table(actual=data[,res.ind], fitted=ftd)
       cm.up = updateCM(cm,type=ifelse(isTest,"Ptd","Ftd"))
+      err = cm.up[nrow(cm.up),ncol(cm.up)]
     } else {
       ftd = predict(fit, newdata=data)
       cm.up = regCM(data[,res.ind],ftd,probs=c(0.25,0.5,0.75),ifelse(isTest,"Ptd","Ftd"))
+      err = round(sqrt(sum(data[,res.ind]-ftd)^2/length(data[,res.ind])),6)
     }
-    mmce = list(pkg="rpart",isTest=isTest,isSE=isSE
-                ,cp=round(param,4),mmce=cm.up[nrow(cm.up),ncol(cm.up)])
-    list(ftd=ftd,cm=cm.up,mmce=mmce)
+    error = list(pkg="rpart",isTest=isTest,isSE=isSE,cp=round(param,4),error=err)
+    list(ftd=ftd,cm=cm.up,error=error)
   }
   # $train.lst (3)
   train.perf.lst = perf(mod,trainData,res.name,cp,FALSE,FALSE)
@@ -101,7 +102,7 @@ plot.rpartExt = function(x, ...) {
 
 ## create modCARET class
 cartCARET = function(trainData, testData=NULL, formula
-                     ,fitInd=FALSE, tuneLen=20, method="repeatedcv", nDiv=10, nRep=5) {
+                     ,fitInd=FALSE, tuneLen=30, method="repeatedcv", nDiv=10, nRep=5) {
   if(class(trainData) != "data.frame" & ifelse(is.null(testData),TRUE,class(testData)=="data.frame"))
     stop("data frames should be entered for train and test (if any) data")
   # extract response name and index
@@ -152,13 +153,14 @@ cartCARET = function(trainData, testData=NULL, formula
     ftd = predict(model, newdata=data)    
     if(class(data[,res.ind])=="factor") {
       cm = table(actual=data[,res.ind], fitted=ftd)
-      cm.up = updateCM(cm,type=ifelse(isTest,"Ptd","Ftd"))      
+      cm.up = updateCM(cm,type=ifelse(isTest,"Ptd","Ftd"))
+      err = cm.up[nrow(cm.up),ncol(cm.up)]
     } else {
       cm.up = regCM(data[,res.ind],ftd,probs=c(0.25,0.5,0.75),ifelse(isTest,"Ptd","Ftd"))
+      err = round(sqrt(sum(data[,res.ind]-ftd)^2/length(data[,res.ind])),6)
     }
-    mmce = list(pkg="caret",isTest=isTest,isSE=isSE
-                ,cp=round(param,4),mmce=cm.up[nrow(cm.up),ncol(cm.up)])
-    list(ftd=ftd,cm=cm.up,mmce=mmce)
+    error = list(pkg="caret",isTest=isTest,isSE=isSE,cp=round(param,4),error=err)
+    list(ftd=ftd,cm=cm.up,error=error)
   }
   train.perf.lst = perf(mod,trainData,res.name,cp,FALSE,FALSE)
   if(!is.null(testData)) {
@@ -167,8 +169,7 @@ cartCARET = function(trainData, testData=NULL, formula
     test.perf.lst = ls()
   }    
   # update results
-  result = list(rpt=rpt,mod=mod,cp=cp
-                ,train.lst=train.perf.lst,test.lst=test.perf.lst)
+  result = list(rpt=rpt,mod=mod,cp=cp,train.lst=train.perf.lst,test.lst=test.perf.lst)
   # add class name
   class(result) = c("rpartExtCrt","rpartExt")
   return(result)
@@ -176,7 +177,7 @@ cartCARET = function(trainData, testData=NULL, formula
 
 ## create modCARET class
 cartMLR = function(trainData, testData=NULL, formula
-                   ,fitInd=FALSE, tuneLen=20, method="RepCV", nDiv=10, nRep=5) {
+                   ,fitInd=FALSE, tuneLen=30, method="RepCV", nDiv=10, nRep=5) {
   if(class(trainData) != "data.frame" & ifelse(is.null(testData),TRUE,class(testData)=="data.frame"))
     stop("data frames should be entered for train and test (if any) data")
   # extract response name and index
@@ -255,13 +256,14 @@ cartMLR = function(trainData, testData=NULL, formula
     ftd = predict(mod, newdata=data)$data
     if(class(data[,res.ind]) == "factor") {
       cm = table(actual=ftd$truth, fitted=ftd$response)
-      cm.up = updateCM(cm,type=ifelse(isTest,"Ptd","Ftd"))      
+      cm.up = updateCM(cm,type=ifelse(isTest,"Ptd","Ftd"))
+      err = cm.up[nrow(cm.up),ncol(cm.up)]
     } else {
-      cm.up = regCM(ftd$truth,ftd$response,probs=c(0.25,0.5,0.75),ifelse(isTest,"Ptd","Ftd"))
+      cm.up = regCM(data[,res.ind],ftd$response,probs=c(0.25,0.5,0.75),ifelse(isTest,"Ptd","Ftd"))
+      err = round(sqrt(sum(data[,res.ind]-ftd$response)^2/length(data[,res.ind])),6)
     }
-    mmce = list(pkg="mlr",isTest=isTest,isSE=isSE
-                ,cp=round(param,4),mmce=cm.up[nrow(cm.up),ncol(cm.up)])
-    list(ftd=ftd,cm=cm.up,mmce=mmce)
+    error = list(pkg="mlr",isTest=isTest,isSE=isSE,cp=round(param,4),error=err)
+    list(ftd=ftd,cm=cm.up,error=error)
   }
   train.perf.lst = perf(mod,trainData,res.name,cp[[1]],FALSE,FALSE)
   if(!is.null(testData)) {

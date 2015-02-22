@@ -16,30 +16,39 @@ testData.cl = data.cl[-trainIndex,]
 trainData.rg = data.rg[trainIndex,]
 testData.rg = data.rg[-trainIndex,]
 
-## import constructors of S3 objects
+## import constructors
 source("src/cart.R")
 
 ## classification
 set.seed(12357)
 rpt.cl = cartRPART(trainData.cl,testData.cl,formula="High ~ .")
-crt.cl = cartCARET(trainData.cl,testData.cl,formula="High ~ .")
-mlr.cl = cartMLR(trainData.cl,testData.cl,formula="High ~ .")
+crt.cl = cartCARET(trainData.cl,testData.cl,formula="High ~ .",fitInd=TRUE)
+mlr.cl = cartMLR(trainData.cl,testData.cl,formula="High ~ .",fitInd=TRUE)
+
+## classes and attributes
+data.frame(rpart=c(class(rpt.cl),""),caret=class(crt.cl),mlr=class(crt.cl))
+
+attributes(rpt.cl)$names
+attributes(crt.cl)$names
+attributes(mlr.cl)$names
+attributes(crt.cl$rpt)$names
+
 
 # comparison
-perf.cl = list(rpt.cl$train.lst$mmce,rpt.cl$train.se$mmce
-               ,rpt.cl$test.lst$mmce,rpt.cl$test.se$mmce
-               ,crt.cl$train.lst$mmce,crt.cl$test.lst$mmce
-               ,mlr.cl$train.lst$mmce,mlr.cl$test.lst$mmce)
+perf.cl = list(rpt.cl$train.lst$error,rpt.cl$train.se$error
+               ,rpt.cl$test.lst$error,rpt.cl$test.se$error
+               ,crt.cl$train.lst$error,crt.cl$test.lst$error
+               ,mlr.cl$train.lst$error,mlr.cl$test.lst$error)
 
-mmce = function(mmce.vec) {
-  out = list(unlist(mmce.vec[[1]]))
-  for(i in 2:length(mmce.vec)) {
-    out[[length(out)+1]] = unlist(mmce.vec[[i]])
+err = function(perf) {
+  out = list(unlist(perf[[1]]))
+  for(i in 2:length(perf)) {
+    out[[length(out)+1]] = unlist(perf[[i]])
   }
   t(sapply(out,unlist))
 }
 
-mmce(perf.cl)
+err(perf.cl)
 
 ## regression
 set.seed(12357)
@@ -48,15 +57,9 @@ crt.rg = cartCARET(trainData.rg,testData.rg,formula="Sales ~ .")
 mlr.rg = cartMLR(trainData.rg,testData.rg,formula="Sales ~ .")
 
 # comparison
-perf.rg = list(rpt.rg$train.lst$mmce,rpt.rg$train.se$mmce
-               ,rpt.rg$test.lst$mmce,rpt.rg$test.se$mmce
-               ,crt.rg$train.lst$mmce,crt.rg$test.lst$mmce
-               ,mlr.rg$train.lst$mmce,mlr.rg$test.lst$mmce)
+perf.rg = list(rpt.rg$train.lst$error,rpt.rg$train.se$error
+               ,rpt.rg$test.lst$error,rpt.rg$test.se$error
+               ,crt.rg$train.lst$error,crt.rg$test.lst$error
+               ,mlr.rg$train.lst$error,mlr.rg$test.lst$error)
 
-mmce(perf.rg)
-
-# caret doesn't include 0 in tuneLength
-head(crt.rg$mod$result,2)
-
-# rpart plots
-plot(rpt.cl)
+err(perf.rg)
