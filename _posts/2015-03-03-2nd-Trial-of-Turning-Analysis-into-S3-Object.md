@@ -31,7 +31,8 @@ Before getting started, note that the source of the classes can be found in [thi
 
 The bootstrap samples are created using the **mlr** package (`makeResampleInstance()`). Note that a sample is discarded if the *cp* values are not obtained - *cnt* is added by 1 only if the sum of *cp* values is not 0 where 0 is assigned as *cp* values when an error is encountered (see the *tryCatch* block).
 
-```{r selection, message=FALSE, warning=FALSE, eval=FALSE}
+
+{% highlight r %}
 cnt = 0
 while(cnt < ntree) {
   # create resample description and task
@@ -60,11 +61,12 @@ while(cnt < ntree) {
     cnt = cnt + 1
   ...
 }
-```
+{% endhighlight %}
 
 Data is split as usual.
 
-```{r data, message=FALSE, warning=FALSE}
+
+{% highlight r %}
 ## data
 require(ISLR)
 data(Carseats)
@@ -80,17 +82,18 @@ set.seed(1237)
 trainIndex = createDataPartition(Carseats$High, p=0.8, list=FALSE, times=1)
 trainData.cl = data.cl[trainIndex,]
 testData.cl = data.cl[-trainIndex,]
-```
+{% endhighlight %}
 
 The class is instantiated after importing the constructors.
 
-```{r fit, message=FALSE, warning=FALSE}
+
+{% highlight r %}
 ## run rpartDT
 # import constructors
 source("src/cart.R")
 set.seed(12357)
 cl = cartDT(trainData.cl, testData.cl, "High ~ .", ntree=10)
-```
+{% endhighlight %}
 
 The naming rule is shown below.
 
@@ -100,31 +103,89 @@ The naming rule is shown below.
 - oob (test) - out-of-bag (test) data
 - ind (cum) - individual (cumulative) values
 
-```{r class, message=FALSE, warning=FALSE}
+
+{% highlight r %}
 names(cl)
-```
+{% endhighlight %}
+
+
+
+{% highlight text %}
+##  [1] "rpt"             "boot.cp"         "varImp.lst"     
+##  [4] "ind.varImp.lst"  "cum.varImp.lst"  "varImp.se"      
+##  [7] "ind.varImp.se"   "cum.varImp.se"   "ind.oob.lst"    
+## [10] "ind.oob.lst.err" "cum.oob.lst"     "cum.oob.lst.err"
+## [13] "ind.oob.se"      "ind.oob.se.err"  "cum.oob.se"     
+## [16] "cum.oob.se.err"  "ind.tst.lst"     "ind.tst.lst.err"
+## [19] "cum.tst.lst"     "cum.tst.lst.err" "ind.tst.se"     
+## [22] "ind.tst.se.err"  "cum.tst.se"      "cum.tst.se.err"
+{% endhighlight %}
 
 The summary of the *cp* values of the bagged trees are shown below, followed by the single tree's *cp* value at the least *xerror*.
 
-```{r cp, message=FALSE, warning=FALSE}
+
+{% highlight r %}
 ## cp values
 # cart
 cl$rpt$cp[1,][[1]]
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## [1] 0.01136364
+{% endhighlight %}
+
+
+
+{% highlight r %}
 # bagging
 summary(t(cl$boot.cp)[,2])
-```
+{% endhighlight %}
+
+
+
+{% highlight text %}
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## 0.000000 0.000000 0.003788 0.005303 0.007576 0.022730
+{% endhighlight %}
 
 Selective individual and cumulative fitted values are shown below. Don't be confused with the first column as it is the response values of the entire training data - each fitted value column has its own sample number.
 
-```{r fitted, message=FALSE, warning=FALSE}
+
+{% highlight r %}
 ## fitted values
 # individual - each oob sample
 cl$ind.oob.lst[3:6,1:8]
+{% endhighlight %}
 
+
+
+{% highlight text %}
+##    res  s.1  s.2  s.3  s.4  s.5  s.6  s.7
+## 3 High <NA> <NA>   No   No   No   No   No
+## 4   No <NA> <NA>   No High High <NA> High
+## 6 High <NA> High <NA> <NA> High <NA>   No
+## 7   No <NA> <NA> <NA> <NA> High   No   No
+{% endhighlight %}
+
+
+
+{% highlight r %}
 # cumulative - majority vote or average
 # 1. not used - NA, 2. used once - get name, 3. tie - NA, 4. name at max number of labels
 cl$cum.oob.lst[3:6,1:8]
-```
+{% endhighlight %}
+
+
+
+{% highlight text %}
+##    res  s.1  s.2  s.3  s.4  s.5  s.6  s.7
+## 3 High <NA> <NA>   No   No   No   No   No
+## 4   No <NA> <NA>   No <NA> High High High
+## 6 High <NA> High High High High High High
+## 7   No <NA> <NA> <NA> <NA> High <NA>   No
+{% endhighlight %}
 
 Given a data frame of fitted values of individual trees (*fit*), the fitted values are averaged depending on the class of the respose - majority vote if *factor* or average if *numeric*. For a *numeric* response, `average()` is applied in an expanding way column-wise while a vectorized function (`retVote()`) is created for a *factor* response with the following rules in order.
 
@@ -135,7 +196,8 @@ Given a data frame of fitted values of individual trees (*fit*), the fitted valu
 
 Note that, as the first column has response values, it is excluded and, although `retCum()` updates values in a way that is vectorized row-wise, it has to be 'for-looped' column-wise. By far this part is the biggest bottleneck and it should be enhanced in the future - the way how *factor* response variables are updated makes it longer to perform classification tasks.
 
-```{r cum, message=FALSE, warning=FALSE, eval=FALSE}
+
+{% highlight r %}
 # function to update fitted values - majority vote or average
 # response kept in 1st column, should be excluded
 retCum = function(fit) {
@@ -168,11 +230,12 @@ retCum = function(fit) {
   }
   cum.fit
 }
-```
+{% endhighlight %}
 
 Given a data frame of fitted values (*fit*), *mmce* or *rmse* are obtained depending on the class of the response. Note that, as the first column has response values, it is excluded.
 
-```{r err_fcn, message=FALSE, warning=FALSE, eval=FALSE}
+
+{% highlight r %}
 # function to updated errors - mmce or rmse
 # response kept in 1st column, should be excluded
 retErr = function(fit) {
@@ -189,29 +252,87 @@ retErr = function(fit) {
   }
   err[2:length(err)]
 }
-```
+{% endhighlight %}
 
 Selective individual and cumulative errors of bagged trees are shown below.
 
-```{r err, message=FALSE, warning=FALSE}
+
+{% highlight r %}
 # individual error
 round(cl$ind.oob.lst.err[1:7],4)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+##      s.1   s.2    s.3    s.4    s.5    s.6    s.7
+## 1 0.3417 0.248 0.2373 0.3471 0.2437 0.3162 0.3017
+{% endhighlight %}
+
+
+
+{% highlight r %}
 # cumulative error
 round(cl$cum.oob.lst.err[1:7],4)
-```
+{% endhighlight %}
+
+
+
+{% highlight text %}
+##      s.1    s.2    s.3    s.4  s.5    s.6    s.7
+## 1 0.3417 0.2697 0.2691 0.2445 0.25 0.2564 0.2399
+{% endhighlight %}
 
 Importance of each variable of the single and bagged trees is found below.
 
-```{r vi, message=FALSE, warning=FALSE}
+
+{% highlight r %}
 ## variable importance
 # cart
 data.frame(variable=names(cl$rpt$mod$variable.importance)
            ,value=cl$rpt$mod$variable.importance/sum(cl$rpt$mod$variable.importance)
            ,row.names=NULL)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+##      variable       value
+## 1       Price 0.331472010
+## 2   ShelveLoc 0.292989310
+## 3         Age 0.105875102
+## 4 Advertising 0.100231974
+## 5   CompPrice 0.085284347
+## 6      Income 0.067056406
+## 7  Population 0.014197379
+## 8   Education 0.002893471
+{% endhighlight %}
+
+
+
+{% highlight r %}
 # bagging - cumulative
 ntree = 10
 data.frame(variable=rownames(cl$cum.varImp.lst)
            ,value=cl$cum.varImp.lst[,ntree])
-```
+{% endhighlight %}
+
+
+
+{% highlight text %}
+##       variable      value
+## 1  Advertising 0.10420483
+## 2          Age 0.13376989
+## 3    CompPrice 0.14935661
+## 4    Education 0.03494124
+## 5       Income 0.08071209
+## 6   Population 0.06293981
+## 7        Price 0.21012575
+## 8    ShelveLoc 0.16739729
+## 9        Urban 0.01013187
+## 10          US 0.04642062
+{% endhighlight %}
 
 In the next two articles, the CART analysis will be evaluated using the same data as regression and classification tasks.
+
+<script src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type="text/javascript"></script>
