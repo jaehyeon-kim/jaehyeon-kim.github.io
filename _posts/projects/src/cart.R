@@ -17,9 +17,9 @@
 # cartCARET() and cartMLR()
 # - http://jaehyeon-kim.github.io/r/2015/02/23/Tree-Based-Methods-Part-IV-Packages-Comparison-in-S3/
 # cartDT()
-# - 
+# - http://jaehyeon-kim.github.io/r/2015/03/03/2nd-Trial-of-Turning-Analysis-into-S3-Object/
 #
-# last modified on Mar 1, 2015
+# last modified on Mar 3, 2015
 #
 cartRPART = function(trainData, testData=NULL, formula, ...) {
   if(class(trainData) != "data.frame" & ifelse(is.null(testData),TRUE,class(testData)=="data.frame"))
@@ -284,7 +284,7 @@ cartMLR = function(trainData, testData=NULL, formula
   return(result)
 }
 
-cartDT = function(trainData, testData=NULL, formula, ntree = 2, ...) {
+cartDT = function(trainData, testData=NULL, formula, ntree = 2, isStratify = FALSE, ...) {
   if(class(trainData) != "data.frame" & ifelse(is.null(testData),TRUE,class(testData)=="data.frame"))
     stop("data frames should be entered for train and test (if any) data")  
   # extract response name and index
@@ -334,7 +334,7 @@ cartDT = function(trainData, testData=NULL, formula, ntree = 2, ...) {
       boot.desc = makeResampleDesc(method="Bootstrap", stratify=FALSE, iters=1)
       boot.task = makeRegrTask(data=trainData,target=res.name)
     } else {
-      boot.desc = makeResampleDesc(method="Bootstrap", stratify=TRUE, iters=1)
+      boot.desc = makeResampleDesc(method="Bootstrap", stratify=isStratify, iters=1)
       boot.task = makeClassifTask(data=trainData,target=res.name)
     }
     # create bootstrap instance and split data - in-bag and out-of-bag

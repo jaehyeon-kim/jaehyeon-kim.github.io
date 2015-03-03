@@ -40,7 +40,8 @@ while(cnt < ntree) {
     boot.desc = makeResampleDesc(method="Bootstrap", stratify=FALSE, iters=1)
     boot.task = makeRegrTask(data=trainData,target=res.name)
   } else {
-    boot.desc = makeResampleDesc(method="Bootstrap", stratify=TRUE, iters=1)
+    # isStratify set to FALSE by default
+    boot.desc = makeResampleDesc(method="Bootstrap", stratify=isStratify, iters=1)
     boot.task = makeClassifTask(data=trainData,target=res.name)
   }
   # create bootstrap instance and split data - in-bag and out-of-bag
