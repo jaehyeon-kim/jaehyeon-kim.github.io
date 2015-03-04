@@ -7,7 +7,7 @@ tags: [rpart, caret, mlr, dplyr, ggplot2]
 ---
 {% include JB/setup %}
 
-A regression tree is evaluated using bagged trees in the [previous article](). In this article, the response variable of the same data set is converted into a binary factor variable and a classification tree is evaluated by comparing to bagged trees' individual oob/test errors, cumulative oob/test errors and variable importance measures.
+A regression tree is evaluated using bagged trees in the [previous article](http://jaehyeon-kim.github.io/r/2015/03/05/Tree-Based-Methods-Part-V-Regression-Evaluation/). In this article, the response variable of the same data set is converted into a binary factor variable and a classification tree is evaluated by comparing to bagged trees' individual oob/test errors, cumulative oob/test errors and variable importance measures.
 
 Before getting started, note that the source of the classes can be found in [this gist](https://gist.github.com/jaehyeon-kim/b89dcbd2fb0b84fd236e) and, together with the relevant packages (see *tags*), it requires a utility function (`bestParam()`) that can be found [here](https://gist.github.com/jaehyeon-kim/5622ae9fa982e0b46550).
 
