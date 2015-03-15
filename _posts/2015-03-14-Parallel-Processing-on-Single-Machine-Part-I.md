@@ -160,7 +160,7 @@ ggplot(data=sysTime, aes(x=fun,y=elapsed,fill=fun)) +
 reset("parallel")
 {% endhighlight %}
 
-## CASE II - I/O operations matters
+## CASE II - I/O operation matters
 
 In this example, a case where an argument is sent to workers is considered. While the argument is passed to wokers once for each task by `clusterApply()` and `clusterApplyLB()`, it is sent to each chunk once by `parLapply()` and `parLapplyLB()`. Therefore the benefit of the latter group of functions can be outstanding in this example - it can be checked workers are idle inbetween in the first two plots while tasks are performed continuously in the last plot.
 
