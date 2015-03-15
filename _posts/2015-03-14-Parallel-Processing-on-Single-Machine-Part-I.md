@@ -3,7 +3,7 @@ layout: post
 title: "2015-03-14-Parallel-Processing-on-Single-Machine-Part-I"
 description: ""
 category: R
-tags: [snow, parallel, rlecuyer, MASS, ggplot2]
+tags: [snow, parallel, rlecuyer, MASS, ggplot2, programming]
 ---
 {% include JB/setup %}
 
