@@ -7,7 +7,7 @@ tags: [foreach, doParallel, parallel, iterators, programming]
 ---
 {% include JB/setup %}
 
-In the [previous article](http://jaehyeon-kim.github.io/r/2015/03/14/Parallel-Processing-on-Single-Machine-Part-I/), parallel processing on a single machine using the **snow** and **parallel** packages are introduced. The four functions are an extension of `lapply()` with an additional argument that specifies a cluster object. In spite of their effectiveness and ease of use, there may be cases where creating a function that can be sent into clusters is not easy or looping may be more natural. In this article, another way of implementing parallel processing on a single machine is introduced using the **foreach** and **doParallel** packages where clusters using the socket transport are created using the **parallel** package. Finally the **iterators** package is briefly covered. The examples here are largely based on the individual packages' vignettes and further details can be found there.
+In the [previous article](http://jaehyeon-kim.github.io/r/2015/03/14/Parallel-Processing-on-Single-Machine-Part-I/), parallel processing on a single machine using the **snow** and **parallel** packages are introduced. The four functions are an extension of `lapply()` with an additional argument that specifies a cluster object. In spite of their effectiveness and ease of use, there may be cases where creating a function that can be sent into clusters is not easy or looping may be more natural. In this article, another way of implementing parallel processing on a single machine is introduced using the **foreach** and **doParallel** packages where clusters are created by the **parallel** package. Finally the **iterators** package is briefly covered as it can facilitate writing a loop. The examples here are largely based on the individual packages' vignettes and further details can be found there.
 
 Let's get started.
 
@@ -81,7 +81,7 @@ system.time(foreach(i=1:4) %do% Sys.sleep(i))
 
 {% highlight text %}
 ##    user  system elapsed 
-##   0.026   0.069  10.007
+##   0.010   0.084  10.006
 {% endhighlight %}
 
 
@@ -96,7 +96,7 @@ system.time(foreach(i=1:4) %dopar% Sys.sleep(i))
 
 {% highlight text %}
 ##    user  system elapsed 
-##   0.025   0.024   4.061
+##   0.013   0.033   4.056
 {% endhighlight %}
 
 
