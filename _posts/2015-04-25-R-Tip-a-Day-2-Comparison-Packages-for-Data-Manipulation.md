@@ -209,7 +209,7 @@ ggplot(times[-2, ], aes(x = package, y = elapsed, fill = package)) +
   geom_bar(stat = "identity") + ggtitle("Elapsed time of each package")
 {% endhighlight %}
 
-![center](./figs/2015-04-25-R-Tip-a-Day-2-Comparison-Packages-for-Data-Manipulation/speed-1.png) 
+![center](/figs/2015-04-25-R-Tip-a-Day-2-Comparison-Packages-for-Data-Manipulation/speed-1.png) 
 
 ### session information
 
