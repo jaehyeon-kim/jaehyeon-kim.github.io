@@ -21,7 +21,7 @@ knitPost <- function(title, base.url = "") {
   knit(paste0("_",title,".Rmd"), paste0("../",title,".md"), envir = parent.frame())
   
   # move fig files
-  moveFigs(fig.path)
+  try(moveFigs(fig.path), TRUE)
 }
 
 moveFigs <- function(fig.path, ...) {
