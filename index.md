@@ -4,9 +4,9 @@ title: Journey of Full Stack Data Products Development
 ---
 {% include JB/setup %}
 
-## Background
+### Background
 
-I studied economics and actuarial studies but I have been developing applications/database over the course of my major career. Due to the mixed backgrounds, I become interested in *full stack data product development*. The term of **data product** is borrowed from [data science specialization](https://www.coursera.org/specialization/jhudatascience/1) of Coursera while *full stack development* is from the developer community.
+I studied economics and actuarial studies but I have been developing applications/database over the course of my major career. Due to the mixed backgrounds, I become interested in *full stack data product development*. The term of **data product** is borrowed from [data science specialization](https://www.coursera.org/specialization/jhudatascience/1) of Coursera while **full stack development** is from the developer community.
 
 For statistical or machine learning analysis, a process may be considered roughly as following.
 
