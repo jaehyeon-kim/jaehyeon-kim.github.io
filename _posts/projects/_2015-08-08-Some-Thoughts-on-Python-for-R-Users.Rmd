@@ -169,5 +169,5 @@ On the other hand, if I use the RCurl package, I have to send the following SOAP
 DEBUG:suds.client:headers = {'SOAPAction': '"http://api.eyeblaster.com/IAdvertiserService/GetAdvertisers"', 'Content-Type': 'text/xml; charset=utf-8'}
 ```
 
-I guess most R users are not programmers but many of them are quite good at understanding how a program works. Therefore, if there is an area that R is not strong, it'd be alright to consider another language to make life easier. Among those, I consider Python is easy to learn and it can provide a range of good tools. If you're interested, please see my next article about [some thoughts on Python]().
+I guess most R users are not programmers but many of them are quite good at understanding how a program works. Therefore, if there is an area that R is not strong, it'd be alright to consider another language to make life easier. Among those, I consider Python is easy to learn and it can provide a range of good tools. If you're interested, please see my next article about [some thoughts on Python](http://jaehyeon-kim.github.io/python/2015/08/08/Some-Thoughts-on-Python/).
 
