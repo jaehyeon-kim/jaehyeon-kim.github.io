@@ -22,23 +22,23 @@ Then, as seen in *example.py*, advertiser details can be requested by `Advertise
 
 Recently I happened to find a book titled [Introducing Python: Modern Computing in Simple Packages]( http://shop.oreilly.com/product/0636920028659.do). A more generic explanation would be made using it. Its table of contents with some grouping is listed below.
 
--**Intro**
---Chapter 1, A Taste of Py
--**Common Features**
---Chapter 2, Py Ingredients: Numbers, Strings, and Variables
---Chapter 3, Py Filling: Lists, Tuples, Dictionaries, and Sets
---Chapter 4, Py Crust: Code Structures
---Chapter 5, Py Boxes: Modules, Packages, and Programs
--**OOP**
---Chapter 6, Oh Oh: Objects and Classes
--**Application**
---Chapter 7, Mangle Data Like a Pro
---Chapter 8, Data Has to Go Somewhere
---Chapter 9, The Web, Untangled
---Chapter 10, Systems
---Chapter 11, Concurrency and Networks
--**A typical development workflow**
---Chapter 12, Be a Pythonista
+*_Intro_
+    --Chapter 1, A Taste of Py
+*_Common Features_
+    +Chapter 2, Py Ingredients: Numbers, Strings, and Variables
+    +Chapter 3, Py Filling: Lists, Tuples, Dictionaries, and Sets
+    +Chapter 4, Py Crust: Code Structures
+    +Chapter 5, Py Boxes: Modules, Packages, and Programs
+*_OOP_
+    +Chapter 6, Oh Oh: Objects and Classes
+*_Application_
+    +Chapter 7, Mangle Data Like a Pro
+    +Chapter 8, Data Has to Go Somewhere
+    +Chapter 9, The Web, Untangled
+    +Chapter 10, Systems
+    +Chapter 11, Concurrency and Networks
+*_A typical development workflow_
+    +Chapter 12, Be a Pythonista
 
 Beginning with an introduction in Chapter 1, it covers the common features in Chapter 2 to 5 and OOP is the topic of Chapter 6. Up to this, the fundamentals of Python are covered and the rest can be considered as applications. Specifically text and Unicode data can be handled (Chapter 7), data can be processed to and from external data sources (Chapter 8), web services can be consumed/produced (Chapter 9), system functions (file, directory...) can be accessed/modified (Chapter 10) and performance can be improved (Chapter 11).  Note that, for the application parts, it should be understood what to do well. For example, it is hardly successful to process data to/from a database if one doesn't know how database works.
 
