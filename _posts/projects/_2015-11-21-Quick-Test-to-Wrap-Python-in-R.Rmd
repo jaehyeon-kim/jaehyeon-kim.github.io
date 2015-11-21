@@ -11,7 +11,7 @@ As mentioned in an [earlier post](http://jaehyeon-kim.github.io/python/2015/08/0
 
 If there isn't a comprehensive *R-way* of doing something yet, it may be necessary to create it from scratch. Actually there are some options to do so by using [AWS Command Line Interface](https://aws.amazon.com/cli/), [AWS REST API](http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html) or wrapping functionality of another language.
 
-In this post, a quick summary of the last way using Python is illustrated by introducting the **rs3helper** package.
+In this post, a quick summary of the last way using Python is illustrated by introducting the [rs3helper](https://github.com/jaehyeon-kim/rs3helper) package.
 
 The reasons why I've come up with a package are as following.
 
