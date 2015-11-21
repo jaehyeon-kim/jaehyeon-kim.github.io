@@ -29,7 +29,7 @@ An example of the wrapper functions, which looks up a bucket, is shown below.
 
 **Python**: `connect_to_s3()` and `lookup_bucket()` are imported to *inst/python/lookup_bucket.py* from *inst/python/s3helper.py*. The script requires 4 mandatory/optional argumens and prints the response after converting it into JSON string.
 
-```python
+{% highlight python %}
 ## in inst/python/s3helper.py
 import boto
 from boto.s3.connection import OrdinaryCallingFormat
@@ -64,9 +64,9 @@ def lookup_bucket(conn, bucket_name):
     else:
         response = {'bucket': bucket_name, 'is_exist': None, 'message': 'connection is not made'}
     return response
-```
+{% endhighlight %}
 
-```python
+{% highlight python %}
 ## in inst/python/lookup_bucket.py
 import json
 import argparse
@@ -85,7 +85,7 @@ conn = connect_to_s3(args.access_key_id, args.secret_access_key, args.region)
 response = lookup_bucket(conn, args.bucket_name)
 
 print(json.dumps(response))
-```
+{% endhighlight %}
 
 **R**: `lookup_bucket()` generates the path where *inst/python/lookup_bucket.py* exists and constructs the command to be executed in `system()` - the *intern* argument should be *TRUE* to grap the printed JSON string. Then it parses the returned JSON string into a R object using the **jsoinlite** package.
 
