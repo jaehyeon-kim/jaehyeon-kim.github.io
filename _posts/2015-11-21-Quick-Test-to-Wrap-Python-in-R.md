@@ -16,14 +16,14 @@ In this post, a quick summary of the last way using Python is illustrated by int
 The reasons why I've come up with a package are as following.
 
 * Firstly, Python is relatively easy to learn and it has quite a comprehensive interface to Amazon Web Services - [boto](http://boto.cloudhackers.com/en/latest/).
-* Secondly, in order to call Python in R, the [rPython](http://rpython.r-forge.r-project.org/) package may be used if it only targets UNIX-like platforms. For cross-platform functionality, howver, `system` command has to be executed. 
+* Secondly, in order to call Python in R, the [rPython](http://rpython.r-forge.r-project.org/) package may be used if it only targets UNIX-like platforms. For cross-platform functionality, however, `system` command has to be executed. 
 * Finally, due to the previous reason, it wouldn't be stable to keep the source files locally and it'd be necessary to keep them in a package.
 
 I use Python 2.7 and the boto library can be installed easily using [pip](http://pip.readthedocs.org/en/stable/quickstart/) by executing `pip install boto`.
 
-Using RStudio, it is not that complicated to develop a package. (see [R packages](http://r-pkgs.had.co.nz/) by Hadley Wickham) Even the folder structure and necessary files are generated if the project type is selected as *R Package*. R script files should locates in the `R` folder while Python scripts should be in `inst/python`. 
+Using RStudio, it is not that complicated to develop a package. (see [R packages](http://r-pkgs.had.co.nz/) by Hadley Wickham) Even the folder structure and necessary files are generated if the project type is selected as *R Package*. R script files should locate in the **R** folder while Python scripts should be in **inst/python**. 
 
-In the package, the s3-related R functions exists in `R/s3utils.R` while the corresponding python scripts are in `inst/python` - all Python functions are in `inst/python/s3helper.py`. As the Python function outputs should be passed to R, a *response* variable is returned for each function and it is converted into JSON string. The response variable is a Python list, dictionary or list of dictionaries and thus it is parsed as R vector, list or data frame.
+In the package, the s3-related R functions exists in **R/s3utils.R** while the corresponding python scripts are in **inst/python** - all Python functions are in **inst/python/s3helper.py**. As the Python function outputs should be passed to R, a *response* variable is returned for each function and it is converted into JSON string. The response variable is a Python list, dictionary or list of dictionaries and thus it is parsed as R vector, list or data frame.
 
 An example of the wrapper functions, which looks up a bucket, is shown below.
 
