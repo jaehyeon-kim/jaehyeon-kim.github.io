@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "2015-11-28-Connecting-to-VirtualBox-via-SSH-And-RStudio-Server"
+title: "2015-11-28-Connecting-to-VirtualBox-Guest-via-SSH-And-RStudio-Server"
 description: ""
 category: R
 tags: [programming]
