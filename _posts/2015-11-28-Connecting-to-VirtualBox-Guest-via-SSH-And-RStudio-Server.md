@@ -19,7 +19,9 @@ Then [OpenSSH Server](https://help.ubuntu.com/lts/serverguide/openssh-server.htm
 
 ```
 sudo apt-get update
+
 sudo apt-get install openssh-server
+
 sudo ufw allow 22
 ```
 
@@ -59,6 +61,7 @@ When I tried to update the package by `sudo apt-get update`, however, _GPG error
 
 ```
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 51716619E084DAB9
+
 sudo apt-get update
 ```
 
@@ -66,6 +69,7 @@ Then I was able to install R and the development packages.
 
 ```
 sudo apt-get install r-base
+
 sudo apt-get install r-base-dev
 ```
 
