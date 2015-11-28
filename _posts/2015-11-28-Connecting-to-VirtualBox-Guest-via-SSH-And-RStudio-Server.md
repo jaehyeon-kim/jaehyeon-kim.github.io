@@ -17,13 +17,13 @@ Once a VM is installed, it is necessary to set up two network adapters: Bridged 
 
 Then [OpenSSH Server](https://help.ubuntu.com/lts/serverguide/openssh-server.html) should be installed in the guest machine and connection via _port 22_ should be allowed - it is the default SSH port. This job can easily be done as following.
 
-```
+{% highlight r %}
 sudo apt-get update
 
 sudo apt-get install openssh-server
 
 sudo ufw allow 22
-```
+{% endhighlight %}
 
 The ip address of the guest can be checked by `ip addr` and it can be used to set up a session in Putty (`user-name@ip-address`).
 
@@ -53,31 +53,31 @@ Putty Terminal may or may not be good to work on and it may be not if R is used 
 
 As the lastest version of R is not included in Ubuntu LTS, it is good to install the latest version as recommended in the [download page](https://www.rstudio.com/products/rstudio/download-server/). I added the following line in `/etc/apt/sources.list`.
 
-```
+{% highlight r %}
 deb https://<my.favorite.cran.mirror>/bin/linux/ubuntu trusty/
-```
+{% endhighlight %}
 
 When I tried to update the package by `sudo apt-get update`, however, _GPG error_  was encountered, indicating *NO_PUBKEY 51716619E084DAB9*. After some search, I was able to resolve it by the following. (See [this](http://ubuntuforums.org/showthread.php?t=1869890))
 
-```
+{% highlight r %}
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 51716619E084DAB9
 
 sudo apt-get update
-```
+{% endhighlight %}
 
 Then I was able to install R and the development packages.
 
-```
+{% highlight r %}
 sudo apt-get install r-base
 
 sudo apt-get install r-base-dev
-```
+{% endhighlight %}
 
 If you need to install a package that requires *curl* and *xml* libraries (eg *devtools*), they should be installed.
 
-```
+{% highlight r %}
 sudo apt-get install libcurl4-openssl-dev libxml2-dev
-```
+{% endhighlight %}
 
 Then Rstudio Server can be connected via a browser of the host machine. Type *guest-ip-address:8787* in the address bar. The guest machine's user name and password can be used to log on. Mine is shown below.
 
