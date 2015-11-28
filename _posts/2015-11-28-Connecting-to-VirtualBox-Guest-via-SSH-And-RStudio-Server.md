@@ -7,7 +7,7 @@ tags: [programming]
 ---
 {% include JB/setup %}
 
-I mainly use Windows but need to work on Linux for development. One way to use Linux on my Windows machine is using [VirtualBox](https://www.virtualbox.org/). I used to have CentOS destop distribution but it was too much as I didn't need most of its desktop features. A Linux server is good for this purpose but it was quite out of hand until I find out a guest machine can be connected via SSH and RStudio Server. In this post, a quick way to connect to a Ubuntu guest via SSH using [Putty](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html) and RStudio Server is illustrated. Also a way to transfer a file between the machines using [WinSCP](http://winscp.net/eng/index.php) is demonstrated.
+I mainly use Windows but need to work on Linux for development. One way to use Linux on my Windows machine is using [VirtualBox](https://www.virtualbox.org/). I used to have CentOS destop distribution but it was too much as I didn't need most of its desktop features. A Linux server is good for this purpose but it was quite out of hand until I found out a guest machine can be connected via SSH and RStudio Server. In this post, a quick way to connect to a Ubuntu guest via SSH using [Putty](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html) and RStudio Server is illustrated. Also a way to transfer a file between the machines using [WinSCP](http://winscp.net/eng/index.php) is demonstrated.
 
 #### SSH
 
