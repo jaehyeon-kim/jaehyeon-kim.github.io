@@ -9,7 +9,7 @@ tags: [programming, AWS, S3]
 
 ### What is rs3helper
 
-**rs3helper** includes a collection of functions to work on [Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/s3/). Each function executes a Python script that performs an action using the [boto S3 library](http://boto.cloudhackers.com/en/latest/ref/s3.html) - [boto](https://github.com/boto/boto) is probably the most popular interface to Amazon Web Services in Python. In this regard, this package can be considered as a R wrapper of Python boto S3 library.
+[rs3helper](https://github.com/jaehyeon-kim/rs3helper) includes a collection of functions to work on [Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/s3/). Each function executes a Python script that performs an action using the [boto S3 library](http://boto.cloudhackers.com/en/latest/ref/s3.html) - [boto](https://github.com/boto/boto) is probably the most popular interface to Amazon Web Services in Python. In this regard, this package can be considered as a R wrapper of Python boto S3 library.
 
 ### Why use Python
 
