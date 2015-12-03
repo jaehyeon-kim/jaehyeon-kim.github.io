@@ -84,7 +84,7 @@ lookup_bucket(access_key_id, secret_access_key, bucket_name = 'rs3helper')
 
 From now on, demonstration will be made using this wrapper function.
 
-## Functions to lookup objects and setting variables
+### Functions to lookup objects and setting variables
 
 As mentioned earlier, connection can be made to a specific region and it can be checked by executing *lookup_region()*. Also a bucket can be created in a specific location and avaialble locations can be looked up by *lookup_location()*. Both of them return a character vector.
 
