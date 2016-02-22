@@ -9,7 +9,7 @@ tags: [programming, Spark]
 
 In an [earlier post](http://jaehyeon-kim.github.io/r/2015/11/28/Connecting-to-VirtualBox-Guest-via-SSH-And-RStudio-Server/), a way to connect an Ubuntu guest to a Windows host on VirtualBox is introduced as well as RStudio server is set up. This article is an extension of the post, which demonstrates how to set up a Spark cluser between 2 Ubuntu guests. Firstly it begins with machine preparation. Once a machine is baked, its image file (*VDI*) can be copied for the second one. Then how to launch a cluster by [standalone mode](http://spark.apache.org/docs/latest/spark-standalone.html) is discussed. Let's get started.
 
-#### Machine preparation
+#### Machine preparation 
 
 If you haven't read the previous post, I recommend to read as it introduces [Putty](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html) as well. Also, as Spark need Java Development Kit (JDK), you may need to _apt-get_ it first - see [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-java-on-ubuntu-with-apt-get) for further details.
 
