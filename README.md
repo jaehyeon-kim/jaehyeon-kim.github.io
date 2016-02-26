@@ -1,49 +1,7 @@
-Jekyll Clean Dark
-============
+This repository includes all sources of [my personal blog](http://jaehyeon-kim.github.com).
 
-This theme was created on top of Jekyll Clean theme by Scotte, you can view the originnal version in action [on his blog](https://scotte.github.io).
+It is cloned from [Jekyll-Bootstrap](http://jekyllbootstrap.com) and the setup is modified from [Jason Fisher's blog](https://github.com/jfisher-usgs/jfisher-usgs.github.com).
 
-* Get it from [github](https://github.com/streetturtle/jekyll-clean-dark).
-* See the [live demo](http://pavelmakhov.com/jekyll-clean-dark).
-* See it [in action on my own blog](http://pavelmakhov.com).
+More resources can be found at [Jekyll QuickStart](http://jekyllbootstrap.com/usage/jekyll-quick-start.html) and [Jekyll-Bootstrap](http://jekyllbootstrap.com/) while this blog's Jekyll build on CentOS and R project setup are going to be posted to the blog.
 
-This theme uses some parts of Twitter Bootstrap, which allows it to look nice on a mobile devices using a collapsable nav bar and hiding the
-sidebar.
-
-Optionally you can use:
-
- - [Disqus](http://disqus.com) as a comments system;
- - [Google Analytics](http://www.google.com/analytics/);
- - [Yandex Metrika](http://metrica.yandex.com);
- - Blog tags.
-
-All these features could be set up in `_config.yml`. Also you can have social icons which could lead to your social acounts. It uses font-awesome, so you can have any icon you want to any social profile. Out-of-the box it has: LinkedIn, GitHub, StackOverflow, LastFm, Instagram. And you can easily add more by adding new style in `theme.css` and setting it in `_config.yml`.
-
-Installation
-==
-
-If you dont't have your own blog you can clone this repository and put your articles in a `_posts` folder.
-If you already have your own blog then I think you can clone this repository and copy-paste content keeping your `_posts` folder.
-
-After you will have to set up your `_config.yml`
-
-License
-=======
-
-The content of this theme is distributed and licensed under a
-[Creative Commons Attribution 4.0 License](https://creativecommons.org/licenses/by/4.0/legalcode)
-
-    This license lets others distribute, remix, tweak, and build upon your work,
-    even commercially, as long as they credit you for the original creation. This
-    is the most accommodating of licenses offered. Recommended for maximum
-    dissemination and use of licensed materials.
-
-In other words: you can do anything you want with this theme on any site, just please
-provide a link to the original theme on github.
-
-This theme includes the following files which are the properties of their
-respective owners:
-
-* js/bootstrap.min.js - [bootstrap](http://getbootstrap.com)
-* css/bootstrap.min.css - [bootstrap](http://getbootstrap.com)
-* js/jquery.min.js - [jquery](https://jquery.com)
+Jekyll-Boostrap is under [MIT License](http://opensource.org/licenses/MIT).
