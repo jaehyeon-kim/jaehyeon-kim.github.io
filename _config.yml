@@ -12,10 +12,10 @@ baseurl: ''
 
 social:
   github: jaehyeon-kim
-  stackoverflow: ''
-  linkedin: jaehyeon-kim
-  instagram: ''
-  lastfm: ''
+  stackoverflow: 4222853/jaehyeon-kim
+  linkedin: jaehyeon-kim-76b93429
+  instagram: 
+  lastfm: 
   rss: feed.xml
 
 # Google Analytics key, leave blank to ignore
