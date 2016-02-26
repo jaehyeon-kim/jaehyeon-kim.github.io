@@ -1,5 +1,19 @@
----
-layout: default
----
-{% include JB/setup %}
-{% include themes/twitter-2.0/page.html %}
+{% include header.html %}
+
+<div class="wrapper">
+  <div class="content">
+    <div class="container container-center">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="well">
+            {{ content }}
+          </div>
+        </div>
+        <div class="col-md-4 hidden-xs">
+          {% include sidebar.html %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% include footer.html %}
+</div>
