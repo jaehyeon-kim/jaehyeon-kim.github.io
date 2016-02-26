@@ -1,7 +1,7 @@
 # Jekyll configuration
 
-name: Blog Name
-description: Software Developer
+name: Jaehyeon's blog
+description: Blog on full stack data product development
 
 # Url is currently only used only for the RSS feed in feed.xml
 url: http://jaehyeon-kim.github.io
