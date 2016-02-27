@@ -1,0 +1,25 @@
+# Site settings
+title: Jaehyeon's blog
+email: dottami@gmail.com
+description: "Blog about data product development"
+baseurl: ""
+url: "http://jaehyeon-kim.github.io"
+#twitter_username: lauriswat
+github_username:  jaehyeon-kim
+
+# disqus
+disqus: jaehyeon
+
+# social
+social:
+  github: jaehyeon-kim
+  stackoverflow: 4222853/jaehyeon-kim
+  linkedin: jaehyeon-kim-76b93429
+
+# Build settings
+markdown: kramdown
+permalink: pretty
+excerpt_separator: "<!-- more -->"
+
+gems:
+  - jekyll-sitemap
