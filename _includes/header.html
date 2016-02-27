@@ -46,6 +46,9 @@
         </button>
         <a class="navbar-brand" href="{{site.baseurl | prepend:site.url}}/">{{ site.name }}</a>
       </div>
+	  <div class="navbar-header">
+	    {% include social.html %}
+	  </div>
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
           <li><a href="{{site.baseurl | prepend:site.url}}/">/home</a></li>
