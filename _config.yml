@@ -1,11 +1,11 @@
 # Site settings
-title: lauris.github.io
-email: lauris@discuss.lv
-description: "Personal blog about programming, hacking, open-source, startups, git, vim, linux, etc."
+title: Jaehyeon's Blog
+email: dottami@gmail.com
+description: "Blog about full stack data product development"
 baseurl: ""
-url: "https://lauris.github.io"
-twitter_username: lauriswat
-github_username:  lauris
+url: "http://jaehyeon-kim.github.io"
+twitter_username: 
+github_username:  jaehyeon-kim
 
 # Build settings
 markdown: kramdown
