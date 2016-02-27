@@ -1,0 +1,106 @@
+---
+layout: post
+title: "2015-01-14-Quick-Trial-to-Add-Column"
+description: ""
+category: R
+tags: [plyr, dplyr, data.table]
+---
+{% include JB/setup %}
+
+This is a quick trial of adding overall and conditional (by user) average columns in a data frame. `base`,`plyr`,`dplyr`,`data.table`,`dplyr + data.table` packages are used. Personally I perfer `dplyr + data.table` - `dplyr` for comperhensive syntax and `data.table` for speed.
+
+```{r setup, warning=FALSE, message=FALSE}
+## set up variables
+size <- 36000
+numUsers <- 4900
+# roughly each user has 7 sessions
+numSessions <- (numUsers / 7) - ((numUsers / 7) %% 1)
+ 
+## create data frame
+set.seed(123457)
+userIds <- sample.int(numUsers, size=size, replace=TRUE)
+ssIds <- sample.int(numSessions, size=size, replace=TRUE)
+scores <- sample.int(10, size=size, replace=TRUE) 
+
+preDf <- data.frame(User=userIds, Session=ssIds, Score=scores)
+preDf$User <- as.factor(preDf$User) 
+```
+
+#### Adding overall average
+
+As calculating overall average is not complicated, I don't find a big difference among packages.
+
+```{r base_overall, message=FALSE, warning=FALSE}
+# base
+system.time(overallDf1 <- transform(preDf, MeanScore=mean(Score, na.rm=TRUE))) 
+```
+
+```{r plyr_overall, message=FALSE, warning=FALSE}
+# plyr
+require(plyr)
+system.time(overallDf2 <- mutate(preDf, MeanScore=mean(Score, na.rm=TRUE)))
+```
+
+```{r dplyr_overall, message=FALSE, warning=FALSE}
+# dplyr
+require(dplyr)
+system.time(overallDf3 <- preDf %>% 
+                            mutate(MeanScore=mean(Score, na.rm=TRUE)))
+```
+
+```{r dt_overall, message=FALSE, warning=FALSE}
+# data.table
+require(data.table)
+preDt <- data.table(preDf)
+setkey(preDt, User)
+system.time(overallDt <- preDt[,list(User=User
+                                     ,Session=Session
+                                     ,Score=Score
+                                     ,MeanScore=mean(Score, na.rm=T))])
+```
+
+```{r combined_overall, message=FALSE, warning=FALSE}
+# dplyr + data.table
+system.time(overallDf4 <- preDt %>% 
+                            mutate(MeanScore=mean(Score, na.rm=TRUE))) 
+```
+
+#### Adding average by user
+
+It takes quite long using `plyr` and other packages would be more practial - `base` is not considered even.
+
+```{r plyr_con, message=FALSE, warning=FALSE}
+# plyr
+require(plyr)
+system.time(postDf1 <- ddply(preDf
+                             ,.(User)
+                             ,mutate,MeanScore=mean(Score, na.rm=TRUE))) 
+```
+
+```{r dplyr_con, message=FALSE, warning=FALSE}
+# dplyr
+require(dplyr)
+system.time(postDf2 <- preDf %>% 
+              group_by(User) %>% 
+              mutate(MeanScore=mean(Score, na.rm=TRUE)) %>% 
+              arrange(User))
+```
+
+```{r dt_con, message=FALSE, warning=FALSE}
+# data.table
+require(data.table)
+preDt <- data.table(preDf)
+setkey(preDt, User)
+system.time(postDt <- preDt[,list(Session=Session
+                                  ,Score=Score
+                                  ,MeanScore=mean(Score, na.rm=T))
+                            ,by=User])
+```
+
+```{r combined_con, message=FALSE, warning=FALSE}
+# dplyr + data.table
+system.time(postDf3 <- preDt %>% 
+              group_by(User) %>% 
+              mutate(MeanScore=mean(Score, na.rm=TRUE)) %>% 
+              arrange(User))
+```
