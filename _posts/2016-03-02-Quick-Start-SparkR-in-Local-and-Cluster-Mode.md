@@ -3,7 +3,7 @@ layout: post
 title: "2016-03-02-Quick-Start-SparkR-in-Local-and-Cluster-Mode"
 description: ""
 category: Spark
-tags: [programming, Spark, SparkR]
+tags: [Spark, SparkR]
 ---
 {% include JB/setup %}
 
