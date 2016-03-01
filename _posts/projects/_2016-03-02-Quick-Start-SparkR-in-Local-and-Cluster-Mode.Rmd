@@ -19,7 +19,7 @@ log4j.rootCategory=WARN, console
 
 The spark folder in the repository is shown below.
 
-![center](/home/jaehyeon/jaehyeon-kim.github.io/figs/2016-03-02-Quick-Start-SparkR-in-Local-and-Cluster-Mode/01_spark_foler.png)
+![center](/figs/2016-03-02-Quick-Start-SparkR-in-Local-and-Cluster-Mode/01_spark_foler.png)
 
 There are 2 data files. *iris.json* is the popular iris data set in JSON format. *iris_up.csv* is the same data set in CSV format with 3 extra columns - 1 integer, 1 date and 1 integer column with NA values - how to read them will be discussed shortly. *postgresql-9.3-1103.jdbc3.jar* is a JDBC driver to connect *PostgreSQL*-like database servers such as PostgreSQL server or Amazon Redshift - you may add another driver for your own DB server.
 
