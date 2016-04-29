@@ -1,0 +1,207 @@
+---
+layout: post
+title: "2015-01-17-First-Look-on-MLR"
+description: ""
+category: R
+tags: [mlr]
+---
+{% include JB/setup %}
+
+R is an open source tool and contribution is made from various fields. In many ways, this can have positive influences but there is a concern that its syntax or API can be quite *non-standardized*. I've looked for a way that various models can be applied consistently for a while and the following two packages are found: [mlr](https://github.com/berndbischl/mlr/) and [caret](https://github.com/topepo/caret).
+
+Among these, I'm more interested in **mlr** as its objects that are related to model building seem to be structured more clearly and strictly, which can be additional benefit while analysis gets complicated.
+
+According to the [tutorial](http://berndbischl.github.io/mlr/tutorial/html/index.html), typical analysis would be performed as following. 
+
+0. Imputation, Processing ...
+1. **Task**
+2. **Learner**
+3. **Train**
+4. **Predict**
+5. **Performance**
+6. Resampling
+7. Benchmark
+
+In this article, steps 1 to 5 are briefly introduced by reiterating *Chapter 4 Lab* of [ISLR](http://www-bcf.usc.edu/~gareth/ISL/) - i.e. *logistic regression* is fit on *Smarket* data using *stats* and *mlr* packages.
+
+In order to fit *logistic regression* using *mlr*, the development version (v2.3) has to be installed as `classif.binomial` is yet to be added into the stable version (v2.2) - for further details, see [here](https://github.com/berndbischl/mlr/blob/master/NEWS). Note that [Rtools](http://cran.r-project.org/bin/windows/Rtools/) should be installed to build the packages on Windows.
+
+```{r install_devel, eval=FALSE}
+# dev install
+devtools::install_github("berndbischl/ParamHelpers")
+devtools::install_github("berndbischl/BBmisc")
+devtools::install_github("berndbischl/parallelMap")
+devtools::install_github("berndbischl/mlr")
+```
+
+The following packages are loaded.
+
+```{r load_pkgs, message=FALSE, warning=FALSE}
+library(ISLR)
+library(mlr)
+```
+
+The structure of the data (*Smarket*) is shown below - *Year* and *Today* are going to be excluded.
+
+```{r structure, message=FALSE, warning=FALSE}
+str(Smarket)
+```
+
+#### Test on training data
+
+##### ISLR
+
+Matching objects for *Task* and *Learner* steps don't exist on *stats* package.
+
+###### 3. Train
+
+```{r islr_train, warning=FALSE, message=FALSE}
+glm.mod = glm(Direction ~ ., data=subset(Smarket, select=c(-Year, -Today)), family=binomial)
+summary(glm.mod)
+# coef(glm.mod) # also summary(glm.mod)$coef[,4]
+```
+
+###### 4. Predict
+
+```{r islr_predict, warning=FALSE, message=FALSE}
+# type = c("link","response","terms"), default - "link"
+glm.probs = predict(glm.mod, type="response")
+head(glm.probs) # check positive level (1): contrasts(Smarket$Direction)
+
+glm.pred = sapply(glm.probs, function(p) { ifelse(p>.5,"Up","Down") })
+head(glm.pred)
+```
+
+###### 5. Performance
+
+```{r islr_perf, warning=FALSE, message=FALSE}
+glm.cm = table(data.frame(response=glm.pred, truth=Smarket$Direction))
+glm.cm # confusion matrix
+
+# mean misclassificaton error rate 47.84%
+glm.mmse = 1 - sum(diag(glm.cm)) / sum(glm.cm)
+glm.mmse
+```
+
+##### MLR
+
+###### 1. Task
+
+```{r mlr_task, warning=FALSE, message=FALSE}
+mlr.glm.task = makeClassifTask(id="Smarket", data=subset(Smarket, select=c(-Year, -Today)), positive="Up", target="Direction")
+mlr.glm.task
+```
+
+###### 2. Learner
+
+```{r mlr_lrn, warning=FALSE, message=FALSE}
+mlr.glm.lrn = makeLearner("classif.binomial", predict.type="prob")
+mlr.glm.lrn
+```
+
+###### 3. Train
+
+```{r mlr_train, warning=FALSE, message=FALSE}
+mlr.glm.mod = train(mlr.glm.lrn, mlr.glm.task)
+mlr.glm.mod
+```
+
+###### 4. Predict
+
+```{r mlr_pred, warning=FALSE, message=FALSE}
+## prediction - model + either task or newdata but not both
+mlr.glm.pred = predict(object=mlr.glm.mod, task=mlr.glm.task)
+mlr.glm.pred
+```
+
+###### 5. Performance
+
+```{r mlr_pref, warning=FALSE, message=FALSE}
+mlr.glm.cm = table(subset(mlr.glm.pred$data, select=c("response","truth")))
+mlr.glm.cm
+
+mlr.glm.mmse = 1 - sum(diag(mlr.glm.cm)) / sum(mlr.glm.cm)
+mlr.glm.mmse
+
+# or simply
+mlr.glm.mmse = performance(mlr.glm.pred) # default: mean misclassification error (mmse)
+mlr.glm.mmse
+# see available measures - listMeasures(task.name)
+```
+
+So far the model is tested on the training data and the resulting test error (mean misclassifcation error) is likely to be overly optimistic. Below the model is tested on an independent data to obtain a more reliable test error rate.
+
+#### Test on independent data
+
+```{r split_data, warning=FALSE, message=FALSE}
+Smarket.train = subset(Smarket, Year != 2005, select=c(-Year, -Today))
+Smarket.test = subset(Smarket, Year == 2005, select=c(-Year, -Today))
+```
+
+##### ISLR
+
+###### 3. Train
+
+```{r islr_train_new, warning=FALSE, message=FALSE}
+glm.mod.new = glm(Direction ~ ., data=Smarket.train, family=binomial)
+glm.mod.new
+```
+
+###### 4. Predict
+
+```{r islr_predict_new, warning=FALSE, message=FALSE}
+glm.probs.new = predict(glm.mod.new, newdata=Smarket.test, type="response")
+head(glm.probs.new)
+
+glm.pred.new = sapply(glm.probs.new, function(p) { ifelse(p>.5,"Up","Down") })
+head(glm.pred.new)
+```
+
+###### 5. Performance
+
+```{r islr_perf_new, warning=FALSE, message=FALSE}
+glm.cm.new = table(data.frame(response=glm.pred.new, truth=Smarket.test$Direction))
+glm.cm.new
+
+glm.mmse.new = 1 - sum(diag(glm.cm.new)) / sum(glm.cm.new)
+glm.mmse.new
+```
+
+##### MLR
+
+###### 1. Task
+
+```{r mlr_task_new, warning=FALSE, message=FALSE}
+mlr.glm.task.new = makeClassifTask(id="SmarketNew", data=Smarket.train, positive="Up", target="Direction")
+mlr.glm.task.new
+```
+
+###### 2. Learner
+
+```{r mlr_lrn_new, warning=FALSE, message=FALSE}
+mlr.glm.lrn.new = mlr.glm.lrn # learner can be reused
+```
+
+###### 3. Train
+
+```{r mlr_train_new, warning=FALSE, message=FALSE}
+mlr.glm.mod.new = train(mlr.glm.lrn.new, mlr.glm.task.new)
+mlr.glm.mod.new
+```
+
+###### 4. Predict
+
+```{r mlr_pred_new, warning=FALSE, message=FALSE}
+## prediction - model + either task or newdata but not both
+mlr.glm.pred.new = predict(object=mlr.glm.mod.new, newdata=Smarket.test)
+mlr.glm.pred.new
+```
+
+###### 5. Performance
+
+```{r mlr_perf_new, warning=FALSE, message=FALSE}
+mlr.glm.mmse.new = performance(mlr.glm.pred.new)
+mlr.glm.mmse.new
+```
+
+Above is a quick introcution to *mlr*. I consider the real benefits of using this package would be demonstrated better in *Resampling* and *Benchmark* steps as well as its native support of parallel computing. These will be topics of subsequent articles.
