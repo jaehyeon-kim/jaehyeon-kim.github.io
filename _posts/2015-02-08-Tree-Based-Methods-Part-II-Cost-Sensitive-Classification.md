@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [dplyr, caret, rpart, rpart.plot]
 ---
-{% include JB/setup %}
-
 In the previous article ([Tree Based Methods Part I](http://jaehyeon-kim.github.io/r/2015/02/01/Tree-Based-Methods-Part-I/)), a decision tree is created on the *Carseats* data which is in the chapter 8 lab of [ISLR](http://www-bcf.usc.edu/~gareth/ISL/). In that article, potentially asymetric costs due to misclassification are not taken into account. When unbalance between false positive and false negative can have a significant impact, it can be explicitly adjusted either by altering prior (or empirical) probabilities or by adding a loss matrix. 
 
 A comprehensive summary of this topic, as illustrated in [Berk (2008)](http://www.springer.com/mathematics/probability/book/978-0-387-77500-5), is shown below.

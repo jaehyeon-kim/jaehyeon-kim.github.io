@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [mlr, kernlab, caret]
 ---
-{% include JB/setup %}
-
 In the previous article ([Benchmark Example in MLR Part I](http://jaehyeon-kim.github.io/r/2015/01/24/Benchmark-Example-in-MLR-Part-I/)), SVM and logistic regression are benchmarked on German credit data - this data is from the *credit scoring* example in Chapter 4 of [Applied Predictive Modeling](http://appliedpredictivemodeling.com/). For SVM, the cost parameter (C) is tuned by repeated cross-validation before the test measure is compared to that of logistic regression. 
 
 A potential issue on that approach is *the CV error can be optimistically biased to estimate the expected test error* as discussed in [Varma & Simon (2006)](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1397873/) and [Tibshirani and Tibshirani (2009)](http://www.stat.cmu.edu/~ryantibs/papers/cvbias.pdf). In this article, the issue is briefly summarized in its nature, remedies and cases where it can be outstanding. Among the two remedies, **nested cross-validation** is performed as (1) **mlr** provides this resampling strategy and (2) this resampling strategy is useful as it can be applied to other topics such as feasure selection.

@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [programming]
 ---
-{% include JB/setup %}
-
 In the [previous post](http://jaehyeon-kim.github.io/r/2015/05/09/R-Tip-a-Day-5-Function-Composition/), an introduction to *function composition* is made. As *function* is one of the most important objects in R and functional programming techniques can be beneficial in a way to achieve code reusability and to result in succinct code, it would be important to appreciate their values (and, of course, limitations). 
 
 In this short post, a way to read an unstructured file is illustrated. Although there are many good functions to read files in various formats, there may an occasion that a file fails to be read using one of them. In this case, rather than reformatting it to be fit into one of the existing functions externally, it could be easier to process them internally. This post just shows one of the possible ways with an example which is based on a [StackOverflow question](http://stackoverflow.com/questions/30251576/reading-a-non-standard-csv-file-into-r/30251915).

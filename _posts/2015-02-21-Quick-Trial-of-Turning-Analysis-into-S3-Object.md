@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [ggplot2, rpart, programming]
 ---
-{% include JB/setup %}
-
 While comparing the three packages (**rpart**, **caret**, **mlr**) in the [previous article](http://jaehyeon-kim.github.io/r/2015/02/15/Tree-Based-Methods-Part-IV-Packages-Comparison/), I was quite concerned that names of new variables are not easy to be kept effectively. First of all, names that are separated by full stop (.) are by no means effective and/or it gets harder to keep a comprehensive naming convention as the number of variables increases. Secondly, although old variables may be replaced, there are cases that some of them should be kept during analysis and/or, at worst, replacement can be unintentional. Also, as R is not type-safe due to its dynamic type system, things can go beyond control easily. In order to keep analysis under control, the S3 object system is looked into and it is found that, at least, key analysis outcomes can be easily encapsulated as members of a list so that it can be easier to perform analysis without making horible names and/or avoidng an error that is caused by confliting names.
 
 This article begins with a simple example that illustrates what seems to be the most relevant for encapculating variables and thus it is not complete - for those who are intested in more details, please see [these slides](http://www.mat.uc.cl/~susana/CE/oopV2.pdf). Then a class that holds CART analysis outcomes is discussed - this class aims to keep the same outcomes by the *rpart* package in the [previous article](http://jaehyeon-kim.github.io/r/2015/02/15/Tree-Based-Methods-Part-IV-Packages-Comparison/)

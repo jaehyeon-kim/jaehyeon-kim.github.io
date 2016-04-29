@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [programming]
 ---
-{% include JB/setup %}
-
 This is the first article of this series. One or two tips are going to be included and they are mostly from R-related groups in LinkedIn, StackOverflow, Quora ...
 
 The tip of this post is from the [R Programming](http://www.linkedin.com/grp/home?gid=2229532&sort=RECENT) group of Linkedin and it is included below.

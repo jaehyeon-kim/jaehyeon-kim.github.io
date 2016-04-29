@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [caret, programming]
 ---
-{% include JB/setup %}
-
 In the [previous post](http://jaehyeon-kim.github.io/r/2015/04/25/R-Tip-a-Day-2-Comparison-Packages-for-Data-Manipulation/), several popular packages for data minipulation are compared. In this post, two useful recursive functions (or functionals), `lapply()` and `do.call()`, are compared. This post is based on a [StackOverflow question](http://stackoverflow.com/questions/29902946/apply-confusionmatrix-to-elements-of-a-split-list-in-r/29904689#29904689).
 
 It is about obtaining some model assessment measures (accuracy, sensitivity and specificity) of each of the 3 groups where confusion matrices are obtained using `confusionMatrix()` in the **caret** package. In each group, there are actual values and three fitted values so that a double loop is necessary to obtain all possible confusion matrices - one by group and the other by each of the fitted values. The answer focuses on how to obtain the confusion matrices effectively.

@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [knitr,lubridate,stringr,plyr,dplyr]
 ---
-{% include JB/setup %}
-
 In an [earlier article](http://jaehyeon-kim.github.io/r/2014/11/20/Download-Stock-Data-1/), a way to download stock price data files from Google, save it into a local drive and merge them into a single data frame. If files are not large, however, it wouldn't be effective and, in this article, files are downloaded and merged internally.
 
 The following packages are used.

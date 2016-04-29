@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [knitr,lubridate,stringr,plyr,dplyr]
 ---
-{% include JB/setup %}
-
 This article illustrates how to download stock price data files from Google, save it into a local drive and merge them into a single data frame. This script is slightly modified from a script which downloads RStudio package download log data. The original source can be found [here](https://github.com/hadley/cran-logs-dplyr/blob/master/1-download.r).  
 
 First of all, the following three packages are used.

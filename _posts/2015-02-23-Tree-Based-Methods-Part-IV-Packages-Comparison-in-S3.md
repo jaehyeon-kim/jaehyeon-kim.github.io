@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [ggplot2, rpart, caret, mlr, programming]
 ---
-{% include JB/setup %}
-
 In the [previous article](http://jaehyeon-kim.github.io/r/2015/02/21/Quick-Trial-of-Turning-Analysis-into-S3-Object/), a brief introduction to the S3 object is made as well as a class that encapsulates the CART analysis by the **rpart** package is illustrated. Extending an [earlier article](http://jaehyeon-kim.github.io/r/2015/02/15/Tree-Based-Methods-Part-IV-Packages-Comparison/) of comparing the three packages (**rpart**, **caret** and **mlr**), this article compares them using the following 3 S3 objects: *rpartExt*, *rpartExtCrt* and *rpartExtMlr*. Like *manager* **is-a** *employee* so that it can extends the base class in the previous article, it is roughly conceptualized that the last two classes extend the first. On this setting, performance of both classification and regression tasks are compared in this article.
 
 Before getting started, note that the source of these classes can be found in [this gist](https://gist.github.com/jaehyeon-kim/b89dcbd2fb0b84fd236e) and, together with the relevant packages, it requires 3 utility functions that can be found [here](https://gist.github.com/jaehyeon-kim/5622ae9fa982e0b46550).

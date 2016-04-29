@@ -10,8 +10,6 @@ customJS:
 - highcharts-more
 - exporting
 ---
-{% include JB/setup %}
-
 This is a quick example of producing a multiple bar chart using [rCharts]() package via implementing [HighCharts]() library. The original tutorial can be found in [rChart Gallery](http://rcharts.io/gallery/) but some functions are outdated as can be checked [here](https://github.com/ramnathv/rCharts/issues/251) - They are updated here.
 
 Firstly _rCharts_ package needs to be installed from the GitHub repo if not installed.

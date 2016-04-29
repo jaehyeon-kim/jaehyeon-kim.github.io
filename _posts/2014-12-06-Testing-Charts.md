@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [ggplot2, plyr]
 ---
-{% include JB/setup %}
-
 This is a quick chart test and the examples are from Chapter 2 of [R Graphic Cookbook](http://shop.oreilly.com/product/0636920023135.do).
 
 

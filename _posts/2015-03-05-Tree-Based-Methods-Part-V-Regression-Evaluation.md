@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [rpart, caret, mlr, dplyr, ggplot2]
 ---
-{% include JB/setup %}
-
 In the [previous article](http://jaehyeon-kim.github.io/r/2015/03/03/2nd-Trial-of-Turning-Analysis-into-S3-Object/), a class that implements bagging (*rpartDT*) is introduced. Using the class, this article evaluates a single regression tree's performance by comparing to bagged trees' individual oob/test errors, cumulative oob/test errors and variable importance measures.
 
 Before getting started, note that the source of the classes can be found in [this gist](https://gist.github.com/jaehyeon-kim/b89dcbd2fb0b84fd236e) and, together with the relevant packages (see *tags*), it requires a utility function (`bestParam()`) that can be found [here](https://gist.github.com/jaehyeon-kim/5622ae9fa982e0b46550).

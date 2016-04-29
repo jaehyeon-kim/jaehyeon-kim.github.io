@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [mlr]
 ---
-{% include JB/setup %}
-
 In the previous article titled [First Look on MLR](http://jaehyeon-kim.github.io/r/2015/01/17/First-Look-on-MLR/), a quick comparison is made between *stats* and *mlr* packages by fitting logistic regression. However the benefits of using *mlr* (**consistent API** and **extensibility**) cannot be demonstrated well with that kind of simple analysis which has a single learner and no or a simple resampling strategy. 
 
 In this article, the comparison is extended to cover **Resampling** and **Benchmark** so as to illustrate how comprehensive analysis can be implemented - data is '*resampled*' to employ holdout and 10-fold cross validation and the following 4 learners are '*benchmarked*': logistic regression (glm), linear discriminant analysis (lda), quadratic discriminant analysis (qda) and k-nearest neighbors algorithm (knn). Same to the first article, *Chapter 4 Lab* of [ISLR](http://www-bcf.usc.edu/~gareth/ISL/) is reiterated again.

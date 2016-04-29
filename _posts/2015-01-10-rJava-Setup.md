@@ -5,8 +5,6 @@ description: ""
 category: Intro
 tags: [rJava, RWeka, CentOS]
 ---
-{% include JB/setup %}
-
 I tried to install **RWeka** but failed as **rJava** couldn't be installed mainly because Java is installed in a non-conventional location. Below is quick summary of installing/loading these packages.
 
 For installation, **JAVA_HOME** should be updated and the following has been done under the _root_ account - it is found [here](http://r.789695.n4.nabble.com/Can-t-get-R-to-recognize-Java-for-rJava-installation-td4553023.html)

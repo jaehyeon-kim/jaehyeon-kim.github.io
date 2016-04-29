@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [snow, parallel, rlecuyer, MASS, ggplot2, programming]
 ---
-{% include JB/setup %}
-
 Lack of multi-threading and memory limitation are two outstanding weaknesses of base R. In fact, however, if the size of data is not so large that it can be read in RAM, the former would be relatively easily handled by parallel processing, provided that multiple processors are equipped. This article introduces to a way of implementing parallel processing on a single machine using the **snow** and **parallel** packages - the examples are largely based on [McCallum and Weston (2012)](http://shop.oreilly.com/product/0636920021421.do).
 
 The **snow** and **multicore** are two of the packages for parallel processing and the **parallel** package, which has been included in the base R distribution by CRAN (since R 2.14.0), provides functions of both the packages (and more). Only the functions based on the **snow** package are covered in the article.

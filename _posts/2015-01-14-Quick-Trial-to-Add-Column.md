@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [plyr, dplyr, data.table]
 ---
-{% include JB/setup %}
-
 This is a quick trial of adding overall and conditional (by user) average columns in a data frame. `base`,`plyr`,`dplyr`,`data.table`,`dplyr + data.table` packages are used. Personally I perfer `dplyr + data.table` - `dplyr` for comperhensive syntax and `data.table` for speed.
 
 

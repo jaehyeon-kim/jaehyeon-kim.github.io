@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [reshape2, plyr, dplyr, ggplot2, rpart, caret, mlr]
 ---
-{% include JB/setup %}
-
 While the last three articles illustrated the CART model for both classification (with equal/unequal costs) and regression tasks, this article is rather technical as it compares three packages: **rpart**, **caret** and **mlr**. For those who are not farmiliar with the last two packages, they are wrappers (or frameworks) that implement a range of models (or algorithms) in a unified way. For example, the CART implementation of the **rpart** package can also be performed in these packages as an integrated learner. As mentioned in an earlier article ([Link](http://jaehyeon-kim.github.io/r/2015/01/17/First-Look-on-MLR/)), inconsistent API could be a drawback of R (like other open source tools) and it would be quite beneficial if there is a way to implement different models in a standardized way. In line with the earlier articles, the *Carseats* data is used for a classification task.
 
 Before getting started, I should admit the names are not defined effectively. I hope the below list may be helpful to follow the script.

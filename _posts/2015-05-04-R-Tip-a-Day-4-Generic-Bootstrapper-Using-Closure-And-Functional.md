@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [rpart, programming]
 ---
-{% include JB/setup %}
-
 In the [previous post](http://jaehyeon-kim.github.io/r/2015/05/01/R-Tip-a-Day-3-Comparison-Between-lapply-And-do.call/), a quick comparison is made between two useful functionals: `lapply()` and `do.call()`. Functionals are an example of higher-order functions, which can have a function as an argument and/or return a function as an output. As R supports functional programming, it supports other types of higher order functions and clever use of them can be beneficial, resulting in succinct code. In this post, **closure** and user-defined **functional** are illustrated by creating a *generic bootstrapper*.
 
 ### Closure

@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [base, plyr, dplyr, data.table, programming]
 ---
-{% include JB/setup %}
-
 In the [first post](http://jaehyeon-kim.github.io/r/2015/04/21/R-Tip-a-Day-1-Distinct-Column-Combinations/) of this series, a function (`uniqueCol()`) is illustrated. The function returns all combinations of columns that can uniquely identify the records of a data frame and it is created by combining recursive functions. In this post, popular packages or a combination of packages for data manipulation are compared. They are listed below.
 
 - base

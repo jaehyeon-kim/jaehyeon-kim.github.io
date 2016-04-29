@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [mlr]
 ---
-{% include JB/setup %}
-
 R is an open source tool and contribution is made from various fields. In many ways, this can have positive influences but there is a concern that its syntax or API can be quite *non-standardized*. I've looked for a way that various models can be applied consistently for a while and the following two packages are found: [mlr](https://github.com/berndbischl/mlr/) and [caret](https://github.com/topepo/caret).
 
 Among these, I'm more interested in **mlr** as its objects that are related to model building seem to be structured more clearly and strictly, which can be additional benefit while analysis gets complicated.

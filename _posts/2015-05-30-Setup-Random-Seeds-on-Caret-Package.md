@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [parallel, doParallel, foreach, randomForest, caret]
 ---
-{% include JB/setup %}
-
 A short while ago I had a chance to perform analysis using the **caret** package. One of the requirements is to run it parallelly and to work in both Windows and Linux. The requirement can be met by using the **parallel** and **doParallel** packages as the **caret** package trains a model using the **foreach** package if clusters are registered by the **doParallel** package - further details about how to implement parallel processing on a single machine can be found in earlier posts ([Link 1](http://jaehyeon-kim.github.io/r/2015/03/14/Parallel-Processing-on-Single-Machine-Part-I/), [Link 2](http://jaehyeon-kim.github.io/r/2015/03/17/Parallel-Processing-on-Single-Machine-Part-II/) and [Link 3](http://jaehyeon-kim.github.io/r/2015/03/19/Parallel-Processing-on-Single-Machine-Part-III/)). While it is relatively straightforward to train a model across multiple clusters using the **caret** package, setting up random seeds may be a bit tricky. As analysis can be more reproducible by random seeds, a way of setting them up is illustrated using a simple function in this post.
 
 The following packages are used.

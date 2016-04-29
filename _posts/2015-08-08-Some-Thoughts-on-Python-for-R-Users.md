@@ -5,8 +5,6 @@ description: ""
 category: Python
 tags: [programming]
 ---
-{% include JB/setup %}
-
 There seem to be growing interest in Python in the R cummunity. While there can be a range of opinions about using R over Python (or vice versa) for exploratory data analysis, fitting statistical/machine learning algorithms and so on, I consider one of the strongest attractions of using Python comes from the fact that *Python is a general purpose programming language*. As more developers are involved in, it can provide a way to get jobs done easily, which can be tricky in R. In this article, an example is introduced by illustrating how to connect to [SOAP (Simple Object Access Protocol)](https://en.wikipedia.org/wiki/SOAP) web services.
 
 Web service (or API) is a popular way to connect to a server programmatically and SOAP web service is one type. For those who are interested in it, please see [this article](https://msdn.microsoft.com/en-us/library/ms996486.aspx). Although R has good packages to connect to a newer type of web service, which is based on [REST (Representational state transfer)](https://en.wikipedia.org/wiki/Representational_state_transfer) (eg, [httr package](https://cran.r-project.org/web/packages/httr/index.html)), I haven't found a good R package that can be used as a comprehensive SOAP client, which means I have to use the RCurl package at best. On the other hand, as 'batteries included', one of Python's philosophies, assures, it has a number of SOAP client libraries. Among those, I've chosen the [suds library](https://bitbucket.org/jurko/suds).

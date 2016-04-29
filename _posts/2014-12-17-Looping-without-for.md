@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [plyr, knitr]
 ---
-{% include JB/setup %}
-
 Purely programming point of view, I consider **for-loops** would be better to be avoided in R as 
 
 * the script can be more readable 

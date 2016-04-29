@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [data.table, programming]
 ---
-{% include JB/setup %}
-
 In the [previous post](http://jaehyeon-kim.github.io/r/2015/05/04/R-Tip-a-Day-4-Generic-Bootstrapper-Using-Closure-And-Functional/), a generic bootstrapper is created using two higher order functions: **closure** and **functional**. The closure is used to set up bootstrap configuration and it returns an anonymous functional that accepts another function that fits a model - `lm()` and `rpart()` are used as an example. Having a function as an argument enables the bootstrapper to be generic and its main benefit is to achieve **succint code** - in my opinion, there would be many use cases of this kind as R's support to object oriented programming is somewhat limited.
 
 In this post, another way of applying higher order functions is illustrated by **function composition** - this example is from a [StackOverflow question](http://stackoverflow.com/questions/30086163/simplest-way-to-create-wrapper-functions/30086519#30086519). Two functions are under consideration: `prop.table()` and `table()`. While the latter returns a contingency table, the former returns marginal proportions given a value of its margin argument - eg 1 by row and 2 by column. Before moving forward, it'd be necessary to show simple examples of these functions.

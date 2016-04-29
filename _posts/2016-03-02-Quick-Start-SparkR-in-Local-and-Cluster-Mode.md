@@ -5,8 +5,6 @@ description: ""
 category: Spark
 tags: [programming, Spark, SparkR]
 ---
-{% include JB/setup %}
-
 In the [previous post](http://jaehyeon-kim.github.io/2016/02/Spark-Cluster-Setup-on-VirtualBox), a Spark cluster is set up using 2 VirtualBox Ubuntu guests. while this is a viable option for many, it is not always for others. For those who find setting-up such a cluster is not convenient, there's still another option, which is relying on the local mode of Spark. In this post, a BitBucket repository is introduced, which is a R project that includes *Spark 1.6.0 Pre-built for Hadoop 2.0 and later* and *hadoop-common 2.2.0* - the latter is necessary if it is tested on Windows. Then several initialization steps are discussed such as setting-up environment variables and library path as well as including the [spark-csv package](https://github.com/databricks/spark-csv) and a JDBC driver. Finally it shows some examples of reading JSON and CSV files in the cluster mode.
 
 ### [sparkr-test](https://bitbucket.org/jaehyeon/sparkr-test) repo

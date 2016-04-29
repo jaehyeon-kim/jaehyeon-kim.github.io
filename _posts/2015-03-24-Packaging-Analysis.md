@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [foreach, doParallel, parallel, iterators, rpart, treebgg, programming]
 ---
-{% include JB/setup %}
-
 When I imagine a workflow, it is performing the same or similar tasks regularly (daily or weekly) in an automated way. Although those tasks can be executed in a script or a *source()*d script, it may not be easy to maintain separate scripts while the size of tasks gets bigger or if they have to be executed in different machines. In academia, reproducible research shares similar ideas but the level of reproducibility introduced in [Gandrud, 2013](http://www.crcpress.com/product/isbn/9781466572843) may not suffice in a business environment as the focus is documenting in a reproducible way. A R package, however, can be an effective tool and it can be considered as a portable class library in C# or Java. Like a class library, it can include a set of necessary tasks (usually using functions) and, being portable, its dependency can be managed well - for example, it is possible to set so that dependent packages can also be installed if some of them are not installed already. Moreover the benefit of creating a R package would be significant if it has to be deployed in a production server as it'd be a lot easier to convince system admin with the built-in unit tests, object documents and package vignettes. In this article an example of creating a R package is illustrated.
 
 ### Introduction to the [treebgg](https://github.com/jaehyeon-kim/treebgg) package

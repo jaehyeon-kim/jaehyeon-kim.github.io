@@ -5,8 +5,6 @@ description: ""
 category: Intro
 tags: [knitr, CentOS]
 ---
-{% include JB/setup %}
-
 The setup of R project is modified from [Jason Fisher's blog](http://jfisher-usgs.github.io/r/2012/07/03/knitr-jekyll/). Instead of moving a markdown (md) and figure folder into the blog repository after they have been created, a R project named **projects** is created in the **_posts** folder so that articles can be created in the same repository. 
 
 Note that the title of a R markdown (Rmd) file is in **_yyyy-mm-dd-article-name.Rmd**. Basically Jekyll parses a markdown (md) file if its title is in **yyyy-mm-dd-article-name.md** in the **_posts** and its subfolders. However it also parses Rmd files as well if they have the same title formats. Therefore, if a Rmd file is created and converted into a md file, there will be two duplicate articles.

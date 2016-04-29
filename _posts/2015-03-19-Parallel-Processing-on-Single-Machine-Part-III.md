@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [parallel, foreach, doParallel, iterators, rpart, randomForest, ISLR, programming]
 ---
-{% include JB/setup %}
-
 In the previous posts, two groups of ways to implement parallel processing on a single machine are introduced. The first group is provided by the **snow** or **parallel** package and the functions are an extension of `lapply()` ([link](http://jaehyeon-kim.github.io/r/2015/03/14/Parallel-Processing-on-Single-Machine-Part-I/)). The second group is based on an extension of the *for* construct (*foreach*, *%dopar%* and *%:%*). The *foreach* construct is provided by the *foreach* package while clusters are made and registered by the **parallel** and **doParallel** packages respectively ([link](http://jaehyeon-kim.github.io/r/2015/03/17/Parallel-Processing-on-Single-Machine-Part-II/)). To conclude this series, three practical examples are discussed for comparison in this article.
 
 Let's get started.

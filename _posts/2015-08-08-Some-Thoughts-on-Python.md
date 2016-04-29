@@ -5,8 +5,6 @@ description: ""
 category: Python
 tags: [programming]
 ---
-{% include JB/setup %}
-
 When I bagan to teach myself C# 3 years ago, I only had some experience in interactive analysis tools such as MATLAB and R - I didn't consider R as a programming language at that time. The general purpose programming language shares some common features (data type, loop, if...) but it is rather different in the way how code is written/organized, which is object oriented. Therefore, while it was not a problem to grap the common features, it took quite some time to understand and keep my code in an object oriented way. 
 
 Python, as another object-oriented programming language, the situation would be similar. The snippets in the following link show an example - ([Link](https://bitbucket.org/snippets/jaehyeon-kim/GApK6)). There 4 classes are defined to connect to the advertiser service of [Sizmek MDX API](http://platform.mediamind.com/Eyeblaster.MediaMind.API.Doc/?v=3). 

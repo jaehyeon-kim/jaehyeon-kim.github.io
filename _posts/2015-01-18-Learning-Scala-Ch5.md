@@ -5,8 +5,6 @@ description: ""
 category: scala
 tags: [programming]
 ---
-{% include JB/setup %}
-
 This post summarises notes and/or exercise solutions of _Chapter 5 First Class Functions_ of [Learning Scala](http://chimera.labs.oreilly.com/books/1234000001798/index.html) by  Jason Swartz. More complete solutions can be found [HERE](https://github.com/swartzrock/LearningScalaMaterials). Scala code is originally executed in a Eclipse Scala worksheet.
 
 ### Notes

@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [mlr, kernlab, caret]
 ---
-{% include JB/setup %}
-
 This is an update of the second article - [Second Look on MLR](http://jaehyeon-kim.github.io/r/2015/01/18/Second-Look-on-MLR/). While a hyper- or turning parameter is either non-existent or given in the previous article, it is estimated here - specifically cost of constraints violation (C) of support vector machine is estimated. 
 
 The *Credit Scoring* example in Chapter 4 of [Applied Predictive Modeling](http://appliedpredictivemodeling.com/) is reimplemented using the **mlr** package. Details of the German Credit Data that is used here can be found [here](http://www.rdocumentation.org/packages/caret/functions/GermanCredit).

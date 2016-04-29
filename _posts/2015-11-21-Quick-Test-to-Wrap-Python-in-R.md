@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [programming]
 ---
-{% include JB/setup %}
-
 As mentioned in an [earlier post](http://jaehyeon-kim.github.io/python/2015/08/08/Some-Thoughts-on-Python-for-R-Users/), things that are not easy in R can be relatively simple in other languages. Another example would be connecting to Amazon Web Services. In relation to s3, although there are a number of existing packages, many of them seem to be deprecated, premature or platform-dependent. (I consider the [cloudyr](https://cloudyr.github.io/) project looks promising though.)
 
 If there isn't a comprehensive *R-way* of doing something yet, it may be necessary to create it from scratch. Actually there are some options to do so by using [AWS Command Line Interface](https://aws.amazon.com/cli/), [AWS REST API](http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html) or wrapping functionality of another language.

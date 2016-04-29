@@ -5,8 +5,6 @@ description: ""
 category: Intro
 tags: [Jekyll, CentOS]
 ---
-{% include JB/setup %}
-
 This blog has been influenced by [Jason Fisher's blog](http://jfisher-usgs.github.io/) and this article illustrates some modification of his [Jekyll Build on Windows](http://jfisher-usgs.github.io/lessons/2012/05/30/jekyll-build-on-windows/) to CentOS.
 
 ## GitHub

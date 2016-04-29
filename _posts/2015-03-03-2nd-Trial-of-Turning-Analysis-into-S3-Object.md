@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [rpart, caret, mlr, dplyr, programming]
 ---
-{% include JB/setup %}
-
 In order to avoid an error that could be caused by conflicting variable names and to keep variables in a more effective way, a trial of turning analysis into a S3 object is made in a ([previous article](http://jaehyeon-kim.github.io/r/2015/02/21/Quick-Trial-of-Turning-Analysis-into-S3-Object/)). The second trial is made recently and a class (*rpartDT*) that extends *rpartExt* is introduced in this article. In line with the first trial, the base class keeps key outcomes of the CART model in a list and the extended class includes outcomes of bagged trees as well as those of the base class. As the main purpose of this class is to evaluate performance of an individual tree, its bagging implementation is a bit different from the conventional one. Specifically, while unpruned trees are fit recursively in the conventional bagging so that bias-variance trade-off could be improved mainly due to lowered variance, it performs with the *cp* values set at the lowest xerror and by the 1-SE rule. Also other control variables are untouched (eg *minbucket* is 20 at default).
 
 The class is constructed so as to produce the following outcomes.

@@ -5,8 +5,6 @@ description: ""
 category: R
 tags: [dplyr, ggplot2, grid, gridExtra, caret, rpart, rpart.plot]
 ---
-{% include JB/setup %}
-
 While classificaton tasks are implemented in the last two articles ([Link 1](http://jaehyeon-kim.github.io/r/2015/02/01/Tree-Based-Methods-Part-I/) and [Link 2](http://jaehyeon-kim.github.io/r/2015/02/08/Tree-Based-Methods-Part-II-Cost-Sensitive-Classification/)), a regression task is the topic of this article. While the **caret** package selects the tuning parameter (*cp*) that minimizes the error (*RMSE*), the **rpart** packages recommends the *1-SE rule*, which selects the smallest tree within 1 standard error of the minimum cross validation error (*xerror*). The models with 2 complexity parameters that are suggested by the packages are compared.
 
 The bold-cased sections of the [tutorial](http://topepo.github.io/caret/index.html) of the caret package are covered in this article.
