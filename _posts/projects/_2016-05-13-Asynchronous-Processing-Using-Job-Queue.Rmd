@@ -1,0 +1,75 @@
+---
+layout: post
+title: "2016-05-13-Asynchronous-Processing-Using-Job-Queue"
+description: ""
+category: R
+tags: [programming, jobqueue]
+---
+
+In this post, a way to overcome one of R's limitations (**lack of multi-threading**) is discussed by job queuing using the [jobqueue package](http://jobqueue.r-forge.r-project.org/) - a generic asynchronous job queue implementation for R. See the package description below.
+
+> The jobqueue package is meant to provide an easy-to-use interface that allows to queue computations for background evaluation while the calling R session remains responsive. It is based on a *1-node socket cluster from the parallel package*. The package provides a way to do basic threading in R. The main focus of the package is on an intuitive and easy-to-use interface for the job queue programming construct. … Typical applications include: **background computation of lengthy tasks (such as data sourcing, model fitting, bootstrapping), simple/interactive parallelization (if you have 5 different jobs, move them to up to 5 different job queues), and concurrent task scheduling in more complicated R programs.** [Bramblecloud's cloud computing service for R](https://www.bramblecloud.com/) uses the jobqueue package as an asynchronous wrapper for synchronous remote connections.
+
+Added to the typical applications indicated above, another good application of this package would be with a Shiny application especially when it is served by Shiny open source.
+
+The package can be installed as following.
+
+```{r load_libs, warning=FALSE, message=FALSE}
+# http://r-forge.r-project.org/R/?group_id=2066
+if(!require(jobqueue)) {
+  pkg_src <- if(grepl("win", Sys.info()["sysname"], ignore.case = TRUE)) {
+    "http://download.r-forge.r-project.org/bin/windows/contrib/3.2/jobqueue_1.0-4.zip"
+  } else {
+    "http://download.r-forge.r-project.org/src/contrib/jobqueue_1.0-4.tar.gz"
+  }
+  
+  install.packages(pkg_src, repos = NULL)
+}
+
+library(jobqueue)
+```
+
+As can be seen in the description, it is highly related to the **parallel** package and thus it wouldn't be hard to understand how it works if you know how to make a cluster using that package - if not, have a look at [this post](http://jaehyeon-kim.github.io/2015/03/Parallel-Processing-on-Single-Machine-Part-I.html). 
+
+```{r rf_ex, warning=FALSE}
+# create queue
+queue <- Q.make()
+# load library
+Q.push(queue, library(randomForest), mute = TRUE)
+# execute function
+Q.push(queue, randomForest(Species ~ ., data=iris, importance=TRUE, proximity=TRUE)$call)
+# get output
+Q.pop(queue)
+# close queue
+Q.close(queue)
+```
+
+
+```{r local_ex, warning=FALSE}
+queue <- Q.make()
+fun <- function(max_val) {
+  unlist(lapply(1:max_val, function(x) {
+    Sys.sleep(1)
+    x
+  }))
+}
+# send local R object
+Q.sync(queue, fun)
+Q.push(queue, fun(10))
+Q.pop(queue)
+while (TRUE) {
+  out <- Q.pop(queue)
+  message(paste("INFO output is NULL?", is.null(out)))
+  if(!is.null(out)) {
+    break
+  }
+}
+Q.close(queue)
+out
+```
+
+
+
+
+
+
