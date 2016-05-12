@@ -73,7 +73,7 @@ Q.pop(queue)
 {% highlight r %}
 while (TRUE) {
   out <- Q.pop(queue)
-  message(paste("INFO execution completed?", is.null(out)))
+  message(paste("INFO execution not completed?", is.null(out)))
   if(!is.null(out)) {
     break
   }
@@ -83,19 +83,19 @@ while (TRUE) {
 
 
 {% highlight text %}
-## INFO execution completed? TRUE
-## INFO execution completed? TRUE
-## INFO execution completed? TRUE
-## INFO execution completed? TRUE
-## INFO execution completed? TRUE
-## INFO execution completed? TRUE
-## INFO execution completed? TRUE
+## INFO execution not completed? TRUE
+## INFO execution not completed? TRUE
+## INFO execution not completed? TRUE
+## INFO execution not completed? TRUE
+## INFO execution not completed? TRUE
+## INFO execution not completed? TRUE
+## INFO execution not completed? TRUE
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## INFO execution completed? FALSE
+## INFO execution not completed? FALSE
 {% endhighlight %}
 
 

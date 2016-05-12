@@ -59,7 +59,7 @@ Q.push(queue, fun(10))
 Q.pop(queue)
 while (TRUE) {
   out <- Q.pop(queue)
-  message(paste("INFO execution completed?", is.null(out)))
+  message(paste("INFO execution not completed?", is.null(out)))
   if(!is.null(out)) {
     break
   }
