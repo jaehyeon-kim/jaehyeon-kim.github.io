@@ -14,7 +14,8 @@ Added to the typical applications indicated above, this package can be quite ben
 
 The package is not on CRAN and it can be installed as following.
 
-```{r load_libs, warning=FALSE, message=FALSE}
+
+{% highlight r %}
 # http://r-forge.r-project.org/R/?group_id=2066
 if(!require(jobqueue)) {
   pkg_src <- if(grepl("win", Sys.info()["sysname"], ignore.case = TRUE)) {
@@ -27,24 +28,26 @@ if(!require(jobqueue)) {
 }
 
 library(jobqueue)
-```
+{% endhighlight %}
 
 As can be seen in the description, it is highly related to the **parallel** package and thus it wouldn't be hard to understand how it works if you know how to do parallel processing using that package - if not, have a look at [this post](http://jaehyeon-kim.github.io/2015/03/Parallel-Processing-on-Single-Machine-Part-I.html). 
 
 Here is a quick example of job queue. In the following function, execution is suspended for 1 second at each iteration and the processed is blocking until it is executed in base R.
 
-```{r local_fun, warning=FALSE}
+
+{% highlight r %}
 fun <- function(max_val) {
   unlist(lapply(1:max_val, function(x) {
     Sys.sleep(1)
     x
   }))
 }
-```
+{% endhighlight %}
 
 Using the package, however, the function can be executed asynchronously as shown below.
 
-```{r local_ex, warning=FALSE}
+
+{% highlight r %}
 # create queue
 # similar to makeCluster()
 queue <- Q.make()
@@ -57,6 +60,17 @@ Q.push(queue, fun(10))
 ### another job can be done while it is being executed
 # get result - NULL is not complete
 Q.pop(queue)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## NULL
+{% endhighlight %}
+
+
+
+{% highlight r %}
 while (TRUE) {
   out <- Q.pop(queue)
   message(paste("INFO execution completed?", is.null(out)))
@@ -64,15 +78,45 @@ while (TRUE) {
     break
   }
 }
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## INFO execution completed? TRUE
+## INFO execution completed? TRUE
+## INFO execution completed? TRUE
+## INFO execution completed? TRUE
+## INFO execution completed? TRUE
+## INFO execution completed? TRUE
+## INFO execution completed? TRUE
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## INFO execution completed? FALSE
+{% endhighlight %}
+
+
+
+{% highlight r %}
 # close queue
 # similar to stopCluster()
 Q.close(queue)
 out
-```
+{% endhighlight %}
+
+
+
+{% highlight text %}
+##  [1]  1  2  3  4  5  6  7  8  9 10
+{% endhighlight %}
 
 Another example of applying *job queue* is fitting a bootstrap-based algorithm. In this example, each of 500 trees are grown and they are combined at the end - note that, in practice, it'd be better to save outputs and combine them later.
 
-```{r rf_ex, warning=FALSE, message=FALSE}
+
+{% highlight r %}
 q1 <- Q.make()
 q2 <- Q.make()
 # load library
@@ -88,6 +132,17 @@ Q.close(q2)
 
 library(randomForest)
 do.call("combine", list(r1, r2))
-```
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## 
+## Call:
+##  randomForest(formula = Species ~ ., data = iris, importance = TRUE,      proximity = TRUE) 
+##                Type of random forest: classification
+##                      Number of trees: 1000
+## No. of variables tried at each split: 2
+{% endhighlight %}
 
 I hope this article is useful.
