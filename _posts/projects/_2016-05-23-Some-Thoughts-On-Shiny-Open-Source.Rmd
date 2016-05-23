@@ -1,0 +1,151 @@
+---
+layout: post
+title: "2016-05-23-Some-Thoughts-On-Shiny-Open-Source"
+description: ""
+category: R
+tags: [Shiny]
+---
+
+Shiny is an interesting web framework that helps create a web application quickly. If it targets a large number of audience, however, it has several limitations and it is so true when the open source version of Shiny is in use. It may be possible to tackle down some of the limitations with the enterprise version but I haven't seen an example in relation to it.
+
+While whether Shiny can be used in production environment is a controversial issue, this series of posts illustrate some ways to use **open source Shiny** a bit more wisely. Specifically the following topics are going to be covered.
+
++ Load balancing (and auth scaling)
+    - Each application (or folder in `/srv/shiny-server`) is binded by a single process so that multiple users are served by the same process. Let say multiple cores exist in the server machine. Then this can be one of the main causes of performance bottleneck as only a single process (or core) is reserved for an application.
++ Rendering multiple pages, including authentication
+    - An application is served as a single-page web application so that it is not built to render multiple pages. Application code could be easier to manage if code is split by different pages. Moreover it is highly desirable to implement authentication.
++ Running with a Proxy and SSL configuration for HTTPS
+    - By default, an application is served by HTTP with port 3838. A useful use case to serve a Shiny application via HTTPS is it can be integrated with a Tableau dashboard.
+
+In this post, a simple way of **load balancing** is demonstrated by *redirecting multiple same applications, depending on the number of processes binded to them* - this is originally from [Huidong Tian's blog](http://withr.me/a-shiny-app-serves-as-shiny-server-load-balancer/).
+
+### Folder structure
+
+As an illustration, 5 applications locate in `/srv/shiny-server/redirect` as shown below. The folders named *1 to 4* are the same application and the application that redirects a user (or session) to one of those is placed in *app* folder. How many sessions are binded by each application is monitored by **monitor.R** and the output is recorded in **monitor.log**.
+
+![center](C:\workspace\jaehyeon-kim.github.io\figs\2016-05-23-Some-Thoughts-On-Shiny-Open-Source\folder_structure.png)
+
+### Monitor processes
+
+```{r monitor, eval=FALSE}
+lapply(1:60, function(x) {
+  tops <- system("top -n 1 -b -u shiny", intern = TRUE)
+  if(length(tops) > 0) {
+    ids <- grep("R *$", tops)
+    header <- grep("%CPU", tops)
+    names <- strsplit(gsub("^ +|%|\\+", "", tops[header]), " +")[[1]]
+    
+    if(length(ids) > 0) {
+      dat <- as.data.frame(do.call(rbind, strsplit(gsub("^ *", "", tops[ids]), " +")))
+      names(dat) <- names
+      info <- as.data.frame(do.call(rbind, lapply(dat$PID, function(pid) {
+        netstat <- system(paste("sudo netstat -p | grep", pid), intern = TRUE)
+        lsof <- system(paste("sudo lsof -p", pid, "| grep /srv"), intern = TRUE)
+        users <- length(grep("ESTABLISHED", netstat) & grep("tcp", netstat))
+        app <- regmatches(lsof, regexec("srv/(.*)", lsof))[[1]][2]
+        c(app = app, users = users)
+      })))
+    } else {
+      info <- data.frame(app = "app", users = 0)
+    }
+    write.table(info, file = "/srv/shiny-server/redirect/monitor.log")
+  }  
+})
+```
+
+```{r out, eval=FALSE}
+                      app users
+1 shiny-server/redirect/1     1
+2 shiny-server/redirect/2     1
+```
+
+```{r cron, eval=FALSE}
+* * * * * Rscript /srv/shiny-server/redirect/monitor.R
+```
+
+### Application code
+
+![center](C:\workspace\jaehyeon-kim.github.io\figs\2016-05-23-Some-Thoughts-On-Shiny-Open-Source\redirect.png)
+![center](C:\workspace\jaehyeon-kim.github.io\figs\2016-05-23-Some-Thoughts-On-Shiny-Open-Source\app.png)
+
+```{r redirect_app, eval=FALSE}
+library(shiny)
+library(magrittr)
+library(dplyr)
+
+ui <- fluidPage(
+  fluidRow(
+    #tags$style("#link {visibility: hidden;}"),
+    tags$script(type="text/javascript", src = "redirect.js"),
+    column(3, offset = 4,
+           wellPanel(
+             h3("app info"),
+             tableOutput("app_info")
+             )
+           )
+  ),
+  fluidRow(
+    column(3, offset = 4,
+           wellPanel(
+             h3("Redirecting ..."),
+             textInput(inputId = "link", label = "", value = "")
+             )
+           )
+  )
+)
+
+server <- function(input, output, session) {
+  users <- read.table("/srv/shiny-server/redirect/monitor.log", header = TRUE, stringsAsFactors = FALSE)
+  app <- data.frame(app = paste0("shiny-server/redirect/", 1:4), stringsAsFactors = FALSE)
+  app <- app %>% left_join(users, by = "app") %>% mutate(app = sub("shiny-server/", "", app),
+                                                         users = ifelse(is.na(users), "0", as.character(users)))
+  link <- paste0("hostname-or-ip-address[:port]/", app$app[which.min(app$users)])
+  
+  # info tables
+  output$app_info <- renderTable(app)
+  
+  updateTextInput(session, inputId = "link", value = link)
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+
+```{r redirect_js, eval=FALSE}
+setInterval(function() {
+  var link = document.getElementById('link').value;
+    if (link.length > 1) {
+      window.open(link, "_top")
+    }
+}, 1000)
+```
+
+
+```{r actual_app, eval=FALSE}
+library(shiny)
+
+ui <- fluidPage(
+  fluidRow(
+    column(3, offset = 4,
+           wellPanel(
+             h3("URL components"),
+             verbatimTextOutput("urlText")
+             )
+           )
+  )
+)
+
+server <- function(input, output, session) {
+  output$urlText <- renderText({
+    paste(sep = "",
+          "protocol: ", session$clientData$url_protocol, "\n",
+          "hostname: ", session$clientData$url_hostname, "\n",
+          "pathname: ", session$clientData$url_pathname, "\n",
+          "port: ",     session$clientData$url_port,     "\n",
+          "search: ",   session$clientData$url_search,   "\n"
+    )
+  })
+}
+
+shinyApp(ui = ui, server = server)
+```
