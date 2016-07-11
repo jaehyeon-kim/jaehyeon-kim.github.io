@@ -1,0 +1,280 @@
+---
+layout: post
+title: "2016-07-11-Hello-Meteor"
+description: ""
+category: R
+tags: [Meteor]
+---
+
+While Shiny provides a quick and effective way of presenting analysis outputs in the form of web application, there may be some cases where it doesn't suit to deliver those well and it is so true when the open source edition is in use. When it comes to developing a web application, it normally requires quite an effort to wire-up a variety of different technology. For example, as discussed in [this post](https://wiki.dandascalescu.com/essays/meteor_js_vs_the_mean_stack), the MEAN (**M**ongoDB, **E**xpress, **A**ngular and **N**ode.js) stack requires a whole lot of work to integrate MongoDB and Node.js as well as to create/consume REST endpoints between Express and Angular. In this circumstances, it can be invaluable if there is something that provides an efficient way to integrates necessary technology and [Meteor](https://www.meteor.com/) can be good fit.
+
+## What is Meteor?
+
+As indicated in [this post](http://javascriptissexy.com/learn-meteor-js-properly/), **Meteor** is
+
++ an open-source _Isomorphic Development Ecosystem (IDevE)_, written in JavaScript on the Node.js platform, for efficiently and painlessly developing web and mobile applications. 
+
+    - **Isomorphic**: Isomorphic refers to using the same code on the frontend and the backend; that is, using the same API everywhere (frontend, backend, and even for mobile apps).
+    - **Development**: Meteor provides all the tools for the application development life cycle, from setup and configuration tools to API and deployment tools.
+    - **Ecosystem**: The Meteor ecosystem seamlessly integrates all the components (tools, libraries, databases, and frameworks [frontend and backend]) necessary for building and deploying applications.
+
+If you are intersted, read on this why-meteor article - [What framework should I choose to build a web app? ... and 10 reasons why the answer should be "Meteor"](https://wiki.dandascalescu.com/essays/why_meteor).
+
+## How to install Meteor and create/start application
+
+On Linux and OSX, it is simply `curl https://install.meteor.com/ | sh` and there is a separate installer on Windows. Then an application can be created by `meteor create app-name` and it is started by `meteor`.
+
+I had the following error when I started an application and it was necessary to remove *ecmascript* folder in `C:\Users\user-name\AppData\Local\.meteor\packages\` and to start it again.
+
+
++ _While processing files with ecmascript (for target web.browser): module.js:338:15: Cannot find module 'babel-helper-function-name'_
+
+## Adding package to Meteor
+
+Similar to *Node Package Manager (NPM)* or *CRAN* in R, Meteor has its own package manager called [Atmosphere](https://atmospherejs.com/) - `meteor add package-name`. Also, from Meteor 1.3, it is quite [comprehensive to use NPM packages](https://voice.kadira.io/top-5-predictions-for-meteor-in-2016-c7c196eab308#.lbb5pet70) - `meteor npm install package-name`. Furthermore it is possible to add a client package directly as illustrated in the next section.
+
+## Hello Meteor
+
+As proof of concept, the start-up Shiny application is implemented in Meteor. The main pages of the Shiny and Meteor applications are shown below.
+
+![center](C:\workspace\BLOG\jaehyeon-kim.github.io\figs\2016-07-11-Hello-Meteor\shiny_main.png)
+
+![center](C:\workspace\BLOG\jaehyeon-kim.github.io\figs\2016-07-11-Hello-Meteor\meteor_main.png)
+
+### Packages
+
+The meteor application can be downloaded from this [Github repository](https://github.com/jaehyeon-kim/meteor-poc) and it requires the following packages.
+
++ **session** to keep slider value ([link](https://atmospherejs.com/meteor/session))
+    - `meteor add session`
++ **noUiSlider** for range slider ([link](https://atmospherejs.com/rcy/nouislider))
+    - `meteor add rcy:nouislider`
++ **TwitterBootstrap** for UI ([link](https://atmospherejs.com/twbs/bootstrap))
+    - `meteor add twbs:bootstrap`
++ **NVD3** library for chart ([link](http://nvd3.org/))
+    - see `/client/script/nv.d3.min.js` and `/client/css/nv.d3.css`.
+    - note a package is in Atmosphere ([link](https://atmospherejs.com/nvd3/nvd3))
+
+If you start this application, Meteor automatically downloads the packages except for **NVD3** and it is possible to start it just by executing `meteor`.
+
+### UI
+
+Meteor supports three UI frameworks/system: [Blaze](https://guide.meteor.com/blaze.html), [React](https://react-in-meteor.readthedocs.io/en/latest/) and [Angular](http://www.angular-meteor.com/). Blaze is used for the application, which is the default frontend rendering system. Blaze uses [Spacebars](http://meteorcapture.com/spacebars/) as a template engine by default, which is similar to Handlebars or Mustache. 
+
+Below shows how the UI is constructed in **app.html**. The body includes two templates (*sliderTemplate* and *chartTemplate*) and the layout is setup by Twitter Bootstrap (or Shiny's FluidPage if you like). In *sliderTemplate*, the value of *slider* is tracked as a session variable. On one hand, it shows the current slider value on the UI and, on the other hand, it is entered as an argument of a R script as demonstrated below.
+
+```{r blaze, eval=FALSE}
+<head>
+  <title>meteor-poc</title>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <h2>Old Faithful Geyser Data</h2>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="well">
+                    {{> sliderTemplate}}
+                </div>
+            </div>
+            <div class="col-sm-8">
+                {{> chartTemplate}}
+            </div>
+        </div>
+    </div>
+</body>
+
+<template name="sliderTemplate">    
+    <p>Number of bins:{{slider}}</p>
+    <div id="slider"></div>
+</template>
+
+<template name="chartTemplate">
+    <div id="chart">
+        <svg></svg>
+    </div>
+</template>
+```
+
+### Slider
+
+In Meteor, Javascript code is run both in the client and server so that, unless an [application is structured appropriately](https://guide.meteor.com/structure.html), it is necessary to indicate whether code should be run in the client or server - `if(Meteor.isClient) {}`. The code can be found in **app.js**.
+
+At the beginning, a session variable called *slider* is set up with the default value of 30. And, when *sliderTemplate* is rendered, the slider is rendered where the min, max and start values are 1, 50 and 30 respectively. Note that the start value is from the value of the *slider* session variable. 
+
+Two events are set up on the slider:
+
++ *slide*
+    - set a new value to the *slider* session variable
++ *change*
+    - set a new value to the *slider* session variable
+    - execute a [Meteor method](https://guide.meteor.com/methods.html) called `consoleExecSync` (see next subsection)
+        * Note to adjust the correrct path of _example.R_
+
+A helper is set up so that whenever the *slider* session variable changes, its value is updated to the UI.
+
+```{r slider, eval=FALSE}
+if(Meteor.isClient) {
+  
+  ....
+  
+  Session.setDefault('slider', 30);
+  
+  // slider template
+  Template.sliderTemplate.rendered = function () {
+      this.$("#slider").noUiSlider({
+          start: Session.get('slider'),
+          connect: 'lower',
+          range: {
+              'min': 1,
+              'max': 50
+          }
+      }).on('slide', function (event, value) {
+          // set values on 'slide' event
+          Session.set('slider', Math.ceil(value));
+      }).on('change', function (event, value) {
+          // round off on 'change' event
+          Session.set('slider', Math.ceil(value));
+          console.log('slider: ' + Session.get('slider'));
+          //note to adjust correct path of example.R
+          var cmd = 'Rscript C:\\workspace\\meteor-poc\\.script\\example.R' + ' ' + Session.get('slider');
+          //var cmd = 'Rscript /home/jaehyeon/meteor-poc/.script/example.R' + ' ' + Session.get('slider');
+          Meteor.call('consoleExecSync', cmd);
+          //console.log(DataSets.findOne().data);
+          //renderChart(getData());
+      });
+  };
+
+  Template.sliderTemplate.helpers({
+      slider: function() {
+          return Session.get('slider');
+      }
+  });
+}
+```
+
+### Run R script
+
+One of the key success criteria is how good to run a R function or script and to bring the output back to the application. In order to execute a R script, `child_preocess.exec()` of the [Node child process module](https://nodejs.org/api/child_process.html) is used. `consoleExecSync()` executes a command and inserts the output to a Mongo collection (*DataSets*) after removing the existing one - see this [Meteor Forum article](https://forums.meteor.com/t/meteor-python/2563/3) for further details.
+
+```{r method, eval=FALSE}
+DataSets = new Mongo.Collection('datasets');
+
+...
+    
+if (Meteor.isServer) {
+    exec = Npm.require('child_process').exec;
+    Fiber = Npm.require('fibers');
+
+    _execSync = function(cmd, stdoutHandler, stderrHandler) {
+        exec(cmd, Meteor.bindEnvironment(
+                function(error, stdout, stderr) {
+                    if (stdout != "")
+                        stdoutHandler(stdout);
+                    if (stderr != "")
+                        stderrHandler(stderr);
+                }
+            )
+        );
+    }
+
+    Meteor.methods({
+        consoleExecSync : function(cmd) {
+            _execSync(cmd, consoleInsert, consoleInsert);
+        }
+    });
+
+    consoleInsert = function(_data) {
+        DataSets.remove({});
+        DataSets.insert({
+            timestamp: new Date().getTime(),
+            data: _data
+        });
+    }
+}
+```
+
+In *example.R*, `hist()` is executed given the number of breaks, which is from the *slider* session variable, and *breaks* and *counts* are kept to generate a JSON string. This JSON string is inserted into the Mongo collection (*DataSets*) and used to render the histogram. Note that, in practice, it will be a lot efficient to load data to the client and to manipulate it for updating the histogram. However it is set up to run *example.R* each time when the slider value is changed so that it'd be easier to see how good a R script can be run. 
+
+A *prettified* string is shown below.
+
+```{r example, error=FALSE, message=FALSE, warning=FALSE}
+#breaks <- as.integer(commandArgs(TRUE)[1])
+breaks <- 3
+
+hist_obj <- hist(faithful[, 2], breaks = breaks, plot = FALSE)
+labels <- hist_obj$breaks
+values <- hist_obj$counts
+min_len <- min(length(labels), length(values))
+hist_df <- data.frame(label = as.character(labels[1:min_len]), value = values[1:min_len])
+
+lst <- list()
+lst[[length(lst) + 1]] <- list(values = hist_df)
+#print(jsonlite::toJSON(lst))
+print(jsonlite::toJSON(lst, pretty = TRUE))
+```
+
+### Render/Update histogram
+
+`renderChart()` is from a [NVD3 example](http://nvd3.org/livecode/index.html#codemirrorNav) and it is set up to run every time when a new value is added to the Mongo collection (*DataSets*) so that the histogram is updated. (It is like `observe()` in Shiny) Without this setup, it was not possible to render the histogram even if data is updated to the collection.
+
+```{r plot, eval=FALSE}
+...
+
+function renderChart(data) {
+    nv.addGraph(function() {
+        var chart = nv.models.discreteBarChart()
+            .x(function(d) { return d.label })
+            .y(function(d) { return d.value })
+            .staggerLabels(true)
+            .tooltips(true)
+            .showValues(false)
+
+        //chart.xAxis.axisLabel('X label');
+        chart.yAxis.axisLabel('Frequency').tickFormat(d3.format('d'));
+
+        d3.select('#chart svg')
+            .datum(data)
+            .transition().duration(500)
+            .call(chart)
+        ;
+
+      nv.utils.windowResize(chart.update);
+
+      return chart;
+    });
+}
+
+if(Meteor.isClient) {
+  DataSets.find().observe({
+      added: function(document) {
+          console.log('groups observe added value function');
+          console.log(document.data);
+          renderChart(JSON.parse(document.data));
+      },
+      changed: function(new_document, old_document) {
+          console.log('groups observe changed value function');
+      },
+      removed: function(document) {
+          console.log('groups observe removed value function');
+      }
+  });
+
+  ...
+}
+```
+
+Below shows another screen shot when the slider value is set to be 3. As can be seen, the histogram is updated by the JSON string from *example.R*.
+
+![center](C:\workspace\BLOG\jaehyeon-kim.github.io\figs\2016-07-11-Hello-Meteor\meteor_up.png)
+
+I hope this post is useful.
+
+
+
+
+
+
+
+
+
