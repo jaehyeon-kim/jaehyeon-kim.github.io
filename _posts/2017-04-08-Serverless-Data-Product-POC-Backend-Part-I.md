@@ -20,7 +20,7 @@ This is the first post of *Serverless Data Product POC* series and I'm planning 
 
 ## Model
 
-The data is from the [LOGIT REGRESSION|R DATA ANALYSIS EXAMPLES](http://stats.idre.ucla.edu/r/dae/logit-regression/) of UCLA: Statistical Consulting Group. It is hypothetical data about graduate school admission and has 3 featues (_gre_, _gpa_, _rank_) and 1 binary response (_admit_).
+The data is from the [LOGIT REGRESSION - R DATA ANALYSIS EXAMPLES](http://stats.idre.ucla.edu/r/dae/logit-regression/) of UCLA: Statistical Consulting Group. It is hypothetical data about graduate school admission and has 3 featues (_gre_, _gpa_, _rank_) and 1 binary response (_admit_).
 
 
 {% highlight r %}
