@@ -50,7 +50,7 @@ Before creating a role, it is necessary to create (user-based) policies so that 
 * Resource - On which resources?
 * Principal - Who is allowed or denied access to a resource? (relevant to trust policies)
 
-*ServerlessPOC* is read-only permission to all keys in the *serverless-poc-models* bucket while *AWSLambdaBasicExecutionRole* is read-write permission to all resources in Amazon CloudWatch.
+*ServerlessPOC* is read-only permission to all keys in the *serverless-poc-models* bucket while *AWSLambdaBasicExecutionRole* is write permission to all resources in Amazon CloudWatch.
 
 
 {% highlight bash %}
