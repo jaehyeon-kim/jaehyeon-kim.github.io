@@ -12,7 +12,7 @@ A developer can be relieved from the overwhelming DevOps stuff if his/her model 
 
 This is the first post of *Serverless Data Product POC* series and I'm planning to introduce a data product in a **serverless** environment. For the backend, a simple logistic regression model is packaged and tested for [AWS Lambda](https://aws.amazon.com/lambda/) - R is not included in [Lambda runtime](http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html) so that it is packaged and run via the Python [rpy2](https://pypi.python.org/pypi/rpy2) package. Then the model is deployed at [AWS Lambda](https://aws.amazon.com/lambda/) and the Lambda function is exposed via [Amazon API Gateway](https://aws.amazon.com/api-gateway/). For the frontend, a simple single page application is served from [Amazon S3](https://aws.amazon.com/s3/).
 
-[EDIT 2017-04-11] Deploying at AWS Lambda and exposing via API Gateway are split into 2 posts (Part I and II).
+[EDIT 2017-04-11] Deploying at AWS Lambda and exposing via API Gateway are split into 2 posts (Part II and III).
 
 * Backend
     * [Packaging R for AWS Lambda](#) - this post
