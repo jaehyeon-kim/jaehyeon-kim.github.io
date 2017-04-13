@@ -16,8 +16,8 @@ This is the first post of *Serverless Data Product POC* series and I'm planning 
 
 * Backend
     * [Packaging R for AWS Lambda](#) - this post
-    * [Deploying at AWS Lambda](http://jaehyeon-kim.github.io/2017/04/Serverless-Data-Product-POC-Backend-Part-II.html)
-    * Exposing via Amazon API Gateway
+    * [Deploying at AWS Lambda](/2017/04/Serverless-Data-Product-POC-Backend-Part-II.html)
+    * [Exposing via Amazon API Gateway](/2017/04/Serverless-Data-Product-POC-Backend-Part-III.html)
 * Frontend
     * Serving a single page application from Amazon S3
 
