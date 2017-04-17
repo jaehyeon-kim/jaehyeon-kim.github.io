@@ -224,7 +224,7 @@ Then, in the properties tab, *static website hosting* is enabled where *index.ht
 <hr style="height:1px;border:none;color:#333;background-color:#333;" />
 <br/>
 
-In order to replace the *endpoint* with a custom domain name, a [Canonical name (CNAME) record](https://en.wikipedia.org/wiki/CNAME_record) is created in [Amazon Route 53](https://aws.amazon.com/route53/). Note that the CNAME record (*poc.jaehyeon.me*) has to be the same to the bucket name. `s3-website-us-east-1.amazonaws.com.` is entered in *Value*, which is used to define the host name as an alias for the Amazon S3 bucket. Note the period at the end is necessary as it signifies the DNS root and, if it is not specified, a DNS resolver could append it's default domain to the domain you provided. (See [Customizing Amazon S3 URLs with CNAMEs](http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html#VirtualHostingCustomURLs) for further details.) Now the application can be accessed using http://poc.jaehyeon.me.
+In order to replace the *endpoint* with a custom domain name, a [Canonical name (CNAME) record](https://en.wikipedia.org/wiki/CNAME_record) is created in [Amazon Route 53](https://aws.amazon.com/route53/). Note that the CNAME record (*poc.jaehyeon.me*) has to be the same to the bucket name. `s3-website-us-east-1.amazonaws.com.` is entered in *Value*, which is used to define the host name as an alias for the Amazon S3 bucket. Note the period at the end is necessary as it signifies the DNS root and, if it is not specified, a DNS resolver could append it's default domain to the domain you provided. (See [Customizing Amazon S3 URLs with CNAMEs](http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html#VirtualHostingCustomURLs) for further details.) Now the application can be accessed using [http://poc.jaehyeon.me](http://poc.jaehyeon.me).
 
 {:.center}
 ![](/figs/Serverless-Data-Product-POC-Frontend/04-route53.png)
@@ -296,7 +296,7 @@ In Route 53, a new record set is created and `web.jaehyeon.me` is entered in the
 <hr style="height:1px;border:none;color:#333;background-color:#333;" />
 <br/>
 
-Once it is ready, the application can be accessed using either http://web.jaehyeon.me or https://web.jaehyeon.me where HTTP is redirected to HTTPS.
+Once it is ready, the application can be accessed using either [http://web.jaehyeon.me](http://web.jaehyeon.me) or [https://web.jaehyeon.me](https://web.jaehyeon.me) where HTTP is redirected to HTTPS.
 
 ## Final thoughts
 
