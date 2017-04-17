@@ -18,8 +18,13 @@ In [Part I](/2017/04/Serverless-Data-Product-POC-Backend-Part-I.html) of this se
     * [Deploying at AWS Lambda](/2017/04/Serverless-Data-Product-POC-Backend-Part-II.html)
     * [Exposing via Amazon API Gateway](#) - this post
 * Frontend
-    * Serving a single page application from Amazon S3
-    
+    * [Serving a single page application from Amazon S3](/2017/04/Serverless-Data-Product-POC-Frontend-Part-IV.html)
+
+<hr/>
+<br/>
+[**EDIT 2017-04-17**] The Lambda function hander (*handler.py*) has been modified to resolve an issue of *Cross-Origin Resource Sharing (CORS)*. See [Part IV](/2017/04/Serverless-Data-Product-POC-Frontend-Part-IV.html) for further details.
+<hr/>
+
 ## Create API
 
 It can be started by clicking the *Get Started* button if there's no existing API or the *Create API* button if there is an existing one.

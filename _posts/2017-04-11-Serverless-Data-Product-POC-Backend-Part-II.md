@@ -19,7 +19,12 @@ Initially I was planning to discuss how to deploy a package at AWS Lambda and to
     * [Deploying at AWS Lambda](#) - this post
     * [Exposing via Amazon API Gateway](/2017/04/Serverless-Data-Product-POC-Backend-Part-III.html)
 * Frontend
-    * Serving a single page application from Amazon S3
+    * [Serving a single page application from Amazon S3](/2017/04/Serverless-Data-Product-POC-Frontend-Part-IV.html)
+
+<hr/>
+<br/>
+[**EDIT 2017-04-17**] The Lambda function hander (*handler.py*) has been modified to resolve an issue of *Cross-Origin Resource Sharing (CORS)*. See [Part IV](/2017/04/Serverless-Data-Product-POC-Frontend-Part-IV.html) for further details.
+<hr/>
 
 ## Managing security
 
