@@ -22,8 +22,9 @@ The initial series plan is listed below.
 Development
 
 * [Introduction to HITS and weighted association rules mining](/2017/05/CRAN-Package-Recommender-Part-I) - this post
-* Processing CRAN package download logs
+* [Downloading/Processing relevant data](/2017/05/CRAN-Package-Recommender-Part-II)
 * Analysing CRAN package download logs
+* Identifying package similarity
 * _to be updated_
 
 Deployment
