@@ -233,7 +233,7 @@ test <- function(env) {
 }
 {% endhighlight %}
 
-This is all for Part I. In [Part II]([Part II](/2017/11/API-Development-with-R-Part-II)), it'll be discussed how to deploy the APIs via a Docker container, how to make example requests and their performance. I hope this article is interesting.
+This is all for Part I. In [Part II](/2017/11/API-Development-with-R-Part-II), it'll be discussed how to deploy the APIs via a Docker container, how to make example requests and their performance. I hope this article is interesting.
 
 
 
