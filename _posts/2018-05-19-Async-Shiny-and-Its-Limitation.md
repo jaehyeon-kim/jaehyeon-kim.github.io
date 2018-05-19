@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "2018-05-19-Aync-Shiny-and-Its-Limitation"
+title: "2018-05-19-Async-Shiny-and-Its-Limitation"
 description: ""
 category: R
 tags: [Web Development, R, Shiny, Rserve, JavaScript]
