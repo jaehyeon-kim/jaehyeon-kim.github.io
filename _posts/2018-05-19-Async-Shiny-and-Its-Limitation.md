@@ -3,7 +3,7 @@ layout: post
 title: "2018-05-19-Async-Shiny-and-Its-Limitation"
 description: ""
 category: R
-tags: [Web Development, R, Shiny, Rserve, JavaScript]
+tags: [Web Development, R, Shiny, Rserve, Javascript]
 ---
 A Shiny app is served by one (*single-threaded blocking*) process by [Open Source Shiny Server](https://www.rstudio.com/products/shiny/download-server/). This causes a scalability issue because all requests are handled one by one in a queue. Recently the creator of *Shiny* introduced the [promises](https://rstudio.github.io/promises/) package, which brings *asynchronous programming capabilities to R*. This is a remarkable step forward to web development in R.
 
@@ -533,4 +533,4 @@ As mentioned earlier, AJAX requests are made by clicking buttons and it's implem
 
 For comparison, the async Shiny app and the JavaScript frontend/backend are included in the [docker compose](https://github.com/jaehyeon-kim/more-thoughts-on-shiny/blob/master/compose-all/docker-compose.yml). The JavaScript app can be accessed in port 7000. Once started, it's possible to see widgets are rendered without delay when buttons are clicked multiple times.
 
-Compared to the async Shiny app, the JavaScript app is more effective in handling multiple requests. The downside of it is the benefits that Shiny provides is no longer available. Some of them are built-in data binding, event handling and state management. For example, think about what `reactive*()` and `observe*()` do for a Shiny app. Although it is possible to setup those with plain JavaScript or JQuery, life will be a lot easier if an app is built with one of the popular JavaScript frameworks: [Angular](https://angularjs.org/), [React](https://reactjs.org/) and [Vue](https://vuejs.org/). In the next post, it'll be shown how to render htmlwidgets in a Vue application as well as building those with native JavaScript libraries.
+Compared to the async Shiny app, the JavaScript app is more effective in handling multiple requests. The downside of it is the benefits that Shiny provides are no longer available. Some of them are built-in data binding, event handling and state management. For example, think about what `reactive*()` and `observe*()` do for a Shiny app. Although it is possible to setup those with plain JavaScript or JQuery, life will be a lot easier if an app is built with one of the popular JavaScript frameworks: [Angular](https://angularjs.org/), [React](https://reactjs.org/) and [Vue](https://vuejs.org/). In the next post, it'll be shown how to render htmlwidgets in a Vue application as well as building those with native JavaScript libraries.
