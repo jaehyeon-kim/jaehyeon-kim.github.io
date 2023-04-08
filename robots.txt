@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://jaehyeon-kim.github.io/sitemap.xml
