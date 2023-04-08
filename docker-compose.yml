@@ -1,0 +1,12 @@
+version: "3.5"
+
+services:
+  hugo:
+      image: klakegg/hugo:0.107.0-ext-ubuntu
+      command: server -D -F -E --poll 700ms
+      container_name: hugo
+      volumes:
+        - $PWD:/src
+        - /etc/ssl/certs:/etc/ssl/certs
+      ports:
+        - "1313:1313"

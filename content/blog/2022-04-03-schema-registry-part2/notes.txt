@@ -1,0 +1,18 @@
+analytics-db-cluster.cluster-ctrfy31kg8iq.ap-southeast-2.rds.amazonaws.com
+
+
+pip install -r connect/data/requirements.txt 
+
+python connect/data/load/main.py \
+  -h analytics-db-cluster.cluster-ctrfy31kg8iq.ap-southeast-2.rds.amazonaws.com \
+  -d main -u master
+
+p Passw0rd
+
+update BS_SERVERS env var
+docker-compose -f kafka-ui.yml up
+
+confluent-s3-sink-registry-up
+.zip
+
+debezium-postgres-source
