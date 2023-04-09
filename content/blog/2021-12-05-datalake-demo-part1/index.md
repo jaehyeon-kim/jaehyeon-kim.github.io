@@ -30,6 +30,7 @@ authors:
   - JaehyeonKim
 images: []
 cevo: 5
+description: Change data capture (CDC) on Amazon MSK and ingesting data using Apache Hudi on Amazon EMR can be used to build an efficient data lake solution. As a starting point, we’ll discuss the source database and CDC streaming infrastructure in the local environment.
 ---
 
 [Change data capture (CDC)](https://www.redhat.com/en/topics/integration/what-is-change-data-capture#what-is-cdc) is a proven data integration pattern that has a wide range of applications. Among those, data replication to data lakes is a good use case in data engineering. Coupled with [best-in-breed data lake formats](https://lakefs.io/hudi-iceberg-and-delta-lake-data-lake-table-formats-compared/) such as [Apache Hudi](https://hudi.apache.org/), we can build an efficient data replication solution. This is the first post of the data lake demo series. Over time, we'll build a data lake that uses CDC. As a starting point, we'll discuss the source database and CDC streaming infrastructure in the local environment.

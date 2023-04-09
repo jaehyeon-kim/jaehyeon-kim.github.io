@@ -25,6 +25,7 @@ authors:
   - JaehyeonKim
 images: []
 cevo: 19
+description: The data build tool (dbt) is an effective data transformation tool and it supports key AWS analytics services - Redshift, Glue, EMR and Athena. In part 2 of the dbt on AWS series, we discuss data transformation pipelines using dbt on AWS Glue. Subsets of IMDb data are used as source and data models are developed in multiple layers according to the dbt best practices.
 ---
 
 
