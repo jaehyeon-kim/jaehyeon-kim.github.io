@@ -22,6 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
+description: API is an effective way of distributing analysis outputs to external clients. When it comes to API development with R, however, there are not many choices. In this post, serving an R function with plumber, Rserve and rApache is discussed.
 ---
 API is an effective way of distributing analysis outputs to external clients. When it comes to API development with R, however, there are not many choices. Probably development would be made with [plumber](https://github.com/trestletech/plumber), [Rserve](https://www.rforge.net/Rserve/), [rApache](http://rapache.net/) or [OpenCPU](https://www.opencpu.org/) if a client or bridge layer to R is not considered. 
 

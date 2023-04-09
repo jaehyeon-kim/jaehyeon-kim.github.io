@@ -15,11 +15,11 @@ featuredImage: false
 categories:
   - Engineering
 tags: 
-  - LocalStack
   - AWS
   - Docker
   - Docker Compose
   - AWS Lambda
+  - LocalStack
   - S3
   - SQS
   - Python
@@ -28,9 +28,10 @@ tags:
 authors:
   - JaehyeonKim
 images: []
+description: LocalStack provides an easy-to-use test/mocking framework for developing AWS applications. In this post, I'll demonstrate how to utilize LocalStack for development using a web service.
 ---
 
-[LocalStack](https://github.com/localstack/localstack) provides an easy-to-use test/mocking framework for developing AWS applications. In this post, a web service will be used for demonstrating how to utilize LocalStack for development.
+[LocalStack](https://github.com/localstack/localstack) provides an easy-to-use test/mocking framework for developing AWS applications. In this post, I'll demonstrate how to utilize LocalStack for development using a web service.
 
 Specifically a simple web service built with [Flask-RestPlus](https://flask-restplus.readthedocs.io/en/stable/) is used. It supports simple CRUD operations against a database table. It is set that SQS and Lambda are used for creating and updating a record. When a _POST_ or _PUT_ request is made, the service sends a message to a SQS queue and directly returns _204_ reponse. Once a message is received, a Lambda function is invoked and a relevant database operation is performed. 
 

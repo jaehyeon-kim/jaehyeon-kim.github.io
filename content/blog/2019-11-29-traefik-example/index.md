@@ -25,6 +25,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
+description: Traefik is a modern HTTP reverse proxy and load balancer. In this post, it'll be demonstrated how path-based routing can be set up by Traefik with Docker. Also a centralized authentication will be illustrated with the Forward Authentication feature of Traefik.
 ---
 
 [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) in [Kubernetes](https://kubernetes.io/) exposes HTTP and HTTPS routes from outside the cluster to services within the cluster. By setting rules, it routes requests to appropriate services (precisely requests are sent to individual [Pods](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/) by [Ingress Controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)). Rules can be set up dynamically and I find it's more efficient compared to traditional [reverse proxy](https://en.wikipedia.org/wiki/Reverse_proxy).

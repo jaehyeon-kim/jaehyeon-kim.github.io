@@ -22,6 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
+description: Although R Shiny added async features but it has limitation when compared to Javascript. In this post, I'll demonstrate how to render htmlwigets in a Vue application in a more performant way as well as how to replace those widgets with native Javascript libraries.
 ---
 
 In the [last post](/blog/2018-05-19-asyn-shiny-and-its-limitation), the async feature of Shiny was discussed. Although it is a remarkable step forward to web development in R, it is not to the full extent that a Javascript application can bring. In fact, (long running) requests of a user (or session) are not impacted by those of other users (or sessions) but, for a given user, all requests are handled sequentially. On the other hand, it is not the case for a Javascript-backed app where all requests are processed asynchronously.

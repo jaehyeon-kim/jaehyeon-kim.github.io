@@ -22,6 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
+description: In part I, it is discussed how to serve an R function with plumber, Rserve and rApache. In this post, the APIs are deployed in a Docker container and, after showing example requests, their performance is compared.
 ---
 In [Part I](/blog/2017-11-18-api-development-with-r-1), it is discussed how to serve an R function with _plumber_, _Rserve_ and _rApache_. In this post, the APIs are deployed in a Docker container and, after showing example requests, their performance is compared. The [rocker/r-ver:3.4](https://hub.docker.com/r/rocker/r-ver/) is used as the base image and each of the APIs is added to it. For simplicity, the APIs are served by [Supervisor](http://supervisord.org/). For performance testing, [Locust](https://locust.io/) is used. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/r-api-demo).
 

@@ -1,5 +1,5 @@
 ---
-title: Serverless Data Product POC Backend Part III
+title: Serverless Data Product POC Backend Part III - Exposing R ML Model via APIG
 date: 2017-04-13
 draft: false
 featured: false
@@ -23,16 +23,17 @@ tags:
 authors:
   - JaehyeonKim
 images: []
+description: In previous posts, we discussed how to package and deploy an R machine learning model via Lambda. In this post, I'll demonstrate how to expose the model via Amazon API Gateway.
 ---
 
 In [Part I](/blog/2017-04-08-serverless-data-product-1) of this series, R and necessary libraries/packages together with a Lambda function handler are packaged and saved to [Amazon S3](https://aws.amazon.com/s3/). Then, in [Part II](/blog/2017-04-11-serverless-data-product-2), the package is deployed at [AWS Lambda](https://aws.amazon.com/lambda/) after creating and assigning a role to the Lambda function. Although the Lambda function can be called via the Invoke API, it'll be much more useful if the function can be called as a web service (or API). In this post, it is discussed how to expose the Lambda function via [Amazon API Gateway](https://aws.amazon.com/api-gateway/). After creating an API by integrating the Lambda function, it is protected with an API key. Finally a custom domain name is used as an alternative URL of the API.
 
 * Backend
-    * [Packaging R for AWS Lambda - Part I](/blog/2017-04-08-serverless-data-product-1)
-    * [Deploying at AWS Lambda - Part II](/blog/2017-04-11-serverless-data-product-2)
-    * [Exposing via Amazon API Gateway - Part III](#) - this post
+    * [Part I - Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1)
+    * [Part II - Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2)
+    * [Part III - Exposing R ML Model via APIG](#) - this post
 * Frontend
-    * [Serving a single page application from Amazon S3 - Part IV](/blog/2017-04-17-serverless-data-product-4) - this post
+    * [Part IV - Serving R ML Model via S3](/blog/2017-04-17-serverless-data-product-4)
 
 [**EDIT 2017-04-17**] The Lambda function hander (*handler.py*) has been modified to resolve an issue of *Cross-Origin Resource Sharing (CORS)*. See [Part IV](/blog/2017-04-17-serverless-data-product-4) for further details.
 

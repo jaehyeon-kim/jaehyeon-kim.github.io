@@ -1,5 +1,5 @@
 ---
-title: Serverless Data Product POC Backend Part I
+title: Serverless Data Product POC Backend Part I - Packaging R ML Model for Lambda
 date: 2017-04-08
 draft: false
 featured: false
@@ -23,6 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
+description: In this post, I'll demonstrate how to test and develop a logistic regression model developed in R. Also the model will be packaged for AWS Lambda.
 ---
 
 Let say you've got a prediction model built in R and you'd like to *productionize* it, for example, by serving it in a web application. One way is exposing the model through an API that returns the predicted result as a web service. However there are many issues. Firstly R is not a language for API development although there may be some ways - eg the [plumber](https://github.com/trestletech/plumber) package. More importantly developing an API is not the end of the story as the API can't be served in a production system if it is not *deployed/managed/upgraded/patched/...* appropriately in a server or if it is not *scalable*, *protected via authentication/authorization* and so on. Therefore it requires quite a vast range of skill sets that cover both development and DevOps (engineering). 
@@ -32,11 +33,11 @@ A developer can be relieved from the overwhelming DevOps stuff if his/her model 
 This is the first post of *Serverless Data Product POC* series and I'm planning to introduce a data product in a **serverless** environment. For the backend, a simple logistic regression model is packaged and tested for [AWS Lambda](https://aws.amazon.com/lambda/) - R is not included in [Lambda runtime](http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html) so that it is packaged and run via the Python [rpy2](https://pypi.python.org/pypi/rpy2) package. Then the model is deployed at [AWS Lambda](https://aws.amazon.com/lambda/) and the Lambda function is exposed via [Amazon API Gateway](https://aws.amazon.com/api-gateway/). For the frontend, a simple single page application is served from [Amazon S3](https://aws.amazon.com/s3/).
 
 * Backend
-    * [Packaging R for AWS Lambda - Part I](#) - this post
-    * [Deploying at AWS Lambda - Part II](/blog/2017-04-11-serverless-data-product-2)
-    * [Exposing via Amazon API Gateway - Part III](/blog/2017-04-13-serverless-data-product-3)
+    * [Part I - Packaging R ML Model for Lambda](#) - this post
+    * [Part II - Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2)
+    * [Part III - Exposing R ML Model via APIG](/blog/2017-04-13-serverless-data-product-3)
 * Frontend
-    * [Serving a single page application from Amazon S3 - Part IV](/blog/2017-04-17-serverless-data-product-4)
+    * [Part IV - Serving R ML Model via S3](/blog/2017-04-17-serverless-data-product-4)
 
 [**EDIT 2017-04-11**] Deploying at AWS Lambda and exposing via API Gateway are split into 2 posts (Part II and III).
 

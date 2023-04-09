@@ -27,6 +27,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
+description: In this post, I'll illustrate how a web service is created using FastAPI framework where tasks are sent to multiple workers. The workers are built with Celery and Rserve. Redis is used as a message broker/result backend for Celery and a key-value store for Rserve. Demos can be run in both Docker Compose and Kubernetes.
 ---
 
 While I'm looking into [Apache Airflow](https://airflow.apache.org/), a workflow management tool, I thought it would be beneficial to get some understanding of how [Celery](http://www.celeryproject.org/) works. To do so, I built a simple web service that sends tasks to Celery workers and collects the results from them. [FastAPI](https://fastapi.tiangolo.com/) is used for developing the web service and [Redis](https://redis.io/) is used for the message broker and result backend. During the development, I thought it would be possible to implement similar functionality in R with [Rserve](https://www.rforge.net/Rserve/). Therefore a Rserve worker is added as an example as well. Coupling a web service with distributed task queue is beneficial on its own as it helps the service be more responsive by offloading heavyweight and long running processes to task workers.

@@ -24,11 +24,12 @@ tags:
 authors:
   - JaehyeonKim
 images: []
+description: In this post, it is demonstrated how AWS Lambda can be integrated with Apache Airflow using a custom operator inspired by the ECS Operator.
 ---
 
 [Apache Airflow](https://airflow.apache.org/) is a popular open-source workflow management platform. Typically tasks run remotely by [Celery](http://www.celeryproject.org/) workers for scalability. In AWS, however, scalability can also be achieved using serverless computing services in a simpler way. For example, the [ECS Operator](https://airflow.apache.org/docs/stable/_api/airflow/contrib/operators/ecs_operator/index.html) allows to run _dockerized_ tasks and, with the _Fargate_ launch type, they can run in a serverless environment.
 
-The ECS Operator alone is not sufficent because it can take up to several minutes to pull a Docker image and to set up network interface (for the case of _Fargate_ launch type). Due to its latency, it is not suitable for frequently-running tasks. On the other hand, the latency of a Lambda function is negligible so that it's more suitable for managing such tasks.
+The ECS Operator alone is not sufficient because it can take up to several minutes to pull a Docker image and to set up network interface (for the case of _Fargate_ launch type). Due to its latency, it is not suitable for frequently-running tasks. On the other hand, the latency of a Lambda function is negligible so that it's more suitable for managing such tasks.
 
 In this post, it is demonstrated how AWS Lambda can be integrated with Apache Airflow using a custom operator inspired by the ECS Operator.
 

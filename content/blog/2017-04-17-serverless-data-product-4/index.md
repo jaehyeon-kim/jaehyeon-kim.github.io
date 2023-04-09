@@ -1,5 +1,5 @@
 ---
-title: Serverless Data Product POC Backend Part IV
+title: Serverless Data Product POC Backend Part IV - Serving R ML Model via S3
 date: 2017-04-17
 draft: false
 featured: false
@@ -27,17 +27,17 @@ tags:
 authors:
   - JaehyeonKim
 images: []
+description: In the previous posts, it is discussed how to package/deploy an R machine learning model with AWS Lambda and to expose the Lambda function via Amazon API Gateway. In this post, I'll demonstrate how to host a web application that services the backend API in a serverless environment.
 ---
 
-In the previous posts, it is discussed how to package/deploy a [R](https://www.r-project.org/about.html) model with [AWS Lambda](https://aws.amazon.com/lambda/details/) and to expose the Lambda function via [Amazon API Gateway](https://aws.amazon.com/api-gateway/). Main benefits of **serverless architecture** is cost-effectiveness and being hassle-free from provisioning/managing servers. While the API returns a predicted admission status value given *GRE*, *GPA* and *Rank*, there is an issue if it is served within a web application: *Cross-Origin Resource Sharing (CORS)*. This post discusses how to resolve this issue by updating API configuration and the Lambda function handler  with a simple web application. Also it is illustrated how to host the application in a serverless environment.
+In the previous posts, it is discussed how to package/deploy an [R](https://www.r-project.org/about.html) model with [AWS Lambda](https://aws.amazon.com/lambda/details/) and to expose the Lambda function via [Amazon API Gateway](https://aws.amazon.com/api-gateway/). Main benefits of **serverless architecture** is cost-effectiveness and being hassle-free from provisioning/managing servers. While the API returns a predicted admission status value given *GRE*, *GPA* and *Rank*, there is an issue if it is served within a web application: *Cross-Origin Resource Sharing (CORS)*. This post discusses how to resolve this issue by updating API configuration and the Lambda function handler with a simple web application. Also it is illustrated how to host the application in a serverless environment.
 
 * Backend
-    * [Packaging R for AWS Lambda - Part I](/blog/2017-04-08-serverless-data-product-1)
-    * [Deploying at AWS Lambda - Part II](/blog/2017-04-11-serverless-data-product-2)
-    * [Exposing via Amazon API Gateway - Part III](/blog/2017-04-13-serverless-data-product-3)
+    * [Part I - Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1)
+    * [Part II - Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2)
+    * [Part III - Exposing R ML Model via APIG](/blog/2017-04-13-serverless-data-product-3)
 * Frontend
-    * [Serving a single page application from Amazon S3 - Part IV](#) - this post
-
+    * [Part IV - Serving R ML Model via S3](#) - this post
 ## Frontend
 
 A simple *single page application* is created using [React](https://facebook.github.io/react/). By clicking the *Check!* button after entering the *GRE*, *GPA* and *Rank* values, information of the expected admimission status pops up in a modal. The status value is `fetch`ed from the API of the POC application that is discussed in [Part III](/blog/2017-04-13-serverless-data-product-3). The code of this application can be found [here](https://github.com/jaehyeon-kim/serverless-poc/tree/master/poc-web).

@@ -1,5 +1,5 @@
 ---
-title: Serverless Data Product POC Backend Part II
+title: Serverless Data Product POC Backend Part II - Deploying R ML Model via Lambda
 date: 2017-04-11
 draft: false
 featured: false
@@ -23,6 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
+description: In the previous post, it is discuss how to develop and package an R machine learning model. In this post, I'll illustrate how to deploy the model via AWS Lambda.
 ---
 
 In the [previous post](/blog/2017-04-08-serverless-data-product-1), **serverless** **event-driven** application development is introduced. Also how to package R, necessary libraries/packages and a Lambda function handler is discussed. No need of provisioning/managing servers is one of the key benefits of the architecture. It is also a cost-effective way of delivering a data product as functions are executed *on-demand* rather than in servers that run 24/7. Furthermore [AWS Lambda free tier](https://aws.amazon.com/lambda/pricing/) includes 1M free requests per month and 400,000 GB-seconds of compute time per month, which is available to both existing and new AWS customers indefinitely. (GB-seconds is applicable when execution is made with 1 GB of memory.) Lowering the size of memory increases the execution time and thus 3.2M seconds or about 37 days are free with 128 MB of memory (1 GB divided by 8) - note that CPU power is proportional to allocated memory.
@@ -30,11 +31,11 @@ In the [previous post](/blog/2017-04-08-serverless-data-product-1), **serverless
 Initially I was planning to discuss how to deploy a package at AWS Lambda and to expose it via Amazon API Gateway in this post. However it'd be too long with so many screenshots and I split them in Part II and III. Here is an updated series plan.
 
 * Backend
-    * [Packaging R for AWS Lambda - Part I](/blog/2017-04-08-serverless-data-product-1)
-    * [Deploying at AWS Lambda - Part II](#) - this post
-    * [Exposing via Amazon API Gateway - Part III](/blog/2017-04-13-serverless-data-product-3)
+    * [Part I - Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1)
+    * [Part II - Deploying R ML Model via Lambda](#) - this post
+    * [Part III - Exposing R ML Model via APIG](/blog/2017-04-13-serverless-data-product-3)
 * Frontend
-    * [Serving a single page application from Amazon S3 - Part IV](/blog/2017-04-17-serverless-data-product-4)
+    * [Part IV - Serving R ML Model via S3](/blog/2017-04-17-serverless-data-product-4)
 
 [**EDIT 2017-04-17**] The Lambda function handler (*handler.py*) has been modified to resolve an issue of *Cross-Origin Resource Sharing (CORS)*. See [Part IV](/blog/2017-04-17-serverless-data-product-4) for further details.
 
