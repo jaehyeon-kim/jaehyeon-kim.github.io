@@ -41,7 +41,7 @@ color: light # light, dark or auto. Default to auto.
 # dateFormat: Jan 2, 2006
 
 # Google Adsense
-googleAdsense: 
+googleAdsense: ca-pub-2764466088407958
 
 math: true # Enable math globally.
 toc: true # Disable TOC globally.
