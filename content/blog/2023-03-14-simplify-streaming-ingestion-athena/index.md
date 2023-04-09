@@ -30,8 +30,6 @@ images: []
 cevo: 25
 ---
 
-This article is originally posted in the [Tech Insights](https://cevo.com.au/tech-insights/) of Cevo Australia - [Link](https://cevo.com.au/post/streaming-ingestion-on-aws-part-2/).
-
 In Part 1, we discussed a streaming ingestion solution using [EventBridge](https://aws.amazon.com/eventbridge/), [Lambda](https://aws.amazon.com/lambda/), [MSK](https://aws.amazon.com/msk/) and [Redshift Serverless](https://aws.amazon.com/redshift/redshift-serverless/). Athena provides the [MSK connector](https://docs.aws.amazon.com/athena/latest/ug/connectors-msk.html) to enable SQL queries on Apache Kafka topics directly, and it can also facilitate the extraction of insights without setting up an additional pipeline to store data into S3. In this post, we discuss how to update the streaming ingestion solution so that data in the Kafka topic can be queried by Athena instead of Redshift.
 
 * [Part 1 MSK and Redshift](/blog/2023-02-08-simplify-streaming-ingestion-redshift)

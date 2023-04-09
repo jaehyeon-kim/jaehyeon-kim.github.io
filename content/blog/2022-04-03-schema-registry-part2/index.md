@@ -29,8 +29,6 @@ images: []
 cevo: 11
 ---
 
-This article is originally posted in the [Tech Insights](https://cevo.com.au/tech-insights/) of Cevo Australia - [Link](https://cevo.com.au/post/external-schema-registry-part-2/).
-
 In the [previous post](/blog/2022-03-07-schema-registry-part1), we discussed a Change Data Capture (CDC) solution with a schema registry. A local development environment is set up using Docker Compose. The Debezium and Confluent S3 connectors are deployed with the Confluent Avro converter and the Apicurio registry is used as the schema registry service. A quick example is shown to illustrate how schema evolution can be managed by the schema registry. In this post, we'll build the solution on AWS using [MSK](https://aws.amazon.com/msk/), [MSK Connect](https://aws.amazon.com/msk/features/msk-connect/), [Aurora PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraPostgreSQL.html) and [ECS](https://aws.amazon.com/ecs/).
 
 * [Part 1 Local Development](/blog/2022-03-07-schema-registry-part1)

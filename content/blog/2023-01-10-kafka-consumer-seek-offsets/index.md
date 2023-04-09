@@ -25,8 +25,6 @@ images: []
 cevo: 23
 ---
 
-This article is originally posted in the [Tech Insights](https://cevo.com.au/tech-insights/) of Cevo Australia - [Link](https://cevo.com.au/post/kafka-seek-offset-by-timestamp/).
-
 Normally we consume Kafka messages from the beginning/end of a topic or last committed offsets. For backfilling or troubleshooting, however, we need to consume messages from a certain timestamp occasionally. The Kafka consumer class of the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package has a method to [seek a particular offset](https://kafka-python.readthedocs.io/en/master/apidoc/KafkaConsumer.html#kafka.KafkaConsumer.seek) for a topic partition. Therefore, if we know which topic partition to choose e.g. by [assigning a topic partition](https://kafka-python.readthedocs.io/en/master/apidoc/KafkaConsumer.html#kafka.KafkaConsumer.assign), we can easily override the fetch offset. When we deploy multiple consumer instances together, however, we make them [subscribe to a topic](https://kafka-python.readthedocs.io/en/master/apidoc/KafkaConsumer.html#kafka.KafkaConsumer.subscribe) and topic partitions are dynamically assigned, which means we do not know which topic partition will be assigned to a consumer instance in advance. In this post, we will discuss how to configure the Kafka consumer to seek offsets by timestamp where topic partitions are dynamically assigned by subscription.
 
 

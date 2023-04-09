@@ -27,8 +27,6 @@ images: []
 cevo: 17
 ---
 
-This article is originally posted in the [Tech Insights](https://cevo.com.au/tech-insights/) of Cevo Australia - [Link](https://cevo.com.au/post/develop-and-test-apache-spark-apps-for-emr-remotely-using-vscode/).
-
 When we develop a Spark application on EMR, we can use [docker for local development](/blog/2022-05-08-emr-local-dev) or notebooks via [EMR Studio](https://aws.amazon.com/emr/features/studio/) (or [EMR Notebooks](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html)). However, the local development option is not viable if the size of data is large. Also, I am not a fan of notebooks as it is not possible to utilise the features my editor supports such as syntax highlighting, autocomplete and code formatting. Moreover, it is not possible to organise code into modules and to perform unit testing properly with that option. In this post, We will discuss how to set up a remote development environment on an EMR cluster deployed in a private subnet with VPN and the [VS Code remote SSH extension](https://code.visualstudio.com/docs/remote/ssh). Typical Spark development examples will be illustrated while sharing the cluster with multiple users. Overall it brings another effective way of developing Spark apps on EMR, which improves developer experience significantly.
 
 

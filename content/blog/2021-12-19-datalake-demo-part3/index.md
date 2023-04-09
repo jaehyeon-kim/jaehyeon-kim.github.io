@@ -32,8 +32,6 @@ images: []
 cevo: 7
 ---
 
-This article is originally posted in the [Tech Insights](https://cevo.com.au/tech-insights/) of Cevo Australia - [Link](https://cevo.com.au/post/data-lake-demo-using-cdc-part-3/).
-
 In the [previous post](/blog/2021-12-12-datalake-demo-part2), we created a VPC that has private and public subnets in 2 availability zones in order to build and deploy the data lake solution on AWS. NAT instances are created to forward outbound traffic to the internet and a VPN bastion host is set up to facilitate deployment. An [Aurora PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraPostgreSQL.html) cluster is deployed to host the source database and a Python command line app is used to create the database. To develop data ingestion using CDC, an [Amazon MSK](https://aws.amazon.com/msk/) cluster is deployed and the [Debezium source](https://debezium.io/documentation/reference/stable/connectors/postgresql.html) and [Lenses S3 sink](https://lenses.io/blog/2020/11/new-kafka-to-S3-connector/) connectors are created on [MSK Connect](https://aws.amazon.com/msk/features/msk-connect/). We also confirmed the order creation and update events are captured as expected. As the last part of this series, we'll build an [Apache Hudi DeltaStreamer](https://hudi.apache.org/docs/writing_data/#deltastreamer) app on [Amazon EMR](https://aws.amazon.com/emr/) and use the resulting Hudi table with [Amazon Athena](https://aws.amazon.com/athena/) and [Amazon Quicksight](https://aws.amazon.com/quicksight/) to build a dashboard.
 
 * [Part 1 Local Development](/blog/2021-12-05-datalake-demo-part1)

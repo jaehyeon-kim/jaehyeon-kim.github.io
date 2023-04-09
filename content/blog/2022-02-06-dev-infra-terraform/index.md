@@ -24,8 +24,6 @@ images: []
 cevo: 9
 ---
 
-This article is originally posted in the [Tech Insights](https://cevo.com.au/tech-insights/) of Cevo Australia - [Link](https://cevo.com.au/post/simplify-your-development-on-aws-with-terraform/).
-
 When I wrote my data lake demo series ([part 1](/blog/2021-12-05-datalake-demo-part1), [part 2](/blog/2021-12-12-datalake-demo-part2) and [part 3](/blog/2021-12-19-datalake-demo-part3)) recently, I used an Aurora PostgreSQL, MSK and EMR cluster. All of them were deployed to private subnets and dedicated infrastructure was created using CloudFormation. Using the infrastructure as code (IaC) tool helped a lot, but it resulted in creating 7 CloudFormation stacks, which was a bit harder to manage in the end. Then I looked into how to simplify building infrastructure and managing resources on AWS and decided to use Terraform instead. I find it has useful constructs (e.g. [meta-arguments](https://blog.knoldus.com/meta-arguments-in-terraform/)) to make it simpler to create and manage resources. It also has a wide range of useful [modules](https://registry.terraform.io/namespaces/terraform-aws-modules) that facilitate development significantly. In this post, we’ll build an infrastructure for development on AWS with Terraform. A VPN server will also be included in order to improve developer experience by accessing resources in private subnets from developer machines.
 
 ## Architecture

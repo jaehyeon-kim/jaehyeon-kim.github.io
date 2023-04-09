@@ -28,8 +28,6 @@ images: []
 cevo: 4
 ---
 
-This article is originally posted in the [Tech Insights](https://cevo.com.au/tech-insights/) of Cevo Australia - [Link](https://cevo.com.au/post/local-development-of-aws-glue-3-0-and-later/).
-
 In an [earlier post](/blog/2021-08-20-glue-local-development), I demonstrated how to set up a local development environment for AWS Glue 1.0 and 2.0 using a [docker image that is published by the AWS Glue team](https://aws.amazon.com/blogs/big-data/developing-aws-glue-etl-jobs-locally-using-a-container/) and the [Visual Studio Code Remote – Containers](https://code.visualstudio.com/docs/remote/containers) extension. Recently [AWS Glue 3.0 was released](https://aws.amazon.com/about-aws/whats-new/2021/08/spark-3-1-runtime-aws-glue-3-0/), but a docker image for this version is not published. In this post, I'll illustrate how to create a development environment for AWS Glue 3.0 (and later versions) by building a custom docker image.
 
 

@@ -32,8 +32,6 @@ images: []
 cevo: 5
 ---
 
-This article is originally posted in the [Tech Insights](https://cevo.com.au/tech-insights/) of Cevo Australia - [Link](https://cevo.com.au/post/data-lake-demo-using-cdc-part-1/).
-
 [Change data capture (CDC)](https://www.redhat.com/en/topics/integration/what-is-change-data-capture#what-is-cdc) is a proven data integration pattern that has a wide range of applications. Among those, data replication to data lakes is a good use case in data engineering. Coupled with [best-in-breed data lake formats](https://lakefs.io/hudi-iceberg-and-delta-lake-data-lake-table-formats-compared/) such as [Apache Hudi](https://hudi.apache.org/), we can build an efficient data replication solution. This is the first post of the data lake demo series. Over time, we'll build a data lake that uses CDC. As a starting point, we'll discuss the source database and CDC streaming infrastructure in the local environment.
 
 * [Part 1 Local Development](#) (this post)
