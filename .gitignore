@@ -1,5 +1,5 @@
 /node_modules
 /resources
-/public
+# /public
 .hugo_build.lock
 hugo_stats.json
