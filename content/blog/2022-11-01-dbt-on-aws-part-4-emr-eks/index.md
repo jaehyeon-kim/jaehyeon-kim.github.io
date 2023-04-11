@@ -29,6 +29,8 @@ cevo: 21
 description: The data build tool (dbt) is an effective data transformation tool and it supports key AWS analytics services - Redshift, Glue, EMR and Athena. In part 4 of the dbt on AWS series, we discuss data transformation pipelines using dbt on Amazon EMR on EKS. Subsets of IMDb data are used as source and data models are developed in multiple layers according to the dbt best practices.
 ---
 
+**[This article](https://cevo.com.au/post/dbt-on-aws-part-4/) was originally posted on Tech Insights of [Cevo Australia](https://cevo.com.au/).**
+
 The [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) is an effective data transformation tool and it supports key AWS analytics services - Redshift, Glue, EMR and Athena. In the previous posts, we discussed benefits of a common data transformation tool and the potential of dbt to cover a wide range of data projects from data warehousing to data lake to data lakehouse. Demo data projects that target Redshift Serverless, Glue and EMR on EC2 are illustrated as well. In part 4 of the dbt on AWS series, we discuss data transformation pipelines using dbt on [Amazon EMR on EKS](https://aws.amazon.com/emr/features/eks/). As Spark Submit does not allow the spark thrift server to run in cluster mode on Kubernetes, a simple wrapper class is created to overcome the limitation and it makes the thrift server run indefinitely. [Subsets of IMDb data](https://www.imdb.com/interfaces/) are used as source and data models are developed in multiple layers according to the [dbt best practices](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview). A list of posts of this series can be found below.
 
 * [Part 1 Redshift](/blog/2022-09-28-dbt-on-aws-part-1-redshift)

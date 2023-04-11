@@ -26,6 +26,8 @@ cevo: 1
 description: Authorization is the mechanism that controls who can do what on which resource in an application and it is a critical part of an application. In this post, I'll illustrate how to set up authorization in a GraphQL API using a custom directive and Oso, an open-source authorization library.
 ---
 
+**[This article](https://cevo.com.au/post/adding-authorization-to-a-graphql-api/) was originally posted on Tech Insights of [Cevo Australia](https://cevo.com.au/).**
+
 Authorization is the mechanism that controls who can do what on which resource in an application. Although it is a critical part of an application, there are limited resources available on how to build authorization into an app effectively. In this post, I'll be illustrating how to set up authorization in a GraphQL API using a custom [directive](https://www.apollographql.com/docs/apollo-server/schema/directives/) and [Oso](https://www.osohq.com/), an open-source authorization library. This tutorial covers the NodeJS variant of Oso, but it also supports Python and other languages.
 
 

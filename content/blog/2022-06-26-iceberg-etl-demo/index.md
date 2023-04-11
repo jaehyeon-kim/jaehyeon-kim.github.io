@@ -33,6 +33,8 @@ cevo: 13
 description: We'll discuss how to implement data warehousing ETL using Iceberg for data storage/management and Spark for data processing. A Pyspark ETL app will be used for demonstration in an EMR local environment. Finally the ETL results will be queried by Athena for verification.
 ---
 
+**[This article](https://cevo.com.au/post/iceberg-etl-demo/) was originally posted on Tech Insights of [Cevo Australia](https://cevo.com.au/).**
+
 Unlike traditional Data Lake, new table formats ([Iceberg](https://iceberg.apache.org/), [Hudi](https://hudi.apache.org/) and [Delta Lake](https://delta.io/)) support [features](https://iceberg.apache.org/docs/latest/spark-writes/) that can be used to apply data warehousing patterns, which can bring a way to be rescued from [Data Swamp](https://www.gartner.com/en/newsroom/press-releases/2014-07-28-gartner-says-beware-of-the-data-lake-fallacy). In this post, we'll discuss how to implement ETL using retail analytics data. It has two dimension data (user and product) and a single fact data (order). The dimension data sets have different ETL strategies depending on whether to track historical changes. For the fact data, the primary keys of the dimension data are added to facilitate later queries. We'll use Iceberg for data storage/management and Spark for data processing. Instead of provisioning an EMR cluster, a local development environment will be used. Finally, the ETL results will be queried by Athena for verification.
 
 

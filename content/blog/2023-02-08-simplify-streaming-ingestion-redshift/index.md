@@ -31,6 +31,8 @@ cevo: 24
 description: Streaming ingestion from Kafka (MSK) into Redshift and Athena can be much simpler as they now support direct integration. In part 1, we discuss an end-to-end streaming ingestion solution using EventBridge, Lambda, MSK and Redshift. We also use AWS SAM integrated with Terraform for developing the producer Lambda function locally.
 ---
 
+**[This article](https://cevo.com.au/post/streaming-ingestion-on-aws-part-1/) was originally posted on Tech Insights of [Cevo Australia](https://cevo.com.au/).**
+
 [Apache Kafka](https://kafka.apache.org/) is a popular distributed event store and stream processing platform. Previously loading data from Kafka into Redshift and Athena usually required Kafka connectors (e.g. [Amazon Redshift Sink Connector](https://www.confluent.io/hub/confluentinc/kafka-connect-aws-redshift) and [Amazon S3 Sink Connector](https://www.confluent.io/hub/confluentinc/kafka-connect-s3)). Recently these AWS services provide features to ingest data from Kafka directly, which facilitates a simpler architecture that achieves low-latency and high-speed ingestion of streaming data. In part 1 of the _simplify streaming ingestion on AWS_ series, we discuss how to develop an end-to-end streaming ingestion solution using [EventBridge](https://aws.amazon.com/eventbridge/), [Lambda](https://aws.amazon.com/lambda/), [MSK](https://aws.amazon.com/msk/) and [Redshift Serverless](https://aws.amazon.com/redshift/redshift-serverless/) on AWS. 
 
 * [Part 1 MSK and Redshift](#) (this post)

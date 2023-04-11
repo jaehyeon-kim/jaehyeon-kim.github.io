@@ -28,6 +28,8 @@ cevo: 15
 description: We'll discuss limitations of the Lambda invoke function operator of Apache Airflow and create a custom Lambda operator. The custom operator extends the existing one and it reports the invocation result of a function correctly and records the exact error message from failure.
 ---
 
+**[This article](https://cevo.com.au/post/revisit-airflow-lambda-operator/) was originally posted on Tech Insights of [Cevo Australia](https://cevo.com.au/).**
+
 [Apache Airflow](https://airflow.apache.org/) is a popular workflow management platform. A wide range of AWS services are integrated with the platform by [Amazon AWS Operators](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/operators/index.html). AWS Lambda is one of the integrated services, and it can be used to develop workflows efficiently. The current [Lambda Operator](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/operators/lambda.html), however, just invokes a Lambda function, and it can fail to report the invocation result of a function correctly and to record the exact error message from failure. In this post, we’ll discuss a custom Lambda operator that handles those limitations.
 
 
