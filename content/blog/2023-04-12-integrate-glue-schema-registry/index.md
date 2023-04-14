@@ -19,7 +19,7 @@ tags:
   - AWS Glue Schema Registry
   - AWS Lambda
   - AWS Serverless Application Model
-  - Kafka
+  - Apache Kafka
   - Python
   - Docker
   - Docker Compose
