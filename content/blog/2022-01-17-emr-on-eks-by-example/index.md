@@ -3,7 +3,6 @@ title: EMR on EKS by Example
 date: 2022-01-17
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

@@ -3,7 +3,6 @@ title: Simplify Your Development on AWS with Terraform
 date: 2022-02-06
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

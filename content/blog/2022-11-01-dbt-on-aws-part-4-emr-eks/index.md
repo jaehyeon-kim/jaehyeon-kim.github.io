@@ -3,7 +3,6 @@ title: Data Build Tool (dbt) for Effective Data Transformation on AWS – Part 4
 date: 2022-11-01
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

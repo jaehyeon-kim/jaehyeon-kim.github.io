@@ -3,7 +3,6 @@ title: Serverless Data Product POC Backend Part II - Deploying R ML Model via La
 date: 2017-04-11
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

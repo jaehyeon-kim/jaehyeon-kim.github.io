@@ -3,7 +3,6 @@ title: Revisit AWS Lambda Invoke Function Operator of Apache Airflow
 date: 2022-08-06
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

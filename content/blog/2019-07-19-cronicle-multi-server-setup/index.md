@@ -3,7 +3,6 @@ title: Cronicle Multi Server Setup
 date: 2019-07-19
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

@@ -3,7 +3,6 @@ title: Serverless Application Model (SAM) for Data Professionals
 date: 2022-07-18
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

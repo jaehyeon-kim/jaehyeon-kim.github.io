@@ -3,7 +3,6 @@ title: Shiny to Vue.js
 date: 2018-05-26
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

@@ -3,7 +3,6 @@ title: Thoughts on Apache Airflow AWS Lambda Operator
 date: 2020-04-13
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

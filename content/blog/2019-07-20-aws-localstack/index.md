@@ -3,7 +3,6 @@ title: AWS Local Development with LocalStack
 date: 2019-07-20
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

@@ -3,7 +3,6 @@ title: Dynamic Routing and Centralized Auth with Traefik, Python and R Example
 date: 2019-11-29
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

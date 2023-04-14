@@ -3,7 +3,6 @@ title: Linux Dev Environment on Windows
 date: 2019-11-01
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

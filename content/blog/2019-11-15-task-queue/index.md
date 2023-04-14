@@ -3,7 +3,6 @@ title: Distributed Task Queue with Python and R Example
 date: 2019-11-15
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

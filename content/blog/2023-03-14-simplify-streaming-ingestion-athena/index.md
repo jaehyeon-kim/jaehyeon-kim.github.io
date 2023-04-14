@@ -3,7 +3,6 @@ title: Simplify Streaming Ingestion on AWS – Part 2 MSK and Athena
 date: 2023-03-14
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

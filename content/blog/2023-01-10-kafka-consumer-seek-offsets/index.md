@@ -3,7 +3,6 @@ title: How to configure Kafka consumers to seek offsets by timestamp
 date: 2023-01-10
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

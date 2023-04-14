@@ -3,7 +3,6 @@ title: Develop and Test Apache Spark Apps for EMR Remotely Using Visual Studio C
 date: 2022-09-07
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

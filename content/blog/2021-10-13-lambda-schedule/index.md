@@ -3,7 +3,6 @@ title: Yet another serverless solution for invoking AWS Lambda at a sub-minute f
 date: 2021-10-13
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

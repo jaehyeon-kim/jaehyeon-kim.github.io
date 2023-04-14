@@ -3,7 +3,6 @@ title: Async Shiny and Its Limitation
 date: 2018-05-19
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

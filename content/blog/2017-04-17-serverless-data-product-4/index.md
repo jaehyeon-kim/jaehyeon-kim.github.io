@@ -3,7 +3,6 @@ title: Serverless Data Product POC Backend Part IV - Serving R ML Model via S3
 date: 2017-04-17
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

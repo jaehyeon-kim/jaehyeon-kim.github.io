@@ -3,7 +3,6 @@ title: Adding Authorization to a Graphql API
 date: 2021-07-20
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

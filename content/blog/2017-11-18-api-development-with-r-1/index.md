@@ -3,7 +3,6 @@ title: API Development with R Part I
 date: 2017-11-18
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

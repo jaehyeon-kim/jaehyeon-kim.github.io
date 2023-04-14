@@ -3,7 +3,6 @@ title: Data Warehousing ETL Demo with Apache Iceberg on EMR Local Environment
 date: 2022-06-26
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

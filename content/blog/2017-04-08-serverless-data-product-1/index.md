@@ -3,7 +3,6 @@ title: Serverless Data Product POC Backend Part I - Packaging R ML Model for Lam
 date: 2017-04-08
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

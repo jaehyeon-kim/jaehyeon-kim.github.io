@@ -3,7 +3,6 @@ title: Serverless Data Product POC Backend Part III - Exposing R ML Model via AP
 date: 2017-04-13
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

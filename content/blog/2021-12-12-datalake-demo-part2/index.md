@@ -3,7 +3,6 @@ title: Data Lake Demo using Change Data Capture (CDC) on AWS – Part 2 Implemen
 date: 2021-12-12
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

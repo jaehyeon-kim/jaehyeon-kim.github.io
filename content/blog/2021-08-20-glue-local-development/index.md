@@ -3,7 +3,6 @@ title: AWS Glue Local Development with Docker and Visual Studio Code
 date: 2021-08-20
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

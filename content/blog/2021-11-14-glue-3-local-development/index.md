@@ -3,7 +3,6 @@ title: Local Development of AWS Glue 3.0 and Later
 date: 2021-11-14
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

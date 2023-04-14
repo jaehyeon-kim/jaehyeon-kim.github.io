@@ -3,7 +3,6 @@ title: Develop and Test Apache Spark Apps for EMR Locally Using Docker
 date: 2022-05-08
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false

@@ -3,7 +3,6 @@ title: Use External Schema Registry with MSK Connect – Part 1 Local Developmen
 date: 2022-03-07
 draft: false
 featured: false
-draft: false
 comment: true
 toc: true
 reward: false
