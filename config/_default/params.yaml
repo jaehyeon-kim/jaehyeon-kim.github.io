@@ -144,9 +144,9 @@ creativeCommons:
   # sa: true # Adaptations must be shared under the same terms.
 
 utterances:
-  repo: jaehyeon-kim/site # Replace with your repository.
-  #issueTerm: pathname # pathname, url, title, og:title
-  label: comment
+  # repo: jaehyeon-kim/jaehyeon-kim.github.io # Replace with your repository.
+  # issueTerm: pathname # pathname, url, title, og:title
+  # label: comment
   # By default, light and dark mode correspond to github-light and github-dark, respectively.
   # Optional values: github-light, github-dark, preferred-color-scheme, github-dark-orange, icy-dark, dark-blue, photon-dark.
   #theme:  
@@ -168,16 +168,16 @@ utterances:
   #paginate: 5 # Default to 10.
   #moderation: false # Same as Staticman's moderation.
 
-#giscus:
-  # repo: ""
-  # repoId: ""
+giscus:
+  repo: jaehyeon-kim/jaehyeon-kim.github.io
+  repoId: "MDEwOlJlcG9zaXRvcnkyNjgwMjU0NQ=="
   # category: ""
-  # categoryId: ""
+  categoryId: "DIC_kwDOAZj5cc4CV2fp"
   # theme: "dark" # Default to auto.
   # mapping: "title" # Default to pathname.
-  # inputPosition: "bottom" # Default to top.
-  # reactions: false # Disable reactions.
-  # metadata: true # Emit discussion metadata.
+  inputPosition: "bottom" # Default to top.
+  reactions: true # Disable reactions.
+  metadata: true # Emit discussion metadata.
   # lang: "en" # Specify language, default to site language.
   # lazyLoading: false # Default to true.
 
