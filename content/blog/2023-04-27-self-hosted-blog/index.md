@@ -34,6 +34,7 @@ description: Glue Schema Registry provides a centralized repository for managing
 TO BE UPDATED
 
 ```
+# https://docs.github.com/en/graphql/overview/explorer
 query {
   repository(owner: "jaehyeon-kim", name: "jaehyeon-kim.github.io") {
     id # RepositoryID
