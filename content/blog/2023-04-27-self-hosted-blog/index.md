@@ -38,7 +38,7 @@ query {
   repository(owner: "jaehyeon-kim", name: "jaehyeon-kim.github.io") {
     id # RepositoryID
     name
-    discussionCategories(first: 10) {
+    discussionCategories(first: 1) {
       nodes {
         id # CategoryID
         name
