@@ -1,6 +1,6 @@
 ---
-title: Integrate Glue Schema Registry with Your Python Kafka App
-date: 2023-04-12
+title: Self-managed Blog with Hugo and GitHub Pages
+date: 2023-04-27
 draft: true
 featured: false
 comment: true
