@@ -202,10 +202,10 @@ search:
   # indexName: ""
   # debug: true
 
-reward:
-  # alipay: images/reward/alipay.png
-  # wechat: images/reward/wechat.png
-  #paypal: images/reward/paypal.png
+#reward:
+  #alipay: images/reward/alipay.png
+  #wechat: images/reward/wechat.png
+  # paypal: images/reward/paypal.png
   #patreon: images/reward/patreon.png
   #liberapay: images/reward/liberapay.png
 
@@ -248,7 +248,7 @@ contact:
 
 repo:
   url: https://github.com/jaehyeon-kim/site
-  branch: main
+  branch: master
   # subPath: exampleSite
   # dateFormat: 02/01/2006, 15:04:05 PM
 
@@ -257,8 +257,8 @@ topAppBar:
   social:
     github: jaehyeon-kim
     linkedin: jaehyeon-kim-76b93429
-    # patreon: razonyang
-    # paypal: razonyang
+    # patreon: 
+    paypal: dottami
 
 #docs:
   # nav:
