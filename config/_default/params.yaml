@@ -5,10 +5,10 @@ mainSections:
 
 # titleSeparator: '|' # Title separator. Default to -.
 
-description: #An extreme fast, responsive and feature-rich blog theme for Hugo
+description: Jaehyeon works as a consultant focused on working with customers to design and build their data and analtyics solutions on AWS.
 keywords: AWS, Data, Analytics, Containers, Serverless
-# images:
-#   - site-feature-image.jpg
+images:
+  - site-feature-image.png
 
 # metaRobots: noindex, nofollow # Default value for Meta Tag robots
 # metaRobots:  # disable Meta Tag robots
@@ -225,7 +225,7 @@ fontSize:
 pwa:
   manifest:
     name: Jaehyeon's Site # Default to site title.
-    short_name: JK
+    short_name: Jaehyeon
     # display: fullscreen # Default to standalone.
     # description:  # Default to site description.
     # theme_color: 
@@ -257,7 +257,7 @@ topAppBar:
   social:
     github: jaehyeon-kim
     linkedin: jaehyeon-kim-76b93429
-    # patreon: 
+    # patreon:  
     paypal: dottami
 
 #docs:
