@@ -12,24 +12,19 @@ featuredImage: false
 # series:
 #   - API development with R
 categories:
-  - Data Engineering
+  - Blog
 tags: 
-  - AWS
-  - Amazon MSK
-  - AWS Glue Schema Registry
-  - AWS Lambda
-  - AWS Serverless Application Model
-  - Apache Kafka
-  - Python
-  - Docker
-  - Docker Compose
-  - Terraform
+  - Hugo
+  - Bootstrap
+  - GitHub Pages
 authors:
   - JaehyeonKim
 images: []
 cevo: 26
-description: Glue Schema Registry provides a centralized repository for managing and validating schemas for topic message data. Its featuers can be utilized by many AWS services when building data streaming applications. In this post, we will discuss how to integrate Python Kafka producer and consumer apps in AWS Lambda with the Glue Schema Registry.
+description: abc
 ---
+
+I started writing blog posts in 2014. At first, it was based on a simple Jekyll theme that supports posting a [Markdown](https://en.wikipedia.org/wiki/Markdown) file, which is converted by a [RMarkdown](https://github.com/rstudio/rmarkdown) file. Most of my work was in R at that time and the simple theme was good enough to publish posts via [GitHub Pages](https://pages.github.com/). It was around 2018 when I changed my blog with a single page application built by [Vue.js](https://vuejs.org/). It was fun to develop a blog site with the JavaScript framework as I was teaching myself web development seriously while developing an analytics platform for the company I used to work for. Also, I was able to learn the necessary infrastructure in AWS as it was hosted using a group of AWS services - S3, CloudFront, ACM and Route53.
 
 TO BE UPDATED
 
