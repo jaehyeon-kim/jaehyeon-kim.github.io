@@ -5,7 +5,7 @@ mainSections:
 
 # titleSeparator: '|' # Title separator. Default to -.
 
-description: Jaehyeon works as a consultant focused on working with customers to design and build their data and analtyics solutions on AWS.
+description: Jaehyeon works as a consultant focused on working with customers to design and build their data and analtyics solutions on AWS. He is a real-time enthusiast and writes posts on AWS, Data, Analytics, Containers and Serverless.
 keywords: AWS, Data, Analytics, Containers, Serverless
 images:
   - site-feature-image.png
