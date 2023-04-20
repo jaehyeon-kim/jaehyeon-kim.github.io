@@ -10,7 +10,7 @@ pinned: false
 carousel: false
 featuredImage: false
 # series:
-#   - API development with R
+#   - 
 categories:
   - Blog
 tags: 
@@ -20,22 +20,224 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-cevo: 26
-description: abc
+description: ...
 ---
 
-I started blogging in 2014. At first, it was based on a simple Jekyll theme that supports posting a [Markdown](https://en.wikipedia.org/wiki/Markdown) file, which is converted from a [RMarkdown](https://github.com/rstudio/rmarkdown) file. Most of my work was in R at that time and the simple theme was good enough, and it was hosted via [GitHub Pages](https://pages.github.com/). It was around 2018 when I changed my blog with a single page application built by [Vue.js](https://vuejs.org/). It was fun to develop a blog site with the JavaScript framework as I was teaching myself web development in order to build an analytics portal for the company I used to work for. Also, I was able to learn the necessary infrastructure in AWS while hosting it using multiple AWS services - S3, CloudFront, ACM and Route53. I stopped writing posts from 2020 to early 2021 when my wife got pregnant and gave birth to my baby. Then I restarted publishing posts to my company's blog page from the middle of 2021. It is good as I can have a post peer-reviewed by colleagues and the company provides an incentive for each post published. However, I find it is not the right place to write small posts as I am recommended to keep in mind e.g. *how an article translates into better customer outcomes* before writing a post. It is a good recommendation, but it requires longer time to write a post while following those recommendations.
+I started blogging in 2014. At first, it was based on a simple Jekyll theme that supports posting a [Markdown](https://en.wikipedia.org/wiki/Markdown) file, which is converted from a [RMarkdown](https://github.com/rstudio/rmarkdown) file. Most of my work was in [R](https://www.r-project.org/about.html) at that time and the simple theme was good enough, and it was hosted via [GitHub Pages](https://pages.github.com/). It was around 2018 when I changed my blog with a single page application, which is built by [Vue.js](https://vuejs.org/) and hosted on AWS. Developing a blog site with it was fun as I was teaching myself web development while building an analytics portal at work. In 2020, I paused blogging for some time while expecting a baby and restarted publishing posts to my [company's blog page](https://cevo.com.au/author/jaehyeon-kim/) from mid-2021. It is good as I can have a post peer-reviewed and the company provides an incentive for each post published. However, it is not a convenient place to write small posts as I am recommended to keep in mind e.g. *how an article translates into better customer outcomes*. That is a good recommendation but not all posts can fit into it. Therefore, I thought I'd need something else for small and/or personal posts. I'd keep publishing to the company site, and I probably repost some of them to a new blog with delay.
 
-## Configuration
+I wouldn't like to use the existing site as it misses many features, and it'd take time to build those on my own. As I prefer a self-managed blog over a blog platform, I thought a [static site generator](https://jamstack.org/generators/) and GitHub Pages would be one of the quickest options. After searching mainly [Hugo](https://gohugo.io/), [Jekyll](https://jekyllrb.com/) and [Pelican](https://getpelican.com/), Hugo caught up my eyes as it has [more themes with good features](https://themes.gohugo.io/). Among those I chose the [Hugo Bootstrap Theme](https://github.com/razonyang/hugo-theme-bootstrap). In this post, I'll demonstrate how I built/hosted this blog site in a couple of days.
 
-To be updated...
+## Quick Start
 
-### Hugo Bootstrap Theme
+I used the [starter template](https://github.com/razonyang/hugo-theme-bootstrap-skeleton) of the [Hugo Bootstrap Theme](https://github.com/razonyang/hugo-theme-bootstrap). After installing _Node.js (16+)_, I cloned the template and installed NPN packages by executing `npm install`. Then I started the site using *docker-compose* with the following compose file shown below. Without docker, I had to install [_Hugo (0.97.0+)_](https://hbs.razonyang.com/v1/en/docs/getting-started/prerequisites/#build-tools) but the apt repo has an older version of it and I wouldn't like to be bothered to install a newer version from source. Using *docker-compose* is much easier way for me. Note it reloads the site when there is a change in the current directory so that updated contents can be checked on a browser seamlessly.
 
-To be updated...
+```yaml
+version: "3.5"
+
+services:
+  hugo:
+      image: klakegg/hugo:0.107.0-ext-ubuntu
+      command: server -D -F -E --poll 700ms
+      container_name: hugo
+      volumes:
+        - $PWD:/src
+        - /etc/ssl/certs:/etc/ssl/certs
+      ports:
+        - "1313:1313"
+```
+
+Below shows the site generated by the template by default. As it has way more sections and menus, I reduced those by updating configurations.
+
+![](default.png#center)
+
+## Configuration Updates
+
+The *config/_default* folder contains default configurations and I mainly updated site configs (*config.yaml*), site params (*params.yaml*) and menu configs (*menu.yaml*). Note they can be overridden by those in the *config/production* folder.
+
+```bash
+$ tree config
+config
+├── _default
+│   ├── author.yaml
+│   ├── config.yaml
+│   ├── languages.yaml
+│   ├── menu.yaml
+│   ├── params.yaml
+│   ├── server.yaml
+│   └── social.yaml
+└── production
+    ├── config.yaml
+    └── params.yaml
+```
+
+### Site Configuration
+
+The [site configuration](https://hbs.razonyang.com/v1/en/docs/configuration/site/) section includes [Hugo-defined variables](https://gohugo.io/getting-started/configuration/#all-configuration-settings). I mainly updated *title*, *copyright* and *taxonomies*. Also, the [*markup* config](https://gohugo.io/getting-started/configuration-markup/) is added to override the default config of code highlighting and table of contents.
+
+```yaml
+# config/_default/config.yaml
+baseURL: /
+title: Jaehyeon
+theme: github.com/razonyang/hugo-theme-bootstrap
+copyright: 'Copyright © 2023-{year} Jaehyeon Kim. All Rights Reserved.'
+defaultContentLanguage: en
+...
+taxonomies:
+  category: categories
+  series: series
+  tag: tags
+...
+markup:
+  highlight:
+    lineNos: true
+    lineNumbersInTable: false
+    noClasses: false
+  tableOfContents:
+    endLevel: 6
+    ordered: false
+    startLevel: 2
+```
+
+### Site Parameters
+
+The [site parameters](https://hbs.razonyang.com/v1/en/docs/configuration/site-params/) section includes specific config variables for the Hugo theme. Their names are mostly self-explanatory as well as many of them are explained by comments. Configuration of site parameters would require trials and errors, and we can quickly check the updated content thanks to Hugo's hot reloading feature.
+
+```yaml
+# config/_default/params.yaml
+mainSections:
+  - blog
+  - posts
+description: <description>
+keywords: <keyword-1>, <keyword-2>
+images:
+  - site-feature-image.png
+...
+logo: false # Disable Logo
+brand: Jaehyeon Kim
+palette: blue-gray
+color: light # light, dark or auto. Default to auto.
+...
+googleAdsense: <AdSense Publisher ID>
+math: true # Enable math globally.
+toc: true # Disable TOC globally.
+tocPosition: content # sidebar or content
+...
+searchBar: true # disable search-bar
+poweredBy: false # Whether to show powered by.
+readingTime: true # Whether to display the reading time.
+postDate: true # Whether to display the post date in the post meta section.
+...
+sidebarTaxonomies: [categories, tags, series] # The order of taxonomies on the sidebar.
+...
+codeBlock:
+  maxLines: 20
+  lineNos: true # true/false represents that show/hide the line numbers by default.
+...
+post:
+  excerpt: description
+  excerptMaxLength: 200
+  copyright: false # Whether to display copyright section on each post.
+  featuredImage: true # Show the featured image above the content.
+  numberifyHeadings: false # Count headings automatically.
+  numberifyHeadingsSeparator: . # The separator between of number and headings.
+  imageTitleAsCaption: true
+...
+search:
+  paginate: 5 # Pagination. Default to 10.
+  fuse:
+    threshold: 0.1
+...
+topAppBar:
+  social:
+    github: <GitHub User ID>
+    linkedin: <LinkedIn ID>
+    paypal: <Paypal.Me Link ID>
+```
+
+### Menu Configuration
+
+For now, I only need the blog menu and all other items are removed from the [menu configuration](https://hbs.razonyang.com/v1/en/docs/configuration/menu/).
+
+```yaml
+# config/_default/menu.yaml
+main:
+  - name: Blog
+    identifier: blog
+    params:
+      icon: '<i class="fas fa-fw fa-blog text-warning"></i>'
+      description:
+```
+
+### Production Configurations
+
+As mentioned, the production configuration can be overridden. I added the base URL as it'll be hosted by a custom domain and the Google Analytics measurement ID.
+
+```yaml
+# config/production/config.yaml
+baseURL: https://jaehyeon.me/
+googleAnalytics: <Measurement ID>
+```
+
+### Add Extra Files
+
+```bash
+$ tree public
+public
+├── CNAME
+├── ads.txt
+└── site-feature-image.png
+```
+## Article Configuration
+
+```bash
+$ tree content/blog/2023-04-27-self-hosted-blog/
+content/blog/2023-04-27-self-hosted-blog/
+├── comment-1.png
+├── comment-2.png
+├── comment-3.png
+├── comment-4.png
+├── custom-domain-1.png
+├── custom-domain-2.png
+├── custom-domain-3.png
+├── default.png
+├── discussion-1.png
+├── discussion-2.png
+├── featured.png
+├── giscus-1.png
+├── giscus-2.png
+└── index.md
+```
+
+```yaml
+---
+title: Self-managed Blog with Hugo and GitHub Pages
+date: 2023-04-27
+draft: true
+featured: false
+comment: true
+toc: true
+reward: false
+pinned: false
+carousel: false
+featuredImage: false
+# series:
+#   - 
+categories:
+  - Blog
+tags: 
+  - Hugo
+  - Bootstrap
+  - GitHub Pages
+authors:
+  - JaehyeonKim
+images: []
+description: ...
+---
+```
 
 ## Custom Domain
 
+### ACM Certificate
 
 ```yaml
 ---
@@ -63,6 +265,16 @@ Outputs:
       Ref: ACMCertificate
 ```
 
+### Add Custom Domain
+
+![](custom-domain-1.png#center)
+
+
+![](custom-domain-2.png#center)
+
+### Verify Custom Domain
+
+![](custom-domain-3.png#center)
 
 
 ## Comment Widget
@@ -146,3 +358,5 @@ query {
 ![](comment-3.png#center)
 
 ![](comment-4.png#center)
+
+## Deployment
