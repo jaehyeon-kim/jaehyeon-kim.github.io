@@ -2,7 +2,7 @@
 title: Manage EMR on EKS with Terraform
 date: 2022-08-26
 draft: false
-featured: false
+featured: true
 comment: true
 toc: true
 reward: false

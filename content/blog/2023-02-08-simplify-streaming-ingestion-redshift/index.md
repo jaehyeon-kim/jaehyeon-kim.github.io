@@ -2,7 +2,7 @@
 title: Simplify Streaming Ingestion on AWS – Part 1 MSK and Redshift
 date: 2023-02-08
 draft: false
-featured: false
+featured: true
 comment: true
 toc: true
 reward: false

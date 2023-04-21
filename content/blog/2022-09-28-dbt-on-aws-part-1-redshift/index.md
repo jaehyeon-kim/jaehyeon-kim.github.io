@@ -2,7 +2,7 @@
 title: Data Build Tool (dbt) for Effective Data Transformation on AWS – Part 1 Redshift
 date: 2022-09-28
 draft: false
-featured: false
+featured: true
 comment: true
 toc: true
 reward: false
