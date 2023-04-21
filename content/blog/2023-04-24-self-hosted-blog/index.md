@@ -20,7 +20,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: We can quickly create a blog site with a static site generator and host via GitHub pages. After searching mainly Hugo, Jekyll and Pelican, I chose Hugo as it has more themes with good features. In this post, I'll demonstrate how I set up this blog site in days.
+description: We can quickly create a blog site with a static site generator and host via GitHub pages. After searching mainly Hugo, Jekyll and Pelican, I chose Hugo as it has more themes with good features. In this post, I'll demonstrate how I set up this blog site.
 ---
 
 I started blogging in 2014. At first, it was based on a simple Jekyll theme that supports posting [Markdown](https://en.wikipedia.org/wiki/Markdown) files, which are converted from [R Markdown](https://github.com/rstudio/rmarkdown) files. Most of my work was in [R](https://www.r-project.org/about.html) at that time and the simple theme was good enough, and it was hosted via [GitHub Pages](https://pages.github.com/). It was around 2018 when I changed my blog with a single page application, built by [Vue.js](https://vuejs.org/) and hosted on AWS. It was fun as I was teaching myself web development while building an analytics portal at work. In 2020, I paused blogging for some time while expecting a baby and restarted publishing posts to my [company's blog page](https://cevo.com.au/author/jaehyeon-kim/) from mid-2021. It is good as I can have peer-reviews and the company provides an incentive for each post published. However, it is not the right place to publish all the posts that I plan. For example, I am recommended to keep in mind e.g. *how an article translates into better customer outcomes*. That's understandable but not all posts can fit into it. Currently, I am teaching myself [modern data streaming architectures](https://docs.aws.amazon.com/whitepapers/latest/build-modern-data-streaming-analytics-architectures/build-modern-data-streaming-analytics-architectures.html), and, until I gain competency, articles could be inadequate for customers. Therefore, I thought I need another place that I can publish related posts. I'd keep publishing to the company site, and I probably repost some of them to the new blog with delay.
@@ -184,7 +184,8 @@ Contents of a post are kept in a subfolder of the `content/blog` folder - e.g. `
 
 ```bash
 $ tree content/blog/2023-04-27-self-hosted-blog/
-content/blog/2023-04-27-self-hosted-blog/
+content/blog/2023-04-24-self-hosted-blog/
+├── after.png
 ├── before.png
 ├── comment-1.png
 ├── comment-2.png
@@ -206,7 +207,7 @@ The [page parameters](https://hbs.razonyang.com/v1/en/docs/configuration/page-pa
 ```yaml
 ---
 title: Self-managed Blog with Hugo and GitHub Pages
-date: 2023-04-27
+date: 2023-04-24
 draft: true
 featured: false
 comment: true
