@@ -32,3 +32,4 @@ VSCode
 Kubenetes
 PYTHONPATH
 jaehyeon
+Jaehyeon
