@@ -1,4 +1,4 @@
-module github.com/jaehyeon-kim/site
+module github.com/jaehyeon-kim/jaehyeon-kim.github.io
 
 go 1.18
 

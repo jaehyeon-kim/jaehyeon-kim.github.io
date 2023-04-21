@@ -5,7 +5,7 @@ mainSections:
 
 # titleSeparator: '|' # Title separator. Default to -.
 
-description: Jaehyeon works as a consultant focused on working with customers to design and build their data and analtyics solutions on AWS. He is a real-time enthusiast and writes posts on AWS, Data, Analytics, Containers and Serverless.
+description: Consultant at Cevo 🇦🇺 ▪️ ☁ AWS Community Builder ▪️ 💭 Blogger ▪️ 🚀 Real-time Enthusiast
 keywords: AWS, Data, Analytics, Containers, Serverless
 images:
   - site-feature-image.png
@@ -57,11 +57,11 @@ poweredBy: false # Whether to show powered by.
 readingTime: true # Whether to display the reading time.
 postDate: true # Whether to display the post date in the post meta section.
 
-# featuredPostCount: 10 # The number of featured posts shown in sidebar. Turn off by setting it to false.
-# recentPostCount: 10 # The number of recent posts shown in sidebar. Turn off by setting it to false.
-# relatedPostCount: 10 # The number of related posts. Turn off by setting it to false.
+featuredPostCount: 10 # The number of featured posts shown in sidebar. Turn off by setting it to false.
+recentPostCount: 10 # The number of recent posts shown in sidebar. Turn off by setting it to false.
+relatedPostCount: 10 # The number of related posts. Turn off by setting it to false.
 # categoryCount: 10 # The number of categories shown in sidebar. Turn off by setting it to false.
-# tagCount: 10 # The number of tags shown in sidebar. Turn off by setting it to false.
+tagCount: 20 # The number of tags shown in sidebar. Turn off by setting it to false.
 # seriesCount: 20 # The number of series shown in sidebar. Turn off by setting it to false.
 # taxonomyPaginate: 5 # Default to 10.
 taxonomyPostCount: 20 # The number of taxonomy's posts. Turn off by setting it to false.
@@ -247,7 +247,7 @@ contact:
     # siteKey: ""
 
 repo:
-  url: https://github.com/jaehyeon-kim/site
+  url: https://github.com/jaehyeon-kim/jaehyeon-kim.github.io
   branch: master
   # subPath: exampleSite
   # dateFormat: 02/01/2006, 15:04:05 PM
