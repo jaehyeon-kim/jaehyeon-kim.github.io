@@ -1,7 +1,7 @@
 ---
 title: Self-managed Blog with Hugo and GitHub Pages
-date: 2023-04-27
-draft: true
+date: 2023-04-24
+draft: false
 featured: false
 comment: true
 toc: true
