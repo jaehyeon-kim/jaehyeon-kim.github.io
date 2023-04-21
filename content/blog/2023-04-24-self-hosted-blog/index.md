@@ -183,7 +183,7 @@ googleAnalytics: <Measurement ID>
 Contents of a post are kept in a subfolder of the `content/blog` folder - e.g. `content/blog/2023-04-27-self-hosted-blog`. The article is written in *index.md*, and the post folder includes figures that can be referenced within the article. Note *featured.png* will be showing at the top of the post page as well as in the post list - see the [featured image configuration](https://hbs.razonyang.com/v1/en/docs/content/#featured-images-selection-order) for details.
 
 ```bash
-$ tree content/blog/2023-04-27-self-hosted-blog/
+$ tree content/blog/2023-04-24-self-hosted-blog/
 content/blog/2023-04-24-self-hosted-blog/
 ├── after.png
 ├── before.png
