@@ -291,7 +291,7 @@ The GitHub Pages recommends [verifying the custom domain](https://docs.github.co
 
 The starter template has a GitHub workflow ([.github/workflows/gh-pages.yml](https://github.com/jaehyeon-kim/jaehyeon-kim.github.io/blob/master/.github/workflows/gh-pages.yml)). It builds the site and deploys the `./public` folder to the remote *gh-pages* branch. Note GitHub Pages should be linked to the *gh-pages* branch.
 
-I added three additional files to the `./public` folder so that they are found in the deployed site. *CNAME* includes the custom domain name (*jaehyeon.me*) so that it keeps being linked to the site. *ads.txt* is required by Google AdSense, and *site-feature-image.png* is as per the site parameter configuration.
+I added three additional files to the `./public` folder so that they are found in the deployed site. *CNAME* includes the custom domain name (*jaehyeon.me*) so that it keeps being linked to the site. [*ads.txt*](https://support.google.com/adsense/answer/7532444?hl=en) is required by Google AdSense, and *site-feature-image.png* is as per the site parameter configuration.
 
 ```bash
 $ tree public
