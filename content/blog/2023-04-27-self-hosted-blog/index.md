@@ -23,13 +23,13 @@ images: []
 description: We can quickly create a blog site with a static site generator and host via GitHub pages. After searching mainly Hugo, Jekyll and Pelican, I chose Hugo as it has more themes with good features. In this post, I'll demonstrate how I set up this blog site in days.
 ---
 
-I started blogging in 2014. At first, it was based on a simple Jekyll theme that supports posting a [Markdown](https://en.wikipedia.org/wiki/Markdown) file, which is converted from an [R Markdown](https://github.com/rstudio/rmarkdown) file. Most of my work was in [R](https://www.r-project.org/about.html) at that time and the simple theme was good enough, and it was hosted via [GitHub Pages](https://pages.github.com/). It was around 2018 when I changed my blog with a single page application. It was built by [Vue.js](https://vuejs.org/) and hosted on AWS. It was as I was teaching myself web development while building an analytics portal at work. In 2020, I paused blogging for some time while expecting a baby and restarted publishing posts to my [company's blog page](https://cevo.com.au/author/jaehyeon-kim/) from mid-2021. It is good as I can have peer-reviews and the company provides an incentive for each post published. However, it is not the right place to publish all the posts that I plan. For example, I am recommended to keep in mind e.g. *how an article translates into better customer outcomes*. That's understandable but not all posts can fit into it. Currently, I am teaching myself [modern data streaming architectures](https://docs.aws.amazon.com/whitepapers/latest/build-modern-data-streaming-analytics-architectures/build-modern-data-streaming-analytics-architectures.html), and, until I gain competency, articles could be inadequate for customers. Therefore, I thought I'd need another place that I can publish those posts. I'd keep publishing to the company site, and I probably repost some of them to the new blog with delay.
+I started blogging in 2014. At first, it was based on a simple Jekyll theme that supports posting [Markdown](https://en.wikipedia.org/wiki/Markdown) files, which are converted from [R Markdown](https://github.com/rstudio/rmarkdown) files. Most of my work was in [R](https://www.r-project.org/about.html) at that time and the simple theme was good enough, and it was hosted via [GitHub Pages](https://pages.github.com/). It was around 2018 when I changed my blog with a single page application, built by [Vue.js](https://vuejs.org/) and hosted on AWS. It was fun as I was teaching myself web development while building an analytics portal at work. In 2020, I paused blogging for some time while expecting a baby and restarted publishing posts to my [company's blog page](https://cevo.com.au/author/jaehyeon-kim/) from mid-2021. It is good as I can have peer-reviews and the company provides an incentive for each post published. However, it is not the right place to publish all the posts that I plan. For example, I am recommended to keep in mind e.g. *how an article translates into better customer outcomes*. That's understandable but not all posts can fit into it. Currently, I am teaching myself [modern data streaming architectures](https://docs.aws.amazon.com/whitepapers/latest/build-modern-data-streaming-analytics-architectures/build-modern-data-streaming-analytics-architectures.html), and, until I gain competency, articles could be inadequate for customers. Therefore, I thought I need another place that I can publish related posts. I'd keep publishing to the company site, and I probably repost some of them to the new blog with delay.
 
-I wouldn't like to use the existing site as it misses some features, and it'd take time to add those to it. As I prefer a self-managed blog over a blog platform, I thought a [static site generator](https://jamstack.org/generators/) and GitHub Pages would be one of the quickest options. After searching mainly [Hugo](https://gohugo.io/), [Jekyll](https://jekyllrb.com/) and [Pelican](https://getpelican.com/), Hugo caught up my eyes as it has [more themes with good features](https://themes.gohugo.io/). Among those I chose the [Hugo Bootstrap Theme](https://github.com/razonyang/hugo-theme-bootstrap). In this post, I'll demonstrate how I set up this blog site in days.
+I wouldn't like to use the existing site as it misses some features, and it'd take time to add those to it. As I prefer a self-managed blog over a blog platform, I thought a [static site generator](https://jamstack.org/generators/) and GitHub Pages would be one of the quickest options. After searching mainly [Hugo](https://gohugo.io/), [Jekyll](https://jekyllrb.com/) and [Pelican](https://getpelican.com/), Hugo caught up my eyes as it has [more themes with good features](https://themes.gohugo.io/). Among those I chose the [Hugo Bootstrap Theme](https://github.com/razonyang/hugo-theme-bootstrap). In this post, I'll demonstrate how I set up this blog site.
 
 ## Quick Start
 
-I used the [starter template](https://github.com/razonyang/hugo-theme-bootstrap-skeleton) of the [Hugo Bootstrap Theme](https://github.com/razonyang/hugo-theme-bootstrap). After installing _Node.js (16+)_, I cloned the template and installed NPN packages by executing `npm install`. Then I changed the module name in the `go.mod` file into mine (i.e. `module github.com/jaehyeon-kim/jaehyeon-kim.github.io`). Finally, I started the site using *docker-compose* with the compose file shown below. Without docker, I have to install [_Hugo (0.97.0+)_](https://hbs.razonyang.com/v1/en/docs/getting-started/prerequisites/#build-tools) but the apt repo has an older version of it and I wouldn't like to be bothered to install a newer version from source. Using *docker-compose* is a much easier way for me. Note it reloads the site when there is a change in the current directory so that updated contents can be checked on a browser seamlessly.
+I used the [starter template](https://github.com/razonyang/hugo-theme-bootstrap-skeleton) of the [Hugo Bootstrap Theme](https://github.com/razonyang/hugo-theme-bootstrap). After installing _Node.js (16+)_, I cloned the template and installed NPN packages by executing `npm install`. Then I changed the module name in the `go.mod` file into mine (i.e. `module github.com/jaehyeon-kim/jaehyeon-kim.github.io`). Finally, I started the site using *docker-compose* with the compose file shown below. Without docker, I have to install [_Hugo (0.97.0+)_](https://hbs.razonyang.com/v1/en/docs/getting-started/prerequisites/#build-tools) but the apt repo has an older version and I wouldn't like to be bothered to install a supported version from source. Using *docker-compose* is a much easier way for me. Note it reloads the site when there is a change in the current directory so that updated contents can be checked on a browser seamlessly.
 
 ```yaml
 version: "3.5"
@@ -52,7 +52,7 @@ Below shows the site generated by the template. As it has way more sections and 
 
 ## Update Configuration
 
-The *config/_default* folder contains default configurations and I mainly updated the site configuration (*config.yaml*), site parameters (*params.yaml*) and menu configuration (*menu.yaml*). Note they can be overridden by those in the *config/production* folder.
+The `config/_default` folder contains default configurations and I mainly updated the site configuration (*config.yaml*), site parameters (*params.yaml*) and menu configuration (*menu.yaml*). Note they can be overridden by those in the `config/production` folder.
 
 ```bash
 $ tree config
@@ -100,7 +100,7 @@ markup:
 
 ### Site Parameters
 
-The [site parameters](https://hbs.razonyang.com/v1/en/docs/configuration/site-params/) section includes specific config variables for the Hugo theme. Their names are mostly self-explanatory and many of them are explained by accompanying comments. Configuration of site parameters would require trials and errors, and we can quickly check the updated content thanks to Hugo's hot reloading feature.
+The [site parameters](https://hbs.razonyang.com/v1/en/docs/configuration/site-params/) section includes specific config variables for the Hugo theme. They are self-explanatory and have comments that explain further. Configuration of site parameters would require trials and errors, and we can quickly check the updated content thanks to Hugo's hot reloading feature.
 
 ```yaml
 # config/_default/params.yaml
@@ -170,7 +170,7 @@ main:
 
 ### Production Configuration
 
-As mentioned, the production configuration can be overridden. I'll host it using a custom domain, and it is updated accordingly. Also, I added the Google Analytics measurement ID, and it'll ensure the site activities are tracked only when it is deployed.
+As mentioned, the production configuration can be overridden. I'll host it using a custom domain, and the base URL is updated accordingly. I added the Google Analytics measurement ID as well, and it'll ensure the site activities are tracked only when it is deployed.
 
 ```yaml
 # config/production/config.yaml
@@ -180,7 +180,7 @@ googleAnalytics: <Measurement ID>
 
 ## Content Configuration
 
-Contents of a post are kept in a subfolder of the `content/blog` folder - e.g. `content/blog/2023-04-27-self-hosted-blog`. The article is written in `index.md`, and the post folder includes figures that can be referenced within the article. Note `featured.png` will be showing at the top of the post page as well as in the post list - see the [featured image configuration](https://hbs.razonyang.com/v1/en/docs/content/#featured-images-selection-order) for details.
+Contents of a post are kept in a subfolder of the `content/blog` folder - e.g. `content/blog/2023-04-27-self-hosted-blog`. The article is written in *index.md*, and the post folder includes figures that can be referenced within the article. Note *featured.png* will be showing at the top of the post page as well as in the post list - see the [featured image configuration](https://hbs.razonyang.com/v1/en/docs/content/#featured-images-selection-order) for details.
 
 ```bash
 $ tree content/blog/2023-04-27-self-hosted-blog/
@@ -201,7 +201,7 @@ content/blog/2023-04-27-self-hosted-blog/
 └── index.md
 ```
 
-The [page parameters](https://hbs.razonyang.com/v1/en/docs/configuration/page-params/) can be added at the top. It allows you to configure post components (e.g. *comment*, *toc*, *carousel*, ...) and its visibility (e.g. *draft*).
+The [page parameters](https://hbs.razonyang.com/v1/en/docs/configuration/page-params/) can be added at the top. It allows you to configure post components (e.g. *comment*, *toc*, *carousel*, ...), visibility (e.g. *draft*) etc.
 
 ```yaml
 ---
@@ -238,17 +238,18 @@ Once created, we can check it appears in the post list as shown below. We can vi
 
 ## Configure Custom Domain
 
-The GitHub Pages has a [good documentation](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site) about custom domain configuration. I'll just sketch how I set it up.
+The GitHub Pages has a [good documentation](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site) about custom domain configuration. I'll sketch how I set it up so that my custom domain (*jaehyeon.me*) is used to serve the site.
 
 ### Create ACM Certificate
 
-I bought a domain (*jaehyeon.me*) from Route53, and a public hosted zone is created automatically. For serving the site via HTTP, an ACM certificate is create for the domain and all of its subdomains. We can create a certificate by CloudFormation, and domain validation can also be automated. 
+I bought the domain from Route53, and a public hosted zone is created automatically. In order to serve the site via HTTPS, an ACM certificate is create for the domain and all of its subdomains. We can create a certificate by CloudFormation, and domain validation can be automated via DNS validation. 
 
 ```yaml
----
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create an ACM certificate for a domain and all of its subdomains.
 Parameters:
   DomainName:
-    Description: Fully qualified domain name to secure with an SSL/TLS certificate (eg example.com)
+    Description: Fully qualified domain name (eg example.com)
     Type: String
   HostedZoneId:
     Description: Route53 hosted zone id
@@ -272,11 +273,11 @@ Outputs:
 
 ### Manage Custom Domain
 
-I plan to configure the apex domain (*jaehyeon.me*) primarily and added the A and AAAA records to the hosted zone as indicated in the [documentation](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site). Also, a www subdomain (*www.jaehyeon.me*) is configured by adding a CNAME record to it. In this way, if someone visits the site by *www.jaehyeon.me*, it'll be redirected to *jaehyeon.me*.
+I plan to configure the apex domain (*jaehyeon.me*) primarily and added the A and AAAA records to the hosted zone as indicated in the [documentation](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site). Also, the WWW subdomain (*www.jaehyeon.me*) is configured by adding a CNAME record to it. In this way, if someone visits the site by *www.jaehyeon.me*, it'll be redirected to *jaehyeon.me*.
 
 ![](custom-domain-1.png#center)
 
-I saved the custom domain in the repository setting, and it is checked successfully. Note I do not enforce HTTPS as Google AdSense fails to verify `ads.txt` when it was enabled. 
+I saved the custom domain in the repository setting, and it is checked successfully. Note I do not enforce HTTPS as Google AdSense fails to verify the `ads.txt` file when it was enforced. 
 
 ![](custom-domain-2.png#center)
 
@@ -286,12 +287,23 @@ The GitHub Pages recommends [verifying the custom domain](https://docs.github.co
 
 ![](custom-domain-3.png#center)
 
-After this step, we can visit the site via the custom domain.
-
 ## Deployment
 
-## Additional Configuration
-### Comment Widget
+The starter template has a GitHub workflow ([.github/workflows/gh-pages.yml](https://github.com/jaehyeon-kim/jaehyeon-kim.github.io/blob/master/.github/workflows/gh-pages.yml)). It builds the site and deploys the `./public` folder to the remote *gh-pages* branch. Note GitHub Pages should be linked to the *gh-pages* branch.
+
+I added three additional files to the `./public` folder so that they are found in the deployed site. *CNAME* includes the custom domain name (*jaehyeon.me*) so that it keeps being linked to the site. *ads.txt* is required by Google AdSense, and *site-feature-image.png* is as per the site parameter configuration.
+
+```bash
+$ tree public
+public
+├── CNAME
+├── ads.txt
+└── site-feature-image.png
+```
+
+Once it is deployed, we can visit the site using the custom domain.
+
+## (Optional) Comment Widget
 
 While it supports multiple [comment widgets](https://hbs.razonyang.com/v1/en/docs/widgets/comments/), I decided to use [Giscus](https://giscus.app/), which is a lightweight comment widget built on GitHub discussions.
 
@@ -299,7 +311,7 @@ I first enabled *Discussions* in the repository *Settings* as shown below.
 
 ![](discussion-1.png#center)
 
-After that the *Discussions* tab is showing at the top and there are multiple discussion categories. The widget requires a category for comments, and I am going to use the *General* category.
+After that the *Discussions* tab is showing at the top, and we can see multiple discussion categories in that menu. As shown below, the widget requires a category where comments are saved, and I chose the *General* category.
 
 ![](discussion-2.png#center)
 
@@ -307,9 +319,11 @@ Then we need to install the widget as a GitHub app, and it can be installed by v
 
 ![](giscus-1.png#center)
 
+I only selected the repository for the blog site and clicked the *Install* button.
+
 ![](giscus-2.png#center)
 
-The key configuration values for the widget are the repo name, repo ID and category ID. 
+The *Giscus* configuration can be found in the site parameter configuration. It requires the repository name/ID and category ID.
 
 ```yaml
 # config/_default/params.yaml
@@ -329,7 +343,7 @@ giscus:
 ...
 ```
 
-The repository and category IDs can be queries on the [GitHub GraphQL API Explorer](https://docs.github.com/en/graphql/overview/explorer) as shown below. In the query, it is limited to show only the first one, and you may increase the number if the category you want to use is not queried.
+The repository and category IDs can be obtained from the [GitHub GraphQL API Explorer](https://docs.github.com/en/graphql/overview/explorer). In the query, it is limited to show only the first one category, and you may increase the number if the category you want to use is not queried.
 
 ```graphql
 query {
@@ -365,20 +379,19 @@ query {
 }
 ```
 
+Once the configuration is updated, we can see the *Comments* section appears correctly. We first need to sign in with GitHub to leave a comment.
+
 ![](comment-1.png#center)
+
+Once signed in, the text area is enabled, and we can leave a comment.
 
 ![](comment-2.png#center)
 
+The comment can also be checked on the *Discussion > General* of the repository and a reply can be made from it.
+
 ![](comment-3.png#center)
+
+On the post page, we can see the reply
 
 ![](comment-4.png#center)
 
-### Add Extra Files
-
-```bash
-$ tree public
-public
-├── CNAME
-├── ads.txt
-└── site-feature-image.png
-```
