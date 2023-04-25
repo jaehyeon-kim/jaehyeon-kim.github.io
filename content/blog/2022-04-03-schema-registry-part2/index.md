@@ -19,6 +19,7 @@ tags:
   - Amazon MSK
   - Amazon MSK Connect
   - Apache Kafka
+  - Kafka Connect
   - Terraform
   - Docker
   - Docker Compose

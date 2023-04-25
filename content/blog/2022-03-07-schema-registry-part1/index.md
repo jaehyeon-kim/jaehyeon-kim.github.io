@@ -18,6 +18,7 @@ tags:
   - Amazon MSK
   - Amazon MSK Connect
   - Apache Kafka
+  - Kafka Connect
   - Docker
   - Docker Compose
 authors:
