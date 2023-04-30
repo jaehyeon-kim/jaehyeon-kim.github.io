@@ -26,7 +26,7 @@ description: Kafka Connect is a tool for scalably and reliably streaming data be
 
 [Amazon Kinesis Data Streams](https://aws.amazon.com/kinesis/data-streams/) and [Amazon Managed Streaming for Apache Kafka (MSK)](https://aws.amazon.com/msk/) are two managed streaming services offered by AWS. Many resources on the web indicate Kinesis Data Streams is better when it comes to integrating with AWS services. However, it is not necessarily the case with help of Kafka Connect. According to the documentation of [Apache Kafka](https://kafka.apache.org/documentation/#connect), *Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It makes it simple to quickly define connectors that move large collections of data into and out of Kafka*. Kafka Connect supports two types of connectors - source and sink. Source connectors are used to ingest messages from external systems into Kafka topics while messages are ingested into external systems form Kafka topics with sink connectors. In this post, I will introduce available Kafka connectors mainly for AWS services integration.
 
-* [Part 1 Redshift](#) (this post)
+* [Part 1 Introduction](#) (this post)
 * (**to be updated...**)
 
 ## Amazon
@@ -41,13 +41,13 @@ As far as I've searched, there are two GitHub repositories by AWS. The [Kinesis 
 
 Note that, if we use the sink connector for Kinesis Data Firehose, we can build data pipelines to the [AWS services that are supported by it](https://docs.aws.amazon.com/firehose/latest/dev/create-name.html), which covers S3, Redshift and OpenSearch mainly. 
 
-There is one more source connector by AWS Labs to be noted, although it doesn't support to integrate with a specific AWS service. The [Amazon MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) is a translation of the [Voluble connector](https://github.com/MichaelDrogalis/voluble), and it can be used to generate test or fake data and ingest into a Kafka topic.
+There is one more source connector by AWS Labs to be noted, although it doesn't support integration with a specific AWS service. The [Amazon MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) is a translation of the [Voluble connector](https://github.com/MichaelDrogalis/voluble), and it can be used to generate test or fake data and ingest into a Kafka topic.
 
 ## Confluent Hub
 
 [Confluent](https://www.confluent.io/) is a leading provider of Apache Kafka and related services. It manages the [Confluent Hub](https://www.confluent.io/hub/) where we can discover (and/or submit) Kafka connectors for various integration use cases. Although it keeps a wide range of connectors, only less than 10 connectors can be used to integrate with AWS services reliably at the time of writing this post. Moreover, all of them except for the S3 sink connector are licensed under *Commercial (Standard)*, which requires purchase of Confluent Platform subscription. Or it can only be used on a single broker cluster or evaluated for 30 days otherwise. Therefore, practically most of them cannot be used unless you have a subscription for the Confluent Platform.
 
-|Service|Source|Sink|License|
+|Service|Source|Sink|Licence|
 |:------|:-----:|:---:|:------:|
 |[S3](https://www.confluent.io/hub/confluentinc/kafka-connect-s3)||✔|Free|
 |[S3](https://www.confluent.io/hub/confluentinc/kafka-connect-s3-source)|✔||Commercial (Standard)|
@@ -63,7 +63,7 @@ There is one more source connector by AWS Labs to be noted, although it doesn't 
 
 [Apache Camel](https://camel.apache.org/manual/faq/what-is-camel.html) is a versatile open-source integration framework based on known [Enterprise Integration Patterns](https://camel.apache.org/components/3.20.x/eips/enterprise-integration-patterns.html). It supports [Camel Kafka connectors](https://camel.apache.org/camel-kafka-connector/3.18.x/index.html), which allows you to use all [Camel components](https://camel.apache.org/components/3.20.x/index.html) as Kafka Connect connectors. The latest LTS version is *3.18.x (LTS)*, and it is supported until July 2023. Note that it works with Apache Kafka at version 2.8.0 as a dependency. In spite of the compatibility requirement, the connectors are using the Kafka Client which often is [compatible with different broker versions](https://github.com/apache/camel-kafka-connector/issues/1525), especially when the two versions are closer. Therefore, we can use them with a different Kafka version e.g. [2.8.1, which is recommended by Amazon MSK](https://docs.aws.amazon.com/msk/latest/developerguide/supported-kafka-versions.html).
 
-At the time of writing this post, there are 23 source and sink connectors that target specific AWS services - see the summary table below. Moreover, there are connectors targeting popular RDBMS, which cover MariaDB, MySQL, Oracle, PostgreSQL and MS SQL Server. Together with the [Debezium connectors](https://debezium.io/), we can build effective data pipeline on Amazon RDS as well. Overall Camel connectors can be quite beneficial when building real-time data pipelines on AWS. 
+At the time of writing this post, there are 23 source and sink connectors that target specific AWS services - see the summary table below. Moreover, there are connectors targeting popular RDBMS, which cover MariaDB, MySQL, Oracle, PostgreSQL and MS SQL Server. Together with the [Debezium connectors](https://debezium.io/), we can build effective data pipelines on Amazon RDS as well. Overall Camel connectors can be quite beneficial when building real-time data pipelines on AWS. 
 
 |Service|Source|Sink|
 |:------|:-----:|:---:|
@@ -94,7 +94,7 @@ At the time of writing this post, there are 23 source and sink connectors that t
 
 ## Other Providers
 
-Two other vendors ([Aiven](https://aiven.io/) and [Lenses](https://lenses.io/)) provide Kafka connectors that target AWS services, and those are related to S3 and OpenSearch - see below. I find the OpenSearch sink connector from Aiven would worth a close look.
+Two other vendors ([Aiven](https://aiven.io/) and [Lenses](https://lenses.io/)) provide Kafka connectors that target AWS services, and those are related to S3 and OpenSearch - see below. I find the OpenSearch sink connector from Aiven would be worth a close look.
 
 |Service|Source|Sink|Provider|
 |:------|:-----:|:---:|:---:|
@@ -105,4 +105,4 @@ Two other vendors ([Aiven](https://aiven.io/) and [Lenses](https://lenses.io/)) 
 
 ## Summary
 
-Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It can be used to build real-time data pipeline on AWS effectively. Among available connectors, those that are provided by Amazon and Apache Camel have good potential.
+Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It can be used to build real-time data pipelines on AWS effectively. Among available connectors, those that are provided by Amazon and Apache Camel have good potential.
