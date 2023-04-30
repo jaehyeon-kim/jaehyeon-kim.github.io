@@ -1,5 +1,5 @@
 ---
-title: Kafka Connectors for AWS Services Integration - Part 1 Introduction
+title: Kafka Connect for AWS Services Integration - Part 1 Introduction
 date: 2023-05-03
 draft: true
 featured: true
@@ -10,7 +10,7 @@ pinned: false
 carousel: false
 featuredImage: false
 series:
-  - Kafka Connectors for AWS Integration
+  - Kafka Connect for AWS Services Integration
 categories:
   - Data Engineering
 tags: 
