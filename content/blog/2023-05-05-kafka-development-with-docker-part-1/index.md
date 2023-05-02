@@ -158,21 +158,38 @@ $ docker-compose -f compose-kafka.yml ps
 ```
 
 ```bash
-$ sudo ls /var/lib/docker/volumes | grep data$
-# kafka_0_data
-# kafka_1_data
-# kafka_2_data
-# zookeeper_data
+$ docker volume ls | grep data$
+# local     kafka_0_data
+# local     kafka_1_data
+# local     kafka_2_data
+# local     zookeeper_data
 $ sudo ls -l /var/lib/docker/volumes/kafka_0_data/_data/data
-# total 28
-# -rw-r--r-- 1 1001 root    0 May  2 15:31 cleaner-offset-checkpoint
-# -rw-r--r-- 1 1001 root    4 May  2 15:33 log-start-offset-checkpoint
-# -rw-r--r-- 1 1001 root   88 May  2 15:31 meta.properties
-# drwxr-xr-x 2 1001 root 4096 May  2 15:32 orders-0
-# drwxr-xr-x 2 1001 root 4096 May  2 15:32 orders-1
-# drwxr-xr-x 2 1001 root 4096 May  2 15:32 orders-2
-# -rw-r--r-- 1 1001 root   37 May  2 15:33 recovery-point-offset-checkpoint
-# -rw-r--r-- 1 1001 root   37 May  2 15:34 replication-offset-checkpoint
+# total 96
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-0
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-12
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-15
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-18
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-21
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-24
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:58 __consumer_offsets-27
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-3
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-30
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-33
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:58 __consumer_offsets-36
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-39
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:58 __consumer_offsets-42
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:58 __consumer_offsets-45
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:58 __consumer_offsets-48
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-6
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:58 __consumer_offsets-9
+# -rw-r--r-- 1 hadoop root    0 May  3 07:52 cleaner-offset-checkpoint
+# -rw-r--r-- 1 hadoop root    4 May  3 07:59 log-start-offset-checkpoint
+# -rw-r--r-- 1 hadoop root   88 May  3 07:52 meta.properties
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 orders-0
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:57 orders-1
+# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 orders-2
+# -rw-r--r-- 1 hadoop root  442 May  3 07:59 recovery-point-offset-checkpoint
+# -rw-r--r-- 1 hadoop root  442 May  3 07:59 replication-offset-checkpoint
 ```
 
 ```bash
