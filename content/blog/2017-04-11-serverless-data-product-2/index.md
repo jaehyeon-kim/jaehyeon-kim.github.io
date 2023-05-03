@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Serverless Data Product
 categories:
-  - Serverless
+  - Data Product
 tags: 
   - AWS
   - AWS Lambda

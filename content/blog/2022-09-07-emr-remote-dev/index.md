@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - Integrate Schema Registry with MSK Connect
 categories:
-  - Engineering
+  - Data Engineering
 tags: 
   - AWS
   - Amazon EMR

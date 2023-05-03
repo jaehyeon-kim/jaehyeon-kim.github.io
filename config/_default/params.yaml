@@ -60,9 +60,9 @@ postDate: true # Whether to display the post date in the post meta section.
 featuredPostCount: 10 # The number of featured posts shown in sidebar. Turn off by setting it to false.
 recentPostCount: 10 # The number of recent posts shown in sidebar. Turn off by setting it to false.
 relatedPostCount: 10 # The number of related posts. Turn off by setting it to false.
-# categoryCount: 10 # The number of categories shown in sidebar. Turn off by setting it to false.
-tagCount: 20 # The number of tags shown in sidebar. Turn off by setting it to false.
-# seriesCount: 20 # The number of series shown in sidebar. Turn off by setting it to false.
+categoryCount: 20 # The number of categories shown in sidebar. Turn off by setting it to false.
+tagCount: 40 # The number of tags shown in sidebar. Turn off by setting it to false.
+seriesCount: 20 # The number of series shown in sidebar. Turn off by setting it to false.
 # taxonomyPaginate: 5 # Default to 10.
 taxonomyPostCount: 20 # The number of taxonomy's posts. Turn off by setting it to false.
 countTaxonomyPosts: true # Count posts of taxonomy.
