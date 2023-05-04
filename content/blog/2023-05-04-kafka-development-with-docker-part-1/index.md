@@ -2,7 +2,7 @@
 title: Kafka Development with Docker - Part 1 Kafka Cluster Setup
 date: 2023-05-04
 draft: false
-featured: false
+featured: true
 comment: true
 toc: true
 reward: false
