@@ -48,7 +48,7 @@ Glue Schema Registry
 
 |Application|IAM Auth|MSK Connect|Glue Schema Registry|Note|
 |:------|:---:|:---:|:---:|:---|
-|[UI for Apache Kafka (kafka-ui)](https://github.com/provectus/kafka-ui)|✔|[❌](https://github.com/provectus/kafka-ui/issues/1311)|✔|Support multiple clusters|
+|[UI for Apache Kafka (kafka-ui)](https://docs.kafka-ui.provectus.io/overview/readme)|✔|[❌](https://github.com/provectus/kafka-ui/issues/1311)|✔|Support multiple clusters|
 |[kpow](https://kpow.io/)|✔|✔|✔|Single cluster if community edition|
 |[Conduktor Desktop](https://www.conduktor.io/desktop/)|✔|✔|✔|Single cluster single broker|
 
