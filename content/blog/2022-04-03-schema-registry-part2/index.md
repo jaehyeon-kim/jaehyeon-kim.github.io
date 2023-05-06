@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Integrate Schema Registry with MSK Connect
 categories:
-  - Data Engineering
+  - Apache Kafka
 tags: 
   - AWS
   - Amazon ECS

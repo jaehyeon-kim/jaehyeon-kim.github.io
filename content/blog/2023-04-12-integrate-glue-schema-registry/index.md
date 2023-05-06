@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - 
 categories:
-  - Data Engineering
+  - Apache Kafka
 tags: 
   - AWS
   - Amazon MSK

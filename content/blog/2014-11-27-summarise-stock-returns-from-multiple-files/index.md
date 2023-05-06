@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - Tree based methods in R
 categories:
-  - Engineering
+  - R
 tags: 
   - R
 authors:

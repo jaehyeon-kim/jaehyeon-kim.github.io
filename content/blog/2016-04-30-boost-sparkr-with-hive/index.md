@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - API development with R
 categories:
-  - Data Engineering
+  - R
 tags: 
   - Apache Spark
   - Apache Hive

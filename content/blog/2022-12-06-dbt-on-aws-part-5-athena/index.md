@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - DBT for Effective Data Transformation on AWS
 categories:
-  - Data Engineering
+  - Data Build Tool (DBT)
 tags: 
   - AWS
   - Amazon Athena
