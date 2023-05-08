@@ -1,7 +1,7 @@
 ---
 title: Kafka Development with Docker - Part 2 Kafka Management App
 date: 2023-05-10
-draft: false
+draft: true
 featured: false
 comment: true
 toc: true
