@@ -26,7 +26,7 @@ description: Apache Kafka is one of the key technologies for modern data streami
 I'm teaching myself [modern data streaming architectures](https://docs.aws.amazon.com/whitepapers/latest/build-modern-data-streaming-analytics-architectures/build-modern-data-streaming-analytics-architectures.html) on AWS, and [Apache Kafka](https://kafka.apache.org/) is one of the key technologies, which can be used for messaging, activity tracking, stream processing and so on. While applications tend to be deployed to cloud, it can be much easier if we develop and test those with [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) locally. As the series title indicates, I plan to publish articles that demonstrate Kafka and related tools in *Dockerized* environments. Although I covered some of them in previous posts, they are implemented differently in terms of the Kafka Docker image, the number of brokers, Docker volume mapping etc. It can be confusing, and one of the purposes of this series is to illustrate reference implementations that can be applied to future development projects. Also, I can extend my knowledge while preparing for this series. In fact Kafka security is one of the areas that I expect to learn further. Below shows a list of posts that I plan for now.
 
 * [Part 1 Kafka Cluster Setup](#) (this post)
-* Part 2 Kafka Management UI
+* Part 2 Kafka Management App
 * Part 3 Kafka Connect without Schema Registry
 * Part 4 Glue Schema Registry
 * Part 5 Kafka Connect with Glue Schema Registry
@@ -53,6 +53,7 @@ The following Docker Compose file is used to create the Kafka cluster indicated 
   - kafka-*[id]*
     - Each broker has a unique ID (*KAFKA_CFG_BROKER_ID*) and shares the same Zookeeper connect parameter (*KAFKA_CFG_ZOOKEEPER_CONNECT*). These are required to connect to the Zookeeper node.
     - Each has two listeners. The port 9092 is used within the same network and each has its own port (9093 to 9095), which can be used to connect from outside the network.
+      - [**UPDATE 2023-05-09**] The external ports are updated from 29092 to 29094, which is because it is planned to use 9093 for SSL encryption.
     - Each can be accessed without authentication (*ALLOW_PLAINTEXT_LISTENER*). 
 - networks
   - A network named *kafka-network* is created and used by all services. Having a custom network can be beneficial when services are launched by multiple Docker Compose files. This custom network can be referred by services in other compose files.
@@ -82,7 +83,7 @@ services:
     expose:
       - 9092
     ports:
-      - "9093:9093"
+      - "29092:29092"
     networks:
       - kafkanet
     environment:
@@ -90,8 +91,8 @@ services:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CFG_BROKER_ID=0
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-0:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:29092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-0:9092,EXTERNAL://localhost:29092
       - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
     volumes:
       - kafka_0_data:/bitnami/kafka
@@ -103,7 +104,7 @@ services:
     expose:
       - 9092
     ports:
-      - "9094:9094"
+      - "29093:29093"
     networks:
       - kafkanet
     environment:
@@ -111,8 +112,8 @@ services:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CFG_BROKER_ID=1
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-1:9092,EXTERNAL://localhost:9094
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:29093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-1:9092,EXTERNAL://localhost:29093
       - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
     volumes:
       - kafka_1_data:/bitnami/kafka
@@ -124,7 +125,7 @@ services:
     expose:
       - 9092
     ports:
-      - "9095:9095"
+      - "29094:29094"
     networks:
       - kafkanet
     environment:
@@ -132,8 +133,8 @@ services:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CFG_BROKER_ID=2
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9095
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-2:9092,EXTERNAL://localhost:9095
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:29094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-2:9092,EXTERNAL://localhost:29094
       - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
     volumes:
       - kafka_2_data:/bitnami/kafka
