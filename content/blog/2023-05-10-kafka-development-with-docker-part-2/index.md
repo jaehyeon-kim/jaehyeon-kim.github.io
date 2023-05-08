@@ -62,6 +62,19 @@ There are other popular Kafka management apps, and they are listed below for you
 
 In the subsequent sections, I will introduce UI for Apache Kafka (kafka-ui) and Kpow. I assume the local Kafka cluster demonstrated in [Part 1]((blog/2023-05-04-kafka-development-with-docker-part-1)) is up and running.
 
+
+<!-- value.user_id == "072"
+
+Seek Type - offset/timestamp
+Partitions
+Oldest First/Newest First/Live Mode
+
+.value.user_id == "072"
+
+Mode - Sample, Partition, Key
+Window - Recent, Last minute, Last 15 minutes, Last hour, Last 24 hours, Earliest, Custom timestamp, Custom datetime
+Streaming Search -->
+
 ## UI for Apache Kafka (kafka-ui)
 
 
