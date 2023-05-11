@@ -1,7 +1,7 @@
 ---
 title: Kafka Development with Docker - Part 2 Kafka Management App
-date: 2023-05-10
-draft: false
+date: 2023-05-18
+draft: true
 featured: false
 comment: true
 toc: true
@@ -27,7 +27,7 @@ In the previous post, I illustrated how to create a topic and to produce/consume
 
 * [Part 1 Kafka Cluster Setup](blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Kafka Management App](#) (this post)
-* Part 3 Kafka Connect without Schema Registry
+* Part 3 Kafka Connect
 * Part 4 Glue Schema Registry
 * Part 5 Kafka Connect with Glue Schema Registry
 * Part 6 SSL Encryption

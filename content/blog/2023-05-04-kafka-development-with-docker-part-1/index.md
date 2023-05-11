@@ -27,7 +27,7 @@ I'm teaching myself [modern data streaming architectures](https://docs.aws.amazo
 
 * [Part 1 Kafka Cluster Setup](#) (this post)
 * Part 2 Kafka Management App
-* Part 3 Kafka Connect without Schema Registry
+* Part 3 Kafka Connect
 * Part 4 Glue Schema Registry
 * Part 5 Kafka Connect with Glue Schema Registry
 * Part 6 SSL Encryption
