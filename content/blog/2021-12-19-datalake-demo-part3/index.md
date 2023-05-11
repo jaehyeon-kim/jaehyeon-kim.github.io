@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Data Lake Demo Using Change Data Capture
 categories:
-  - Data Engineering
+  - Change Data Capture (CDC)
 tags: 
   - AWS
   - Amazon EMR
@@ -21,6 +21,7 @@ tags:
   - Apache Spark
   - Apache Hudi
   - Apache Kafka
+  - Kafka Connect
   - Change Data Capture
   - Data Lake
   - Docker

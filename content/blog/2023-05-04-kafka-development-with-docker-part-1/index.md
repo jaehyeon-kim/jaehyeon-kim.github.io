@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Kafka Development with Docker
 categories:
-  - Data Engineering
+  - Apache Kafka
 tags: 
   - Apache Kafka
   - Docker

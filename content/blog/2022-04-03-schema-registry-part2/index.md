@@ -12,13 +12,14 @@ featuredImage: false
 series:
   - Integrate Schema Registry with MSK Connect
 categories:
-  - Data Engineering
+  - Apache Kafka
 tags: 
   - AWS
   - Amazon ECS
   - Amazon MSK
   - Amazon MSK Connect
   - Apache Kafka
+  - Kafka Connect
   - Terraform
   - Docker
   - Docker Compose

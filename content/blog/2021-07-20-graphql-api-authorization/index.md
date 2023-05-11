@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - API development with R
 categories:
-  - Engineering
+  - Development
 tags: 
   - Apollo
   - Authorization

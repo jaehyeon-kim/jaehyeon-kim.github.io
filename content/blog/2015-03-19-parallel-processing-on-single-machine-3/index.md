@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Parallel processing on single machine
 categories:
-  - Engineering
+  - R
 tags: 
   - R
 authors:

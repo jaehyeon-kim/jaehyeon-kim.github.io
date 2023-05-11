@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - API development with R
 categories:
-  - Engineering
+  - R
 tags: 
   - R
 authors:
