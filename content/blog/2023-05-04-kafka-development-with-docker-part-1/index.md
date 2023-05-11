@@ -25,16 +25,17 @@ description: Apache Kafka is one of the key technologies for modern data streami
 
 I'm teaching myself [modern data streaming architectures](https://docs.aws.amazon.com/whitepapers/latest/build-modern-data-streaming-analytics-architectures/build-modern-data-streaming-analytics-architectures.html) on AWS, and [Apache Kafka](https://kafka.apache.org/) is one of the key technologies, which can be used for messaging, activity tracking, stream processing and so on. While applications tend to be deployed to cloud, it can be much easier if we develop and test those with [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) locally. As the series title indicates, I plan to publish articles that demonstrate Kafka and related tools in *Dockerized* environments. Although I covered some of them in previous posts, they are implemented differently in terms of the Kafka Docker image, the number of brokers, Docker volume mapping etc. It can be confusing, and one of the purposes of this series is to illustrate reference implementations that can be applied to future development projects. Also, I can extend my knowledge while preparing for this series. In fact Kafka security is one of the areas that I expect to learn further. Below shows a list of posts that I plan for now.
 
-* [Part 1 Kafka Cluster Setup](#) (this post)
-* Part 2 Kafka Management App
+* [Part 1 Cluster Setup](#) (this post)
+* Part 2 Management App
 * Part 3 Kafka Connect
-* Part 4 Glue Schema Registry
-* Part 5 Kafka Connect with Glue Schema Registry
-* Part 6 SSL Encryption
-* Part 7 SSL Authentication
-* Part 8 SASL Authentication
-* Part 9 Kafka Authorization
-* (More topics related to MSK, MSK Connect...)
+* Part 4 Product/Consume Messages
+* Part 5 Glue Schema Registry
+* Part 6 Kafka Connect with Glue Schema Registry
+* Part 7 Product/Consume Messages with Glue Schema Registry
+* Part 8 SSL Encryption
+* Part 9 SSL Authentication
+* Part 10 SASL Authentication
+* Part 11 Kafka Authorization
 
 ## Setup Kafka Cluster
 

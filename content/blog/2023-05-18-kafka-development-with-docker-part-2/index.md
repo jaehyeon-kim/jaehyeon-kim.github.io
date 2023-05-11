@@ -25,16 +25,17 @@ description: A Kafka management app can be a good companion for development, whi
 
 In the previous post, I illustrated how to create a topic and to produce/consume messages using the command utilities provided by Apache Kafka. It is not convenient, however, for example, when you consume serialised messages where their schemas are stored in a schema registry. Also, the utilities don't support to browse or manage related resources such as connectors and schemas. Therefore, a Kafka management app can be a good companion for development, which helps monitor and manage resources on an easy-to-use user interface. An app can be more useful if it supports features that are desirable for Kafka development on AWS. Those features cover [IAM access control](https://docs.aws.amazon.com/msk/latest/developerguide/iam-access-control.html) of [Amazon MSK](https://aws.amazon.com/msk/) and integration with [Amazon MSK Connect](https://aws.amazon.com/msk/features/msk-connect/) and [AWS Glue Schema Registry](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html). In this post, I'll introduce several management apps that meet those requirements.
 
-* [Part 1 Kafka Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
-* [Part 2 Kafka Management App](#) (this post)
+* [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
+* [Part 2 Management App](#) (this post)
 * Part 3 Kafka Connect
-* Part 4 Glue Schema Registry
-* Part 5 Kafka Connect with Glue Schema Registry
-* Part 6 SSL Encryption
-* Part 7 SSL Authentication
-* Part 8 SASL Authentication
-* Part 9 Kafka Authorization
-* (More topics related to MSK, MSK Connect...)
+* Part 4 Product/Consume Messages
+* Part 5 Glue Schema Registry
+* Part 6 Kafka Connect with Glue Schema Registry
+* Part 7 Product/Consume Messages with Glue Schema Registry
+* Part 8 SSL Encryption
+* Part 9 SSL Authentication
+* Part 10 SASL Authentication
+* Part 11 Kafka Authorization
 
 ## Overview of Kafka Management App
 

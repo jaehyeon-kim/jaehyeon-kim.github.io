@@ -27,16 +27,17 @@ description: Kafka Connect is a tool for scalably and reliably streaming data be
 According to the documentation of [Apache Kafka](https://kafka.apache.org/documentation/#connect), *Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It makes it simple to quickly define connectors that move large collections of data into and out of Kafka*. Kafka Connect supports two types of connectors - source and sink. Source connectors are used to ingest messages from external systems into Kafka topics while messages are ingested into external systems form Kafka topics with sink connectors. In this post, I will introduce how to set up a source and sink connectors on Docker. Fake customer and order data will be ingested into the corresponding topics using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) source connector. The messages in the topics will then be saved into a S3 bucket using the [Confluent S3](https://www.confluent.io/hub/confluentinc/kafka-connect-s3) sink connector.
 
 
-* [Part 1 Kafka Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
-* [Part 2 Kafka Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
+* [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
+* [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
 * [Part 3 Kafka Connect](#) (this post)
-* Part 4 Glue Schema Registry
-* Part 5 Kafka Connect with Glue Schema Registry
-* Part 6 SSL Encryption
-* Part 7 SSL Authentication
-* Part 8 SASL Authentication
-* Part 9 Kafka Authorization
-* (More topics related to MSK, MSK Connect...)
+* Part 4 Product/Consume Messages
+* Part 5 Glue Schema Registry
+* Part 6 Kafka Connect with Glue Schema Registry
+* Part 7 Product/Consume Messages with Glue Schema Registry
+* Part 8 SSL Encryption
+* Part 9 SSL Authentication
+* Part 10 SASL Authentication
+* Part 11 Kafka Authorization
 
 ## Kafka Connect Setup
 
