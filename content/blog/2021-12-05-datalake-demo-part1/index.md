@@ -21,6 +21,7 @@ tags:
   - Apache Spark
   - Apache Hudi
   - Apache Kafka
+  - Kafka Connect
   - Change Data Capture
   - Data Lake
   - Docker

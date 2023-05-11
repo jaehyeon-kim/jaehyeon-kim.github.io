@@ -15,6 +15,7 @@ categories:
   - Apache Kafka
 tags: 
   - Apache Kafka
+  - Kafka Connect
   - Docker
   - Docker Compose
 authors:
