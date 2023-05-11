@@ -21,10 +21,10 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: ...
+description: Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. In this post, I will introduce how to set up a source and sink connectors on Docker.I will introduce how to set up a source and sink connectors on Docker. Fake customer and order data will be ingested into the corresponding topics using the MSK Data Generator source connector. The messages in the topics will then be saved into a S3 bucket using the Confluent S3 sink connector.
 ---
 
-...
+According to the documentation of [Apache Kafka](https://kafka.apache.org/documentation/#connect), *Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It makes it simple to quickly define connectors that move large collections of data into and out of Kafka*. Kafka Connect supports two types of connectors - source and sink. Source connectors are used to ingest messages from external systems into Kafka topics while messages are ingested into external systems form Kafka topics with sink connectors. In this post, I will introduce how to set up a source and sink connectors on Docker. Fake customer and order data will be ingested into the corresponding topics using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) source connector. The messages in the topics will then be saved into a S3 bucket using the [Confluent S3](https://www.confluent.io/hub/confluentinc/kafka-connect-s3) sink connector.
 
 
 * [Part 1 Kafka Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
@@ -40,12 +40,7 @@ description: ...
 
 ## Kafka Connect Setup
 
-```bash
-$ cd kafka-dev-with-docker/part-03
-$ docker-compose -f compose-kafka.yml up -d
-$ docker-compose -f compose-connect.yml up -d
-$ docker-compose -f compose-ui.yml up -d
-```
+*Kafka Connect* is included in the Kafka distribution, and we can use the same Docker image. As we will create multiple 
 
 ```yaml
 # /kafka-dev-with-docker/part-03/compose-connect.yml
@@ -79,7 +74,7 @@ networks:
 
 ### Connect Configuration
 
-```conf
+```java-properties
 # kafka-dev-with-docker/part-03/configs/connect-distributed.properties
 
 # A list of host/port pairs to use for establishing the initial connection to the Kafka cluster.
@@ -152,6 +147,15 @@ echo "downloading msk data generator..."
 DOWNLOAD_URL=https://github.com/awslabs/amazon-msk-data-generator/releases/download/v0.4.0/msk-data-generator-0.4-jar-with-dependencies.jar
 
 curl -L -o ${SRC_PATH}/msk-datagen/msk-data-generator.jar ${DOWNLOAD_URL}
+```
+
+### Start All Services
+
+```bash
+$ cd kafka-dev-with-docker/part-03
+$ docker-compose -f compose-kafka.yml up -d
+$ docker-compose -f compose-connect.yml up -d
+$ docker-compose -f compose-ui.yml up -d
 ```
 
 ## Source Connector Creation
