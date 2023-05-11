@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - 
 categories:
-  - Blog
+  - General
 tags: 
   - Hugo
   - Bootstrap

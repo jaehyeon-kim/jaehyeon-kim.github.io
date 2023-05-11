@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - Integrate Schema Registry with MSK Connect
 categories:
-  - Data Engineering
+  - Apache Airflow
 tags: 
   - AWS
   - AWS Lambda

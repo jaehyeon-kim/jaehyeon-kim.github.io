@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - API development with R
 categories:
-  - Serverless
+  - Data Product
 tags: 
   - R
   - Rserve
