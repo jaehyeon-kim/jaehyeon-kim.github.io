@@ -25,7 +25,7 @@ description: A Kafka management app can be a good companion for development, whi
 
 In the previous post, I illustrated how to create a topic and to produce/consume messages using the command utilities provided by Apache Kafka. It is not convenient, however, for example, when you consume serialised messages where their schemas are stored in a schema registry. Also, the utilities don't support to browse or manage related resources such as connectors and schemas. Therefore, a Kafka management app can be a good companion for development, which helps monitor and manage resources on an easy-to-use user interface. An app can be more useful if it supports features that are desirable for Kafka development on AWS. Those features cover [IAM access control](https://docs.aws.amazon.com/msk/latest/developerguide/iam-access-control.html) of [Amazon MSK](https://aws.amazon.com/msk/) and integration with [Amazon MSK Connect](https://aws.amazon.com/msk/features/msk-connect/) and [AWS Glue Schema Registry](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html). In this post, I'll introduce several management apps that meet those requirements.
 
-* [Part 1 Kafka Cluster Setup](blog/2023-05-04-kafka-development-with-docker-part-1)
+* [Part 1 Kafka Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Kafka Management App](#) (this post)
 * Part 3 Kafka Connect
 * Part 4 Glue Schema Registry
@@ -64,7 +64,7 @@ In the subsequent sections, I will introduce UI for Apache Kafka (kafka-ui) and 
 
 ## Start Management Apps
 
-I assume the local Kafka cluster demonstrated in [Part 1]((blog/2023-05-04-kafka-development-with-docker-part-1)) is up and running. I created a separate compose file for the management apps. The cluster details are configured by environment variables, and only the Kafka cluster details are added in this post - more complete examples will be covered in later posts. As *kafka-ui* supports multiple clusters, cluster config variables are indexed while only a single cluster config is allowed for *Kpow CE*. Note that, as the services share the same network to the Kafka cluster, they can use the inter broker listener, which means the bootstrap servers can be indicated as `kafka-0:9092,kafka-1:9092,kafka-2:9092`. The services can be started by `docker-compose -f compose-ui.yml up -d`, and *kafka-ui* and *Kpow CE* are accessible on port 8080 and 3000 respectively.
+I assume the local Kafka cluster demonstrated in [Part 1](/blog/2023-05-04-kafka-development-with-docker-part-1) is up and running. I created a separate compose file for the management apps. The cluster details are configured by environment variables, and only the Kafka cluster details are added in this post - more complete examples will be covered in later posts. As *kafka-ui* supports multiple clusters, cluster config variables are indexed while only a single cluster config is allowed for *Kpow CE*. Note that, as the services share the same network to the Kafka cluster, they can use the inter broker listener, which means the bootstrap servers can be indicated as `kafka-0:9092,kafka-1:9092,kafka-2:9092`. The services can be started by `docker-compose -f compose-ui.yml up -d`, and *kafka-ui* and *Kpow CE* are accessible on port 8080 and 3000 respectively.
 
 ```yaml
 # kafka-dev-with-docker/part-02/kafka-ui.yml

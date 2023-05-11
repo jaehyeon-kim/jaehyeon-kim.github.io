@@ -27,8 +27,8 @@ description: ...
 ...
 
 
-* [Part 1 Kafka Cluster Setup](blog/2023-05-04-kafka-development-with-docker-part-1)
-* [Part 2 Kafka Management App](blog/2023-05-18-kafka-development-with-docker-part-2)
+* [Part 1 Kafka Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
+* [Part 2 Kafka Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
 * [Part 3 Kafka Connect](#) (this post)
 * Part 4 Glue Schema Registry
 * Part 5 Kafka Connect with Glue Schema Registry
