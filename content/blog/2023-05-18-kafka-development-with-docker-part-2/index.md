@@ -28,10 +28,10 @@ In the previous post, I illustrated how to create a topic and to produce/consume
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](#) (this post)
 * Part 3 Kafka Connect
-* Part 4 Product/Consume Messages
+* Part 4 Produce/Consume Messages
 * Part 5 Glue Schema Registry
 * Part 6 Kafka Connect with Glue Schema Registry
-* Part 7 Product/Consume Messages with Glue Schema Registry
+* Part 7 Produce/Consume Messages with Glue Schema Registry
 * Part 8 SSL Encryption
 * Part 9 SSL Authentication
 * Part 10 SASL Authentication
