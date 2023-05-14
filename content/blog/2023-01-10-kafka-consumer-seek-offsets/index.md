@@ -357,7 +357,7 @@ if __name__ == "__main__":
 ```
 
 
-Docker-compose is used to deploy multiple instances of the producer. Note that the compose service uses the same docker network (_kafkanet_) so that it can use _kafka:9092_ as the bootstrap server address. The OFFSET_STR environment variable is used to override the fetch offset.
+Docker-compose is used to deploy multiple instances of the consumer. Note that the compose service uses the same docker network (_kafkanet_) so that it can use _kafka:9092_ as the bootstrap server address. The OFFSET_STR environment variable is used to override the fetch offset.
 
 
 ```yaml
