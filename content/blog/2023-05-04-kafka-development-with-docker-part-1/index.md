@@ -53,8 +53,9 @@ The following Docker Compose file is used to create the Kafka cluster indicated 
     - A Zookeeper node is created with minimal configuration. It allows anonymous login.
   - kafka-*[id]*
     - Each broker has a unique ID (*KAFKA_CFG_BROKER_ID*) and shares the same Zookeeper connect parameter (*KAFKA_CFG_ZOOKEEPER_CONNECT*). These are required to connect to the Zookeeper node.
-    - Each has two listeners. The port 9092 is used within the same network and each has its own port (9093 to 9095), which can be used to connect from outside the network.
+    - Each has two listeners - *INTERNAL* and *EXTERNAL*. The former is accessed on port 9092, and it is used within the same Docker network. The latter is mapped from port 9093 to 9095, and it can be used to connect from outside the network.
       - [**UPDATE 2023-05-09**] The external ports are updated from 29092 to 29094, which is because it is planned to use 9093 for SSL encryption.
+      - [**UPDATE 2023-05-15**] The inter broker listener name is changed from *CLIENT* to *INTERNAL*. 
     - Each can be accessed without authentication (*ALLOW_PLAINTEXT_LISTENER*). 
 - networks
   - A network named *kafka-network* is created and used by all services. Having a custom network can be beneficial when services are launched by multiple Docker Compose files. This custom network can be referred by services in other compose files.
@@ -91,10 +92,10 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CFG_BROKER_ID=0
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:29092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-0:9092,EXTERNAL://localhost:29092
-      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-0:9092,EXTERNAL://localhost:29092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
     volumes:
       - kafka_0_data:/bitnami/kafka
     depends_on:
@@ -112,10 +113,10 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CFG_BROKER_ID=1
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:29093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-1:9092,EXTERNAL://localhost:29093
-      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-1:9092,EXTERNAL://localhost:29093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
     volumes:
       - kafka_1_data:/bitnami/kafka
     depends_on:
@@ -133,10 +134,10 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CFG_BROKER_ID=2
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:29094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-2:9092,EXTERNAL://localhost:29094
-      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-2:9092,EXTERNAL://localhost:29094
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
     volumes:
       - kafka_2_data:/bitnami/kafka
     depends_on:
