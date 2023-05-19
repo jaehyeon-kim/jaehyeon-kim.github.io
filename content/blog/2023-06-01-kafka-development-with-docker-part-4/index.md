@@ -1,5 +1,5 @@
 ---
-title: Kafka Development with Docker - Part 4 Produce/Consume Messages
+title: Kafka Development with Docker - Part 4 Producer and Consumer
 date: 2023-06-01
 draft: true
 featured: false
@@ -29,10 +29,10 @@ In the previous post, we discussed [Kafka Connect](https://kafka.apache.org/docu
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
 * [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3)
-* [Part 4 Produce/Consume Messages](#) (this post)
+* [Part 4 Producer and Consumer](#) (this post)
 * Part 5 Glue Schema Registry
 * Part 6 Kafka Connect with Glue Schema Registry
-* Part 7 Produce/Consume Messages with Glue Schema Registry
+* Part 7 Producer and Consumer with Glue Schema Registry
 * Part 8 SSL Encryption
 * Part 9 SSL Authentication
 * Part 10 SASL Authentication
