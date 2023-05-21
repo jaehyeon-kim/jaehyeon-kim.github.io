@@ -16,6 +16,7 @@ categories:
 tags: 
   - Apache Kafka
   - Glue Schema Registry
+  - Python
   - Docker
   - Docker Compose
 authors:
