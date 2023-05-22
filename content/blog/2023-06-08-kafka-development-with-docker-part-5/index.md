@@ -19,7 +19,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: The Glue Schema Registry supports features to manage and enforce schemas on data streaming applications using convenient integrations with Apache Kafka and other AWS managed services. In order to utilise those features, we need to use the client library. In this post, I'll illustrate how to build the client library followed by briefly introducing how it works to integrate the Glue Schema Registry with Kafka producer and consumer apps.
+description: The Glue Schema Registry supports features to manage and enforce schemas on data streaming applications using convenient integrations with Apache Kafka and other AWS managed services. In order to utilise those features, we need to use the client library. In this post, I'll illustrate how to build the client library after briefly introducing how it works to integrate the Glue Schema Registry with Kafka producer and consumer apps.
 ---
 
 As described in the [Confluent document](https://docs.confluent.io/platform/current/schema-registry/index.html#sr-overview), _Schema Registry_ provides a centralized repository for managing and validating schemas for topic message data, and for serialization and deserialization of the data over the network. Producers and consumers to Kafka topics can use schemas to ensure data consistency and compatibility as schemas evolve. In AWS, the [Glue Schema Registry](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html) supports features to manage and enforce schemas on data streaming applications using convenient integrations with Apache Kafka, [Amazon Managed Streaming for Apache Kafka](https://aws.amazon.com/msk/), [Amazon Kinesis Data Streams](https://aws.amazon.com/kinesis/data-streams/), [Amazon Kinesis Data Analytics for Apache Flink](https://aws.amazon.com/kinesis/data-analytics/), and [AWS Lambda](https://aws.amazon.com/lambda/).
@@ -77,6 +77,19 @@ It can work with Apache Kafka as well as other AWS services. See this [AWS docum
 * Apache Kafka Connect
 
 ## Build the Client Library
+
+In order to build the client library, we need to have both the [JDK](https://openjdk.org/) and [Maven](https://maven.apache.org/) installed. I use Ubuntu 18.04 on WSL2 and both the apps are downloaded from the Ubuntu package manager.
+
+```bash
+$ sudo apt update && sudo apt install -y openjdk-11-jdk maven
+...
+$ mvn --version
+Apache Maven 3.6.3
+Maven home: /usr/share/maven
+Java version: 11.0.19, vendor: Ubuntu, runtime: /usr/lib/jvm/java-11-openjdk-amd64
+Default locale: en, platform encoding: UTF-8
+OS name: "linux", version: "5.4.72-microsoft-standard-wsl2", arch: "amd64", family: "unix"
+```
 
 We first need to download the source archive from the project repository. The latest version is *v.1.1.15*, and it can be downloaded using *curl* with *-L* flag in order to follow the redirected download URL. Once downloaded, we can build the binaries as indicated in the [project repository](https://github.com/awslabs/aws-glue-schema-registry#using-kafka-connect-with-aws-glue-schema-registry). The script can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-05) of this post.
 
@@ -138,7 +151,7 @@ I saw the messages shown below when it was successfully built.
 [INFO] ------------------------------------------------------------------------
 ```
 
-Once built successfully, we can obtain binaries not only for Kafka Connect but also other applications such as Flink for Kinesis Data Analytics. Below shows the available binaries.
+Once built successfully, we can obtain binaries not only for Kafka Connect but also other applications such as Flink for Kinesis Data Analytics. Below shows all the available binaries.
 
 ```bash
 ## kafka connect
@@ -169,3 +182,5 @@ plugins/aws-glue-schema-registry-v.1.1.15/serializer-deserializer-msk-iam/target
 ```
 
 ## Summary
+
+The Glue Schema Registry supports features to manage and enforce schemas on data streaming applications using convenient integrations with Apache Kafka and other AWS managed services. In order to utilise those features, we need to use the client library. In this post, I illustrated how to build the client library after briefly introducing how it works to integrate the Glue Schema Registry with Kafka producer and consumer apps.
