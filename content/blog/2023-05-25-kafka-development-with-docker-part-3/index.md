@@ -41,7 +41,15 @@ According to the documentation of [Apache Kafka](https://kafka.apache.org/docume
 
 ## Kafka Connect Setup
 
-We can use the same Docker image because *Kafka Connect* is included in the Kafka distribution. We'll run it as the [distributed mode](https://docs.confluent.io/platform/current/connect/concepts.html#distributed-workers), and it can be started by executing *connect-distributed.sh* on the Docker command. The startup script requires the properties file, which includes configurations such as Kafka broker server addresses - see below for details. The Connect server is accessible on port 8083, and we can manage connectors via a REST API, which will be demonstrated later. The properties file as well as connector sources are volume-mapped, and AWS credentials are added to environment variables as the sink connector requires permission to write data into S3. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-03) of this post.
+We can use the same Docker image because *Kafka Connect* is included in the Kafka distribution. The Kafka Connect server runs as a separate docker compose service, and its key configurations are listed below.
+
+* We'll run it as the [distributed mode](https://docs.confluent.io/platform/current/connect/concepts.html#distributed-workers), and it can be started by executing *connect-distributed.sh* on the Docker command. 
+  * The startup script requires the properties file (*connect-distributed.properties*). It includes configurations such as Kafka broker server addresses - see below for details. 
+* The Connect server is accessible on port 8083, and we can manage connectors via a REST API as demonstrated below.
+* The properties file and connector sources are volume-mapped.
+* AWS credentials are added to environment variables as the sink connector requires permission to write data into S3. 
+
+The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-03) of this post.
 
 ```yaml
 # /kafka-dev-with-docker/part-03/compose-connect.yml
@@ -75,10 +83,10 @@ networks:
 
 ### Connect Properties File
 
-The properties file includes configurations of the Connect server. Below shows details of the properties file.
+The properties file includes configurations of the Connect server. Below shows key config values.
 
 - Bootstrap Server 
-  - I changed the Kafka bootstrap server addresses to the local cluster addresses. As it shares the same Docker network, we can take the service names (e.g. *kafka-0*) on port 9092.
+  - I changed the Kafka bootstrap server addresses. As it shares the same Docker network, we can take the service names (e.g. *kafka-0*) on port 9092.
 - Cluster group id
   - In distributed mode, multiple worker processes use the same *group.id*, and they automatically coordinate to schedule execution of connectors and tasks across all available workers.
 - Converter-related properties
@@ -89,6 +97,7 @@ The properties file includes configurations of the Connect server. Below shows d
   - Several topics are created to manage connectors by multiple worker processes.
 - Plugin path
   - Paths that contains plugins (connectors, converters, transformations) can be set to a list of filesystem paths separated by commas (,)
+  - `/opt/connectors` is added and connector sources will be volume-mapped to it.
 
 ```java-properties
 # kafka-dev-with-docker/part-03/configs/connect-distributed.properties
@@ -131,7 +140,7 @@ plugin.path=/opt/connectors
 
 ### Download Connectors
 
-The connectors should be downloaded into the host path (`./connectors/confluent-s3` and `./connectors/msk-datagen`) so that it can be volume-mapped to the container's plugin path (`/opt/connectors`). The following script downloads them into the host path. It can be executed by `./download.sh`.
+The connector sources need to be downloaded into the respective host paths (`./connectors/confluent-s3` and `./connectors/msk-datagen`) so that they are volume-mapped to the container's plugin path (`/opt/connectors`). The following script downloads them into the host paths.
 
 ```bash
 # /kafka-dev-with-docker/part-03/download.sh
@@ -172,12 +181,14 @@ connectors/
 └── msk-datagen
 ```
 
-### Start All Services
+## Start Docker Compose Services
 
-We can run the whole services by starting the three compose file. The order matters as the Connect server relies on the Kafka cluster and *kpow* in *compose-ui.yml* fails if the Connect server is not up and running. Note the Connect server address is added to both the Kafka management apps in *compose-ui.yml*, and we are able to monitor and manage connectors on them.
+There are 3 docker compose files for the Kafka cluster, Kafka Connect and management applications. We can run the whole services by starting them in order. The order matters as the Connect server relies on the Kafka cluster and *kpow* in *compose-ui.yml* fails if the Connect server is not up and running. Note the Connect server address is added to both the Kafka management apps in *compose-ui.yml*, and we are able to monitor and manage connectors on them.
 
 ```bash
 $ cd kafka-dev-with-docker/part-03
+# download connectors
+$ ./download.sh
 # starts 3 node kafka cluster
 $ docker-compose -f compose-kafka.yml up -d
 # starts kafka connect server in distributed mode
@@ -190,7 +201,7 @@ $ docker-compose -f compose-ui.yml up -d
 
 ## Source Connector Creation
 
-As mentioned earlier, Kafka Connect provides a REST API that manages connectors. We can create a connector programmatically. The REST endpoint requires a JSON payload, which includes connector configurations.
+As mentioned earlier, Kafka Connect provides a REST API that manages connectors. We can create a connector programmatically. The REST endpoint requires a JSON payload that includes connector configurations.
 
 ```bash
 $ cd kafka-dev-with-docker/part-03
@@ -198,7 +209,7 @@ $ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json
   http://localhost:8083/connectors/ -d @configs/source.json
 ```
 
-The connector class (*connector.class*) is required for any connector and I set it for the MSK Data Generator. Also, as many as two workers are allocated to the connector (*tasks.max*). As mentioned earlier, the converter-related properties are overridden. Specifically, the key converter is set to the string converter as keys of both topics are set to be primitive values (*genkp*). Also, schemas are not enabled for both key and value.
+The connector class (*connector.class*) is required for any connector and I set it for the MSK Data Generator. Also, as many as two workers are allocated to the connector (*tasks.max*). As mentioned earlier, the converter-related properties are overridden. Specifically, the key converter is set to the string converter as the keys of both topics are set to be primitive values (*genkp*). Also, schemas are not enabled for both the key and value.
 
 The remaining properties are specific to the source connectors. Basically it sends messages to two topics (*customer* and *order*). They are linked by the *customer_id* attribute of the *order* topic where the value is from the key of the *customer* topic. This is useful for practicing stream processing e.g. for joining two streams.
 
@@ -328,7 +339,7 @@ As mentioned, the default partitioner prefixes files further by the partition nu
 
 ![](s3-02.png#center)
 
-The files are generated by `<topic>+<partiton>+<start-offset>.json`. The value converter is set to the Json converter so that it writes Json files.
+The files are generated by `<topic>+<partiton>+<start-offset>.json`. The sink connector's format class is set to *io.confluent.connect.s3.format.json.JsonFormat* so that it writes to Json files.
 
 ![](s3-03.png#center)
 

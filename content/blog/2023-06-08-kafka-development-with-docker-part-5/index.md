@@ -16,8 +16,6 @@ categories:
 tags: 
   - Apache Kafka
   - Glue Schema Registry
-  - Docker
-  - Docker Compose
 authors:
   - JaehyeonKim
 images: []
@@ -40,7 +38,7 @@ In order to integrate the *Glue Schema Registry* with an application, we need to
 * Part 10 SASL Authentication
 * Part 11 Kafka Authorization
 
-## How it works with Apache Kafka
+## How It Works with Apache Kafka
 
 The below diagram shows how Kafka producer and consumer apps are integrated with the *Glue Schema Registry*. As Kafka producer and consumer apps are decoupled, they operate on Kafka topics rather than communicating with each other directly. Therefore, it is important to have a schema registry that manages/stores schemas and validates them.
 
@@ -52,7 +50,7 @@ The below diagram shows how Kafka producer and consumer apps are integrated with
 3. The consumer reads the serialized and compressed messages.
 4. The consumer retrieves the schema from the schema registry (if it is yet to be cached) and uses it to decompress and deserialize messages.
 
-## Glue Schema Registry Client library
+## Glue Schema Registry Client Library
 
 As mentioned earlier, the *Glue Schema Registry Client library* primarily provides serializers and deserializers for Avro, Json and Portobuf formats. It also supports other necessary features such as registering schemas and performing compatibility check. Below lists the main features of the library.
 
@@ -78,7 +76,7 @@ It can work with Apache Kafka as well as other AWS services. See this [AWS docum
 * Apache Kafka Streams
 * Apache Kafka Connect
 
-## Build the client library
+## Build the Client Library
 
 We first need to download the source archive from the project repository. The latest version is *v.1.1.15*, and it can be downloaded using *curl* with *-L* flag in order to follow the redirected download URL. Once downloaded, we can build the binaries as indicated in the [project repository](https://github.com/awslabs/aws-glue-schema-registry#using-kafka-connect-with-aws-glue-schema-registry). The script can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-05) of this post.
 
