@@ -199,7 +199,7 @@ class Consumer:
                 if msg is None:
                     continue
                 self.print_info(msg)
-                time.sleep(3)
+                time.sleep(1)
         except KafkaError as error:
             logging.error(error)
 
