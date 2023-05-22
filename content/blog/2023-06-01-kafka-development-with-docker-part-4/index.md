@@ -165,9 +165,9 @@ The *Consumer* class instantiates *KafkaConsumer* in the *create* method. The ma
 ```python
 # kafka-pocs/kafka-dev-with-docker/part-04/consumer.py
 import os
-import datetime
 import time
 import logging
+
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
 
