@@ -262,7 +262,7 @@ part-04_app_2   sh -c pip install -r requi ...   Up      8000/tcp
 part-04_app_3   sh -c pip install -r requi ...   Up      8000/tcp
 ```
 
-Each instance of the consumer subscribes its own topic partition, and we can check it by container logs. Below shows the last 10 log entries of one of the instances. It shows it polls messages from partition 0 only.
+Each instance of the consumer subscribes to its own topic partition, and we can check that by container logs. Below shows the last 10 log entries of one of the instances. It shows it polls messages from partition 0 only.
 
 ```bash
 $ docker logs -f --tail 10 part-04_app_1
@@ -278,6 +278,10 @@ INFO:root:key={"order_id": "b24ed1c0-150a-41b3-b1cb-a27fb5581b2b"}, value={"orde
 INFO:root:key={"order_id": "74b06957-2c6c-4e46-be49-d2915cc80b74"}, value={"order_id": "74b06957-2c6c-4e46-be49-d2915cc80b74", "ordered_at": "2023-05-13T18:02:54.510774", "user_id": "072", "order_items": [{"product_id": 968, "quantity": 2}, {"product_id": 602, "quantity": 3}, {"product_id": 316, "quantity": 9}, {"product_id": 971, "quantity": 8}]}, topic=orders, partition=0, offset=11415, ts=1684000974515
 INFO:root:key={"order_id": "fce38c6b-4806-4579-b11e-8eac24b5166b"}, value={"order_id": "fce38c6b-4806-4579-b11e-8eac24b5166b", "ordered_at": "2023-05-13T18:02:54.510863", "user_id": "071", "order_items": [{"product_id": 751, "quantity": 8}]}, topic=orders, partition=0, offset=11416, ts=1684000974515
 ```
+
+We can also check the consumers with the management apps. For example, the 3 running consumers can be seen in the *Consumers* menu of *kafka-ui*. As expected, each consumer subscribes to its own topic partition. We can run the management apps by `docker-compose -f compose-ui.yml up -d`.
+
+![](consumers.png#center)
 
 ## Summary
 
