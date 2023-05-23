@@ -1,7 +1,7 @@
 ---
 title: Kafka Development with Docker - Part 3 Kafka Connect
 date: 2023-05-25
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
