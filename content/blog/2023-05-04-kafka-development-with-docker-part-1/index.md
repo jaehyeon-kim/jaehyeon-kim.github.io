@@ -27,7 +27,7 @@ I'm teaching myself [modern data streaming architectures](https://docs.aws.amazo
 
 * [Part 1 Cluster Setup](#) (this post)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
-* Part 3 Kafka Connect
+* [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3)
 * Part 4 Producer and Consumer
 * Part 5 Glue Schema Registry
 * Part 6 Kafka Connect with Glue Schema Registry
