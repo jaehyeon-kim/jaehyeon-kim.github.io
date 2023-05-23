@@ -15,6 +15,7 @@ categories:
   - Apache Kafka
 tags: 
   - Apache Kafka
+  - Python
   - Docker
   - Docker Compose
 authors:
