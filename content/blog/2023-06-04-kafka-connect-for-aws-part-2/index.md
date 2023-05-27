@@ -1,6 +1,6 @@
 ---
-title: Kafka Connect for AWS Services Integration - Part 1 Introduction
-date: 2023-05-03
+title: Kafka Connect for AWS Services Integration - Part 2 Introduction
+date: 2023-06-04
 draft: true
 featured: true
 comment: true
@@ -26,12 +26,11 @@ description: Kafka Connect is a tool for scalably and reliably streaming data be
 
 [Amazon Kinesis Data Streams](https://aws.amazon.com/kinesis/data-streams/) and [Amazon Managed Streaming for Apache Kafka (MSK)](https://aws.amazon.com/msk/) are two managed streaming services offered by AWS. Many resources on the web indicate Kinesis Data Streams is better when it comes to integrating with AWS services. However, it is not necessarily the case with the help of Kafka Connect. According to the documentation of [Apache Kafka](https://kafka.apache.org/documentation/#connect), *Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It makes it simple to quickly define connectors that move large collections of data into and out of Kafka*. Kafka Connect supports two types of connectors - source and sink. Source connectors are used to ingest messages from external systems into Kafka topics while messages are ingested into external systems form Kafka topics with sink connectors. In this post, I will introduce available Kafka connectors mainly for AWS services integration. Also, developing and deploying some of them will be covered in later posts.
 
-* [Part 1 Introduction](#) (this post)
-* Part 2 Develop Firehose Connector Locally
-* Part 3 Deploy Firehose Connector on MSK Connect
-* Part 4 Develop Camel Connector Locally
-* Part 5 Deploy Camel Connector on MSK Connect
-
+* [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1)
+* [Part 2 Develop Camel Connector Locally](#) (this post)
+* Part 3 Deploy Camel Connector on MSK Connect
+* Part 4 Develop Firehose Connector Locally
+* Part 5 Deploy Firehose Connector on MSK Connect
 ## Amazon
 
 As far as I've searched, there are two GitHub repositories by AWS. The [Kinesis Kafka Connector](https://github.com/awslabs/kinesis-kafka-connector) includes sink connectors for Kinesis Data Streams and Kinesis Data Firehose. Also, recently AWS released a Kafka connector for Amazon Personalize and the project repository can be found [here](https://github.com/aws/personalize-kafka-connector). The available connectors are summarised below.
