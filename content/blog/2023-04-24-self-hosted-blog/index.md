@@ -396,3 +396,39 @@ On the post page, we can see the reply
 
 ![](comment-4.png#center)
 
+## Updates
+
+### 2023-05-28
+
+The Hugo version is updated to `0.112.3`, and the following changes are made.
+
+1. A new docker images is used as the existing one doesn't support the updated Hugo version. As a result, the docker compose file is updated as following.
+
+```yaml
+version: "3.5"
+
+services:
+  hugo:
+      image: peaceiris/hugo:v0.112.3-full
+      command: server -D -F -E --poll 700ms --bind=0.0.0.0
+      container_name: hugo
+      volumes:
+        - $PWD:/src
+        - /etc/ssl/certs:/etc/ssl/certs
+      ports:
+        - "1313:1313"
+```
+
+2. The template module is updated to `v1.0.2`. As I don't have *go* installed, it is updated inside the new docker image.
+
+```bash
+$ docker run --rm -it -v $PWD:/src --entrypoint bash peaceiris/hugo:v0.112.3-full
+## inside docker
+root@<container-id>:/src# hugo mod get github.com/razonyang/hugo-theme-bootstrap@v1.0.2
+root@<container-id>:/src# hugo mod npm pack
+root@<container-id>:/src# npm update
+## the changes will be committed on the host outside docker
+root@<container-id>:/src# exit
+$ git add go.mod go.sum package.json package-lock.json
+$ git commit -m 'update them to v1.0.2'
+```

@@ -3,7 +3,7 @@ version: "3.5"
 services:
   hugo:
       image: peaceiris/hugo:v0.112.3-full
-      command: server -D -F -E --poll 700ms
+      command: server -D -F -E --poll 700ms --bind=0.0.0.0
       container_name: hugo
       volumes:
         - $PWD:/src
