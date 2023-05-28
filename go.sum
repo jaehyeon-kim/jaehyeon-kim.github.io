@@ -1,2 +1,8 @@
 github.com/razonyang/hugo-theme-bootstrap v1.0.0-beta4.3 h1:q+iNJSbmR5ohPYW4RPfWXgWHbAx9xgk+pDiFCYl3nY8=
 github.com/razonyang/hugo-theme-bootstrap v1.0.0-beta4.3/go.mod h1:o+IIPL/5wreiTojnN4MsQqKuxbv3fWAQnMhG9geltQo=
+github.com/razonyang/hugo-theme-bootstrap v1.0.0 h1:RYKYml1sy/VF5na78oa0ph0wUQutmhx5MLd8l6igYps=
+github.com/razonyang/hugo-theme-bootstrap v1.0.0/go.mod h1:o+IIPL/5wreiTojnN4MsQqKuxbv3fWAQnMhG9geltQo=
+github.com/razonyang/hugo-theme-bootstrap v1.0.2 h1:oQMN6KRUEmWQ+gDn4dnyrUCZgUGutNh71//k5bSH/QM=
+github.com/razonyang/hugo-theme-bootstrap v1.0.2/go.mod h1:o+IIPL/5wreiTojnN4MsQqKuxbv3fWAQnMhG9geltQo=
+github.com/razonyang/hugo-theme-bootstrap v1.0.3-0.20230524120501-4f057b37aabd h1:5T5Cb7e19bDc4ZAxutmpTPFPtM8sbhuF1iBjHyLl3wg=
+github.com/razonyang/hugo-theme-bootstrap v1.0.3-0.20230524120501-4f057b37aabd/go.mod h1:o+IIPL/5wreiTojnN4MsQqKuxbv3fWAQnMhG9geltQo=

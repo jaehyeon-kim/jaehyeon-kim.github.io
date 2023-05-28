@@ -2,7 +2,7 @@ version: "3.5"
 
 services:
   hugo:
-      image: klakegg/hugo:0.107.0-ext-ubuntu
+      image: peaceiris/hugo:v0.112.3-full
       command: server -D -F -E --poll 700ms
       container_name: hugo
       volumes:
