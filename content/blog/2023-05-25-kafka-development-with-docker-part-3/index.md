@@ -211,7 +211,7 @@ $ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json
 
 The connector class (*connector.class*) is required for any connector and I set it for the MSK Data Generator. Also, as many as two workers are allocated to the connector (*tasks.max*). As mentioned earlier, the converter-related properties are overridden. Specifically, the key converter is set to the string converter as the keys of both topics are set to be primitive values (*genkp*). Also, schemas are not enabled for both the key and value.
 
-The remaining properties are specific to the source connectors. Basically it sends messages to two topics (*customer* and *order*). They are linked by the *customer_id* attribute of the *order* topic where the value is from the key of the *customer* topic. This is useful for practicing stream processing e.g. for joining two streams.
+The remaining properties are specific to the source connector. Basically it sends messages to two topics (*customer* and *order*). They are linked by the *customer_id* attribute of the *order* topic where the value is from the key of the *customer* topic. This is useful for practicing stream processing e.g. for joining two streams.
 
 ```json
 // kafka-dev-with-docker/part-03/configs/source.json
