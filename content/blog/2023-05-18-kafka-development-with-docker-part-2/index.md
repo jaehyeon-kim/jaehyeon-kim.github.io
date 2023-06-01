@@ -28,7 +28,7 @@ In the previous post, I illustrated how to create a topic and to produce/consume
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](#) (this post)
 * [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3)
-* Part 4 Producer and Consumer
+* [Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4)
 * Part 5 Glue Schema Registry
 * Part 6 Kafka Connect with Glue Schema Registry
 * Part 7 Producer and Consumer with Glue Schema Registry
