@@ -31,7 +31,7 @@ In the previous post, we discussed [Kafka Connect](https://kafka.apache.org/docu
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
 * [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3)
 * [Part 4 Producer and Consumer](#) (this post)
-* Part 5 Glue Schema Registry
+* [Part 5 Glue Schema Registry](/blog/2023-06-08-kafka-development-with-docker-part-5)
 * Part 6 Kafka Connect with Glue Schema Registry
 * Part 7 Producer and Consumer with Glue Schema Registry
 * Part 8 SSL Encryption

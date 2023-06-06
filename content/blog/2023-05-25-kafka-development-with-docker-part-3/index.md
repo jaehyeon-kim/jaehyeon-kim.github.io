@@ -31,7 +31,7 @@ According to the documentation of [Apache Kafka](https://kafka.apache.org/docume
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
 * [Part 3 Kafka Connect](#) (this post)
 * [Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4)
-* Part 5 Glue Schema Registry
+* [Part 5 Glue Schema Registry](/blog/2023-06-08-kafka-development-with-docker-part-5)
 * Part 6 Kafka Connect with Glue Schema Registry
 * Part 7 Producer and Consumer with Glue Schema Registry
 * Part 8 SSL Encryption
