@@ -1,7 +1,7 @@
 ---
 title: Kafka Development with Docker - Part 6 Kafka Connect with Glue Schema Registry
 date: 2023-06-15
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -22,10 +22,10 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In Part 3, we developed a data ingestion pipeline of fake online orders data using Kafka Connect source and sink connectors without integrating schema registry. Later we discussed the benefits of schema registry when developing Kafka applications in Part 5. In this post, I'll demonstrate how to enhance the existing data ingestion pipeline by integrating AWS Glue Schema Registry.
+description: In Part 3, we developed a data ingestion pipeline using Kafka Connect source and sink connectors without enabling schemas. Later we discussed the benefits of schema registry when developing Kafka applications in Part 5. In this post, I'll demonstrate how to enhance the existing data ingestion pipeline by integrating AWS Glue Schema Registry.
 ---
 
-In [Part 3](/blog/2023-05-25-kafka-development-with-docker-part-3), we developed a data ingestion pipeline of fake online orders data using Kafka Connect source and sink connectors. Schemas are not enabled on both the connectors as there was not an integrated schema registry. In [Part 5](/blog/2023-06-08-kafka-development-with-docker-part-5), we discussed how schema registry can improve robustness of Kafka applications by validating schemas. In this post, I'll demonstrate how to enhance the existing data ingestion pipeline by integrating [*AWS Glue Schema Registry*](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html).
+In [Part 3](/blog/2023-05-25-kafka-development-with-docker-part-3), we developed a data ingestion pipeline with fake online order data using Kafka Connect source and sink connectors. Schemas are not enabled on both them as there was not an integrated schema registry. Later we discussed how producers and consumers to Kafka topics can use schemas to ensure data consistency and compatibility as schemas evolve in [Part 5](/blog/2023-06-08-kafka-development-with-docker-part-5). In this post, I'll demonstrate how to enhance the existing data ingestion pipeline by integrating [*AWS Glue Schema Registry*](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html).
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
@@ -237,9 +237,9 @@ plugins/aws-glue-schema-registry-v.1.1.15/protobuf-kafkaconnect-converter/target
 
 ## Kafka Management App
 
-We should configure additional details in environment variables in order to integrate Glue Schema Registry. While both apps provide serializers/deserializers, *kpow* supports to manage schemas to some extent as well.
+We should configure additional details in environment variables in order to integrate Glue Schema Registry. While both apps provide serializers/deserializers, *kpow* supports to manage schemas as well.
 
-For *kafka-ui*, we can add one or more [serialization plugins](https://docs.kafka-ui.provectus.io/configuration/serialization-serde). I added the [Glue registry serializer](https://github.com/provectus/kafkaui-glue-sr-serde) as a plugin and named it *online-order*. It requires the plugin binary file path, class name, registry name and AWS region name. Another key configuration values are the key and value schema templates values, which are used for finding schema names. They are left unchanged because I will not enable schema for the key and the default template rule (`%s`) for the value matches the default naming convention of the client library. Note that the template values are applicable for producing messages on the UI. Therefore, we can leave them commented out if we don't produce messages on it.
+For *kafka-ui*, we can add one or more [serialization plugins](https://docs.kafka-ui.provectus.io/configuration/serialization-serde). I added the [Glue registry serializer](https://github.com/provectus/kafkaui-glue-sr-serde) as a plugin and named it online-order*. It requires the plugin binary file path, class name, registry name and AWS region name. Another key configuration values are the key and value schema templates values, which are used for finding schema names. They are left unchanged because I will not enable schema for the key and the default template rule (`%s`) for the value matches the default naming convention of the client library. Note that those template properties are only applicable for message production on the UI, and we can leave them commented out if we don't attempt that.
 
 The configuration of *kpow* is simpler as it only requires the registry ARN and AWS region. Note that the app fails to start if the registry doesn't exit. I created the registry named *online-order* before starting it.
 
@@ -323,7 +323,7 @@ $ docker-compose -f compose-ui.yml up -d
 
 ## Source Connector Creation
 
-As mentioned earlier, Kafka Connect provides a REST API that manages connectors. We can create a connector programmatically. The REST endpoint requires a JSON payload that includes connector configurations.
+As mentioned earlier, Kafka Connect provides a REST API that manages connectors, and we can create a connector programmatically using it. The REST endpoint requires a JSON payload that includes connector configurations.
 
 ```bash
 $ cd kafka-dev-with-docker/part-06
@@ -331,7 +331,7 @@ $ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json
   http://localhost:8083/connectors/ -d @configs/source.json
 ```
 
-The connector class (*connector.class*) is required for any connector and I set it for the MSK Data Generator. Also, as many as two workers are allocated to the connector (*tasks.max*). As mentioned earlier, the converter-related properties are overridden. Specifically, the key converter is set to the string converter as the keys of both topics are set to be primitive values (*genkp*). Also, schema is not enabled for the key. On the other hand, schema is enabled for the value and the value converter is configured to the Avro converter of the Glue Schema Registry client library. The converter requires additional properties that cover AWS region, registry name, record type and flag to indicate whether to auto-generate schemas. Note that the generated schema name is the same to the topic name by default. You can configure a custom schema name by the *schemaName* property.
+The connector class (*connector.class*) is required for any connector and I set it for the MSK Data Generator. Also, as many as two workers are allocated to the connector (*tasks.max*). As mentioned earlier, the converter-related properties are overridden. Specifically, the key converter is set to the string converter as the keys of both topics are set to be primitive values (*genkp*). Also, schema is not enabled for the key. On the other hand, schema is enabled for the value and the value converter is configured to the Avro converter of the Glue Schema Registry client library. The converter requires additional properties that cover AWS region, registry name, record type and flag to indicate whether to auto-generate schemas. Note that the generated schema name is the same to the topic name by default. Or we can configure a custom schema name by the *schemaName* property.
 
 The remaining properties are specific to the source connectors. Basically it sends messages to two topics (*customer* and *order*). They are linked by the *customer_id* attribute of the *order* topic where the value is from the key of the *customer* topic. This is useful for practicing stream processing e.g. for joining two streams.
 
@@ -519,4 +519,4 @@ The files are generated by `<topic>+<partiton>+<start-offset>.json`. The sink co
 
 ## Summary
 
-In Part 3, we developed a data ingestion pipeline of fake online orders data using Kafka Connect source and sink connectors without integrating schema registry. Later we discussed the benefits of schema registry when developing Kafka applications in Part 5. In this post, I demonstrated how to enhance the existing data ingestion pipeline by integrating AWS Glue Schema Registry.
+In Part 3, we developed a data ingestion pipeline using Kafka Connect source and sink connectors without enabling schemas. Later we discussed the benefits of schema registry when developing Kafka applications in Part 5. In this post, I demonstrated how to enhance the existing data ingestion pipeline by integrating AWS Glue Schema Registry.
