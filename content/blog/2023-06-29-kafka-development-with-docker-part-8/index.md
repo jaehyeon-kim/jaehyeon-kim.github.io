@@ -15,13 +15,15 @@ categories:
   - Apache Kafka
 tags: 
   - Apache Kafka
+  - Security
+  - Encryption
   - Python
   - Docker
   - Docker Compose
 authors:
   - JaehyeonKim
 images: []
-description: In Part 4, we developed Kafka producer and consumer applications using the kafka-python package without integrating schema registry. Later we discussed the benefits of schema registry when developing Kafka applications in Part 5. In this post, I'll demonstrate how to enhance the existing applications by integrating AWS Glue Schema Registry.
+description: ...
 ---
 
 By default, Apache Kafka communicates in *PLAINTEXT*, which means that all data is sent without being encrypted. To encrypt communication, we can configure Kafka clients and other components to use [Transport Layer Security (TLS)](https://en.wikipedia.org/wiki/Transport_Layer_Security) encryption. Note that TLS is also referred to [Secure Sockets Layer (SSL)](https://en.wikipedia.org/wiki/Transport_Layer_Security#SSL_1.0,_2.0,_and_3.0) or TLS/SSL. SSL is the predecessor of TLS, and has been deprecated since June 2015. However, it is used in configuration and code instead of TLS for historical reasons. In this post, SSL, TLS and TLS/SSL will be used interchangeably. SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). For client authentication, we can enforce two-way verification so that a client certificate is verified by Kafka brokers as well (*SSL Authentication*). Alternatively we can choose a separate mechanism and typically [Simple Authentication and Security Layer (SASL)](https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer) used (*SASL Authentication*). In this post, we will discuss how to configure SSL encryption while client authentication methods are implemented in later posts.
