@@ -448,6 +448,7 @@ INFO:kafka.coordinator:Elected group leader -- performing partition assignments 
 INFO:kafka.coordinator:Successfully joined group orders-group with generation 3
 INFO:kafka.consumer.subscription_state:Updated partition assignment: [TopicPartition(topic='orders', partition=0)]
 INFO:kafka.coordinator.consumer:Setting newly assigned partitions {TopicPartition(topic='orders', partition=0)} for group orders-group
+...
 INFO:root:key={"order_id": "6f642267-0497-4e63-8989-45e29e768351"}, value={"order_id": "6f642267-0497-4e63-8989-45e29e768351", "ordered_at": "2023-06-20T20:26:45.635986", "user_id": "003", "order_items": [{"product_id": 1000, "quantity": 2}, {"product_id": 541, "quantity": 10}, {"product_id": 431, "quantity": 10}, {"product_id": 770, "quantity": 7}]}, topic=orders, partition=0, offset=10700, ts=1687292805638
 INFO:root:key={"order_id": "1d5a92bc-75e0-46e9-a334-43e03e408ea0"}, value={"order_id": "1d5a92bc-75e0-46e9-a334-43e03e408ea0", "ordered_at": "2023-06-20T20:26:45.636034", "user_id": "032", "order_items": [{"product_id": 404, "quantity": 7}, {"product_id": 932, "quantity": 8}]}, topic=orders, partition=0, offset=10701, ts=1687292805638
 ```
