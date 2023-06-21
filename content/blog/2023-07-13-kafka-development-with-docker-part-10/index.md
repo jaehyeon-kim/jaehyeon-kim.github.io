@@ -122,6 +122,7 @@ networks:
 ```
 
 ```properties
+# kafka-dev-with-docker/part-10/kafka_jaas.conf
 KafkaServer {
   org.apache.kafka.common.security.scram.ScramLoginModule required
   username="_"
@@ -149,7 +150,7 @@ ssl.truststore.password=supersecret
 ```bash
 $ docker exec -it kafka-0 bash
 I have no name!@ab0c55c36b22:/$ cd /opt/bitnami/kafka/bin/
-## describe (list) all users - there is no user
+## describe (list) all users - no user exists
 I have no name!@ab0c55c36b22:/opt/bitnami/kafka/bin$ ./kafka-configs.sh --bootstrap-server kafka-1:9093 --describe \
   --entity-type users --command-config /opt/bitnami/kafka/config/command.properties
 
@@ -158,12 +159,12 @@ I have no name!@ab0c55c36b22:/opt/bitnami/kafka/bin$ ./kafka-configs.sh --bootst
   --add-config 'SCRAM-SHA-256=[iterations=8192,password=password]' \
   --entity-type users --entity-name client \
   --command-config /opt/bitnami/kafka/config/command.properties
-Completed updating config for user client.
+# Completed updating config for user client.
 
 ## check if the new user exists
 I have no name!@ab0c55c36b22:/opt/bitnami/kafka/bin$ ./kafka-configs.sh --bootstrap-server kafka-1:9093 --describe \
   --entity-type users --command-config /opt/bitnami/kafka/config/command.properties
-SCRAM credential configs for user-principal 'client' are SCRAM-SHA-256=iterations=8192
+# SCRAM credential configs for user-principal 'client' are SCRAM-SHA-256=iterations=8192
 ```
 
 ### Java Client
