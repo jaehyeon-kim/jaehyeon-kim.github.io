@@ -16,8 +16,6 @@ categories:
 tags: 
   - Apache Kafka
   - Security
-  - Encryption
-  - Authentication
   - Python
   - Docker
   - Docker Compose
@@ -256,6 +254,7 @@ networks:
 ### Java Client
 
 ```properties
+# kafka-dev-with-docker/part-09/client.properties
 security.protocol=SSL
 ssl.truststore.location=/opt/bitnami/kafka/config/certs/kafka.truststore.jks
 ssl.truststore.password=supersecret
@@ -330,7 +329,7 @@ networks:
 #### Producer
 
 ```python
-# kafka-dev-with-docker/part-08/producer.py
+# kafka-dev-with-docker/part-09/producer.py
 ...
 
 class Producer:

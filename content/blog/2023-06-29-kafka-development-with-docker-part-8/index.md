@@ -16,7 +16,6 @@ categories:
 tags: 
   - Apache Kafka
   - Security
-  - Encryption
   - Python
   - Docker
   - Docker Compose
