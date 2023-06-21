@@ -1,6 +1,6 @@
 ---
-title: Kafka Development with Docker - Part 8 SSL Encryption
-date: 2023-06-29
+title: Kafka Development with Docker - Part 9 SSL Authentication
+date: 2023-07-06
 draft: true
 featured: false
 comment: true
@@ -22,10 +22,10 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: To secure communication, we can configure Kafka clients and other components to use TLS (SSL or TLS/SSL) encryption. It is a one-way verification process where a server certificate is verified by a client via SSL Handshake. Additionally we can improve security adding client authentication. In this post, we will discuss how to configure SSL encryption with Java and Python client examples while client authentication will be covered in later posts.
+description: ...
 ---
 
-By default, Apache Kafka communicates in *PLAINTEXT*, which means that all data is sent without being encrypted. To secure communication, we can configure Kafka clients and other components to use [Transport Layer Security (TLS)](https://en.wikipedia.org/wiki/Transport_Layer_Security) encryption. Note that TLS is also referred to [Secure Sockets Layer (SSL)](https://en.wikipedia.org/wiki/Transport_Layer_Security#SSL_1.0,_2.0,_and_3.0) or TLS/SSL. SSL is the predecessor of TLS, and has been deprecated since June 2015. However, it is used in configuration and code instead of TLS for historical reasons. In this post, SSL, TLS and TLS/SSL will be used interchangeably. SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). For client authentication, we can enforce two-way verification so that a client certificate is verified by Kafka brokers as well (*SSL Authentication*). Alternatively we can choose a separate authentication mechanism and typically [Simple Authentication and Security Layer (SASL)](https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer) is used (*SASL Authentication*). In this post, we will discuss how to configure SSL encryption with Java and Python client examples while SSL and SASL client authentication will be covered in later posts.
+In the previous post, we discussed how to configure SSL encryption with Java and Python client examples. SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake).
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
@@ -34,27 +34,17 @@ By default, Apache Kafka communicates in *PLAINTEXT*, which means that all data 
 * [Part 5 Glue Schema Registry](/blog/2023-06-08-kafka-development-with-docker-part-5)
 * [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6)
 * [Part 7 Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7)
-* [Part 8 SSL Encryption](#) (this post)
-* Part 9 SSL Authentication
+* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8)
+* [Part 9 SSL Authentication](#) (this post)
 * Part 10 SASL Authentication
 * Part 11 Kafka Authorization
 
 ## Certificate Setup
 
-SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). The following components are required for setting-up certificates.
-
-* Certificate Authority (CA) - CA is responsible for signing certificates. We'll be using our own CA rather than relying upon an external trusted CA. A private key (*ca-key*) and certificate (*ca-cert*) will be created for the CA.
-* Keystore - Keystore stores the identity of each machine (Kafka broker or logical client). As the machine's certificate is signed by the CA whose certificate is imported into the Truststore of a Kafka cluster, it is trusted and verified during SSL Handshake. Note that each machine requires to have its own Keystore. As we have 3 Kafka brokers, 3 Java Keystore files will be created whose file names begin with the server address e.g. *kafka-0.server.keystore.jks*.
-* Truststore - Truststore stores one or more certificates that a Kafka client should trust. Note that importing a certificate of a CA means the client should trust all other certificates that are signed by that certificate, which is called the chain of trust. We'll have a single Java Keystore file, which will be shared by all Kafka clients - *kafka.truststore.jks*.
-
-Below shows an overview of certificate setup and SSL Handshake. It is from *Apache Kafka Series - Kafka Security | SSL SASL Kerberos ACL by Stephane Maarek and Gerd Koenig* ([LINK](https://www.udemy.com/course/apache-kafka-security/)).
-
 ![](setup.png#center)
 
-The following script generates the components mentioned above. It begins with creating the files for the CA followed by generating the Keystore of each Kafka broker and the Truststore of Kafka clients. Note that the host names of all Kafka brokers should be added to the Kafka host file (*kafka-hosts.txt*) so that their Keystore files are generated recursively. Note also that it ends up producing the CA certificate file in the *PEM (Privacy Enhanced Mail)* file, which is required by a non-Java client. The PEM file will be used by the Python client example below. The source of this post can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-08) of this post.
-
 ```bash
-# kafka-dev-with-docker/part-08/generate.sh
+# kafka-dev-with-docker/part-09/generate.sh
 #!/usr/bin/env bash
  
 set -eu
@@ -110,12 +100,19 @@ echo " To learn more about CNs and FQDNs, read:"
 echo " https://docs.oracle.com/javase/7/docs/api/javax/net/ssl/X509ExtendedTrustManager.html"
 rm -rf $KEYSTORE_WORKING_DIRECTORY && mkdir $KEYSTORE_WORKING_DIRECTORY
 while read -r KAFKA_HOST || [ -n "$KAFKA_HOST" ]; do
-  KEY_STORE_FILE_NAME="$KAFKA_HOST.server.keystore.jks"
+  if [[ $KAFKA_HOST =~ ^kafka-[0-9]+$ ]]; then
+      SUFFIX="server"
+      DNAME="CN=$KAFKA_HOST"
+  else
+      SUFFIX="client"
+      DNAME="CN=client"
+  fi
+  KEY_STORE_FILE_NAME="$KAFKA_HOST.$SUFFIX.keystore.jks"
   echo
   echo "'$KEYSTORE_WORKING_DIRECTORY/$KEY_STORE_FILE_NAME' will contain a key pair and a self-signed certificate."
   keytool -genkey -keystore $KEYSTORE_WORKING_DIRECTORY/"$KEY_STORE_FILE_NAME" \
     -alias localhost -validity $VALIDITY_IN_DAYS -keyalg RSA \
-    -noprompt -dname "CN=$KAFKA_HOST" -keypass $PASSWORD -storepass $PASSWORD
+    -noprompt -dname $DNAME -keypass $PASSWORD -storepass $PASSWORD
  
   echo
   echo "Now a certificate signing request will be made to the keystore."
@@ -161,11 +158,23 @@ keytool -keystore $TRUSTSTORE_WORKING_DIRECTORY/$DEFAULT_TRUSTSTORE_FILE \
 if [ $TO_GENERATE_PEM == "yes" ]; then
   echo
   echo "The following files for SSL configuration will be created for a non-java client"
-  echo "  $PEM_WORKING_DIRECTORY/ca-root.pem: CA file to use in certificate veriication"
+  echo "  $PEM_WORKING_DIRECTORY/ca-root.pem: CA file to use in certificate veriication (ssl_cafile)"
+  echo "  $PEM_WORKING_DIRECTORY/client-certificate.pem: File that contains client certificate, as well as"
+  echo "                any ca certificates needed to establish the certificate's authenticity (ssl_certfile)"
+  echo "  $PEM_WORKING_DIRECTORY/client-private-key.pem: File that contains client private key (ssl_keyfile)"
   rm -rf $PEM_WORKING_DIRECTORY && mkdir $PEM_WORKING_DIRECTORY
 
-  keytool -exportcert -alias CARoot -keystore $TRUSTSTORE_WORKING_DIRECTORY/$DEFAULT_TRUSTSTORE_FILE \
+  keytool -exportcert -alias CARoot -keystore $KEYSTORE_WORKING_DIRECTORY/kafka.client.keystore.jks \
     -rfc -file $PEM_WORKING_DIRECTORY/ca-root.pem -storepass $PASSWORD
+
+  keytool -exportcert -alias localhost -keystore $KEYSTORE_WORKING_DIRECTORY/kafka.client.keystore.jks \
+    -rfc -file $PEM_WORKING_DIRECTORY/client-certificate.pem -storepass $PASSWORD
+
+  keytool -importkeystore -srcalias localhost -srckeystore $KEYSTORE_WORKING_DIRECTORY/kafka.client.keystore.jks \
+    -destkeystore cert_and_key.p12 -deststoretype PKCS12 -srcstorepass $PASSWORD -deststorepass $PASSWORD
+  openssl pkcs12 -in cert_and_key.p12 -nocerts -nodes -password pass:$PASSWORD \
+    | awk '/-----BEGIN PRIVATE KEY-----/,/-----END PRIVATE KEY-----/' > $PEM_WORKING_DIRECTORY/client-private-key.pem
+  rm -f cert_and_key.p12
 fi
 ```
 
@@ -179,19 +188,20 @@ certificate-authority
 keystore
 ├── kafka-0.server.keystore.jks
 ├── kafka-1.server.keystore.jks
-└── kafka-2.server.keystore.jks
+├── kafka-2.server.keystore.jks
+└── kafka.client.keystore.jks
 truststore
 └── kafka.truststore.jks
 pem
-└── ca-root.pem
+├── ca-root.pem
+├── client-certificate.pem
+└── client-private-key.pem
 ```
 
 ## Kafka Broker Update
 
-We should add the SSL listener to the broker configuration and the port 9093 is reserved for it. Both the Keystore and Truststore files need to be specified in the broker configuration. The former is to send the broker certificate to clients while the latter is necessary because a Kafka broker can be a client of other brokers. The changes made to the first Kafka broker can be found below, and the same updates should be made to the other brokers.
-
 ```yaml
-# kafka-dev-with-docker/part-08/compose-kafka.yml
+# kafka-dev-with-docker/part-09/compose-kafka.yml
 version: "3.5"
 
 services:
@@ -220,9 +230,11 @@ services:
       - KAFKA_CFG_SSL_KEY_PASSWORD=supersecret
       - KAFKA_CFG_SSL_TRUSTSTORE_LOCATION=/opt/bitnami/kafka/config/certs/kafka.truststore.jks
       - KAFKA_CFG_SSL_TRUSTSTORE_PASSWORD=supersecret
+      - KAFKA_CFG_SSL_CLIENT_AUTH=required
     volumes:
       - kafka_0_data:/bitnami/kafka
       - ./keystore/kafka-0.server.keystore.jks:/opt/bitnami/kafka/config/certs/kafka.keystore.jks:ro
+      - ./keystore/kafka.client.keystore.jks:/opt/bitnami/kafka/config/certs/kafka.client.keystore.jks:ro
       - ./truststore/kafka.truststore.jks:/opt/bitnami/kafka/config/certs/kafka.truststore.jks:ro
       - ./client.properties:/opt/bitnami/kafka/config/client.properties:ro
     depends_on:
@@ -242,21 +254,24 @@ networks:
 ### Java Client
 
 ```properties
-# kafka-dev-with-docker/part-08/client.properties
+# kafka-dev-with-docker/part-09/client.properties
 security.protocol=SSL
 ssl.truststore.location=/opt/bitnami/kafka/config/certs/kafka.truststore.jks
 ssl.truststore.password=supersecret
+ssl.keystore.location=/opt/bitnami/kafka/config/certs/kafka.client.keystore.jks
+ssl.keystore.password=supersecret
+ssl.key.password=supersecret
 ```
 
 ```bash
 ## producer
 $ docker exec -it kafka-1 bash
-I have no name!@07d1ca934530:/$ cd /opt/bitnami/kafka/bin/
-I have no name!@07d1ca934530:/opt/bitnami/kafka/bin$ ./kafka-topics.sh --bootstrap-server kafka-0:9093 \
+I have no name!@be871da96c09:/$ cd /opt/bitnami/kafka/bin/
+I have no name!@be871da96c09:/opt/bitnami/kafka/bin$ ./kafka-topics.sh --bootstrap-server kafka-0:9093 \
   --create --topic inventory --partitions 3 --replication-factor 3 \
   --command-config /opt/bitnami/kafka/config/client.properties
 Created topic inventory.
-I have no name!@07d1ca934530:/opt/bitnami/kafka/bin$ ./kafka-console-producer.sh --bootstrap-server kafka-0:9093 \
+I have no name!@be871da96c09:/opt/bitnami/kafka/bin$ ./kafka-console-producer.sh --bootstrap-server kafka-0:9093 \
   --topic inventory --producer.config /opt/bitnami/kafka/config/client.properties
 >product: apples, quantity: 5
 >product: lemons, quantity: 7
@@ -265,8 +280,8 @@ I have no name!@07d1ca934530:/opt/bitnami/kafka/bin$ ./kafka-console-producer.sh
 ```bash
 ## consumer
 $ docker exec -it kafka-1 bash
-I have no name!@07d1ca934530:/$ cd /opt/bitnami/kafka/bin/
-I have no name!@07d1ca934530:/opt/bitnami/kafka/bin$ ./kafka-console-consumer.sh --bootstrap-server kafka-0:9093 \
+I have no name!@be871da96c09:/$ cd /opt/bitnami/kafka/bin/
+I have no name!@be871da96c09:/opt/bitnami/kafka/bin$ ./kafka-console-consumer.sh --bootstrap-server kafka-0:9093 \
   --topic inventory --consumer.config /opt/bitnami/kafka/config/client.properties --from-beginning
 product: apples, quantity: 5
 product: lemons, quantity: 7
@@ -275,7 +290,7 @@ product: lemons, quantity: 7
 ### Python Client
 
 ```yaml
-# kafka-dev-with-docker/part-08/compose-apps.yml
+# kafka-dev-with-docker/part-09/compose-apps.yml
 version: "3.5"
 
 services:
@@ -314,7 +329,7 @@ networks:
 #### Producer
 
 ```python
-# kafka-dev-with-docker/part-08/producer.py
+# kafka-dev-with-docker/part-09/producer.py
 ...
 
 class Producer:
@@ -329,6 +344,8 @@ class Producer:
             security_protocol="SSL",
             ssl_check_hostname=True,
             ssl_cafile="pem/ca-root.pem",
+            ssl_certfile="pem/client-certificate.pem",
+            ssl_keyfile="pem/client-private-key.pem",
             value_serializer=lambda v: json.dumps(v, default=self.serialize).encode("utf-8"),
             key_serializer=lambda v: json.dumps(v, default=self.serialize).encode("utf-8"),
         )
@@ -365,10 +382,12 @@ if __name__ == "__main__":
 ```
 
 ```bash
-INFO:kafka.conn:<BrokerConnection node_id=bootstrap-1 host=kafka-0:9093 <connecting> [IPv4 ('172.20.0.3', 9093)]>: connecting to kafka-0:9093 [('172.20.0.3', 9093) IPv4]
-INFO:kafka.conn:Probing node bootstrap-1 broker version
-INFO:kafka.conn:<BrokerConnection node_id=bootstrap-1 host=kafka-0:9093 <handshake> [IPv4 ('172.20.0.3', 9093)]>: Loading SSL CA from pem/ca-root.pem
-INFO:kafka.conn:<BrokerConnection node_id=bootstrap-1 host=kafka-0:9093 <handshake> [IPv4 ('172.20.0.3', 9093)]>: Connection complete.
+INFO:kafka.conn:<BrokerConnection node_id=bootstrap-0 host=kafka-2:9093 <connecting> [IPv4 ('172.24.0.5', 9093)]>: connecting to kafka-2:9093 [('172.24.0.5', 9093) IPv4]
+INFO:kafka.conn:Probing node bootstrap-0 broker version
+INFO:kafka.conn:<BrokerConnection node_id=bootstrap-0 host=kafka-2:9093 <handshake> [IPv4 ('172.24.0.5', 9093)]>: Loading SSL CA from pem/ca-root.pem
+INFO:kafka.conn:<BrokerConnection node_id=bootstrap-0 host=kafka-2:9093 <handshake> [IPv4 ('172.24.0.5', 9093)]>: Loading SSL Cert from pem/client-certificate.pem
+INFO:kafka.conn:<BrokerConnection node_id=bootstrap-0 host=kafka-2:9093 <handshake> [IPv4 ('172.24.0.5', 9093)]>: Loading SSL Key from pem/client-private-key.pem
+INFO:kafka.conn:<BrokerConnection node_id=bootstrap-0 host=kafka-2:9093 <handshake> [IPv4 ('172.24.0.5', 9093)]>: Connection complete.
 INFO:root:max run - -1
 INFO:root:current run - 1
 ...
@@ -378,7 +397,7 @@ INFO:root:current run - 2
 #### Consumer
 
 ```python
-# kafka-dev-with-docker/part-08/consumer.py
+# kafka-dev-with-docker/part-09/consumer.py
 ...
 
 class Consumer:
@@ -395,6 +414,8 @@ class Consumer:
             security_protocol="SSL",
             ssl_check_hostname=True,
             ssl_cafile="pem/ca-root.pem",
+            ssl_certfile="pem/client-certificate.pem",
+            ssl_keyfile="pem/client-private-key.pem",
             auto_offset_reset="earliest",
             enable_auto_commit=True,
             group_id=self.group_id,
@@ -432,30 +453,33 @@ if __name__ == "__main__":
 
 ```bash
 ...
-INFO:kafka.conn:<BrokerConnection node_id=0 host=kafka-0:9093 <connecting> [IPv4 ('172.20.0.3', 9093)]>: connecting to kafka-0:9093 [('172.20.0.3', 9093) IPv4]
-INFO:kafka.conn:<BrokerConnection node_id=0 host=kafka-0:9093 <handshake> [IPv4 ('172.20.0.3', 9093)]>: Loading SSL CA from pem/ca-root.pem
-INFO:kafka.conn:<BrokerConnection node_id=0 host=kafka-0:9093 <handshake> [IPv4 ('172.20.0.3', 9093)]>: Connection complete.
+INFO:kafka.conn:<BrokerConnection node_id=2 host=kafka-2:9093 <connecting> [IPv4 ('172.24.0.5', 9093)]>: connecting to kafka-2:9093 [('172.24.0.5', 9093) IPv4]
+INFO:kafka.conn:<BrokerConnection node_id=2 host=kafka-2:9093 <handshake> [IPv4 ('172.24.0.5', 9093)]>: Loading SSL CA from pem/ca-root.pem
+INFO:kafka.conn:<BrokerConnection node_id=2 host=kafka-2:9093 <handshake> [IPv4 ('172.24.0.5', 9093)]>: Loading SSL Cert from pem/client-certificate.pem
+INFO:kafka.conn:<BrokerConnection node_id=2 host=kafka-2:9093 <handshake> [IPv4 ('172.24.0.5', 9093)]>: Loading SSL Key from pem/client-private-key.pem
+INFO:kafka.conn:<BrokerConnection node_id=2 host=kafka-2:9093 <handshake> [IPv4 ('172.24.0.5', 9093)]>: Connection complete.
 INFO:kafka.cluster:Group coordinator for orders-group is BrokerMetadata(nodeId='coordinator-0', host='kafka-0', port=9093, rack=None)
 INFO:kafka.coordinator:Discovered coordinator coordinator-0 for group orders-group
 WARNING:kafka.coordinator:Marking the coordinator dead (node coordinator-0) for group orders-group: Node Disconnected.
-INFO:kafka.conn:<BrokerConnection node_id=coordinator-0 host=kafka-0:9093 <connecting> [IPv4 ('172.20.0.3', 9093)]>: connecting to kafka-0:9093 [('172.20.0.3', 9093) IPv4]
+INFO:kafka.conn:<BrokerConnection node_id=coordinator-0 host=kafka-0:9093 <connecting> [IPv4 ('172.24.0.3', 9093)]>: connecting to kafka-0:9093 [('172.24.0.3', 9093) IPv4]
 INFO:kafka.cluster:Group coordinator for orders-group is BrokerMetadata(nodeId='coordinator-0', host='kafka-0', port=9093, rack=None)
 INFO:kafka.coordinator:Discovered coordinator coordinator-0 for group orders-group
-INFO:kafka.conn:<BrokerConnection node_id=coordinator-0 host=kafka-0:9093 <handshake> [IPv4 ('172.20.0.3', 9093)]>: Connection complete.
+INFO:kafka.conn:<BrokerConnection node_id=coordinator-0 host=kafka-0:9093 <handshake> [IPv4 ('172.24.0.3', 9093)]>: Connection complete.
 INFO:kafka.coordinator:(Re-)joining group orders-group
 INFO:kafka.coordinator:Elected group leader -- performing partition assignments using range
-INFO:kafka.coordinator:Successfully joined group orders-group with generation 3
+INFO:kafka.coordinator:Successfully joined group orders-group with generation 1
 INFO:kafka.consumer.subscription_state:Updated partition assignment: [TopicPartition(topic='orders', partition=0)]
 INFO:kafka.coordinator.consumer:Setting newly assigned partitions {TopicPartition(topic='orders', partition=0)} for group orders-group
 ...
-INFO:root:key={"order_id": "6f642267-0497-4e63-8989-45e29e768351"}, value={"order_id": "6f642267-0497-4e63-8989-45e29e768351", "ordered_at": "2023-06-20T20:26:45.635986", "user_id": "003", "order_items": [{"product_id": 1000, "quantity": 2}, {"product_id": 541, "quantity": 10}, {"product_id": 431, "quantity": 10}, {"product_id": 770, "quantity": 7}]}, topic=orders, partition=0, offset=10700, ts=1687292805638
-INFO:root:key={"order_id": "1d5a92bc-75e0-46e9-a334-43e03e408ea0"}, value={"order_id": "1d5a92bc-75e0-46e9-a334-43e03e408ea0", "ordered_at": "2023-06-20T20:26:45.636034", "user_id": "032", "order_items": [{"product_id": 404, "quantity": 7}, {"product_id": 932, "quantity": 8}]}, topic=orders, partition=0, offset=10701, ts=1687292805638
+INFO:root:key={"order_id": "e2253de4-7c44-4cf1-b45d-7091a0dd1f23"}, value={"order_id": "e2253de4-7c44-4cf1-b45d-7091a0dd1f23", "ordered_at": "2023-06-20T21:38:18.524398", "user_id": "053", "order_items": [{"product_id": 279, "quantity": 1}]}, topic=orders, partition=0, offset=0, ts=1687297098839
+INFO:root:key={"order_id": "f522db30-f2a1-4b43-8233-a2b36b4f3f95"}, value={"order_id": "f522db30-f2a1-4b43-8233-a2b36b4f3f95", "ordered_at": "2023-06-20T21:38:18.524430", "user_id": "038", "order_items": [{"product_id": 456, "quantity": 3}]}, topic=orders, partition=0, offset=1, ts=1687297098840
 ```
+
 
 ### Kafka-UI
 
 ```yaml
-# kafka-dev-with-docker/part-08/compose-ui.yml
+# kafka-dev-with-docker/part-09/compose-ui.yml
 version: "3.5"
 
 services:
@@ -471,10 +495,13 @@ services:
       KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: SSL
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-0:9093,kafka-1:9093,kafka-2:9093
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_LOCATION: /kafka.client.keystore.jks
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_PASSWORD: supersecret
       KAFKA_CLUSTERS_0_SSL_TRUSTSTORELOCATION: /kafka.truststore.jks
       KAFKA_CLUSTERS_0_SSL_TRUSTSTOREPASSWORD: supersecret
     volumes:
       - ./truststore/kafka.truststore.jks:/kafka.truststore.jks:ro
+      - ./keystore/kafka.client.keystore.jks:/kafka.client.keystore.jks:ro
 
 networks:
   kafkanet:
@@ -485,5 +512,3 @@ networks:
 ![](messages.png#center)
 
 ## Summary
-
-By default, Apache Kafka communicates in *PLAINTEXT*, and we can configure Kafka clients and other components to use TLS (SSL or TLS/SSL) encryption to secure communication. In this post, we discussed how to configure SSL encryption with Java and Python client examples.

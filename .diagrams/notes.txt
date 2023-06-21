@@ -1,0 +1,11 @@
+https://www.markdownguide.org/tools/google-docs-to-markdown/
+
+pandoc post.md -f markdown -t docx -s -o post.docx
+pandoc post.md -f markdown -t odt -s -o post.odt
+
+https://www.befunky.com/features/resize-image/
+
+744 x 400
+
+https://www.wordclouds.com/
+
