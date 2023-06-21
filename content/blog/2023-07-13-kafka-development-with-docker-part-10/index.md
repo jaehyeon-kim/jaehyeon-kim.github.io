@@ -298,6 +298,13 @@ if __name__ == "__main__":
 ```
 
 ```bash
+INFO:kafka.conn:<BrokerConnection node_id=bootstrap-2 host=kafka-2:9094 <handshake> [IPv4 ('172.31.0.4', 9094)]>: Loading SSL CA from pem/ca-root.pem
+INFO:kafka.conn:<BrokerConnection node_id=bootstrap-2 host=kafka-2:9094 <authenticating> [IPv4 ('172.31.0.4', 9094)]>: Authenticated as client via SCRAM-SHA-256
+INFO:kafka.conn:<BrokerConnection node_id=bootstrap-2 host=kafka-2:9094 <authenticating> [IPv4 ('172.31.0.4', 9094)]>: Connection complete.
+INFO:root:max run - -1
+INFO:root:current run - 1
+...
+INFO:root:current run - 2
 ```
 
 #### Consumer
@@ -359,6 +366,18 @@ if __name__ == "__main__":
 ```
 
 ```bash
+...
+INFO:kafka.coordinator:Elected group leader -- performing partition assignments using range
+INFO:kafka.coordinator:Successfully joined group orders-group with generation 1
+INFO:kafka.consumer.subscription_state:Updated partition assignment: [TopicPartition(topic='orders', partition=0)]
+INFO:kafka.coordinator.consumer:Setting newly assigned partitions {TopicPartition(topic='orders', partition=0)} for group orders-group
+INFO:kafka.conn:<BrokerConnection node_id=0 host=kafka-0:9094 <connecting> [IPv4 ('172.31.0.5', 9094)]>: connecting to kafka-0:9094 [('172.31.0.5', 9094) IPv4]
+INFO:kafka.conn:<BrokerConnection node_id=0 host=kafka-0:9094 <handshake> [IPv4 ('172.31.0.5', 9094)]>: Loading SSL CA from pem/ca-root.pem
+INFO:kafka.conn:<BrokerConnection node_id=0 host=kafka-0:9094 <authenticating> [IPv4 ('172.31.0.5', 9094)]>: Authenticated as client via SCRAM-SHA-256
+INFO:kafka.conn:<BrokerConnection node_id=0 host=kafka-0:9094 <authenticating> [IPv4 ('172.31.0.5', 9094)]>: Connection complete.
+INFO:kafka.conn:<BrokerConnection node_id=bootstrap-0 host=kafka-2:9094 <connected> [IPv4 ('172.31.0.4', 9094)]>: Closing connection. 
+INFO:root:key={"order_id": "715720d6-cf21-4c87-ba05-28660109aa73"}, value={"order_id": "715720d6-cf21-4c87-ba05-28660109aa73", "ordered_at": "2023-06-21T01:39:51.291932", "user_id": "016", "order_items": [{"product_id": 956, "quantity": 7}]}, topic=orders, partition=0, offset=0, ts=1687311592501
+INFO:root:key={"order_id": "1d5ece29-ab03-4f62-b88a-bc2242e5e839"}, value={"order_id": "1d5ece29-ab03-4f62-b88a-bc2242e5e839", "ordered_at": "2023-06-21T01:39:51.292015", "user_id": "003", "order_items": [{"product_id": 880, "quantity": 5}, {"product_id": 257, "quantity": 5}]}, topic=orders, partition=0, offset=1, ts=1687311592501
 ```
 
 ### Kafka-UI
