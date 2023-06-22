@@ -367,7 +367,7 @@ The same producer app discussed in [Part 4](/blog/2023-06-01-kafka-development-w
 - *ssl_check_hostname* - Flag to configure whether SSL handshake should verify that the certificate matches the broker's hostname.
 - *ssl_cafile* - Optional filename of CA (certificate) file to use in certificate verification.
 - *ssl_certfile* - Optional filename that contains client certificate, as well as any CA certificates needed to establish the certificate's authenticity.
-* *ssl_keyfile* - Optional filename that contains the client private key.
+- *ssl_keyfile* - Optional filename that contains the client private key.
 
 ```python
 # kafka-dev-with-docker/part-09/producer.py
