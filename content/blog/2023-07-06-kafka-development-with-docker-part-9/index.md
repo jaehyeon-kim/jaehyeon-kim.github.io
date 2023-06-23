@@ -56,7 +56,7 @@ The following script generates the components mentioned above. It begins with cr
 - *client-certificate.pem* - File that contains client certificate, as well as any CA certificates needed to establish the certificate's authenticity
 - *client-private-key.pem* - File that contains client private key
 
-The source of this post can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-09) of this post as well.
+The source of this post can also be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-09) of this post.
 
 ```bash
 # kafka-dev-with-docker/part-09/generate.sh
@@ -215,7 +215,7 @@ pem
 
 ## Kafka Broker Update
 
-We should add the SSL listener to the broker configuration and the port 9093 is reserved for it. Both the Keystore and Truststore files need to be specified in the broker configuration. The former is to send the broker certificate to clients while the latter is necessary because a Kafka broker can be a client of other brokers. Also, we should make SSL client authentication to be required by updating the *KAFKA_CFG_SSL_CLIENT_AUTH* environment variable. The changes made to the first Kafka broker are shown below, and the same updates are made to the other brokers. The cluster can be started by `docker-compose -f compose-kafka.yml up -d`.
+We should add the *SSL* listener to the broker configuration and the port 9093 is reserved for it. Both the Keystore and Truststore files are specified in the broker configuration. The former is to send the broker certificate to clients while the latter is necessary because a Kafka broker can be a client of other brokers. Also, we should make SSL client authentication to be required by updating the *KAFKA_CFG_SSL_CLIENT_AUTH* environment variable. The changes made to the first Kafka broker are shown below, and the same updates are made to the other brokers. The cluster can be started by `docker-compose -f compose-kafka.yml up -d`.
 
 ```yaml
 # kafka-dev-with-docker/part-09/compose-kafka.yml
@@ -270,7 +270,7 @@ networks:
 
 Java and non-Java clients need different configurations. The former can use Java Keystore files directly while the latter needs corresponding details in PEM files. The Kafka CLI and Kafka-UI will be taken as Java client examples while Python producer/consumer will be used to illustrate non-Java clients.
 
-### Java Client
+### Kafka CLI
 
 The following configuration is necessary to use the SSL listener. It includes the security protocol and details about the Keystore and Truststore.
 
