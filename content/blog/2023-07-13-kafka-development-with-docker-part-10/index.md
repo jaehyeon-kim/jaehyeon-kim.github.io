@@ -60,9 +60,9 @@ pem
 
 ## Kafka Cluster Update
 
-I was planning to keep the Zookeeper node as simple as possible because the focus is discussing client authentication. Without enabling authentication in the Zookeeper node, however, I encountered an error that indicates *SASL authentication failed using login context 'Client'*. Therefore, I had to enable authentication and specify user credentials. Those credentials will be referred in the *Client* context of the [Java Authentication and Authorization Service(JAAS)](https://en.wikipedia.org/wiki/Java_Authentication_and_Authorization_Service) configuration file (*kafka_jaas.conf*). The details about the configuration file can be found below.
+I was planning to keep the Zookeeper node as simple as possible because the focus is discussing client authentication. Without enabling authentication in the Zookeeper node, however, I encountered an error that indicates *SASL authentication failed using login context 'Client'*. Therefore, I had to enable authentication and specify user credentials. The credentials will be referred in the *Client* context of the [Java Authentication and Authorization Service(JAAS)](https://en.wikipedia.org/wiki/Java_Authentication_and_Authorization_Service) configuration file (*kafka_jaas.conf*). The details about the configuration file can be found below.
 
-When it comes to Kafka brokers, we should add the *SASL_SSL* listener to the broker configuration and the port 9094 is reserved for it. Both the Keystore and Truststore files are specified in the broker configuration for *SSL*. The former is to send the broker certificate to clients while the latter is necessary because a Kafka broker can be a client of other brokers. While *SASL* supports multiple mechanisms, we enabled the [*Salted Challenge Response Authentication Mechanism (SCRAM)*](https://en.wikipedia.org/wiki/Salted_Challenge_Response_Authentication_Mechanism) by specifying *SCRAM-SHA-256* in the following environment variables.
+When it comes to Kafka broker configurations, we should add the *SASL_SSL* listener to the broker configuration and the port 9094 is reserved for it. Both the Keystore and Truststore files are specified in the broker configuration for *SSL*. The former is to send the broker certificate to clients while the latter is necessary because a Kafka broker can be a client of other brokers. While *SASL* supports multiple mechanisms, we enabled the [*Salted Challenge Response Authentication Mechanism (SCRAM)*](https://en.wikipedia.org/wiki/Salted_Challenge_Response_Authentication_Mechanism) by specifying *SCRAM-SHA-256* in the following environment variables.
 - *KAFKA_CFG_SASL_ENABLED_MECHANISMS*
 - *KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL*.
 
@@ -227,7 +227,7 @@ product: lemons, quantity: 7
 
 ### Python Client
 
-We will run the Python producer and consumer apps using docker-compose. At startup, each of them installs required packages and executes its corresponding app script. As it shares the same network to the Kafka cluster, we can take the service names (e.g. *kafka-0*) on port 9094 as Kafka bootstrap servers. As shown below, we will need the certificate of the CA (*ca-root.pem*) and it will be available via volume-mapping. Also, the SCRAM user's credentials are added to environment variables. The apps can be started by `docker-compose -f compose-apps.yml up -d`.
+We will run the Python producer and consumer apps using docker-compose. At startup, each of them installs required packages and executes its corresponding app script. As it shares the same network to the Kafka cluster, we can take the service names (e.g. *kafka-0*) on port 9094 as Kafka bootstrap servers. As shown below, we will need the certificate of the CA (*ca-root.pem*) and it will be available via volume-mapping. Also, the SCRAM user credentials are added to environment variables. The apps can be started by `docker-compose -f compose-apps.yml up -d`.
 
 ```yaml
 # kafka-dev-with-docker/part-10/compose-apps.yml
