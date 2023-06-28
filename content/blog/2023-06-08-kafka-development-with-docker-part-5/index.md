@@ -33,7 +33,7 @@ In order to integrate the *Glue Schema Registry* with an application, we need to
 * [Part 5 Glue Schema Registry](#) (this post)
 * [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6)
 * [Part 7 Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7)
-* Part 8 SSL Encryption
+* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8)
 * Part 9 SSL Authentication
 * Part 10 SASL Authentication
 * Part 11 Kafka Authorization
