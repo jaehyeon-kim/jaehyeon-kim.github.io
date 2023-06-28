@@ -1,7 +1,7 @@
 ---
 title: Kafka Development with Docker - Part 8 SSL Encryption
 date: 2023-06-29
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -22,10 +22,10 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: To secure communication, we can configure Kafka clients and other components to use TLS (SSL or TLS/SSL) encryption. It is a one-way verification process where a server certificate is verified by a client via SSL Handshake. Additionally we can improve security adding client authentication. In this post, we will discuss how to configure SSL encryption with Java and Python client examples while client authentication will be covered in later posts.
+description: We can configure Kafka clients and other components to use TLS (SSL or TLS/SSL) encryption to secure communication. It is a one-way verification process where a server certificate is verified by a client via SSL Handshake. Moreover we can improve security by adding client authentication. In this post, we will discuss how to configure SSL encryption with Java and Python client examples while client authentication will be covered in later posts.
 ---
 
-By default, Apache Kafka communicates in *PLAINTEXT*, which means that all data is sent without being encrypted. To secure communication, we can configure Kafka clients and other components to use [Transport Layer Security (TLS)](https://en.wikipedia.org/wiki/Transport_Layer_Security) encryption. Note that TLS is also referred to [Secure Sockets Layer (SSL)](https://en.wikipedia.org/wiki/Transport_Layer_Security#SSL_1.0,_2.0,_and_3.0) or TLS/SSL. SSL is the predecessor of TLS, and has been deprecated since June 2015. However, it is used in configuration and code instead of TLS for historical reasons. In this post, SSL, TLS and TLS/SSL will be used interchangeably. SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). For client authentication, we can enforce two-way verification so that a client certificate is verified by Kafka brokers as well (*SSL Authentication*). Alternatively we can choose a separate authentication mechanism and typically [Simple Authentication and Security Layer (SASL)](https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer) is used (*SASL Authentication*). In this post, we will discuss how to configure SSL encryption with Java and Python client examples while SSL and SASL client authentication will be covered in later posts.
+By default, Apache Kafka communicates in *PLAINTEXT*, which means that all data is sent without being encrypted. To secure communication, we can configure Kafka clients and other components to use [Transport Layer Security (TLS)](https://en.wikipedia.org/wiki/Transport_Layer_Security) encryption. Note that TLS is also referred to [Secure Sockets Layer (SSL)](https://en.wikipedia.org/wiki/Transport_Layer_Security#SSL_1.0,_2.0,_and_3.0) or TLS/SSL. SSL is the predecessor of TLS, and has been deprecated since June 2015. However, it is used in configuration and code instead of TLS for historical reasons. In this post, SSL, TLS and TLS/SSL will be used interchangeably. SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). Moreover, we can improve security by adding client authentication. For example, we can enforce two-way verification so that a client certificate is verified by Kafka brokers as well (*SSL Authentication*). Alternatively we can choose a separate authentication mechanism and typically [Simple Authentication and Security Layer (SASL)](https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer) is used (*SASL Authentication*). In this post, we will discuss how to configure SSL encryption with Java and Python client examples while SSL and SASL client authentication will be covered in later posts.
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
@@ -41,17 +41,17 @@ By default, Apache Kafka communicates in *PLAINTEXT*, which means that all data 
 
 ## Certificate Setup
 
-SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). The following components are required for setting-up certificates.
-
-* Certificate Authority (CA) - CA is responsible for signing certificates. We'll be using our own CA rather than relying upon an external trusted CA. A private key (*ca-key*) and certificate (*ca-cert*) will be created for the CA.
-* Keystore - Keystore stores the identity of each machine (Kafka broker or logical client). As the machine's certificate is signed by the CA whose certificate is imported into the Truststore of a Kafka cluster, it is trusted and verified during SSL Handshake. Note that each machine requires to have its own Keystore. As we have 3 Kafka brokers, 3 Java Keystore files will be created whose file names begin with the server address e.g. *kafka-0.server.keystore.jks*.
-* Truststore - Truststore stores one or more certificates that a Kafka client should trust. Note that importing a certificate of a CA means the client should trust all other certificates that are signed by that certificate, which is called the chain of trust. We'll have a single Java Keystore file, which will be shared by all Kafka clients - *kafka.truststore.jks*.
-
 Below shows an overview of certificate setup and SSL Handshake. It is from *Apache Kafka Series - Kafka Security | SSL SASL Kerberos ACL by Stephane Maarek and Gerd Koenig* ([LINK](https://www.udemy.com/course/apache-kafka-security/)).
 
 ![](setup.png#center)
 
-The following script generates the components mentioned above. It begins with creating the files for the CA followed by generating the Keystore of each Kafka broker and the Truststore of Kafka clients. Note that the host names of all Kafka brokers should be added to the Kafka host file (*kafka-hosts.txt*) so that their Keystore files are generated recursively. Note also that it ends up producing the CA certificate file in the *PEM (Privacy Enhanced Mail)* file, which is required by a non-Java client. The PEM file will be used by the Python client example below. The source of this post can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-08) of this post.
+SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). The following components are required for setting-up certificates.
+
+* Certificate Authority (CA) - CA is responsible for signing certificates. We'll be using our own CA rather than relying upon an external trusted CA. Two files will be created for the CA - private key (*ca-key*) and certificate (*ca-cert*).
+* Keystore - Keystore stores the identity of each machine (Kafka broker or logical client), and the certificate of a machine is signed by the CA. As the CA's certificate is imported into the Truststore of a Kafka client, the machine's certificate is also trusted and verified during SSL Handshake. Note that each machine requires to have its own Keystore. As we have 3 Kafka brokers, 3 Java Keystore files will be created and each of the file names begins with the host name e.g. *kafka-0.server.keystore.jks*.
+* Truststore - Truststore stores one or more certificates that a Kafka client should trust. Note that importing a certificate of a CA means the client should trust all other certificates that are signed by that certificate, which is called the chain of trust. We'll have a single Java Keystore file for the Truststore named *kafka.truststore.jks*, and it will be shared by all Kafka brokers and clients.
+
+The following script generates the components mentioned above. It begins with creating the files for the CA followed by generating the Keystore of each Kafka broker and the Truststore of Kafka clients. Note that the host names of all Kafka brokers should be added to the Kafka host file (*kafka-hosts.txt*) so that their Keystore files are generated recursively. Note also that it ends up producing the CA certificate file in the *PEM (Privacy Enhanced Mail)* format as it is required by a non-Java client - *ca-root.pem*. The PEM file will be used by the Python clients below. The source of this post can also be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-08) of this post.
 
 ```bash
 # kafka-dev-with-docker/part-08/generate.sh
@@ -188,7 +188,7 @@ pem
 
 ## Kafka Broker Update
 
-We should add the SSL listener to the broker configuration and the port 9093 is reserved for it. Both the Keystore and Truststore files need to be specified in the broker configuration. The former is to send the broker certificate to clients while the latter is necessary because a Kafka broker can be a client of other brokers. The changes made to the first Kafka broker can be found below, and the same updates should be made to the other brokers.
+We should add the *SSL* listener to the broker configuration and the port 9093 is reserved for it. Both the Keystore and Truststore files are specified in the broker configuration. The former is to send the broker certificate to clients while the latter is necessary because a Kafka broker can be a client of other brokers. The changes made to the first Kafka broker are shown below, and the same updates are made to the other brokers. The cluster can be started by `docker-compose -f compose-kafka.yml up -d`.
 
 ```yaml
 # kafka-dev-with-docker/part-08/compose-kafka.yml
@@ -239,7 +239,11 @@ networks:
 
 ## Examples
 
-### Java Client
+Java and non-Java clients need different configurations. The former can use the Keystore file of the Truststore directly while the latter needs corresponding details in a PEM file. The Kafka CLI and Kafka-UI will be taken as Java client examples while Python producer/consumer will be used to illustrate non-Java clients.
+
+### Kafka CLI
+
+The following configuration is necessary to use the SSL listener. It includes the security protocol, the location of the Truststore file and the password to access it.
 
 ```properties
 # kafka-dev-with-docker/part-08/client.properties
@@ -248,24 +252,34 @@ ssl.truststore.location=/opt/bitnami/kafka/config/certs/kafka.truststore.jks
 ssl.truststore.password=supersecret
 ```
 
+Below shows a producer example. It creates a topic named *inventory* and produces messages using corresponding scripts. Note the client configuration file (*client.properties*) is specified in configurations, and it is available via volume-mapping.
+
 ```bash
-## producer
+## producer example
 $ docker exec -it kafka-1 bash
 I have no name!@07d1ca934530:/$ cd /opt/bitnami/kafka/bin/
+
+## create a topic
 I have no name!@07d1ca934530:/opt/bitnami/kafka/bin$ ./kafka-topics.sh --bootstrap-server kafka-0:9093 \
   --create --topic inventory --partitions 3 --replication-factor 3 \
   --command-config /opt/bitnami/kafka/config/client.properties
-Created topic inventory.
+# Created topic inventory.
+
+## produce messages
 I have no name!@07d1ca934530:/opt/bitnami/kafka/bin$ ./kafka-console-producer.sh --bootstrap-server kafka-0:9093 \
   --topic inventory --producer.config /opt/bitnami/kafka/config/client.properties
 >product: apples, quantity: 5
 >product: lemons, quantity: 7
 ```
 
+Once messages are created, we can check it by a consumer. We can execute a consumer in a separate console.
+
 ```bash
-## consumer
+## consumer example
 $ docker exec -it kafka-1 bash
 I have no name!@07d1ca934530:/$ cd /opt/bitnami/kafka/bin/
+
+## consume messages
 I have no name!@07d1ca934530:/opt/bitnami/kafka/bin$ ./kafka-console-consumer.sh --bootstrap-server kafka-0:9093 \
   --topic inventory --consumer.config /opt/bitnami/kafka/config/client.properties --from-beginning
 product: apples, quantity: 5
@@ -273,6 +287,8 @@ product: lemons, quantity: 7
 ```
 
 ### Python Client
+
+We will run the Python producer and consumer apps using docker-compose. At startup, each of them installs required packages and executes its corresponding app script. As it shares the same network to the Kafka cluster, we can take the service names (e.g. *kafka-0*) on port 9093 as Kafka bootstrap servers. As shown below, we will need the certificate of the CA (*ca-root.pem*) and it will be available via volume-mapping. The apps can be started by `docker-compose -f compose-apps.yml up -d`.
 
 ```yaml
 # kafka-dev-with-docker/part-08/compose-apps.yml
@@ -312,6 +328,12 @@ networks:
 ```
 
 #### Producer
+
+The same producer app discussed in [Part 4](/blog/2023-06-01-kafka-development-with-docker-part-4) is used here. The following arguments are added to access the SSL listener.
+
+- *security_protocol* - Protocol used to communicate with brokers.
+- *ssl_check_hostname* - Flag to configure whether SSL handshake should verify that the certificate matches the broker's hostname.
+- *ssl_cafile* - Optional filename of CA (certificate) file to use in certificate verification.
 
 ```python
 # kafka-dev-with-docker/part-08/producer.py
@@ -364,6 +386,8 @@ if __name__ == "__main__":
         time.sleep(1)
 ```
 
+In the container log, we can check SSH Handshake is performed successfully by loading the CA certificate file.
+
 ```bash
 INFO:kafka.conn:<BrokerConnection node_id=bootstrap-1 host=kafka-0:9093 <connecting> [IPv4 ('172.20.0.3', 9093)]>: connecting to kafka-0:9093 [('172.20.0.3', 9093) IPv4]
 INFO:kafka.conn:Probing node bootstrap-1 broker version
@@ -376,6 +400,8 @@ INFO:root:current run - 2
 ```
 
 #### Consumer
+
+The same consumer app in [Part 4](/blog/2023-06-01-kafka-development-with-docker-part-4) is used here as well. As the producer app, the following arguments are added - *security_protocol*, *ssl_check_hostname* and *ssl_cafile*.
 
 ```python
 # kafka-dev-with-docker/part-08/consumer.py
@@ -430,6 +456,8 @@ if __name__ == "__main__":
     consumer.process()
 ```
 
+We can also check messages are consumed after SSH Handshake is succeeded in the container log.
+
 ```bash
 ...
 INFO:kafka.conn:<BrokerConnection node_id=0 host=kafka-0:9093 <connecting> [IPv4 ('172.20.0.3', 9093)]>: connecting to kafka-0:9093 [('172.20.0.3', 9093) IPv4]
@@ -453,6 +481,8 @@ INFO:root:key={"order_id": "1d5a92bc-75e0-46e9-a334-43e03e408ea0"}, value={"orde
 ```
 
 ### Kafka-UI
+
+Kafka-UI is also a Java client, and it accepts the Keystore file of the Kafka Truststore (*kafka.truststore.jks*). We can specify the file and password to access it as environment variables. The app can be started by `docker-compose -f compose-ui.yml up -d`.
 
 ```yaml
 # kafka-dev-with-docker/part-08/compose-ui.yml
@@ -481,6 +511,8 @@ networks:
     external: true
     name: kafka-network
 ```
+
+Once started, we can check the messages of the *orders* topic successfully.
 
 ![](messages.png#center)
 
