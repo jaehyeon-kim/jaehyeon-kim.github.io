@@ -27,8 +27,8 @@ description: Kafka Connect is a tool for scalably and reliably streaming data be
 [Amazon Kinesis Data Streams](https://aws.amazon.com/kinesis/data-streams/) and [Amazon Managed Streaming for Apache Kafka (MSK)](https://aws.amazon.com/msk/) are two managed streaming services offered by AWS. Many resources on the web indicate Kinesis Data Streams is better when it comes to integrating with AWS services. However, it is not necessarily the case with the help of Kafka Connect. According to the documentation of [Apache Kafka](https://kafka.apache.org/documentation/#connect), *Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It makes it simple to quickly define connectors that move large collections of data into and out of Kafka*. Kafka Connect supports two types of connectors - source and sink. Source connectors are used to ingest messages from external systems into Kafka topics while messages are ingested into external systems form Kafka topics with sink connectors. In this post, I will introduce available Kafka connectors mainly for AWS services integration. Also, developing and deploying some of them will be covered in later posts.
 
 * [Part 1 Introduction](#) (this post)
-* Part 2 Develop Camel DynamoDB Sink Connector using Docker
-* Part 3 Deploy Camel DynamoDB Sink Connector on MSK Connect
+* [Part 2 Develop Camel DynamoDB Sink Connector using Docker](/blog/2023-06-04-kafka-connect-for-aws-part-2)
+* [Part 3 Deploy Camel DynamoDB Sink Connector on MSK Connect](/blog/2023-07-03-kafka-connect-for-aws-part-3)
 * Part 4 Develop Kinesis Kafka Connector for OpenSearch using Docker
 * Part 5 Deploy Kinesis Kafka Connector for OpenSearch on MSK Connect
 

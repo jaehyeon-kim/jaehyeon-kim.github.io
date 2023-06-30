@@ -17,6 +17,8 @@ tags:
   - AWS
   - Apache Kafka
   - Kafka Connect
+  - Apache Camel
+  - Amazon DynamoDB
   - Docker
   - Docker Compose
 authors:
@@ -30,7 +32,7 @@ In [Part 1](/blog/2023-05-03-kafka-connect-for-aws-part-1), we reviewed Kafka co
 
 * [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1)
 * [Part 2 Develop Camel DynamoDB Sink Connector using Docker](#) (this post)
-* Part 3 Deploy Camel DynamoDB Sink Connector on MSK Connect
+* [Part 3 Deploy Camel DynamoDB Sink Connector on MSK Connect](/blog/2023-07-03-kafka-connect-for-aws-part-3)
 * Part 4 Develop Kinesis Kafka Connector for OpenSearch using Docker
 * Part 5 Deploy Kinesis Kafka Connector for OpenSearch on MSK Connect
 
