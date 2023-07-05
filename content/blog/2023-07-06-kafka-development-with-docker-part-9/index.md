@@ -1,7 +1,7 @@
 ---
 title: Kafka Development with Docker - Part 9 SSL Authentication
 date: 2023-07-06
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -22,10 +22,10 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: To improve security, we can extend TLS (SSL or TLS/SSL) encryption either by enforcing two-way verification where a client certificate is verified by Kafka brokers or choosing a separate authentication mechanism, which is typically SASL. In this post, we will discuss how to implement SSL authentication with Java and Python client examples while SASL authentication is covered in the next post.
+description: To improve security, we can extend TLS (SSL or TLS/SSL) encryption either by enforcing two-way verification where a client certificate is verified by Kafka brokers (SSL authentication). Or we can choose a separate authentication mechanism, which is typically Simple Authentication and Security Layer (SASL). In this post, we will discuss how to implement SSL authentication with Java and Python client examples while SASL authentication is covered in the next post.
 ---
 
-In the previous post, we discussed how to configure TLS (SSL or TLS/SSL) encryption with Java and Python client examples. SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). To improve security, we can add client authentication either by enforcing two-way verification where a client certificate is verified by Kafka brokers or choosing a separate authentication mechanism, which is typically [Simple Authentication and Security Layer (SASL)](https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer). In this post, we will discuss how to implement SSL authentication with Java and Python client examples while SASL authentication is covered in the next post.
+In the previous post, we discussed how to configure TLS (SSL or TLS/SSL) encryption with Java and Python client examples. SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). To improve security, we can add client authentication either by enforcing two-way verification where a client certificate is verified by Kafka brokers (SSL authentication). Or we can choose a separate authentication mechanism, which is typically [Simple Authentication and Security Layer (SASL)](https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer). In this post, we will discuss how to implement SSL authentication with Java and Python client examples while SASL authentication is covered in the next post.
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
@@ -561,4 +561,4 @@ networks:
 
 ## Summary
 
-To improve security, we can extend TLS (SSL or TLS/SSL) encryption either by enforcing two-way verification where a client certificate is verified by Kafka brokers or choosing a separate authentication mechanism, which is typically SASL. In this post, we discussed how to implement SSL authentication with Java and Python client examples while SASL authentication is covered in the next post.
+To improve security, we can extend TLS (SSL or TLS/SSL) encryption either by enforcing two-way verification where a client certificate is verified by Kafka brokers (SSL authentication). Or we can choose a separate authentication mechanism, which is typically Simple Authentication and Security Layer (SASL). In this post, we discussed how to implement SSL authentication with Java and Python client examples while SASL authentication is covered in the next post.
