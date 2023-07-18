@@ -35,7 +35,7 @@ I'm teaching myself [modern data streaming architectures](https://docs.aws.amazo
 * [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8)
 * [Part 9 SSL Authentication](/blog/2023-07-06-kafka-development-with-docker-part-9)
 * [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10)
-* Part 11 Kafka Authorization
+* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11)
 
 ## Setup Kafka Cluster
 

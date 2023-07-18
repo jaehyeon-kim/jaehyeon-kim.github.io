@@ -37,7 +37,7 @@ By default, Apache Kafka communicates in *PLAINTEXT*, which means that all data 
 * [Part 8 SSL Encryption](#) (this post)
 * [Part 9 SSL Authentication](/blog/2023-07-06-kafka-development-with-docker-part-9)
 * [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10)
-* Part 11 Kafka Authorization
+* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11)
 
 ## Certificate Setup
 

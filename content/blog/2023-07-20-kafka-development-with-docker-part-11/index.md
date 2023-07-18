@@ -22,10 +22,10 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In the previous posts, we discussed how to implement client authentication by TLS (SSL or TLS/SSL) and SASL authentication. One of the key benefits of client authentication is achieving user access control. In this post, we will discuss how to implement Kafka authorization with Java and Python client examples.
+description: In the previous posts, we discussed how to implement client authentication by TLS (SSL or TLS/SSL) and SASL authentication. One of the key benefits of client authentication is achieving user access control. In this post, we will discuss how to configure Kafka authorization with Java and Python client examples while SASL is kept for client authentication.
 ---
 
-In the previous posts, we discussed how to implement client authentication by TLS (SSL or TLS/SSL) and SASL authentication. One of the key benefits of client authentication is achieving user access control. Kafka ships with a pluggable, out-of-the box authorization framework, which is configured with the *authorizer.class.name* property in the server configuration and stores Access Control Lists (ACLs) in the cluster metadata (either Zookeeper or the KRaft metadata log). In this post, we will discuss how to implement Kafka authorization with Java and Python client examples.
+In the previous posts, we discussed how to implement client authentication by TLS (SSL or TLS/SSL) and SASL authentication. One of the key benefits of client authentication is achieving user access control. Kafka ships with a pluggable, out-of-the box authorization framework, which is configured with the *authorizer.class.name* property in the server configuration and stores Access Control Lists (ACLs) in the cluster metadata (either Zookeeper or the KRaft metadata log). In this post, we will discuss how to configure Kafka authorization with Java and Python client examples while SASL is kept for client authentication.
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
@@ -66,7 +66,7 @@ When it comes to Kafka broker configurations, we should add the *SASL_SSL* liste
 - *KAFKA_CFG_SASL_ENABLED_MECHANISMS*
 - *KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL*.
 
-For authorization, *AclAuthorizer* is specified as the authorizer class name, which uses Zookeeper to persist ACLs. A super user named *superuser* is created. As the name suggests super users are those who are allowed to execute operations without checking ACLs. Finally, it is configured that anyone is allowed to access resources when no ACL is found (*allow.everyone.if.no.acl.found*). This is enabled to create the super user after the Kafka cluster gets started. However, it is not recommended in production environemnt.
+For authorization, *AclAuthorizer* is specified as the authorizer class name, which uses Zookeeper to persist ACLs. A super user named *superuser* is created. As the name suggests, super users are those who are allowed to execute operations without checking ACLs. Finally, it is configured that anyone is allowed to access resources when no ACL is found (*allow.everyone.if.no.acl.found*). This is enabled to create the super user after the Kafka cluster gets started. However, it is not recommended in production environemnt.
 
 The changes made to the first Kafka broker are shown below, and the same updates are made to the other brokers. The source of this post can also be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-11) of this post, and the cluster can be started by `docker-compose -f compose-kafka.yml up -d`.
 
@@ -158,7 +158,7 @@ Client {
 
 For SSL encryption, Java and non-Java clients need different configurations. The former can use the Keystore file of the Truststore directly while the latter needs corresponding details in a PEM file. The Kafka CLI and Kafka-UI will be taken as Java client examples while Python producer/consumer will be used to illustrate non-Java clients.
 
-For client authentication, we will create 4 *SCRAM* users including the super user. Then the super user will add different ACLs to the 3 client users to demonstrate authorization.
+For client authentication, we will create a total of 4 *SCRAM* users. At first we will create the super user. Then the super user will create the 3 client users as well as their permissions.
 
 ### User Creation
 
@@ -567,4 +567,4 @@ networks:
 
 ## Summary
 
-In the previous posts, we discussed how to implement client authentication by TLS (SSL or TLS/SSL) and SASL authentication. One of the key benefits of client authentication is achieving user access control. In this post, we discussed how to implement Kafka authorization with Java and Python client examples.
+In the previous posts, we discussed how to implement client authentication by TLS (SSL or TLS/SSL) and SASL authentication. One of the key benefits of client authentication is achieving user access control. In this post, we discussed how to configure Kafka authorization with Java and Python client examples while SASL is kept for client authentication.

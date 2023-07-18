@@ -37,7 +37,7 @@ In the previous post, we discussed how to configure TLS (SSL or TLS/SSL) encrypt
 * [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8)
 * [Part 9 SSL Authentication](#) (this post)
 * [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10)
-* Part 11 Kafka Authorization
+* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11)
 
 ## Certificate Setup
 
