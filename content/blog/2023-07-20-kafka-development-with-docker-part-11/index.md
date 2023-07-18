@@ -1,7 +1,7 @@
 ---
 title: Kafka Development with Docker - Part 11 Kafka Authorization
 date: 2023-07-20
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
