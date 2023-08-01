@@ -1,5 +1,5 @@
 ---
-title: Kafka and DynamoDB for Real Time Fraud Detection - Part 1 Local Development
+title: Kafka, Flink and DynamoDB for Real Time Fraud Detection - Part 1 Local Development
 date: 2023-08-14
 draft: true
 featured: true
@@ -10,7 +10,7 @@ pinned: false
 carousel: false
 featuredImage: false
 series:
-  - Kafka and DynamoDB for Real Time Fraud Detection
+  - Kafka, Flink and DynamoDB for Real Time Fraud Detection
 categories:
   - Data Engineering
 tags:
