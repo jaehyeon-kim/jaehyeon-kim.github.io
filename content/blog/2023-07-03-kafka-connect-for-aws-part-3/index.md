@@ -1,7 +1,7 @@
 ---
 title: Kafka Connect for AWS Services Integration - Part 3 Deploy Camel DynamoDB Sink Connector on MSK Connect
 date: 2023-07-03
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true

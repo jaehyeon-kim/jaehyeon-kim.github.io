@@ -1,7 +1,7 @@
 ---
 title: Kafka Connect for AWS Services Integration - Part 2 Develop Camel DynamoDB Sink Connector using Docker
 date: 2023-06-04
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true

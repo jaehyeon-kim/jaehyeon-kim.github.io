@@ -1,7 +1,7 @@
 ---
 title: Kafka Connect for AWS Services Integration - Part 1 Introduction
 date: 2023-05-03
-draft: true
+draft: false
 featured: true
 comment: true
 toc: true
