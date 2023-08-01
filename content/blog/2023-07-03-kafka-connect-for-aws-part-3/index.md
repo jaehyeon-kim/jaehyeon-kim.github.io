@@ -28,6 +28,8 @@ cevo: 30
 description: As part of investigating how to utilize Kafka Connect effectively for AWS services integration, I demonstrated how to develop the Camel DynamoDB sink connector using Docker in Part 2. Fake order data was generated using the MSK Data Generator source connector, and the sink connector was configured to consume the topic messages to ingest them into a DynamoDB table. In this post, I will illustrate how to deploy the data ingestion applications using Amazon MSK and MSK Connect.
 ---
 
+**[This article](https://cevo.com.au/post/kafka-connect-for-aws-part-3/) was originally posted on Tech Insights of [Cevo Australia](https://cevo.com.au/).**
+
 As part of investigating how to utilize Kafka Connect effectively for AWS services integration, I demonstrated how to develop the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/3.18.x/index.html) using Docker in [Part 2](/blog/2023-06-04-kafka-connect-for-aws-part-2). Fake order data was generated using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) source connector, and the sink connector was configured to consume the topic messages to ingest them into a DynamoDB table. In this post, I will illustrate how to deploy the data ingestion applications using [Amazon MSK](https://aws.amazon.com/msk/) and [MSK Connect](https://aws.amazon.com/msk/features/msk-connect/).
 
 * [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1)
