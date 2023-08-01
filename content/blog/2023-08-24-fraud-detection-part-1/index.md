@@ -31,7 +31,7 @@ description: The suite of Apache Camel Kafka connectors and the Kinesis Kafka co
 
 [Apache Flink](https://flink.apache.org/) is an open-source, unified stream-processing and batch-processing framework. Its core is a distributed streaming data-flow engine that you can use to run real-time stream processing on high-throughput data sources. Currently, it is widely used to build applications for fraud/anomaly detection, rule-based alerting, business process monitoring, and continuous ETL to name a few. On AWS, we can deploy a Flink application via [Amazon Kinesis Data Analytics (KDA)](https://aws.amazon.com/kinesis/data-analytics/), [Amazon EMR](https://aws.amazon.com/emr/) and [Amazon EKS](https://aws.amazon.com/eks/). Among those, KDA is the easiest option as it provides the underlying infrastructure for your Apache Flink applications.
 
-There are a number of AWS workshops and blog posts that we can learn Flink development on AWS and one of those is [AWS Kafka and DynamoDB for real time fraud detection](https://catalog.us-east-1.prod.workshops.aws/workshops/ad026e95-37fd-4605-a327-b585a53b1300/en-US). While this workshop targets a Flink application on KDA, it would have been easier if it illustrated local development before moving into deployment via KDA. In this series of posts, we will re-implement the fraud detection application of the workshop for those who are new to Flink and KDA. Specifically the app will be developed locally using Docker in part 1, and it will be deployed via KDA in part 2.
+There are a number of AWS workshops and blog posts where we can learn Flink development on AWS and one of those is [AWS Kafka and DynamoDB for real time fraud detection](https://catalog.us-east-1.prod.workshops.aws/workshops/ad026e95-37fd-4605-a327-b585a53b1300/en-US). While this workshop targets a Flink application on KDA, it would have been easier if it illustrated local development before moving into deployment via KDA. In this series of posts, we will re-implement the fraud detection application of the workshop for those who are new to Flink and KDA. Specifically the app will be developed locally using Docker in part 1, and it will be deployed via KDA in part 2.
 
 * [Part 1 Local Development](#) (this post)
 * Part 2 Deployment via KDA
@@ -103,7 +103,7 @@ Once downloaded, they can be found in the corresponding folders as shown below. 
 
 A Kafka cluster with a single broker and zookeeper node is used in this post. The broker has two listeners and the port 9092 and 29092 are used for internal and external communication respectively. The default number of topic partitions is set to 2. Details about Kafka cluster setup can be found in [this post](https://jaehyeon.me/blog/2023-05-04-kafka-development-with-docker-part-1/).
 
-A Kafka connect is configured to run in a distributed mode. The connect properties file and the source of the Camel DynamoDB sink connector are volume-mapped. Also AWS credentials are added to environment variables as it needs permission to put items into a DynamoDB table. Details about Kafka connect setup can be found in [this post](https://jaehyeon.me/blog/2023-06-04-kafka-connect-for-aws-part-2/).
+A Kafka Connect service is configured to run in a distributed mode. The connect properties file and the source of the Camel DynamoDB sink connector are volume-mapped. Also AWS credentials are added to environment variables as it needs permission to put items into a DynamoDB table. Details about Kafka connect setup can be found in [this post](https://jaehyeon.me/blog/2023-06-04-kafka-connect-for-aws-part-2/).
 
 Finally, the [Kpow CE](https://docs.kpow.io/ce/) is used for ease of monitoring Kafka topics and related objects. The bootstrap server address and connect REST URL are added as environment variables. See [this post](https://jaehyeon.me/blog/2023-05-18-kafka-development-with-docker-part-2/) for details about Kafka management apps.
 
@@ -683,7 +683,7 @@ if __name__ == "__main__":
 ]
 ```
 
-The terminal on the right-hand side shows the output records. We see that the account IDs ends with all odd numbers, which matches transactions from flagged accounts.
+The terminal on the right-hand side shows the output records. We see that the account IDs end with all odd numbers, which matches transactions from flagged accounts.
 
 ![](terminal-result.png#center)
 
