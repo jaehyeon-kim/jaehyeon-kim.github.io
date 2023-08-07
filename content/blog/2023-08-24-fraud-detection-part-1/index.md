@@ -26,7 +26,7 @@ authors:
   - JaehyeonKim
 images: []
 cevo: 31
-description: The suite of Apache Camel Kafka connectors and the Kinesis Kafka connector from the AWS Labs can be effective for building data ingestion pipelines that integrate AWS services. In this post, I will illustrate how to develop the Camel DynamoDB sink connector using Docker. Fake order data will be generated using the MSK Data Generator source connector, and the sink connector will be configured to consume the topic messages to ingest them into a DynamoDB table.
+description: Apache Flink is widely used for building real-time stream processing applications. On AWS, Kinesis Data Analytics (KDA) is the easiest option to develop a Flink app as it provides the underlying infrastructure. Re-implementing a solution from an AWS workshop, this series of posts discuss how to develop and deploy a fraud detection app using Kafka, Flink and DynamoDB. Part 1 covers local development using Docker while deployment via KDA will be discussed in part 2.
 ---
 
 [Apache Flink](https://flink.apache.org/) is an open-source, unified stream-processing and batch-processing framework. Its core is a distributed streaming data-flow engine that you can use to run real-time stream processing on high-throughput data sources. Currently, it is widely used to build applications for fraud/anomaly detection, rule-based alerting, business process monitoring, and continuous ETL to name a few. On AWS, we can deploy a Flink application via [Amazon Kinesis Data Analytics (KDA)](https://aws.amazon.com/kinesis/data-analytics/), [Amazon EMR](https://aws.amazon.com/emr/) and [Amazon EKS](https://aws.amazon.com/eks/). Among those, KDA is the easiest option as it provides the underlying infrastructure for your Apache Flink applications.
@@ -95,7 +95,7 @@ curl -o $CONN_PATH/camel-aws-ddb-sink-kafka-connector.tar.gz $CONNECTOR_SRC_DOWN
   && rm $CONN_PATH/camel-aws-ddb-sink-kafka-connector.tar.gz
 ```
 
-Once downloaded, they can be found in the corresponding folders as shown below. Although the Flink app doesn't need the *kafka-python* package, it is included in the *site_packages* folder in order to check if `--pyFiles` option works in KDA - it'll be used in part 2.
+Once downloaded, they can be found in the corresponding folders as shown below. Although the Flink app doesn't need the *kafka-python* package, it is included in the *site_packages* folder in order to check if `--pyFiles` option works in KDA - it'll be checked in part 2.
 
 ![](source-folders.png#center)
 
@@ -105,7 +105,7 @@ A Kafka cluster with a single broker and zookeeper node is used in this post. Th
 
 A Kafka Connect service is configured to run in a distributed mode. The connect properties file and the source of the Camel DynamoDB sink connector are volume-mapped. Also AWS credentials are added to environment variables as it needs permission to put items into a DynamoDB table. Details about Kafka connect setup can be found in [this post](https://jaehyeon.me/blog/2023-06-04-kafka-connect-for-aws-part-2/).
 
-Finally, the [Kpow CE](https://docs.kpow.io/ce/) is used for ease of monitoring Kafka topics and related objects. The bootstrap server address and connect REST URL are added as environment variables. See [this post](https://jaehyeon.me/blog/2023-05-18-kafka-development-with-docker-part-2/) for details about Kafka management apps.
+Finally, the [Kpow CE](https://docs.kpow.io/ce/) is used for ease of monitoring Kafka topics and related resources. The bootstrap server address and connect REST URL are added as environment variables. See [this post](https://jaehyeon.me/blog/2023-05-18-kafka-development-with-docker-part-2/) for details about Kafka management apps.
 
 ```yaml
 version: "3.5"
@@ -238,7 +238,7 @@ aws dynamodb create-table \
 
 ### Virtual Environment
 
-As mentioned earlier, all Python apps are run in a virtual environment, and we need the following pip packages. We use the version 1.15.2 of the [apache-flink](https://pypi.org/project/apache-flink/) package because it is the latest supported version by KDA. We also need the [kafka-python](https://pypi.org/project/kafka-python/) package for source data generation. The pip packages can be installed by `pip install -r requirements-dev.txt`.
+As mentioned earlier, all Python apps run in a virtual environment, and we need the following pip packages. We use the version 1.15.2 of the [apache-flink](https://pypi.org/project/apache-flink/) package because it is the latest supported version by KDA. We also need the [kafka-python](https://pypi.org/project/kafka-python/) package for source data generation. The pip packages can be installed by `pip install -r requirements-dev.txt`.
 
 ```txt
 # requirements.txt
@@ -256,7 +256,7 @@ pytest-cov
 
 ### Source Data
 
-A single Python script is created for the apps that generate and send source data into Kafka topics. Each of the classes for the flagged account and transaction has the *asdict*, *auto* and *create* methods. The *create* method generates a list of records where each element is instantiated by the *auto* method. Those records are sent into the relevant Kafka topic after being converted into dictionary by the *asdict* method. 
+A single Python script is created for the transaction and flagged account apps. They generate and send source data into Kafka topics. Each of the classes for the flagged account and transaction has the *asdict*, *auto* and *create* methods. The *create* method generates a list of records where each element is instantiated by the *auto* method. Those records are sent into the relevant Kafka topic after being converted into a dictionary by the *asdict* method. 
 
 A Kafka producer is created as an attribute of the *Producer* class. The source records are sent into the relevant topic by the *send* method. Note that both the key and value of the messages are serialized as json.
 
@@ -419,9 +419,9 @@ Once we start the apps, we can check the topics for the source data are created 
 
 The Flink application is built using the [Table API](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/python/table_api_tutorial/). We have two Kafka source topics and one output topic. Simply put, we can query the records of the topics as tables of unbounded real-time streams with the Table API. In order to read/write records from/to a Kafka topic, we need to specify the [Kafka connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/) artifact that we downloaded earlier as the [pipeline jar](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/dev/python/dependency_management/#jar-dependencies). Note we only need to configure the connector jar when we develop the app locally as the jar file will be specified by the `--jarfile` option for KDA. We also need the application properties file (*application_properties.json*) in order to be comparable with KDA. The file contains the Flink runtime options in KDA as well as application specific properties. All the properties should be specified when deploying via KDA and, for local development, we keep them as a json file and only the application specific properties are used.
 
-The tables for the source and output topics can be created using SQL with options that are related to the Kafka connector. Key options cover the connector name (*connector*), topic name (*topic*), bootstrap sever address (*properties.bootstrap.servers*) and format (*format*). See the [connector document](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/) for more details about the connector configuration. We also have a function to insert flagged transaction records into the output topic in SQL (*insert_into_stmt*).
+The tables for the source and output topics can be created using SQL with options that are related to the Kafka connector. Key options cover the connector name (*connector*), topic name (*topic*), bootstrap server address (*properties.bootstrap.servers*) and format (*format*). See the [connector document](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/) for more details about the connector configuration. When it comes to inserting flagged transaction records into the output topic, we use a function written in SQL as well - *insert_into_stmt*.
 
-In the *main* method, we create all the source and sink tables after mapping relevant application properties. Then the output records are inserted into the output Kafka topic. Note that the output records are printed in the terminal additionally when the app is running locally for ease of checking them.
+In the *main* method, we create all the source and sink tables after mapping relevant application properties. Then the output records are inserted into the output Kafka topic. Note that the output records are printed in the terminal additionally when the app is running locally for ease of checking them. We can run the app as following - `RUNTIME_ENV=LOCAL python processor.py`
 
 ```py
 import os
@@ -683,7 +683,7 @@ if __name__ == "__main__":
 ]
 ```
 
-The terminal on the right-hand side shows the output records. We see that the account IDs end with all odd numbers, which matches transactions from flagged accounts.
+The terminal on the right-hand side shows the output records of the Flink app while the left-hand side records logs of the transaction app. We see that the account IDs end with all odd numbers, which matches transactions from flagged accounts.
 
 ![](terminal-result.png#center)
 
@@ -734,3 +734,5 @@ We can check the ingested records on the DynamoDB table items view. Below shows 
 ![](ddb-output.png#center)
 
 ## Summary
+
+Apache Flink is widely used for building real-time stream processing applications. On AWS, Kinesis Data Analytics (KDA) is the easiest option to develop a Flink app as it provides the underlying infrastructure. Re-implementing a solution from an AWS workshop, this series of posts discuss how to develop and deploy a fraud detection app using Kafka, Flink and DynamoDB. In this post, we covered local development using Docker, and deployment via KDA will be discussed in part 2.
