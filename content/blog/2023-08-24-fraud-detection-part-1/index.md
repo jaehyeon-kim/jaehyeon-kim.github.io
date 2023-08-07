@@ -108,6 +108,7 @@ A Kafka Connect service is configured to run in a distributed mode. The connect 
 Finally, the [Kpow CE](https://docs.kpow.io/ce/) is used for ease of monitoring Kafka topics and related resources. The bootstrap server address and connect REST URL are added as environment variables. See [this post](https://jaehyeon.me/blog/2023-05-18-kafka-development-with-docker-part-2/) for details about Kafka management apps.
 
 ```yaml
+# docker-compose.yml
 version: "3.5"
 
 services:
@@ -424,6 +425,7 @@ The tables for the source and output topics can be created using SQL with option
 In the *main* method, we create all the source and sink tables after mapping relevant application properties. Then the output records are inserted into the output Kafka topic. Note that the output records are printed in the terminal additionally when the app is running locally for ease of checking them. We can run the app as following - `RUNTIME_ENV=LOCAL python processor.py`
 
 ```py
+# processor.py
 import os
 import json
 import logging
@@ -645,6 +647,7 @@ if __name__ == "__main__":
 ```
 
 ```json
+// application_properties.json
 [
   {
     "PropertyGroupId": "kinesis.analytics.flink.run.options",
