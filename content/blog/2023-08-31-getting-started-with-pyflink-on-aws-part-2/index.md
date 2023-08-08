@@ -24,12 +24,14 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Apache Flink is widely used for building real-time stream processing applications. On AWS, Kinesis Data Analytics (KDA) is the easiest option to develop a Flink app as it provides the underlying infrastructure. Re-implementing a solution from an AWS workshop, this series of posts discuss how to develop and deploy a fraud detection app using Kafka, Flink and DynamoDB. Part 1 covers local development using Docker while deployment via KDA will be discussed in part 2.
+description: This series aims to extend a guide from AWS that demonstrates how to develop a Flink application locally and deploy via KDA. While the guide uses Kinesis Data Stream as the source, we use Apache Kafka on Amazon MSK instead. In this post, we will use a Kafka cluster on Amazon MSK for the source and destination (sink) of the Flink app. We have to build a custom Uber Jar as the cluster is authenticated by IAM and KDA does not allow you to specify multiple pipeline jar files. After that the same application execution examples will be repeated.
 ---
 
-[Apache Flink](https://flink.apache.org/) is an open-source, unified stream-processing and batch-processing framework. Its core is a distributed streaming data-flow engine that you can use to run real-time stream processing on high-throughput data sources. Currently, it is widely used to build applications for fraud/anomaly detection, rule-based alerting, business process monitoring, and continuous ETL to name a few. On AWS, we can deploy a Flink application via [Amazon Kinesis Data Analytics (KDA)](https://aws.amazon.com/kinesis/data-analytics/), [Amazon EMR](https://aws.amazon.com/emr/) and [Amazon EKS](https://aws.amazon.com/eks/). Among those, KDA is the easiest option as it provides the underlying infrastructure for your Apache Flink applications.
+This series aims to extend a [guide from AWS](https://github.com/aws-samples/pyflink-getting-started) that demonstrates how to develop a Flink application locally and deploy via KDA. While the guide uses Kinesis Data Stream as the source, we use Apache Kafka on Amazon MSK instead.
 
-There are a number of AWS workshops and blog posts where we can learn Flink development on AWS and one of those is [AWS Kafka and DynamoDB for real time fraud detection](https://catalog.us-east-1.prod.workshops.aws/workshops/ad026e95-37fd-4605-a327-b585a53b1300/en-US). While this workshop targets a Flink application on KDA, it would have been easier if it illustrated local development before moving into deployment via KDA. In this series of posts, we will re-implement the fraud detection application of the workshop for those who are new to Flink and KDA. Specifically the app will be developed locally using Docker in part 1, and it will be deployed via KDA in part 2.
+In part 1, we discussed how to develop a Flink app locally, which connects a local Kafka cluster. The app was executed in a virtual environment as well as in a local Flink cluster for improved monitoring and debugging.
+
+In this post, we will use a Kafka cluster on Amazon MSK for the source and destination (sink) of the Flink app. We have to build a custom Uber Jar as the cluster is authenticated by IAM and KDA does not allow you to specify multiple pipeline jar files. After that the same application execution examples will be repeated.
 
 * [Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1)
 * [Part 2 Local Flink and MSK](#) (this post)
@@ -37,212 +39,454 @@ There are a number of AWS workshops and blog posts where we can learn Flink deve
 
 ## Architecture
 
-There are two Python applications that send transaction and flagged account records into the corresponding topics - the transaction app sends records indefinitely in a loop. Both the topics are consumed by a Flink application, and it filters the transactions from the flagged accounts followed by sending them into an output topic of flagged transactions. Finally, the flagged transaction records are sent into a DynamoDB table by the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) in order to serve real-time requests from an API.
+The Python source data generator (*producer.py*) sends random stock price records into a Kafka topic. The messages in the source topic are consumed by a Flink application, and it just writes those messages into a different sink topic. This is the simplest application of the AWS guide, and you may try [other examples](https://github.com/aws-samples/pyflink-getting-started/tree/main/pyflink-examples) if interested.
 
 ![](featured.png#center)
 
 ## Infrastructure
 
-The Kafka cluster, Kafka connect and management app (kpow) are created using Docker while the python apps including the Flink app run in a virtual environment. The source of this post can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/fraud-detection/local) of this post.
+A Kafka cluster is created on Amazon MSK using Terraform, and the cluster is secured by IAM access control. Similar to part 1, the Python apps including the Flink app run in a virtual environment in the first trial. After that the Flink app is submitted to a local Flink cluster for improved monitoring and debugging. As with part 1, the Flink cluster is created using Docker. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/pyflink-getting-started-on-aws/remote) of this post.
 
 ### Preparation
 
-As discussed later, the Flink application needs the Kafka connector artifact (*flink-sql-connector-kafka-1.15.2.jar*) in order to connect a Kafka cluster. Also, the source of the Camel DynamoDB sink connector should be available in the Kafka connect service. They can be downloaded by executing the following script.
+#### Flink Pipeline Jar
+
+The Flink application should be able to connect a Kafka cluster on Amazon MSK, and we used the [Apache Kafka SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/) artifact (*flink-sql-connector-kafka-1.15.2.jar*) in part 1. It also needs functionality to authenticate the cluster by IAM, and it should be able to refer to the [Amazon MSK Library for AWS Identity and Access Management (MSK IAM Auth)](https://github.com/aws/aws-msk-iam-auth). So far KDA does not allow you to specify multiple [pipeline jar](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/python/dependency_management/) files, and we have to build a single Jar file (Uber Jar) that includes all the dependencies of the application. Moreover, as the *MSK IAM Auth* library is not compatible with the *Apache Kafka SQL Connector* due to shade relocation, we have to build the Jar file based on the [Apache Kafka Connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/datastream/kafka/). After some search, I found an example from the [Blueprints: Kinesis Data Analytics for Apache Flink](https://github.com/aws-samples/amazon-kinesis-data-analytics-blueprints/tree/main/apps/python-table-api/msk-serverless-to-s3-tableapi-python/src/uber-jar-for-pyflink) and was able to modify the POM file with necessary dependencies for this post. The modified POM file can be shown below, and it creates the Uber Jar for this post - *pyflink-getting-started-1.0.0.jar*.
+
+```xml
+<!--package/uber-jar-for-pyflink/pom.xml-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.amazonaws.services.kinesisanalytics</groupId>
+	<artifactId>pyflink-getting-started</artifactId>
+	<version>1.0.0</version>
+	<packaging>jar</packaging>
+
+	<name>Uber Jar for PyFlink App</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<flink.version>1.15.2</flink.version>
+		<target.java.version>1.11</target.java.version>
+		<jdk.version>11</jdk.version>
+		<scala.binary.version>2.12</scala.binary.version>
+		<kda.connectors.version>2.0.0</kda.connectors.version>
+		<kda.runtime.version>1.2.0</kda.runtime.version>
+		<kafka.clients.version>2.8.1</kafka.clients.version>
+		<log4j.version>2.17.1</log4j.version>
+		<aws-msk-iam-auth.version>1.1.7</aws-msk-iam-auth.version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>apache.snapshots</id>
+			<name>Apache Development Snapshot Repository</name>
+			<url>https://repository.apache.org/content/repositories/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-connector-base</artifactId>
+			<version>${flink.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-connector-kafka</artifactId>
+			<version>${flink.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-connector-files</artifactId>
+			<version>${flink.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka-clients</artifactId>
+			<version>${kafka.clients.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>software.amazon.msk</groupId>
+			<artifactId>aws-msk-iam-auth</artifactId>
+			<version>${aws-msk-iam-auth.version}</version>
+		</dependency>
+
+		<!-- Add logging framework, to produce console output when running in the IDE. -->
+		<!-- These dependencies are excluded from the application JAR by default. -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>${log4j.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<!-- Java Compiler -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+				</configuration>
+			</plugin>
+
+			<!-- We use the maven-shade plugin to create a fat jar that contains all necessary dependencies. -->
+			<!-- Change the value of <mainClass>...</mainClass> if your program entry point changes. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.4.1</version>
+				<executions>
+					<!-- Run shade goal on package phase -->
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<excludes>
+									<exclude>org.apache.flink:force-shading</exclude>
+									<exclude>com.google.code.findbugs:jsr305</exclude>
+									<exclude>org.slf4j:*</exclude>
+									<exclude>org.apache.logging.log4j:*</exclude>
+								</excludes>
+							</artifactSet>
+							<filters>
+								<filter>
+									<!-- Do not copy the signatures in the META-INF folder.
+									Otherwise, this might cause SecurityExceptions when using the JAR. -->
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+
+				<!-- This improves the out-of-the-box experience in Eclipse by resolving some warnings. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-shade-plugin</artifactId>
+										<versionRange>[3.1.1,)</versionRange>
+										<goals>
+											<goal>shade</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore/>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-compiler-plugin</artifactId>
+										<versionRange>[3.1,)</versionRange>
+										<goals>
+											<goal>testCompile</goal>
+											<goal>compile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore/>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>
+```
+
+The following script (*build.sh*) builds to create the Uber Jar file for this post, followed by downloading the *kafka-python* package and creating a zip file that can be used to deploy the Flink app via KDA. Although the Flink app does not need the package, but it is added in order to check if `--pyFiles` option works when submitting the app to a Flink cluster or deploying via KDA. The zip package file will be used for KDA deployment in the next post.
+
 
 ```bash
 # build.sh
 #!/usr/bin/env bash
-PKG_ALL="${PKG_ALL:-no}"
-
 SCRIPT_DIR="$(cd $(dirname "$0"); pwd)"
-
-#### Steps to package the flink app
 SRC_PATH=$SCRIPT_DIR/package
-rm -rf $SRC_PATH && mkdir -p $SRC_PATH/lib
 
-## Download flink sql connector kafka
-echo "download flink sql connector kafka..."
-VERSION=1.15.2
-FILE_NAME=flink-sql-connector-kafka-$VERSION
-FLINK_SRC_DOWNLOAD_URL=https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-kafka/$VERSION/flink-sql-connector-kafka-$VERSION.jar
-curl -L -o $SRC_PATH/lib/$FILE_NAME.jar ${FLINK_SRC_DOWNLOAD_URL}
+# remove contents under $SRC_PATH (except for uber-jar-for-pyflink) and kda-package.zip file
+shopt -s extglob
+rm -rf $SRC_PATH/!(uber-jar-for-pyflink) kda-package.zip
+
+## Generate Uber Jar for PyFlink app for MSK cluster with IAM authN
+echo "generate Uber jar for PyFlink app..."
+mkdir $SRC_PATH/lib
+mvn clean install -f $SRC_PATH/uber-jar-for-pyflink/pom.xml \
+  && mv $SRC_PATH/uber-jar-for-pyflink/target/pyflink-getting-started-1.0.0.jar $SRC_PATH/lib \
+  && rm -rf $SRC_PATH/uber-jar-for-pyflink/target
 
 ## Install pip packages
 echo "install and zip pip packages..."
-pip3 install -r requirements.txt --target $SRC_PATH/site_packages
+pip install -r requirements.txt --target $SRC_PATH/site_packages
 
-if [ $PKG_ALL == "yes" ]; then
-  ## Package pyflink app
-  echo "package pyflink app"
-  zip -r kda-package.zip processor.py package/lib package/site_packages
-fi
-
-#### Steps to create the sink connector
-CONN_PATH=$SCRIPT_DIR/connectors
-rm -rf $CONN_PATH && mkdir $CONN_PATH
-
-## Download camel dynamodb sink connector
-echo "download camel dynamodb sink connector..."
-CONNECTOR_SRC_DOWNLOAD_URL=https://repo.maven.apache.org/maven2/org/apache/camel/kafkaconnector/camel-aws-ddb-sink-kafka-connector/3.20.3/camel-aws-ddb-sink-kafka-connector-3.20.3-package.tar.gz
-
-## decompress and zip contents to create custom plugin of msk connect later
-curl -o $CONN_PATH/camel-aws-ddb-sink-kafka-connector.tar.gz $CONNECTOR_SRC_DOWNLOAD_URL \
-  && tar -xvzf $CONN_PATH/camel-aws-ddb-sink-kafka-connector.tar.gz -C $CONN_PATH \
-  && cd $CONN_PATH/camel-aws-ddb-sink-kafka-connector \
-  && zip -r camel-aws-ddb-sink-kafka-connector.zip . \
-  && mv camel-aws-ddb-sink-kafka-connector.zip $CONN_PATH \
-  && rm $CONN_PATH/camel-aws-ddb-sink-kafka-connector.tar.gz
+## Package pyflink app
+echo "package pyflink app"
+zip -r kda-package.zip processor.py package/lib package/site_packages
 ```
 
-Once downloaded, they can be found in the corresponding folders as shown below. Although the Flink app doesn't need the *kafka-python* package, it is included in the *site_packages* folder in order to check if `--pyFiles` option works in KDA - it'll be checked in part 2.
+Once downloaded, they can be found in the corresponding folders as shown below.
 
 ![](source-folders.png#center)
 
-### Kafka and Related Services
+### VPC and VPN
 
-A Kafka cluster with a single broker and zookeeper node is used in this post. The broker has two listeners and the port 9092 and 29092 are used for internal and external communication respectively. The default number of topic partitions is set to 2. Details about Kafka cluster setup can be found in [this post](https://jaehyeon.me/blog/2023-05-04-kafka-development-with-docker-part-1/).
+A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*remote/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*remote/vpn.tf*). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in an [earlier post](/blog/2022-02-06-dev-infra-terraform).
 
-A Kafka Connect service is configured to run in a distributed mode. The connect properties file and the source of the Camel DynamoDB sink connector are volume-mapped. Also AWS credentials are added to environment variables as it needs permission to put items into a DynamoDB table. Details about Kafka connect setup can be found in [this post](https://jaehyeon.me/blog/2023-06-04-kafka-connect-for-aws-part-2/).
+### MSK Cluster
 
-Finally, the [Kpow CE](https://docs.kpow.io/ce/) is used for ease of monitoring Kafka topics and related resources. The bootstrap server address and connect REST URL are added as environment variables. See [this post](https://jaehyeon.me/blog/2023-05-18-kafka-development-with-docker-part-2/) for details about Kafka management apps.
+An MSK cluster with 2 brokers is created. The broker nodes are deployed with the *kafka.m5.large* instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion.
+
+```terraform
+# infra/variable.tf
+locals {
+  ...
+  msk = {
+    version                    = "2.8.1"
+    instance_size              = "kafka.m5.large"
+    ebs_volume_size            = 20
+    log_retention_ms           = 604800000 # 7 days
+    num_partitions             = 2
+    default_replication_factor = 2
+  }
+  ...
+}
+# infra/msk.tf
+resource "aws_msk_cluster" "msk_data_cluster" {
+  cluster_name           = "${local.name}-msk-cluster"
+  kafka_version          = local.msk.version
+  number_of_broker_nodes = local.msk.number_of_broker_nodes
+  configuration_info {
+    arn      = aws_msk_configuration.msk_config.arn
+    revision = aws_msk_configuration.msk_config.latest_revision
+  }
+
+  broker_node_group_info {
+    instance_type   = local.msk.instance_size
+    client_subnets  = slice(module.vpc.private_subnets, 0, local.msk.number_of_broker_nodes)
+    security_groups = [aws_security_group.msk.id]
+    storage_info {
+      ebs_storage_info {
+        volume_size = local.msk.ebs_volume_size
+      }
+    }
+  }
+
+  client_authentication {
+    unauthenticated = true
+    sasl {
+      iam = true
+    }
+  }
+
+  encryption_info {
+    encryption_in_transit {
+      client_broker = "TLS_PLAINTEXT"
+    }
+  }
+
+  logging_info {
+    broker_logs {
+      cloudwatch_logs {
+        enabled   = true
+        log_group = aws_cloudwatch_log_group.msk_cluster_lg.name
+      }
+      s3 {
+        enabled = true
+        bucket  = aws_s3_bucket.default_bucket.id
+        prefix  = "logs/msk/cluster/"
+      }
+    }
+  }
+
+  tags = local.tags
+
+  depends_on = [aws_msk_configuration.msk_config]
+}
+
+resource "aws_msk_configuration" "msk_config" {
+  name = "${local.name}-msk-configuration"
+
+  kafka_versions = [local.msk.version]
+
+  server_properties = <<PROPERTIES
+    auto.create.topics.enable = true
+    delete.topic.enable = true
+    log.retention.ms = ${local.msk.log_retention_ms}
+    num.partitions = ${local.msk.num_partitions}
+    default.replication.factor = ${local.msk.default_replication_factor}
+  PROPERTIES
+}
+```
+
+### Kafka Management App
+
+The [Kpow CE](https://docs.kpow.io/ce/) is used for ease of monitoring Kafka topics and related resources. The bootstrap server address, security configuration for IAM authentication and AWS credentials are added as environment variables. See [this post](https://jaehyeon.me/blog/2023-05-18-kafka-development-with-docker-part-2/) for details about Kafka management apps.
 
 ```yaml
-# docker-compose.yml
-version: "3.5"
+# compose-ui.yml
+version: "3"
 
 services:
-  zookeeper:
-    image: bitnami/zookeeper:3.5
-    container_name: zookeeper
-    ports:
-      - "2181"
-    networks:
-      - kafkanet
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-    volumes:
-      - zookeeper_data:/bitnami/zookeeper
-  kafka-0:
-    image: bitnami/kafka:2.8.1
-    container_name: kafka-0
-    expose:
-      - 9092
-    ports:
-      - "29092:29092"
-    networks:
-      - kafkanet
-    environment:
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_CFG_BROKER_ID=0
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-0:9092,EXTERNAL://localhost:29092
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
-      - KAFKA_CFG_NUM_PARTITIONS=2
-    volumes:
-      - kafka_0_data:/bitnami/kafka
-    depends_on:
-      - zookeeper
-  kafka-connect:
-    image: bitnami/kafka:2.8.1
-    container_name: connect
-    command: >
-      /opt/bitnami/kafka/bin/connect-distributed.sh
-      /opt/bitnami/kafka/config/connect-distributed.properties
-    ports:
-      - "8083:8083"
-    networks:
-      - kafkanet
-    environment:
-      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-      AWS_SESSION_TOKEN: $AWS_SESSION_TOKEN
-    volumes:
-      - "./configs/connect-distributed.properties:/opt/bitnami/kafka/config/connect-distributed.properties"
-      - "./connectors/camel-aws-ddb-sink-kafka-connector:/opt/connectors/camel-aws-ddb-sink-kafka-connector"
-    depends_on:
-      - zookeeper
-      - kafka-0
   kpow:
     image: factorhouse/kpow-ce:91.2.1
     container_name: kpow
     ports:
       - "3000:3000"
     networks:
-      - kafkanet
+      - appnet
     environment:
-      BOOTSTRAP: kafka-0:9092
-      CONNECT_REST_URL: http://kafka-connect:8083
-    depends_on:
-      - zookeeper
-      - kafka-0
-      - kafka-connect
+      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+      AWS_SESSION_TOKEN: $AWS_SESSION_TOKEN
+      # kafka cluster
+      BOOTSTRAP: $BOOTSTRAP_SERVERS
+      SECURITY_PROTOCOL: SASL_SSL
+      SASL_MECHANISM: AWS_MSK_IAM
+      SASL_CLIENT_CALLBACK_HANDLER_CLASS: software.amazon.msk.auth.iam.IAMClientCallbackHandler
+      SASL_JAAS_CONFIG: software.amazon.msk.auth.iam.IAMLoginModule required;
 
 networks:
-  kafkanet:
-    name: kafka-network
+  appnet:
+    name: app-network
+```
+
+### Flink Cluster
+
+We can create a Flink cluster using the custom Docker image that we discussed [part 1](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1), which includes Python and the *apache-flink* package. It is made up of a single Job Manger and Task Manager, and the cluster runs in the [Session Mode](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/deployment/overview/) where one or more Flink applications can be submitted/executed simultaneously. See [this page](https://nightlies.apache.org/flink/flink-docs-master/docs/deployment/resource-providers/standalone/docker/#flink-with-docker-compose) for details about how to create a Flink cluster using *docker-compose*.
+
+A set of environment variables are configured to adjust the application behaviour and to give permission to read/write messages from the Kafka cluster with IAM authentication. The *RUNTIME_ENV* is set to *DOCKER*, and it determines which pipeline jar and application property file to choose. Also, the *BOOTSTRAP_SERVERS* overrides the Kafka bootstrap server address value from the application property file. The bootstrap server address of the MSK cluster are referred from the host environment variable having the same name. Finally, the current directory is volume-mapped into */etc/flink* so that the application and related resources can be available in the Flink cluster.
+
+The Flink cluster can be started by `docker-compose -f compose-flink.yml up -d`.
+
+```yaml
+version: "3.5"
+
+services:
+  jobmanager:
+    image: pyflink:1.15.2-scala_2.12
+    container_name: jobmanager
+    command: jobmanager
+    ports:
+      - "8081:8081"
+    networks:
+      - flinknet
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        state.backend: filesystem
+        state.checkpoints.dir: file:///tmp/flink-checkpoints
+        heartbeat.interval: 1000
+        heartbeat.timeout: 5000
+        rest.flamegraph.enabled: true
+        web.backpressure.refresh-interval: 10000
+      - RUNTIME_ENV=DOCKER
+      - BOOTSTRAP_SERVERS=$BOOTSTRAP_SERVERS
+      - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
+    volumes:
+      - $PWD:/etc/flink
+  taskmanager:
+    image: pyflink:1.15.2-scala_2.12
+    container_name: taskmanager
+    command: taskmanager
+    networks:
+      - flinknet
+    volumes:
+      - flink_data:/tmp/
+      - $PWD:/etc/flink
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 3
+        state.backend: filesystem
+        state.checkpoints.dir: file:///tmp/flink-checkpoints
+        heartbeat.interval: 1000
+        heartbeat.timeout: 5000
+      - RUNTIME_ENV=DOCKER
+      - BOOTSTRAP_SERVERS=$BOOTSTRAP_SERVERS
+      - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
+    depends_on:
+      - jobmanager
+
+networks:
+  flinknet:
+    name: flink-network
 
 volumes:
-  zookeeper_data:
+  flink_data:
     driver: local
-    name: zookeeper_data
-  kafka_0_data:
-    driver: local
-    name: kafka_0_data
-```
-
-### DynamoDB Table
-
-The destination table is named *flagged-transactions*, and it has the primary key where *transaction_id* and *transaction_date* are the hash and range key respectively. It also has a global secondary index (GSI) where *account_id* and *transaction_date* constitute the primary key. The purpose of the GSI is for ease of querying transactions by account ID. The table can be created using the AWS CLI as shown below.
-
-```bash
-aws dynamodb create-table \
-  --cli-input-json file://configs/ddb.json
-```
-
-```json
-// configs/ddb.json
-{
-  "TableName": "flagged-transactions",
-  "KeySchema": [
-    { "AttributeName": "transaction_id", "KeyType": "HASH" },
-    { "AttributeName": "transaction_date", "KeyType": "RANGE" }
-  ],
-  "AttributeDefinitions": [
-    { "AttributeName": "transaction_id", "AttributeType": "S" },
-    { "AttributeName": "account_id", "AttributeType": "N" },
-    { "AttributeName": "transaction_date", "AttributeType": "S" }
-  ],
-  "ProvisionedThroughput": {
-    "ReadCapacityUnits": 2,
-    "WriteCapacityUnits": 2
-  },
-  "GlobalSecondaryIndexes": [
-    {
-      "IndexName": "account",
-      "KeySchema": [
-        { "AttributeName": "account_id", "KeyType": "HASH" },
-        { "AttributeName": "transaction_date", "KeyType": "RANGE" }
-      ],
-      "Projection": { "ProjectionType": "ALL" },
-      "ProvisionedThroughput": {
-        "ReadCapacityUnits": 2,
-        "WriteCapacityUnits": 2
-      }
-    }
-  ]
-}
-
+    name: flink_data
 ```
 
 ### Virtual Environment
 
-As mentioned earlier, all Python apps run in a virtual environment, and we need the following pip packages. We use the version 1.15.2 of the [apache-flink](https://pypi.org/project/apache-flink/) package because it is the latest supported version by KDA. We also need the [kafka-python](https://pypi.org/project/kafka-python/) package for source data generation. The pip packages can be installed by `pip install -r requirements-dev.txt`.
+As mentioned earlier, all Python apps run in a virtual environment, and we need the following pip packages. We use the version 1.15.2 of the [apache-flink](https://pypi.org/project/apache-flink/) package because it is the latest supported version by KDA. We also need the [kafka-python](https://pypi.org/project/kafka-python/) package for source data generation. As the Kafka cluster is IAM-authenticated, a patched version is installed instead of the stable version. The pip packages can be installed by `pip install -r requirements-dev.txt`.
 
 ```txt
-# requirements.txt
-kafka-python==2.0.2
+# kafka-python with IAM auth support - https://github.com/dpkp/kafka-python/pull/2255
+https://github.com/mattoberle/kafka-python/archive/7ff323727d99e0c33a68423300e7f88a9cf3f830.tar.gz
 
 # requirements-dev.txt
 -r requirements.txt
@@ -256,13 +500,11 @@ pytest-cov
 
 ### Source Data
 
-A single Python script is created for the transaction and flagged account apps. They generate and send source data into Kafka topics. Each of the classes for the flagged account and transaction has the *asdict*, *auto* and *create* methods. The *create* method generates a list of records where each element is instantiated by the *auto* method. Those records are sent into the relevant Kafka topic after being converted into a dictionary by the *asdict* method. 
+A single Python script is created to generate fake stock price records. The class for the stock record has the *asdict*, *auto* and *create* methods. The *create* method generates a list of records where each element is instantiated by the *auto* method. Those records are sent into the relevant Kafka topic after being converted into a dictionary by the *asdict* method. 
 
-A Kafka producer is created as an attribute of the *Producer* class. The source records are sent into the relevant topic by the *send* method. Note that both the key and value of the messages are serialized as json.
+A Kafka producer is created as an attribute of the *Producer* class. It adds security configuration for IAM authentication when the bootstrap server address ends with *9098*. The source records are sent into the relevant topic by the *send* method. Note that both the key and value of the messages are serialized as json.
 
-Whether to send flagged account or transaction records is determined by an environment variable called *DATA_TYPE*. We can run those apps as shown below.
-* flagged account - `DATE_TYPE=account python producer.py`
-* transaction - `DATE_TYPE=transaction python producer.py`
+The data generator can be started simply by `python producer.py`.
 
 ```py
 # producer.py
@@ -273,6 +515,7 @@ import json
 import typing
 import random
 import logging
+import re
 import dataclasses
 
 from kafka import KafkaProducer
@@ -283,96 +526,55 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+
 
 @dataclasses.dataclass
-class FlagAccount:
-    account_id: int
-    flag_date: str
+class Stock:
+    event_time: str
+    ticker: str
+    price: float
 
     def asdict(self):
         return dataclasses.asdict(self)
 
     @classmethod
-    def auto(cls, account_id: int):
-        flag_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-        return cls(account_id, flag_date)
+    def auto(cls, ticker: str):
+        # event_time = datetime.datetime.now().isoformat(timespec="milliseconds")
+        event_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        price = round(random.random() * 100, 2)
+        return cls(event_time, ticker, price)
 
     @staticmethod
     def create():
-        return [FlagAccount.auto(account_id) for account_id in range(1000000001, 1000000010, 2)]
-
-
-@dataclasses.dataclass
-class Transaction:
-    account_id: int
-    customer_id: str
-    merchant_type: str
-    transaction_id: str
-    transaction_type: str
-    transaction_amount: float
-    transaction_date: str
-
-    def asdict(self):
-        return dataclasses.asdict(self)
-
-    @classmethod
-    def auto(cls):
-        account_id = random.randint(1000000001, 1000000010)
-        customer_id = f"C{str(account_id)[::-1]}"
-        merchant_type = random.choice(["Online", "In Store"])
-        transaction_id = "".join(random.choice("0123456789ABCDEF") for i in range(16))
-        transaction_type = random.choice(
-            [
-                "Grocery_Store",
-                "Gas_Station",
-                "Shopping_Mall",
-                "City_Services",
-                "HealthCare_Service",
-                "Food and Beverage",
-                "Others",
-            ]
-        )
-        transaction_amount = round(random.randint(100, 10000) * random.random(), 2)
-        transaction_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-        return cls(
-            account_id,
-            customer_id,
-            merchant_type,
-            transaction_id,
-            transaction_type,
-            transaction_amount,
-            transaction_date,
-        )
-
-    @staticmethod
-    def create(num: int):
-        return [Transaction.auto() for _ in range(num)]
+        tickers = '["AAPL", "ACN", "ADBE", "AMD", "AVGO", "CRM", "CSCO", "IBM", "INTC", "MA", "MSFT", "NVDA", "ORCL", "PYPL", "QCOM", "TXN", "V"]'
+        return [Stock.auto(ticker) for ticker in json.loads(tickers)]
 
 
 class Producer:
-    def __init__(self, bootstrap_servers: list, account_topic: str, transaction_topic: str):
+    def __init__(self, bootstrap_servers: list, topic: str):
         self.bootstrap_servers = bootstrap_servers
-        self.account_topic = account_topic
-        self.transaction_topic = transaction_topic
+        self.topic = topic
         self.producer = self.create()
 
     def create(self):
-        return KafkaProducer(
-            bootstrap_servers=self.bootstrap_servers,
-            key_serializer=lambda v: json.dumps(v, default=self.serialize).encode("utf-8"),
-            value_serializer=lambda v: json.dumps(v, default=self.serialize).encode("utf-8"),
-            api_version=(2, 8, 1),
-        )
+        params = {
+            "bootstrap_servers": self.bootstrap_servers,
+            "key_serializer": lambda v: json.dumps(v, default=self.serialize).encode("utf-8"),
+            "value_serializer": lambda v: json.dumps(v, default=self.serialize).encode("utf-8"),
+            "api_version": (2, 8, 1),
+        }
+        if re.search("9098$", self.bootstrap_servers[0]):
+            params = {
+                **params,
+                **{"security_protocol": "SASL_SSL", "sasl_mechanism": "AWS_MSK_IAM"},
+            }
+        return KafkaProducer(**params)
 
-    def send(self, records: typing.Union[typing.List[FlagAccount], typing.List[Transaction]]):
-        for record in records:
+    def send(self, stocks: typing.List[Stock]):
+        for stock in stocks:
             try:
-                key = {"account_id": record.account_id}
-                topic = self.account_topic
-                if hasattr(record, "transaction_id"):
-                    key["transaction_id"] = record.transaction_id
-                    topic = self.transaction_topic
-                self.producer.send(topic=topic, key=key, value=record.asdict())
+                self.producer.send(self.topic, key={"ticker": stock.ticker}, value=stock.asdict())
             except Exception as e:
                 raise RuntimeError("fails to send a message") from e
         self.producer.flush()
@@ -388,45 +590,41 @@ class Producer:
 if __name__ == "__main__":
     producer = Producer(
         bootstrap_servers=os.getenv("BOOTSTRAP_SERVERS", "localhost:29092").split(","),
-        account_topic=os.getenv("CUSTOMER_TOPIC_NAME", "flagged-accounts"),
-        transaction_topic=os.getenv("TRANSACTION_TOPIC_NAME", "transactions"),
+        topic=os.getenv("TOPIC_NAME", "stocks-in"),
     )
-    if os.getenv("DATE_TYPE", "account") == "account":
-        producer.send(FlagAccount.create())
-        producer.producer.close()
-    else:
-        max_run = int(os.getenv("MAX_RUN", "-1"))
-        logging.info(f"max run - {max_run}")
-        current_run = 0
-        while True:
-            current_run += 1
-            logging.info(f"current run - {current_run}")
-            if current_run - max_run == 0:
-                logging.info(f"reached max run, finish")
-                producer.producer.close()
-                break
-            producer.send(Transaction.create(5))
-            secs = random.randint(2, 5)
-            logging.info(f"messages sent... wait {secs} seconds")
-            time.sleep(secs)
+    max_run = int(os.getenv("MAX_RUN", "-1"))
+    logging.info(f"max run - {max_run}")
+    current_run = 0
+    while True:
+        current_run += 1
+        logging.info(f"current run - {current_run}")
+        if current_run - max_run == 0:
+            logging.info(f"reached max run, finish")
+            producer.producer.close()
+            break
+        producer.send(Stock.create())
+        secs = random.randint(5, 10)
+        logging.info(f"messages sent... wait {secs} seconds")
+        time.sleep(secs)
 ```
 
-Once we start the apps, we can check the topics for the source data are created and messages are ingested in *Kpow*.
+Once we start the app, we can check the topic for the source data is created and messages are ingested in *Kpow*.
 
-![](source-topics.png#center)
+![](source-topic.png#center)
 
-### Output Data
+### Process Data
 
-The Flink application is built using the [Table API](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/python/table_api_tutorial/). We have two Kafka source topics and one output topic. Simply put, we can query the records of the topics as tables of unbounded real-time streams with the Table API. In order to read/write records from/to a Kafka topic, we need to specify the [Kafka connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/) artifact that we downloaded earlier as the [pipeline jar](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/dev/python/dependency_management/#jar-dependencies). Note we only need to configure the connector jar when we develop the app locally as the jar file will be specified by the `--jarfile` option for KDA. We also need the application properties file (*application_properties.json*) in order to be comparable with KDA. The file contains the Flink runtime options in KDA as well as application specific properties. All the properties should be specified when deploying via KDA and, for local development, we keep them as a json file and only the application specific properties are used.
+The Flink application is built using the [Table API](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/python/table_api_tutorial/). We have two Kafka topics - one for the source and the other for the sink. Simply put, we can manipulate the records of the topics as tables of unbounded real-time streams with the Table API. In order to read/write records from/to a Kafka topic where the cluster is IAM authenticated, we need to specify the custom Uber Jar that we built earlier - *pyflink-getting-started-1.0.0.jar*. Note we only need to configure the connector jar when we develop the app locally as the jar file will be specified by the `--jarfile` option when submitting it to a Flink cluster or deploying via KDA. We also need the application properties file (*application_properties.json*) in order to be comparable with KDA. The file contains the Flink runtime options in KDA as well as application specific properties. All the properties should be specified when deploying via KDA and, for local development, we keep them as a json file and only the application specific properties are used.
 
-The tables for the source and output topics can be created using SQL with options that are related to the Kafka connector. Key options cover the connector name (*connector*), topic name (*topic*), bootstrap server address (*properties.bootstrap.servers*) and format (*format*). See the [connector document](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/) for more details about the connector configuration. When it comes to inserting flagged transaction records into the output topic, we use a function written in SQL as well - *insert_into_stmt*.
+The tables for the source and output topics can be created using SQL with options that are related to the Kafka connector. Key options cover the connector name (*connector*), topic name (*topic*), bootstrap server address (*properties.bootstrap.servers*) and format (*format*). See the [connector document](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/) for more details about the connector configuration. Note that the security options of the tables are updated for IAM authentication when the bootstrap server argument ends with *9098* using *inject_security_opts()* When it comes to inserting the source records into the output table, we can use either SQL or built-in *add_insert* method.
 
-In the *main* method, we create all the source and sink tables after mapping relevant application properties. Then the output records are inserted into the output Kafka topic. Note that the output records are printed in the terminal additionally when the app is running locally for ease of checking them. We can run the app as following - `RUNTIME_ENV=LOCAL python processor.py`
+In the *main* method, we create all the source and sink tables after mapping relevant application properties. Then the output records are inserted into the output Kafka topic. Note that the output records are printed in the terminal additionally when the app is running locally for ease of checking them.
 
 ```py
 # processor.py
 import os
 import json
+import re
 import logging
 
 import kafka  # check if --pyFiles works
@@ -438,7 +636,9 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
-RUNTIME_ENV = os.environ.get("RUNTIME_ENV", "KDA")  # KDA, LOCAL
+RUNTIME_ENV = os.environ.get("RUNTIME_ENV", "KDA")  # KDA, DOCKER, LOCAL
+BOOTSTRAP_SERVERS = os.environ.get("BOOTSTRAP_SERVERS")  # overwrite app config
+
 logging.info(f"runtime environment - {RUNTIME_ENV}...")
 
 env_settings = EnvironmentSettings.in_streaming_mode()
@@ -453,11 +653,13 @@ APPLICATION_PROPERTIES_FILE_PATH = (
 if RUNTIME_ENV != "KDA":
     # on non-KDA, multiple jar files can be passed after being delimited by a semicolon
     CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-    PIPELINE_JAR = "flink-sql-connector-kafka-1.15.2.jar"
+    PIPELINE_JAR = "pyflink-getting-started-1.0.0.jar"
+    # PIPELINE_JAR = "uber-jar-for-pyflink-1.0.1.jar"
     table_env.get_config().set(
         "pipeline.jars", f"file://{os.path.join(CURRENT_DIR, 'package', 'lib', PIPELINE_JAR)}"
     )
 logging.info(f"app properties file path - {APPLICATION_PROPERTIES_FILE_PATH}")
+
 
 def get_application_properties():
     if os.path.isfile(APPLICATION_PROPERTIES_FILE_PATH):
@@ -468,175 +670,133 @@ def get_application_properties():
     else:
         raise RuntimeError(f"A file at '{APPLICATION_PROPERTIES_FILE_PATH}' was not found")
 
+
 def property_map(props: dict, property_group_id: str):
     for prop in props:
         if prop["PropertyGroupId"] == property_group_id:
             return prop["PropertyMap"]
 
-def create_flagged_account_source_table(
+
+def inject_security_opts(opts: dict, bootstrap_servers: str):
+    if re.search("9098$", bootstrap_servers):
+        opts = {
+            **opts,
+            **{
+                "properties.security.protocol": "SASL_SSL",
+                "properties.sasl.mechanism": "AWS_MSK_IAM",
+                "properties.sasl.jaas.config": "software.amazon.msk.auth.iam.IAMLoginModule required;",
+                "properties.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
+            },
+        }
+    return ", ".join({f"'{k}' = '{v}'" for k, v in opts.items()})
+
+
+def create_source_table(
     table_name: str, topic_name: str, bootstrap_servers: str, startup_mode: str
 ):
+    opts = {
+        "connector": "kafka",
+        "topic": topic_name,
+        "properties.bootstrap.servers": bootstrap_servers,
+        "properties.group.id": "soruce-group",
+        "format": "json",
+        "scan.startup.mode": startup_mode,
+    }
     stmt = f"""
     CREATE TABLE {table_name} (
-        account_id BIGINT,
-        flag_date TIMESTAMP(3)
+        event_time TIMESTAMP(3),
+        ticker VARCHAR(6),
+        price DOUBLE
     )
     WITH (
-        'connector' = 'kafka',
-        'topic' = '{topic_name}',
-        'properties.bootstrap.servers' = '{bootstrap_servers}',
-        'properties.group.id' = 'flagged-account-source-group',
-        'format' = 'json',
-        'scan.startup.mode' = '{startup_mode}'
+        {inject_security_opts(opts, bootstrap_servers)}
     )
     """
-    logging.info("flagged account source table statement...")
+    logging.info("source table statement...")
     logging.info(stmt)
     return stmt
 
-def create_transaction_source_table(
-    table_name: str, topic_name: str, bootstrap_servers: str, startup_mode: str
-):
+
+def create_sink_table(table_name: str, topic_name: str, bootstrap_servers: str):
+    opts = {
+        "connector": "kafka",
+        "topic": topic_name,
+        "properties.bootstrap.servers": bootstrap_servers,
+        "format": "json",
+        "key.format": "json",
+        "key.fields": "ticker",
+        "properties.allow.auto.create.topics": "true",
+    }
     stmt = f"""
     CREATE TABLE {table_name} (
-        account_id BIGINT,
-        customer_id VARCHAR(15),
-        merchant_type VARCHAR(8),
-        transaction_id VARCHAR(16),
-        transaction_type VARCHAR(20),
-        transaction_amount DECIMAL(10,2),
-        transaction_date TIMESTAMP(3)
+        event_time TIMESTAMP(3),
+        ticker VARCHAR(6),
+        price DOUBLE
     )
     WITH (
-        'connector' = 'kafka',
-        'topic' = '{topic_name}',
-        'properties.bootstrap.servers' = '{bootstrap_servers}',
-        'properties.group.id' = 'transaction-source-group',
-        'format' = 'json',
-        'scan.startup.mode' = '{startup_mode}'
+        {inject_security_opts(opts, bootstrap_servers)}
     )
     """
-    logging.info("transaction source table statement...")
+    logging.info("sint table statement...")
     logging.info(stmt)
     return stmt
 
-def create_flagged_transaction_sink_table(table_name: str, topic_name: str, bootstrap_servers: str):
-    stmt = f"""
-    CREATE TABLE {table_name} (
-        account_id BIGINT,
-        customer_id VARCHAR(15),
-        merchant_type VARCHAR(8),
-        transaction_id VARCHAR(16),
-        transaction_type VARCHAR(20),
-        transaction_amount DECIMAL(10,2),
-        transaction_date TIMESTAMP(3)
-    )
-    WITH (
-        'connector' = 'kafka',
-        'topic' = '{topic_name}',
-        'properties.bootstrap.servers' = '{bootstrap_servers}',        
-        'format' = 'json',
-        'key.format' = 'json',
-        'key.fields' = 'account_id;transaction_id',
-        'properties.allow.auto.create.topics' = 'true'
-    )
-    """
-    logging.info("transaction sink table statement...")
-    logging.info(stmt)
-    return stmt
 
 def create_print_table(table_name: str):
     return f"""
     CREATE TABLE {table_name} (
-        account_id BIGINT,
-        customer_id VARCHAR(15),
-        merchant_type VARCHAR(8),
-        transaction_id VARCHAR(16),
-        transaction_type VARCHAR(20),
-        transaction_amount DECIMAL(10,2),
-        transaction_date TIMESTAMP(3)
+        event_time TIMESTAMP(3),
+        ticker VARCHAR(6),
+        price DOUBLE
     )
     WITH (
         'connector' = 'print'
     )
     """
 
-def insert_into_stmt(insert_from_tbl: str, compare_with_tbl: str, insert_into_tbl: str):
-    return f"""
-    INSERT INTO {insert_into_tbl}
-        SELECT l.*
-        FROM {insert_from_tbl} AS l
-        JOIN {compare_with_tbl} AS r
-            ON l.account_id = r.account_id 
-            AND l.transaction_date > r.flag_date
-    """
 
 def main():
     ## map consumer/producer properties
     props = get_application_properties()
-    # consumer for flagged account
-    consumer_0_property_group_key = "consumer.config.0"
-    consumer_0_properties = property_map(props, consumer_0_property_group_key)
-    consumer_0_table_name = consumer_0_properties["table.name"]
-    consumer_0_topic_name = consumer_0_properties["topic.name"]
-    consumer_0_bootstrap_servers = consumer_0_properties["bootstrap.servers"]
-    consumer_0_startup_mode = consumer_0_properties["startup.mode"]
-    # consumer for transactions
-    consumer_1_property_group_key = "consumer.config.1"
-    consumer_1_properties = property_map(props, consumer_1_property_group_key)
-    consumer_1_table_name = consumer_1_properties["table.name"]
-    consumer_1_topic_name = consumer_1_properties["topic.name"]
-    consumer_1_bootstrap_servers = consumer_1_properties["bootstrap.servers"]
-    consumer_1_startup_mode = consumer_1_properties["startup.mode"]
+    # consumer
+    consumer_property_group_key = "consumer.config.0"
+    consumer_properties = property_map(props, consumer_property_group_key)
+    consumer_table_name = consumer_properties["table.name"]
+    consumer_topic_name = consumer_properties["topic.name"]
+    consumer_bootstrap_servers = BOOTSTRAP_SERVERS or consumer_properties["bootstrap.servers"]
+    consumer_startup_mode = consumer_properties["startup.mode"]
     # producer
-    producer_0_property_group_key = "producer.config.0"
-    producer_0_properties = property_map(props, producer_0_property_group_key)
-    producer_0_table_name = producer_0_properties["table.name"]
-    producer_0_topic_name = producer_0_properties["topic.name"]
-    producer_0_bootstrap_servers = producer_0_properties["bootstrap.servers"]
+    producer_property_group_key = "producer.config.0"
+    producer_properties = property_map(props, producer_property_group_key)
+    producer_table_name = producer_properties["table.name"]
+    producer_topic_name = producer_properties["topic.name"]
+    producer_bootstrap_servers = BOOTSTRAP_SERVERS or producer_properties["bootstrap.servers"]
     # print
     print_table_name = "sink_print"
-    ## create the source table for flagged accounts
+    ## create a souce table
     table_env.execute_sql(
-        create_flagged_account_source_table(
-            consumer_0_table_name,
-            consumer_0_topic_name,
-            consumer_0_bootstrap_servers,
-            consumer_0_startup_mode,
+        create_source_table(
+            consumer_table_name,
+            consumer_topic_name,
+            consumer_bootstrap_servers,
+            consumer_startup_mode,
         )
     )
-    table_env.from_path(consumer_0_table_name).print_schema()
-    ## create the source table for transactions
+    ## create sink tables
     table_env.execute_sql(
-        create_transaction_source_table(
-            consumer_1_table_name,
-            consumer_1_topic_name,
-            consumer_1_bootstrap_servers,
-            consumer_1_startup_mode,
-        )
+        create_sink_table(producer_table_name, producer_topic_name, producer_bootstrap_servers)
     )
-    table_env.from_path(consumer_1_table_name).print_schema()
-    ## create sink table for flagged accounts
-    table_env.execute_sql(
-        create_flagged_transaction_sink_table(
-            producer_0_table_name, producer_0_topic_name, producer_0_bootstrap_servers
-        )
-    )
-    table_env.from_path(producer_0_table_name).print_schema()
     table_env.execute_sql(create_print_table("sink_print"))
     ## insert into sink tables
     if RUNTIME_ENV == "LOCAL":
+        source_table = table_env.from_path(consumer_table_name)
         statement_set = table_env.create_statement_set()
-        statement_set.add_insert_sql(
-            insert_into_stmt(consumer_1_table_name, consumer_0_table_name, producer_0_table_name)
-        )
-        statement_set.add_insert_sql(
-            insert_into_stmt(consumer_1_table_name, consumer_0_table_name, print_table_name)
-        )
+        statement_set.add_insert(producer_table_name, source_table)
+        statement_set.add_insert(print_table_name, source_table)
         statement_set.execute().wait()
     else:
         table_result = table_env.execute_sql(
-            insert_into_stmt(consumer_1_table_name, consumer_0_table_name, producer_0_table_name)
+            f"INSERT INTO {producer_table_name} SELECT * FROM {consumer_table_name}"
         )
         logging.info(table_result.get_job_client().get_job_status())
 
@@ -652,24 +812,15 @@ if __name__ == "__main__":
     "PropertyGroupId": "kinesis.analytics.flink.run.options",
     "PropertyMap": {
       "python": "processor.py",
-      "jarfile": "package/lib/flink-sql-connector-kinesis-1.15.2.jar",
+      "jarfile": "package/lib/pyflink-getting-started-1.0.0.jar",
       "pyFiles": "package/site_packages/"
     }
   },
   {
     "PropertyGroupId": "consumer.config.0",
     "PropertyMap": {
-      "table.name": "flagged_accounts",
-      "topic.name": "flagged-accounts",
-      "bootstrap.servers": "localhost:29092",
-      "startup.mode": "earliest-offset"
-    }
-  },
-  {
-    "PropertyGroupId": "consumer.config.1",
-    "PropertyMap": {
-      "table.name": "transactions",
-      "topic.name": "transactions",
+      "table.name": "source_table",
+      "topic.name": "stocks-in",
       "bootstrap.servers": "localhost:29092",
       "startup.mode": "earliest-offset"
     }
@@ -677,15 +828,17 @@ if __name__ == "__main__":
   {
     "PropertyGroupId": "producer.config.0",
     "PropertyMap": {
-      "table.name": "flagged_transactions",
-      "topic.name": "flagged-transactions",
+      "table.name": "sink_table",
+      "topic.name": "stocks-out",
       "bootstrap.servers": "localhost:29092"
     }
   }
 ]
 ```
 
-The terminal on the right-hand side shows the output records of the Flink app while the left-hand side records logs of the transaction app. We see that the account IDs end with all odd numbers, which matches transactions from flagged accounts.
+#### Run Locally
+
+We can run the app locally as following - `RUNTIME_ENV=LOCAL python processor.py`. The terminal on the right-hand side shows the output records of the Flink app while the left-hand side records logs of the transaction app. We can see that the print output from the Flink app gets updated when new source records are sent by the producer app.
 
 ![](terminal-result.png#center)
 
@@ -693,48 +846,70 @@ We can also see details of all the topics in *Kpow* as shown below.
 
 ![](all-topics.png#center)
 
-### Sink Output Data
+#### Run in Flink Cluster
 
-Kafka Connect provides a REST API that manages connectors, and we can create a connector programmatically using it. The REST endpoint requires a JSON payload that includes connector configurations.
+While we are able to run the app locally, it is limited for monitoring and debugging. Below shows how the app can be submitted in the Flink cluster we created earlier. We need to specify the main application (*--python*), Kafka connector artifact file (*--jarfile*), and 3rd-party Python packages (*--pyFiles*) if necessary. Once submitted, it shows the status with the job ID. 
 
 ```bash
-$ curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" \
-  http://localhost:8083/connectors/ -d @configs/sink.json
+$ docker exec jobmanager /opt/flink/bin/flink run \
+  --python /etc/flink/processor.py \
+  --jarfile /etc/flink/package/lib/pyflink-getting-started-1.0.0.jar \
+  --pyFiles /etc/flink/package/site_packages/ \
+  -d
+2023-08-08 04:21:48.198:INFO:root:runtime environment - DOCKER...
+2023-08-08 04:21:49.187:INFO:root:app properties file path - /etc/flink/application_properties.json
+2023-08-08 04:21:49.187:INFO:root:source table statement...
+2023-08-08 04:21:49.187:INFO:root:
+    CREATE TABLE source_table (
+        event_time TIMESTAMP(3),
+        ticker VARCHAR(6),
+        price DOUBLE
+    )
+    WITH (
+        'properties.sasl.jaas.config' = 'software.amazon.msk.auth.iam.IAMLoginModule required;', 'scan.startup.mode' = 'earliest-offset', 'properties.sasl.client.callback.handler.class' = 'software.amazon.msk.auth.iam.IAMClientCallbackHandler', 'connector' = 'kafka', 'properties.bootstrap.servers' = 'b-1.kdagettingstarted.j92edp.c3.kafka.ap-southeast-2.amazonaws.com:9098,b-2.kdagettingstarted.j92edp.c3.kafka.ap-southeast-2.amazonaws.com:9098', 'properties.sasl.mechanism' = 'AWS_MSK_IAM', 'format' = 'json', 'properties.security.protocol' = 'SASL_SSL', 'topic' = 'stocks-in', 'properties.group.id' = 'soruce-group'
+    )
+    
+2023-08-08 04:21:49.301:INFO:root:sint table statement...
+2023-08-08 04:21:49.301:INFO:root:
+    CREATE TABLE sink_table (
+        event_time TIMESTAMP(3),
+        ticker VARCHAR(6),
+        price DOUBLE
+    )
+    WITH (
+        'topic' = 'stocks-out', 'key.fields' = 'ticker', 'properties.sasl.jaas.config' = 'software.amazon.msk.auth.iam.IAMLoginModule required;', 'properties.sasl.client.callback.handler.class' = 'software.amazon.msk.auth.iam.IAMClientCallbackHandler', 'key.format' = 'json', 'connector' = 'kafka', 'properties.bootstrap.servers' = 'b-1.kdagettingstarted.j92edp.c3.kafka.ap-southeast-2.amazonaws.com:9098,b-2.kdagettingstarted.j92edp.c3.kafka.ap-southeast-2.amazonaws.com:9098', 'properties.allow.auto.create.topics' = 'true', 'properties.sasl.mechanism' = 'AWS_MSK_IAM', 'format' = 'json', 'properties.security.protocol' = 'SASL_SSL'
+    )
+    
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.flink.api.java.ClosureCleaner (file:/opt/flink/lib/flink-dist-1.15.4.jar) to field java.lang.String.value
+WARNING: Please consider reporting this to the maintainers of org.apache.flink.api.java.ClosureCleaner
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+Job has been submitted with JobID 4827bc6fbafd8b628a26f1095dfc28f9
+2023-08-08 04:21:56.327:INFO:root:java.util.concurrent.CompletableFuture@2da94b9a[Not completed]
 ```
 
-The connector is configured to write messages from the *flagged-transactions* topic into the DynamoDB table created earlier. It requires to specify the table name, AWS region, operation, write capacity and whether to use the [default credential provider](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) - see the [documentation](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) for details. Note that, if you don't use the default credential provider, you have to specify the *access key id* and *secret access key*. Note further that, although the current LTS version is *v3.18.2*, the default credential provider option didn't work for me, and I was recommended [to use *v3.20.3* instead](https://github.com/apache/camel-kafka-connector/issues/1533). Finally, the [*camel.sink.unmarshal* option](https://github.com/apache/camel-kafka-connector/blob/camel-kafka-connector-3.20.3/connectors/camel-aws-ddb-sink-kafka-connector/src/main/resources/kamelets/aws-ddb-sink.kamelet.yaml#L123) is to convert data from the internal *java.util.HashMap* type into the required *java.io.InputStream* type. Without this configuration, the [connector fails](https://github.com/apache/camel-kafka-connector/issues/1532) with *org.apache.camel.NoTypeConversionAvailableException* error.
+We can check the submitted job by listing all jobs as shown below.
 
-```json
-// configs/sink.json
-{
-  "name": "transactions-sink",
-  "config": {
-    "connector.class": "org.apache.camel.kafkaconnector.awsddbsink.CamelAwsddbsinkSinkConnector",
-    "tasks.max": "2",
-    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
-    "key.converter.schemas.enable": false,
-    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
-    "value.converter.schemas.enable": false,
-    "topics": "flagged-transactions",
-
-    "camel.kamelet.aws-ddb-sink.table": "flagged-transactions",
-    "camel.kamelet.aws-ddb-sink.region": "ap-southeast-2",
-    "camel.kamelet.aws-ddb-sink.operation": "PutItem",
-    "camel.kamelet.aws-ddb-sink.writeCapacity": 1,
-    "camel.kamelet.aws-ddb-sink.useDefaultCredentialsProvider": true,
-    "camel.sink.unmarshal": "jackson"
-  }
-}
+```bash
+$ docker exec jobmanager /opt/flink/bin/flink list
+Waiting for response...
+------------------ Running/Restarting Jobs -------------------
+08.08.2023 04:21:52 : 4827bc6fbafd8b628a26f1095dfc28f9 : insert-into_default_catalog.default_database.sink_table (RUNNING)
+--------------------------------------------------------------
+No scheduled jobs.
 ```
 
-Below shows the sink connector details on *Kpow*.
+![](cluster-dashboard-01.png#center)
 
-![](sink-connector.png#center)
+![](cluster-dashboard-02.png#center)
 
-We can check the ingested records on the DynamoDB table items view. Below shows a list of scanned records.
-
-![](ddb-output.png#center)
+```bash
+$ docker exec jobmanager /opt/flink/bin/flink cancel 4827bc6fbafd8b628a26f1095dfc28f9
+Cancelling job 4827bc6fbafd8b628a26f1095dfc28f9.
+Cancelled job 4827bc6fbafd8b628a26f1095dfc28f9.
+```
 
 ## Summary
 
-Apache Flink is widely used for building real-time stream processing applications. On AWS, Kinesis Data Analytics (KDA) is the easiest option to develop a Flink app as it provides the underlying infrastructure. Re-implementing a solution from an AWS workshop, this series of posts discuss how to develop and deploy a fraud detection app using Kafka, Flink and DynamoDB. In this post, we covered local development using Docker, and deployment via KDA will be discussed in part 2.
+In this post, we used a Kafka cluster on Amazon MSK for the source and destination (sink) of the Flink app. We have to build a custom Uber Jar as the cluster is authenticated by IAM and KDA does not allow you to specify multiple pipeline jar files. After that the same application execution examples were repeated.
