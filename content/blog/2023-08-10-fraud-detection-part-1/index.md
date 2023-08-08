@@ -44,7 +44,7 @@ There are two Python applications that send transaction and flagged account reco
 
 ## Infrastructure
 
-The Kafka cluster, Kafka connect and management app (kpow) are created using Docker while the python apps including the Flink app run in a virtual environment. The source of this post can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/fraud-detection/local) of this post.
+The Kafka cluster, Kafka connect and management app (kpow) are created using Docker while the python apps including the Flink app run in a virtual environment. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/fraud-detection/local) of this post.
 
 ### Preparation
 
