@@ -34,7 +34,7 @@ description: We'll discuss how to provision and manage Spark jobs on EMR on EKS 
 
 ## Infrastructure
 
-When a user submits a Spark job, multiple Pods (controller, driver and executors) will be deployed to the EKS cluster that is registered with EMR. In general, Karpenter provides just-in-time capacity for unschedulable Pods by creating (and terminating afterwards) additional nodes. We can configure the pod templates of a Spark job so that all the Pods are managed by Karpenter. In this way, we are able to run it only in transient nodes. Karpenter simplifies autoscaling by provisioning just-in-time capacity, and it also reduces scheduling latency. The source can be found in the post’s [**GitHub repository**](https://github.com/jaehyeon-kim/emr-on-eks-terraform).
+When a user submits a Spark job, multiple Pods (controller, driver and executors) will be deployed to the EKS cluster that is registered with EMR. In general, Karpenter provides just-in-time capacity for unschedulable Pods by creating (and terminating afterwards) additional nodes. We can configure the pod templates of a Spark job so that all the Pods are managed by Karpenter. In this way, we are able to run it only in transient nodes. Karpenter simplifies autoscaling by provisioning just-in-time capacity, and it also reduces scheduling latency. The source can be found in the post's [**GitHub repository**](https://github.com/jaehyeon-kim/emr-on-eks-terraform).
 
 ![](featured.png#center)
 

@@ -56,7 +56,7 @@ The following script generates the components mentioned above. It begins with cr
 - *client-certificate.pem* - File that contains client certificate, as well as any CA certificates needed to establish the certificate's authenticity
 - *client-private-key.pem* - File that contains client private key
 
-The source of this post can also be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-09) of this post.
+The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-09) of this post.
 
 ```bash
 # kafka-dev-with-docker/part-09/generate.sh

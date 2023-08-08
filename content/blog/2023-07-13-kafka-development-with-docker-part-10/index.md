@@ -66,7 +66,7 @@ When it comes to Kafka broker configurations, we should add the *SASL_SSL* liste
 - *KAFKA_CFG_SASL_ENABLED_MECHANISMS*
 - *KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL*.
 
-The changes made to the first Kafka broker are shown below, and the same updates are made to the other brokers. The source of this post can also be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-10) of this post, and the cluster can be started by `docker-compose -f compose-kafka.yml up -d`.
+The changes made to the first Kafka broker are shown below, and the same updates are made to the other brokers. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-10) of this post, and the cluster can be started by `docker-compose -f compose-kafka.yml up -d`.
 
 ```yaml
 # kafka-dev-with-docker/part-10/compose-kafka.yml

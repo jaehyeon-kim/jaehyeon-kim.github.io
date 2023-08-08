@@ -68,7 +68,7 @@ When it comes to Kafka broker configurations, we should add the *SASL_SSL* liste
 
 For authorization, *AclAuthorizer* is specified as the authorizer class name, which uses Zookeeper to persist ACLs. A super user named *superuser* is created. As the name suggests, super users are those who are allowed to execute operations without checking ACLs. Finally, it is configured that anyone is allowed to access resources when no ACL is found (*allow.everyone.if.no.acl.found*). This is enabled to create the super user after the Kafka cluster gets started. However, it is not recommended in production environemnt.
 
-The changes made to the first Kafka broker are shown below, and the same updates are made to the other brokers. The source of this post can also be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-11) of this post, and the cluster can be started by `docker-compose -f compose-kafka.yml up -d`.
+The changes made to the first Kafka broker are shown below, and the same updates are made to the other brokers. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-11) of this post, and the cluster can be started by `docker-compose -f compose-kafka.yml up -d`.
 
 ```yaml
 # kafka-dev-with-docker/part-11/compose-kafka.yml
