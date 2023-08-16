@@ -281,7 +281,7 @@ echo "package pyflink app"
 zip -r kda-package.zip processor.py package/lib package/site_packages
 ```
 
-Once downloaded, they can be found in the corresponding folders as shown below.
+Once downloaded, the Uber Jar file and python package can be found in the *lib* and *site_packages* folders respectively as shown below.
 
 ![](source-folders.png#center)
 
