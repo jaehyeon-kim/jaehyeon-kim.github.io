@@ -1,7 +1,7 @@
 ---
 title: Getting Started with Pyflink on AWS - Part 1 Local Flink and Local Kafka
 date: 2023-08-17
-draft: true
+draft: false
 featured: true
 comment: true
 toc: true
@@ -24,14 +24,14 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Apache Flink is widely used for building real-time stream processing applications. On AWS, Kinesis Data Analytics (KDA) is the easiest option to develop a Flink app as it provides the underlying infrastructure. Extending a guide from AWS, this series of posts discuss how to develop and deploy an application using Kafka and Flink (PyFlink). In part 1, we will discuss how to develop a Flink app locally, which connects a local Kafka cluster. The app will be executed in a virtual environment as well as in a local Flink cluster for improved monitoring and debugging.
+description: Apache Flink is widely used for building real-time stream processing applications. On AWS, Kinesis Data Analytics (KDA) is the easiest option to develop a Flink app as it provides the underlying infrastructure. Updating a guide from AWS, this series of posts discuss how to develop and deploy a Flink (Pyflink) application via KDA where the data source and sink are Kafka topics. In part 1, the app will be developed locally targeting a Kafka cluster created by Docker. Furthermore, it will be executed in a virtual environment as well as in a local Flink cluster for improved monitoring.
 ---
 
 [Apache Flink](https://flink.apache.org/) is an open-source, unified stream-processing and batch-processing framework. Its core is a distributed streaming data-flow engine that you can use to run real-time stream processing on high-throughput data sources. Currently, it is widely used to build applications for fraud/anomaly detection, rule-based alerting, business process monitoring, and continuous ETL to name a few. On AWS, we can deploy a Flink application via [Amazon Kinesis Data Analytics (KDA)](https://aws.amazon.com/kinesis/data-analytics/), [Amazon EMR](https://aws.amazon.com/emr/) and [Amazon EKS](https://aws.amazon.com/eks/). Among those, KDA is the easiest option as it provides the underlying infrastructure for your Apache Flink applications.
 
-For those who are new to Flink (Pyflink) and KDA, AWS provides a good resource that guides how to develop a Flink application locally and deploy via KDA. The guide uses Amazon Kinesis Data Stream as a data source and demonstrates how to sink records into multiple destinations - Kinesis Data Stream, Kinesis Firehose Delivery Stream and S3. It can be found in the following [GitHub project](https://github.com/aws-samples/pyflink-getting-started).
+For those who are new to Flink (Pyflink) and KDA, AWS provides a good resource that guides how to develop a Flink application locally and deploy via KDA. The guide uses Amazon Kinesis Data Stream as a data source and demonstrates how to sink records into multiple destinations - Kinesis Data Stream, Kinesis Firehose Delivery Stream and S3. It can be found in this [GitHub project](https://github.com/aws-samples/pyflink-getting-started).
 
-In this series of posts, we will update one of the examples of the guide by changing the data source and sink into [Apache Kafka](https://kafka.apache.org/) topics. In Part 1, we will discuss how to develop a Flink application that targets a local Kafka cluster. We will also submit the application to a local Flink cluster for further monitoring and debugging. The Flink application will be extended by connecting a Kafka cluster on Amazon MSK in part 2. The cluster will be authenticated by [IAM access control](https://docs.aws.amazon.com/msk/latest/developerguide/iam-access-control.html), and it needs to update its configuration accordingly. In part 3, the application will be deployed via KDA. It should be zipped and saved into a S3 bucket, and the application code, Kafka connector artifact, and 3rd-party Python packages will be included in the zip file. The deployment will be made by [Terraform](https://www.terraform.io/).
+In this series of posts, we will update one of the examples of the guide by changing the data source and sink into [Apache Kafka](https://kafka.apache.org/) topics. In part 1, we will discuss how to develop a Flink application that targets a local Kafka cluster. Furthermore, it will be executed in a virtual environment as well as in a local Flink cluster for improved monitoring. The Flink application will be amended to connect a Kafka cluster on Amazon MSK in part 2. The Kafka cluster will be authenticated by [IAM access control](https://docs.aws.amazon.com/msk/latest/developerguide/iam-access-control.html), and the Flink app needs to change its configuration accordingly by creating a custom Uber Jar file. In part 3, the application will be deployed via KDA using an application package that is saved in S3. The application package is a zip file that includes the application script, custom Uber Jar file, and 3rd-party Python packages. The deployment will be made by [Terraform](https://www.terraform.io/).
 
 * [Part 1 Local Flink and Local Kafka](#) (this post)
 * Part 2 Local Flink and MSK
@@ -45,7 +45,7 @@ The Python source data generator (*producer.py*) sends random stock price record
 
 ## Infrastructure
 
-A Kafka cluster and management app (*Kpow*) are created using Docker while the Python apps including the Flink app run in a virtual environment in the first trial. After that the Flink app is submitted to a local Flink cluster for improved monitoring and debugging. The Flink cluster is also created using Docker. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/pyflink-getting-started-on-aws/local) of this post.
+A Kafka cluster and management app (*Kpow*) are created using Docker while the Python apps including the Flink app run in a virtual environment in the first trial. After that the Flink app is submitted to a local Flink cluster for improved monitoring. The Flink cluster is also created using Docker. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/pyflink-getting-started-on-aws/local) of this post.
 
 ### Preparation
 
@@ -74,15 +74,15 @@ echo "package pyflink app"
 zip -r kda-package.zip processor.py package/lib package/site_packages
 ```
 
-Once downloaded, they can be found in the corresponding folders as shown below.
+Once downloaded, the Kafka SQL artifact and python package can be found in the *lib* and *site_packages* folders respectively as shown below.
 
 ![](source-folders.png#center)
 
 ### Kafka Cluster
 
-A Kafka cluster with a single broker and zookeeper node is used in this post. The broker has two listeners and the port 9092 and 29092 are used for internal and external communication respectively. The default number of topic partitions is set to 2. Details about Kafka cluster setup can be found in [this post](https://jaehyeon.me/blog/2023-05-04-kafka-development-with-docker-part-1/).
+A Kafka cluster with a single broker and zookeeper node is used in this post. The broker has two listeners and the port 9092 and 29092 are used for internal and external communication respectively. The default number of topic partitions is set to 2. Details about Kafka cluster setup can be found in [this post](/blog/2023-05-04-kafka-development-with-docker-part-1/).
 
-The [Kpow CE](https://docs.kpow.io/ce/) is used for ease of monitoring Kafka topics and related resources. The bootstrap server address is added as an environment variable. See [this post](https://jaehyeon.me/blog/2023-05-18-kafka-development-with-docker-part-2/) for details about Kafka management apps.
+The [Kpow CE](https://docs.kpow.io/ce/) is used for ease of monitoring Kafka topics and related resources. The bootstrap server address is added as an environment variable. See [this post](/blog/2023-05-18-kafka-development-with-docker-part-2/) for details about Kafka management apps.
 
 The Kafka cluster can be started by `docker-compose -f compose-kafka.yml up -d`.
 
@@ -152,7 +152,7 @@ volumes:
 
 ### Flink Cluster
 
-In order to run the PyFlink application in a Flink cluster, we need to install Python and the *apache-flink* package. We can take the Flink version 1.15.2 from the official Docker image as it is the recommended Flink version, and build a custom Docker image as shown below. It can be built by `docker build -t pyflink:1.15.2-scala_2.12 .`.
+In order to run a PyFlink application in a Flink cluster, we need to install Python and the *apache-flink* package additionally. We can create a custom Docker image based on the [official Flink](https://hub.docker.com/_/flink) image. I chose the version 1.15.2 as it is the recommended Flink version by KDA. The custom image can be built by `docker build -t pyflink:1.15.2-scala_2.12 .`.
 
 ```Docker
 FROM flink:1.15.2-scala_2.12
@@ -181,9 +181,9 @@ RUN apt-get update -y && \
 RUN pip3 install apache-flink==${FLINK_VERSION}
 ```
 
-We can create a Flink cluster using the custom Docker image. It is made up of a single Job Manger and Task Manager, and the cluster runs in the [Session Mode](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/deployment/overview/) where one or more Flink applications can be submitted/executed simultaneously. See [this page](https://nightlies.apache.org/flink/flink-docs-master/docs/deployment/resource-providers/standalone/docker/#flink-with-docker-compose) for details about how to create a Flink cluster using *docker-compose*.
+A Flink cluster is made up of a single Job Manger and Task Manager, and the cluster runs in the [Session Mode](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/deployment/overview/) where one or more Flink applications can be submitted/executed simultaneously. See [this page](https://nightlies.apache.org/flink/flink-docs-master/docs/deployment/resource-providers/standalone/docker/#flink-with-docker-compose) for details about how to create a Flink cluster using *docker-compose*.
 
-Two environment variables are configured to adjust the application behaviour. The *RUNTIME_ENV* is set to *DOCKER*, and it determines which pipeline jar and application property file to choose. Also, the *BOOTSTRAP_SERVERS* overrides the Kafka bootstrap server address value from the application property file. We will make use of it to configure the bootstrap server address dynamically for MSK in part 2. Finally, the current directory is volume-mapped into */etc/flink* so that the application and related resources can be available in the Flink cluster.
+Two environment variables are configured to adjust the application behaviour. The *RUNTIME_ENV* is set to *DOCKER*, and it determines which [pipeline jar](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/python/dependency_management/) and application property file to choose. Also, the *BOOTSTRAP_SERVERS* overrides the Kafka bootstrap server address value from the application property file. We will make use of it to configure the bootstrap server address dynamically for MSK in part 2. Finally, the current directory is volume-mapped into */etc/flink* so that the application and related resources can be available in the Flink cluster.
 
 The Flink cluster can be started by `docker-compose -f compose-flink.yml up -d`.
 
@@ -250,7 +250,7 @@ volumes:
 
 ### Virtual Environment
 
-As mentioned earlier, all Python apps run in a virtual environment, and we need the following pip packages. We use the version 1.15.2 of the [apache-flink](https://pypi.org/project/apache-flink/) package because it is the latest supported version by KDA. We also need the [kafka-python](https://pypi.org/project/kafka-python/) package for source data generation. The pip packages can be installed by `pip install -r requirements-dev.txt`.
+As mentioned earlier, all Python apps run in a virtual environment, and we have the following pip packages. We use the version 1.15.2 of the [apache-flink](https://pypi.org/project/apache-flink/) package because it is the recommended version by KDA. We also need the [kafka-python](https://pypi.org/project/kafka-python/) package for source data generation. The pip packages can be installed by `pip install -r requirements-dev.txt`.
 
 ```txt
 # requirements.txt
@@ -374,7 +374,7 @@ Once we start the app, we can check the topic for the source data is created and
 
 ### Process Data
 
-The Flink application is built using the [Table API](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/python/table_api_tutorial/). We have two Kafka topics - one for the source and the other for the sink. Simply put, we can manipulate the records of the topics as tables of unbounded real-time streams with the Table API. In order to read/write records from/to a Kafka topic, we need to specify the [Kafka connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/) artifact that we downloaded earlier as the [pipeline jar](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/python/dependency_management/#jar-dependencies). Note we only need to configure the connector jar when we develop the app locally as the jar file will be specified by the `--jarfile` option when submitting it to a Flink cluster or deploying via KDA. We also need the application properties file (*application_properties.json*) in order to be comparable with KDA. The file contains the Flink runtime options in KDA as well as application specific properties. All the properties should be specified when deploying via KDA and, for local development, we keep them as a json file and only the application specific properties are used.
+The Flink application is built using the [Table API](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/python/table_api_tutorial/). We have two Kafka topics - one for the source and the other for the sink. Simply put, we can manipulate the records of the topics as tables of unbounded real-time streams with the Table API. In order to read/write records from/to a Kafka topic, we need to specify the [Apache Kafka SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/) artifact that we downloaded earlier as the [pipeline jar](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/python/dependency_management/#jar-dependencies). Note we only need to configure the connector jar when we develop the app locally as the jar file will be specified by the `--jarfile` option when submitting it to a Flink cluster or deploying via KDA. We also need the application properties file (*application_properties.json*) in order to be comparable with KDA. The file contains the Flink runtime options in KDA as well as application specific properties. All the properties should be specified when deploying via KDA and, for local development, we keep them as a json file and only the application specific properties are used.
 
 The tables for the source and output topics can be created using SQL with options that are related to the Kafka connector. Key options cover the connector name (*connector*), topic name (*topic*), bootstrap server address (*properties.bootstrap.servers*) and format (*format*). See the [connector document](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/) for more details about the connector configuration. When it comes to inserting the source records into the output table, we can use either SQL or built-in *add_insert* method.
 
@@ -577,17 +577,17 @@ if __name__ == "__main__":
 
 #### Run Locally
 
-We can run the app locally as following - `RUNTIME_ENV=LOCAL python processor.py`. The terminal on the right-hand side shows the output records of the Flink app while the left-hand side records logs of the transaction app. We can see that the print output from the Flink app gets updated when new source records are sent by the producer app.
+We can run the app locally as following - `RUNTIME_ENV=LOCAL python processor.py`. The terminal on the right-hand side shows the output records of the Flink app while the left-hand side records logs of the producer app. We can see that the print output from the Flink app gets updated when new source records are sent into the source topic by the producer app.
 
 ![](terminal-result.png#center)
 
-We can also see details of all the topics in *Kpow* as shown below.
+We can also see details of all the topics in *Kpow* as shown below. The total number of messages matches between the source and output topics but not within partitions.
 
 ![](all-topics.png#center)
 
 #### Run in Flink Cluster
 
-While we are able to run the app locally, it is limited for monitoring and debugging. Below shows how the app can be submitted in the Flink cluster we created earlier. We need to specify the main application (*--python*), Kafka connector artifact file (*--jarfile*), and 3rd-party Python packages (*--pyFiles*) if necessary. Once submitted, it shows the status with the job ID. 
+The execution in a terminal is limited for monitoring, and we can inspect and understand what is happening inside Flink using the Flink Web UI. For this, we need to submit the app to the Flink cluster we created earlier. Typically, a Pyflink app can be submitted using the [CLI interface](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/deployment/cli/) by specifying the main application (*--python*), Kafka connector artifact file (*--jarfile*), and 3rd-party Python packages (*--pyFiles*) if necessary. Once submitted, it shows the status with the job ID. 
 
 ```bash
 $ docker exec jobmanager /opt/flink/bin/flink run \
@@ -650,9 +650,15 @@ Waiting for response...
 No scheduled jobs.
 ```
 
+The Flink Web UI can be accessed on port 8081. In the Overview section, it shows the available task slots, running jobs and completed jobs.
+
 ![](cluster-dashboard-01.png#center)
 
+We can inspect an individual job in the Jobs menu. It shows key details about a job execution in *Overview*, *Exceptions*, *TimeLine*, *Checkpoints* and *Configuration* tabs.
+
 ![](cluster-dashboard-02.png#center)
+
+We can cancel a job on the web UI or using the CLI. Below shows how to cancel the job we submitted earlier using the CLI.
 
 ```bash
 $ docker exec jobmanager /opt/flink/bin/flink cancel 02d83c46d646aa498a986c0a9335e276
@@ -662,4 +668,4 @@ Cancelled job 02d83c46d646aa498a986c0a9335e276.
 
 ## Summary
 
-Apache Flink is widely used for building real-time stream processing applications. On AWS, Kinesis Data Analytics (KDA) is the easiest option to develop a Flink app as it provides the underlying infrastructure. Extending a guide from AWS, this series of posts discuss how to develop and deploy an application using Kafka and Flink (PyFlink). In part 1, we discussed how to develop a Flink app locally, which connects a local Kafka cluster. The app was executed in a virtual environment as well as in a local Flink cluster for improved monitoring and debugging.
+Apache Flink is widely used for building real-time stream processing applications. On AWS, Kinesis Data Analytics (KDA) is the easiest option to develop a Flink app as it provides the underlying infrastructure. Updating a guide from AWS, this series of posts discuss how to develop and deploy a Flink (Pyflink) application via KDA where the data source and sink are Kafka topics. In part 1, the app was developed locally targeting a Kafka cluster created by Docker. Furthermore, it was executed in a virtual environment as well as in a local Flink cluster for improved monitoring.
