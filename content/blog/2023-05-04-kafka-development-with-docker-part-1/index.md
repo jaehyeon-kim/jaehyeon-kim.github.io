@@ -62,6 +62,12 @@ The following Docker Compose file is used to create the Kafka cluster indicated 
 - volumes
   - Each service has its own volume that will be mapped to the container's data folder. We can check contents of the folder in the Docker volume path. More importantly data is preserved in the Docker volume unless it is deleted so that we don't have to recreate data every time the Kafka cluster gets started.
   - Docker volume mapping doesn't work as expected for me with WSL 2 and Docker Desktop. Therefore, I installed [Docker](https://docs.docker.com/engine/install/ubuntu/) and [Docker Compose](https://docs.docker.com.zh.xy2401.com/v17.12/compose/install/#install-compose) as Linux apps on WSL 2 and start the Docker daemon as `sudo service docker start`. Note I only need to run the command when the system (WSL 2) boots, and I haven't found a way to start it automatically.
+    - [UPDATE 2023-08-17] A newer version of WSL2 (0.67.6+) supports *Systemd* on Windows 11. I updated my WSL version (`wsl --update`) and was able to start Docker automatically by enabling *Systemd* in */etc/wsl.conf*.
+      - ```
+        #/etc/wsl.conf
+        [boot]
+        systemd=true
+        ``` 
 
 ```yaml
 # /kafka-dev-with-docker/part-01/compose-kafka.yml
