@@ -157,15 +157,8 @@ resource "aws_msk_cluster" "msk_data_cluster" {
   }
 
   client_authentication {
-    unauthenticated = true
     sasl {
       iam = true
-    }
-  }
-
-  encryption_info {
-    encryption_in_transit {
-      client_broker = "TLS_PLAINTEXT"
     }
   }
 
@@ -623,7 +616,7 @@ logging
 
 all topics
 
-![](kda-logging.png#center)
+![](all-topics.png#center)
 
 ## Summary
 
