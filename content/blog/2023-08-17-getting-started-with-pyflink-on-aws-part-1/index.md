@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Getting Started with Pyflink on AWS
 categories:
-  - Data Engineering
+  - Apache Flink
 tags:
   - Apache Flink
   - Apache Kafka
@@ -34,7 +34,7 @@ For those who are new to Flink (Pyflink) and KDA, AWS provides a good resource t
 In this series of posts, we will update one of the examples of the guide by changing the data source and sink into [Apache Kafka](https://kafka.apache.org/) topics. In part 1, we will discuss how to develop a Flink application that targets a local Kafka cluster. Furthermore, it will be executed in a virtual environment as well as in a local Flink cluster for improved monitoring. The Flink application will be amended to connect a Kafka cluster on Amazon MSK in part 2. The Kafka cluster will be authenticated by [IAM access control](https://docs.aws.amazon.com/msk/latest/developerguide/iam-access-control.html), and the Flink app needs to change its configuration accordingly by creating a custom Uber Jar file. In part 3, the application will be deployed via KDA using an application package that is saved in S3. The application package is a zip file that includes the application script, custom Uber Jar file, and 3rd-party Python packages. The deployment will be made by [Terraform](https://www.terraform.io/).
 
 * [Part 1 Local Flink and Local Kafka](#) (this post)
-* Part 2 Local Flink and MSK
+* [Part 2 Local Flink and MSK]((/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2))
 * Part 3 KDA and MSK
 
 ## Architecture

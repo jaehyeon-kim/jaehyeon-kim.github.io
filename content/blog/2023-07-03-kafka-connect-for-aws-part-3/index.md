@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Kafka Connect for AWS Services Integration
 categories:
-  - Data Engineering
+  - Apache Kafka
 tags: 
   - AWS
   - Amazon MSK
