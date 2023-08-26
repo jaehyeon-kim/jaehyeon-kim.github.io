@@ -34,8 +34,8 @@ In part 1, we discussed how to develop a Flink app locally, which connects a loc
 In this post, we will use a Kafka cluster on Amazon MSK for the source and destination (sink) of the Flink app. We have to build a custom Uber Jar as the cluster is authenticated by IAM and KDA does not allow you to specify multiple pipeline jar files. After that the same application execution examples will be repeated.
 
 * [Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1)
-* [Part 2 Local Flink and MSK](#) (this post)
-* Part 3 KDA and MSK
+* [Part 2 Local Flink and MSK](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2)
+* [Part 3 KDA and MSK](#) (this post)
 
 ## Architecture
 
@@ -50,6 +50,8 @@ A Kafka cluster is created on Amazon MSK using Terraform, and the cluster is sec
 ### Preparation
 
 #### Application Package
+
+As discussed in [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2), the app has multiple jar dependencies, and they have be combined into a single Uber jar file. This is because Kinesis Data Analytics (KDA) does not allow you to specify multiple pipeline jar files. The following script (*build.sh*) builds to create the Uber Jar file for this post, followed by downloading the *kafka-python* package and creating a zip file that can be used to deploy the Flink app via KDA. Although the Flink app does not need the package, it is added in order to check if `--pyFiles` option works when submitting the app to a Flink cluster or deploying via KDA. The zip package file will be used for KDA deployment in the this post.
 
 ```bash
 # build.sh
@@ -77,7 +79,10 @@ echo "package pyflink app"
 zip -r kda-package.zip processor.py package/lib package/site_packages
 ```
 
-Once downloaded, the Uber Jar file and python package can be found in the *lib* and *site_packages* folders respectively as shown below.
+Once completed, we can check the following contents are included in the application package file.
+- Flink application - *processor.py*
+- Pipeline jar file - *package/lib/pyflink-getting-started-1.0.0.jar*
+- kafka-python package - *package/site_packages/kafka*
 
 ![](package-contents.png#center)
 
@@ -119,7 +124,7 @@ A VPC with 3 public and private subnets is created using the [AWS VPC Terraform 
 
 ### MSK Cluster
 
-An MSK cluster with 2 brokers is created. The broker nodes are deployed with the *kafka.m5.large* instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion.
+A MSK cluster with 2 brokers is created. The broker nodes are deployed with the *kafka.m5.large* instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion. Note that the Flink application needs to have access to the Kafka brokers, and it is allowed by adding an inbound connection from the KDA app into the brokers on port 9098.
 
 ```terraform
 # infra/variable.tf
@@ -222,6 +227,8 @@ resource "aws_security_group_rule" "msk_kda_inbound" {
 
 ### KDA Application
 
+The Flink application and related resources are created conditionally by setting the following variable to *true*: *local.kda.to_create*. The latest supported Flink version is chosen to be the runtime environment (*FLINK-1_15*), and it is the version 1.15.2. 
+
 ```terraform
 # infra/variable.tf
 locals {
@@ -247,7 +254,11 @@ resource "aws_kinesisanalyticsv2_application" "kda_app" {
 
 #### Application Configuration
 
-##### Application Code Configuration
+In the application configuration section, we can specify details of the application code, VPC, environment properties, and Flink application. They will be illustrated below.
+
+##### Application Code Configurationl
+
+The application package (*kda-package.zip*) is uploaded into the default S3 bucket using the *aws_s3_object* Terraform resource. Then it can be used as the code content by specifying the bucket and key names.
 
 ```terraform
 # infra/kda.tf
@@ -289,6 +300,8 @@ resource "aws_s3_object" "kda_package" {
 ```
 
 ##### VPC Configuration
+
+The app can be deployed in one of the private subnets as it doesn't need to be connected from outside. As it should be able to access the Kafka brokers, it requires an outbound rule that permits connection on port 9098.
 
 ```terraform
 # infra/kda.tf
@@ -337,6 +350,8 @@ resource "aws_security_group" "kda_sg" {
 ```
 
 ##### Environment Properties
+
+In environment properties, we first need to specify [Flink CLI options](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/deployment/cli/#submitting-pyflink-jobs) in the *kinesis.analytics.flink.run.options* group. The values of the Pyflink app (*python*), pipeline jar (*jarfile*) and 3rd-party python package location (*pyFiles*) should match those in the application package (*kda-package.zip*). The other property groups are related to the Kafka source/sink table options, and they will be read by the application.
 
 ```terraform
 # infra/kda.tf
@@ -392,6 +407,8 @@ resource "aws_kinesisanalyticsv2_application" "kda_app" {
 ```
 
 ##### Flink Application Configuration
+
+Configurations related to [Checkpointing](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/ops/state/checkpoints/), CloudWatch logging and [parallelism](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/datastream/execution/parallel/)
 
 ```terraform
 # infra/kda.tf
@@ -594,7 +611,7 @@ resource "aws_iam_role" "kda_app_role" {
 
 ## Run Application
 
-source generation locally
+Once we start the app, we can check the topic for the source data is created and messages are ingested in *Kpow*.
 
 ![](source-topic.png#center)
 
@@ -614,7 +631,7 @@ logging
 
 ![](kda-logging.png#center)
 
-all topics
+We can also see details of all the topics in *Kpow* as shown below. The total number of messages matches between the source and output topics but not within partitions.
 
 ![](all-topics.png#center)
 
