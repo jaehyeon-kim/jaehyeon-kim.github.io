@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Getting Started with Pyflink on AWS
 categories:
-  - Data Engineering
+  - Apache Flink
 tags:
   - Apache Flink
   - Apache Kafka
