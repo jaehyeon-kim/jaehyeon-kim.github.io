@@ -16,15 +16,15 @@ categories:
 tags:
   - Apache Flink
   - Apache Kafka
-  - Amazon Kinesis Data Analytics
-  - Amazon MSK
+  - Amazon Managed Service for Apache Flink
+  - Amazon MSK  
   - Python
   - Docker
   - Docker Compose
 authors:
   - JaehyeonKim
 images: []
-description: Apache Flink is widely used for building real-time stream processing applications. On AWS, Kinesis Data Analytics (KDA) is the easiest option to develop a Flink app as it provides the underlying infrastructure. Updating a guide from AWS, this series of posts discuss how to develop and deploy a Flink (Pyflink) application via KDA where the data source and sink are Kafka topics. In part 1, the app will be developed locally targeting a Kafka cluster created by Docker. Furthermore, it will be executed in a virtual environment as well as in a local Flink cluster for improved monitoring.
+description: Apache Flink is widely used for building real-time stream processing applications. On AWS, Amazon Managed Service for Apache Flink is the easiest option to develop a Flink app as it provides the underlying infrastructure. Updating a guide from AWS, this series of posts discuss how to develop and deploy a Flink (Pyflink) application via KDA where the data source and sink are Kafka topics. In part 1, the app will be developed locally targeting a Kafka cluster created by Docker. Furthermore, it will be executed in a virtual environment as well as in a local Flink cluster for improved monitoring.
 ---
 
 [Apache Flink](https://flink.apache.org/) is an open-source, unified stream-processing and batch-processing framework. Its core is a distributed streaming data-flow engine that you can use to run real-time stream processing on high-throughput data sources. Currently, it is widely used to build applications for fraud/anomaly detection, rule-based alerting, business process monitoring, and continuous ETL to name a few. On AWS, we can deploy a Flink application via [Amazon Kinesis Data Analytics (KDA)](https://aws.amazon.com/kinesis/data-analytics/), [Amazon EMR](https://aws.amazon.com/emr/) and [Amazon EKS](https://aws.amazon.com/eks/). Among those, KDA is the easiest option as it provides the underlying infrastructure for your Apache Flink applications.
@@ -34,8 +34,10 @@ For those who are new to Flink (Pyflink) and KDA, AWS provides a good resource t
 In this series of posts, we will update one of the examples of the guide by changing the data source and sink into [Apache Kafka](https://kafka.apache.org/) topics. In part 1, we will discuss how to develop a Flink application that targets a local Kafka cluster. Furthermore, it will be executed in a virtual environment as well as in a local Flink cluster for improved monitoring. The Flink application will be amended to connect a Kafka cluster on Amazon MSK in part 2. The Kafka cluster will be authenticated by [IAM access control](https://docs.aws.amazon.com/msk/latest/developerguide/iam-access-control.html), and the Flink app needs to change its configuration accordingly by creating a custom Uber Jar file. In part 3, the application will be deployed via KDA using an application package that is saved in S3. The application package is a zip file that includes the application script, custom Uber Jar file, and 3rd-party Python packages. The deployment will be made by [Terraform](https://www.terraform.io/).
 
 * [Part 1 Local Flink and Local Kafka](#) (this post)
-* [Part 2 Local Flink and MSK]((/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2))
-* Part 3 KDA and MSK
+* [Part 2 Local Flink and MSK](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2)
+* Part 3 AWS Managed Flink and MSK
+
+[**Update 2023-08-30**] Amazon Kinesis Data Analytics is renamed into [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/). In this post, Kinesis Data Analytics (KDA) and Amazon Managed Service for Apache Flink will be used interchangeably.
 
 ## Architecture
 

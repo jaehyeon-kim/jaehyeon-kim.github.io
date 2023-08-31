@@ -1,5 +1,5 @@
 ---
-title: Getting Started with Pyflink on AWS - Part 3 KDA and MSK
+title: Getting Started with Pyflink on AWS - Part 3 AWS Managed Flink and MSK
 date: 2023-09-07
 draft: true
 featured: false
@@ -16,7 +16,7 @@ categories:
 tags:
   - Apache Flink
   - Apache Kafka
-  - Amazon Kinesis Data Analytics
+  - Amazon Managed Service for Apache Flink
   - Amazon MSK
   - Python
   - Docker
@@ -24,34 +24,34 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: This series aims to extend a guide from AWS that demonstrates how to develop a Flink application locally and deploy via KDA. While the guide uses Kinesis Data Stream as the source, we use Apache Kafka on Amazon MSK instead. In this post, we will use a Kafka cluster on Amazon MSK for the source and destination (sink) of the Flink app. We have to build a custom Uber Jar as the cluster is authenticated by IAM and KDA does not allow you to specify multiple pipeline jar files. After that the same application execution examples will be repeated.
+description: In this series of posts, we discuss a Flink (Pyflink) application that reads/writes from/to Kafka topics. In the previous posts, I demonstrated a Pyflink app that targets a local Kafka cluster as well as a Kafka cluster on Amazon MSK. The app was executed in a virtual environment as well as in a local Flink cluster for improved monitoring. In this post, the app will be deployed via Amazon Managed Service for Apache Flink.
 ---
 
-This series aims to extend a [guide from AWS](https://github.com/aws-samples/pyflink-getting-started) that demonstrates how to develop a Flink application locally and deploy via KDA. While the guide uses Kinesis Data Stream as the source, we use Apache Kafka on Amazon MSK instead.
-
-In part 1, we discussed how to develop a Flink app locally, which connects a local Kafka cluster. The app was executed in a virtual environment as well as in a local Flink cluster for improved monitoring.
-
-In this post, we will use a Kafka cluster on Amazon MSK for the source and destination (sink) of the Flink app. We have to build a custom Uber Jar as the cluster is authenticated by IAM and KDA does not allow you to specify multiple pipeline jar files. After that the same application execution examples will be repeated.
+In this series of posts, we discuss a Flink (Pyflink) application that reads/writes from/to Kafka topics. In the previous posts, I demonstrated a Pyflink app that targets a local Kafka cluster as well as a Kafka cluster on Amazon MSK. The app was executed in a virtual environment as well as in a local Flink cluster for improved monitoring. In this post, the app will be deployed via [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/), which is the easiest option to run Flink applications on AWS.
 
 * [Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1)
 * [Part 2 Local Flink and MSK](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2)
-* [Part 3 KDA and MSK](#) (this post)
+* [Part 3 AWS Managed Flink and MSK](#) (this post)
+
+[**Update 2023-08-30**] Amazon Kinesis Data Analytics is renamed into [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/). In this post, Kinesis Data Analytics (KDA) and Amazon Managed Service for Apache Flink will be used interchangeably.
 
 ## Architecture
 
-The Python source data generator sends random stock price records into a Kafka topic. The messages in the source topic are consumed by a Flink application, and it just writes those messages into a different sink topic. As the Kafka cluster is deployed in private subnets, a VPN server is used to generate records from the developer machine. This is the simplest application of the AWS guide, and you may try [other examples](https://github.com/aws-samples/pyflink-getting-started/tree/main/pyflink-examples) if interested.
+The Python source data generator sends random stock price records into a Kafka topic. The messages in the source topic are consumed by a Flink application, and it just writes those messages into a different sink topic. As the Kafka cluster is deployed in private subnets, a VPN server is used to generate records from the developer machine. This is the simplest application of the [Pyflink getting started guide](https://github.com/aws-samples/pyflink-getting-started) from AWS, and you may try [other examples](https://github.com/aws-samples/pyflink-getting-started/tree/main/pyflink-examples) if interested.
 
 ![](featured.png#center)
 
 ## Infrastructure
 
-A Kafka cluster is created on Amazon MSK using Terraform, and the cluster is secured by IAM access control. Similar to part 1, the Python apps including the Flink app run in a virtual environment in the first trial. After that the Flink app is submitted to a local Flink cluster for improved monitoring. As with part 1, the Flink cluster is created using Docker. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/pyflink-getting-started-on-aws/remote) of this post.
+A Kafka cluster is created on Amazon MSK using Terraform, and the cluster is secured by IAM access control. Unlike the previous posts, the Pyflink app is deployed via *Kinesis Data Analytics (KDA)*. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/pyflink-getting-started-on-aws/remote) of this post.
 
 ### Preparation
 
 #### Application Package
 
-As discussed in [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2), the app has multiple jar dependencies, and they have be combined into a single Uber jar file. This is because Kinesis Data Analytics (KDA) does not allow you to specify multiple pipeline jar files. The following script (*build.sh*) builds to create the Uber Jar file for this post, followed by downloading the *kafka-python* package and creating a zip file that can be used to deploy the Flink app via KDA. Although the Flink app does not need the package, it is added in order to check if `--pyFiles` option works when submitting the app to a Flink cluster or deploying via KDA. The zip package file will be used for KDA deployment in the this post.
+As discussed in [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2), the app has multiple jar dependencies, and they have to be combined into a single Uber jar file. This is because KDA does not allow you to specify multiple pipeline jar files. The details about how to create the custom jar file can be found in [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2).
+
+The following script (*build.sh*) builds to create the Uber Jar file for this post, followed by downloading the *kafka-python* package and creating a zip file that can be used to deploy the Flink app via KDA. Although the Flink app does not need the package, it is added in order to check if `--pyFiles` option works when deploying the app via KDA. The zip package file will be used for KDA deployment in this post.
 
 ```bash
 # build.sh
@@ -120,7 +120,7 @@ networks:
 
 ### VPC and VPN
 
-A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*remote/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*remote/vpn.tf*). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in an [earlier post](/blog/2022-02-06-dev-infra-terraform).
+A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*infra/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*infra/vpn.tf*). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in an [earlier post](/blog/2022-02-06-dev-infra-terraform).
 
 ### MSK Cluster
 
@@ -227,7 +227,7 @@ resource "aws_security_group_rule" "msk_kda_inbound" {
 
 ### KDA Application
 
-The Flink application and related resources are created conditionally by setting the following variable to *true*: *local.kda.to_create*. The latest supported Flink version is chosen to be the runtime environment (*FLINK-1_15*), and it is the version 1.15.2. 
+The Flink application and related resources are created conditionally by setting a flag named *local.kda.to_create* to *true*. When it comes to the runtime environment, the latest supported Flink version (1.15.2) is chosen. Also, the application requires permission to access AWS resources (*service_execution_role*) and it will be discussed in a later section. Furthermore, we need to specify more configurations that are related to the Flink application and CloudWatch logging, and they will be covered below in detail as well.
 
 ```terraform
 # infra/variable.tf
@@ -254,9 +254,9 @@ resource "aws_kinesisanalyticsv2_application" "kda_app" {
 
 #### Application Configuration
 
-In the application configuration section, we can specify details of the application code, VPC, environment properties, and Flink application. They will be illustrated below.
+In the application configuration section, we can specify details of the application code, VPC, environment properties, and application itself.
 
-##### Application Code Configurationl
+##### Application Code Configuration
 
 The application package (*kda-package.zip*) is uploaded into the default S3 bucket using the *aws_s3_object* Terraform resource. Then it can be used as the code content by specifying the bucket and key names.
 
@@ -301,7 +301,7 @@ resource "aws_s3_object" "kda_package" {
 
 ##### VPC Configuration
 
-The app can be deployed in one of the private subnets as it doesn't need to be connected from outside. As it should be able to access the Kafka brokers, it requires an outbound rule that permits connection on port 9098.
+The app can be deployed in the private subnets as it doesn't need to be connected from outside. Note that an outbound rule that permits connection on port 9098 is created in its security group because it should be able to access the Kafka brokers.
 
 ```terraform
 # infra/kda.tf
@@ -351,7 +351,7 @@ resource "aws_security_group" "kda_sg" {
 
 ##### Environment Properties
 
-In environment properties, we first need to specify [Flink CLI options](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/deployment/cli/#submitting-pyflink-jobs) in the *kinesis.analytics.flink.run.options* group. The values of the Pyflink app (*python*), pipeline jar (*jarfile*) and 3rd-party python package location (*pyFiles*) should match those in the application package (*kda-package.zip*). The other property groups are related to the Kafka source/sink table options, and they will be read by the application.
+In environment properties, we first add [Flink CLI options](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/deployment/cli/#submitting-pyflink-jobs) in the *kinesis.analytics.flink.run.options* group. The values of the Pyflink app (*python*), pipeline jar (*jarfile*) and 3rd-party python package location (*pyFiles*) should match those in the application package (*kda-package.zip*). The other property groups are related to the Kafka source/sink table options, and they will be read by the application.
 
 ```terraform
 # infra/kda.tf
@@ -408,7 +408,14 @@ resource "aws_kinesisanalyticsv2_application" "kda_app" {
 
 ##### Flink Application Configuration
 
-Configurations related to [Checkpointing](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/ops/state/checkpoints/), CloudWatch logging and [parallelism](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/datastream/execution/parallel/)
+The Flink application configurations constitute of the following.
+
+- [Checkpoints](https://docs.aws.amazon.com/managed-flink/latest/java/disaster-recovery-resiliency.html) - Checkpoints are backups of application state that Managed Service for Apache Flink automatically creates periodically and uses to restore from faults. By default, the following values are configured.
+  - CheckpointingEnabled: true
+  - CheckpointInterval: 60000
+  - MinPauseBetweenCheckpoints: 5000
+- [Monitoring](https://docs.aws.amazon.com/managed-flink/latest/java/monitoring.html) - The metrics level determines which metrics are created to CloudWatch - see [this page](https://docs.aws.amazon.com/managed-flink/latest/java/metrics-dimensions.html) for details. The supported values are *APPLICATION*, *OPERATOR*, *PARALLELISM*, and *TASK*. Here *APPLICATION* is selected as the metrics level value.
+- [Parallelism](https://docs.aws.amazon.com/managed-flink/latest/java/how-scaling.html) - We can configure the [parallel execution](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/datastream/execution/parallel/) of tasks and the allocation of resources to implement scaling. The *parallelism* indicates the initial number of parallel tasks that an application can perform while the *parallelism_per_kpu* is the number of parallel tasks that an application can perform per Kinesis Processing Unit (KPU). The application parallelism can be updated by enabling auto-scaling.
 
 ```terraform
 # infra/kda.tf
@@ -448,6 +455,8 @@ resource "aws_kinesisanalyticsv2_application" "kda_app" {
 
 #### Cloudwatch Logging Options
 
+We can add a CloudWatch log stream ARN to the CloudWatch logging options. Note that, when I missed it at first, I saw a CloudWatch log group and log stream are created automatically, but logging was not enabled. It was only when I specified a custom log stream ARN that logging was enabled and log messages were ingested.
+
 ```terraform
 # infra/kda.tf
 resource "aws_kinesisanalyticsv2_application" "kda_app" {
@@ -480,6 +489,11 @@ resource "aws_cloudwatch_log_stream" "kda_ls" {
 ```
 
 #### IAM Role
+
+The service execution role has the following permissions.
+
+* Full access to CloudWatch, CloudWatch Log and Amazon Kinesis Data Analytics. It is given by AWS managed policies for logging, metrics generation etc. However, it is by no means recommended and should be updated according to the least privilege principle for production.
+* 3 inline policies for connecting to the MSK cluster (*kda-msk-access*) in private subnets (*kda-vpc-access*) as well as giving access to the application package in S3 (*kda-s3-access*).
 
 ```terraform
 # infra/kda.tf
@@ -607,34 +621,40 @@ resource "aws_iam_role" "kda_app_role" {
 }
 ```
 
+Once deployed, we can see the application on AWS console, and it stays in the ready status.
+
 ![](kda-app.png#center)
 
 ## Run Application
 
-Once we start the app, we can check the topic for the source data is created and messages are ingested in *Kpow*.
+We first need to create records in the source Kafka topic. It is done by executing the data generator app (*producer.py*). See [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2) for details about the generator app and how to execute it. Once executed, we can check the topic for the source data is created and messages are ingested.
 
 ![](source-topic.png#center)
 
-run kda app with *Run without snapshot* option
+We can run the Flink application on AWS console. There are multiple options and, as we haven't enabled [snapshots](https://docs.aws.amazon.com/managed-flink/latest/java/how-fault-snapshot.html), we can run the application without snapshot.
 
 ![](kda-run.png#center)
 
-flink dashboard
+Once the app is running, we can monitor it on the Flink Web UI available on AWS Console. 
 
 ![](cluster-dashboard-00.png#center)
 
+In the Overview section, it shows the available task slots, running jobs and completed jobs.
+
 ![](cluster-dashboard-01.png#center)
+
+We can inspect an individual job in the Jobs menu. It shows key details about a job execution in *Overview*, *Exceptions*, *TimeLine*, *Checkpoints* and *Configuration* tabs.
 
 ![](cluster-dashboard-02.png#center)
 
-logging
+The application log messages can be checked in the CloudWatch Console, and it gives additional capability to debug the application.
 
 ![](kda-logging.png#center)
 
-We can also see details of all the topics in *Kpow* as shown below. The total number of messages matches between the source and output topics but not within partitions.
+Finally, we can see details of all the topics in *Kpow*. The total number of messages matches between the source and output topics but not within partitions.
 
 ![](all-topics.png#center)
 
 ## Summary
 
-In this post, we used a Kafka cluster on Amazon MSK for the source and destination (sink) of the Flink app. We have to build a custom Uber Jar as the cluster is authenticated by IAM and KDA does not allow you to specify multiple pipeline jar files. After that the app was executed in a virtual environment as well as in a local Flink cluster for improved monitoring.
+In this series of posts, we discussed a Flink (Pyflink) application that reads/writes from/to Kafka topics. In the previous posts, I demonstrated a Pyflink app that targets a local Kafka cluster as well as a Kafka cluster on Amazon MSK. The app was executed in a virtual environment as well as in a local Flink cluster for improved monitoring. In this post, the app was deployed via Amazon Managed Service for Apache Flink, which is the easiest option to run Flink applications on AWS.
