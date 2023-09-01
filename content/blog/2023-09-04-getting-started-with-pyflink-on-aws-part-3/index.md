@@ -1,7 +1,7 @@
 ---
 title: Getting Started with Pyflink on AWS - Part 3 AWS Managed Flink and MSK
-date: 2023-09-07
-draft: true
+date: 2023-09-04
+draft: false
 featured: false
 comment: true
 toc: true
@@ -51,7 +51,7 @@ A Kafka cluster is created on Amazon MSK using Terraform, and the cluster is sec
 
 As discussed in [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2), the app has multiple jar dependencies, and they have to be combined into a single Uber jar file. This is because KDA does not allow you to specify multiple pipeline jar files. The details about how to create the custom jar file can be found in [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2).
 
-The following script (*build.sh*) builds to create the Uber Jar file for this post, followed by downloading the *kafka-python* package and creating a zip file that can be used to deploy the Flink app via KDA. Although the Flink app does not need the package, it is added in order to check if `--pyFiles` option works when deploying the app via KDA. The zip package file will be used for KDA deployment in this post.
+The following script (*build.sh*) builds to create the Uber Jar file for this post, followed by downloading the *kafka-python* package and creating a zip file that can be used to deploy the Flink app via KDA. Although the Flink app does not need the *kafka-python* package, it is added in order to check if `--pyFiles` option works when deploying the app via KDA. The zip package file will be used for KDA deployment in this post.
 
 ```bash
 # build.sh
@@ -227,7 +227,7 @@ resource "aws_security_group_rule" "msk_kda_inbound" {
 
 ### KDA Application
 
-The Flink application and related resources are created conditionally by setting a flag named *local.kda.to_create* to *true*. When it comes to the runtime environment, the latest supported Flink version (1.15.2) is chosen. Also, the application requires permission to access AWS resources (*service_execution_role*) and it will be discussed in a later section. Furthermore, we need to specify more configurations that are related to the Flink application and CloudWatch logging, and they will be covered below in detail as well.
+The runtime environment and service execution role are required to create a Flink app. The latest supported Flink version (1.15.2) is specified for the former and an IAM role is created for the latter - it'll be discussed more in a later section. Furthermore, we need to specify more configurations that are related to the Flink application and CloudWatch logging, and they will be covered below in detail as well.
 
 ```terraform
 # infra/variable.tf
@@ -411,9 +411,9 @@ resource "aws_kinesisanalyticsv2_application" "kda_app" {
 The Flink application configurations constitute of the following.
 
 - [Checkpoints](https://docs.aws.amazon.com/managed-flink/latest/java/disaster-recovery-resiliency.html) - Checkpoints are backups of application state that Managed Service for Apache Flink automatically creates periodically and uses to restore from faults. By default, the following values are configured.
-  - CheckpointingEnabled: true
-  - CheckpointInterval: 60000
-  - MinPauseBetweenCheckpoints: 5000
+  - *CheckpointingEnabled: true*
+  - *CheckpointInterval: 60000*
+  - *MinPauseBetweenCheckpoints: 5000*
 - [Monitoring](https://docs.aws.amazon.com/managed-flink/latest/java/monitoring.html) - The metrics level determines which metrics are created to CloudWatch - see [this page](https://docs.aws.amazon.com/managed-flink/latest/java/metrics-dimensions.html) for details. The supported values are *APPLICATION*, *OPERATOR*, *PARALLELISM*, and *TASK*. Here *APPLICATION* is selected as the metrics level value.
 - [Parallelism](https://docs.aws.amazon.com/managed-flink/latest/java/how-scaling.html) - We can configure the [parallel execution](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/datastream/execution/parallel/) of tasks and the allocation of resources to implement scaling. The *parallelism* indicates the initial number of parallel tasks that an application can perform while the *parallelism_per_kpu* is the number of parallel tasks that an application can perform per Kinesis Processing Unit (KPU). The application parallelism can be updated by enabling auto-scaling.
 
@@ -627,11 +627,15 @@ Once deployed, we can see the application on AWS console, and it stays in the re
 
 ## Run Application
 
-We first need to create records in the source Kafka topic. It is done by executing the data generator app (*producer.py*). See [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2) for details about the generator app and how to execute it. Once executed, we can check the topic for the source data is created and messages are ingested.
+We first need to create records in the source Kafka topic. It is done by executing the data generator app (*producer.py*). See [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2) for details about the generator app and how to execute it. Note that we should connect to the VPN server in order to create records from the developer machine.
+
+Once executed, we can check the source topic is created and messages are ingested.
 
 ![](source-topic.png#center)
 
-We can run the Flink application on AWS console. There are multiple options and, as we haven't enabled [snapshots](https://docs.aws.amazon.com/managed-flink/latest/java/how-fault-snapshot.html), we can run the application without snapshot.
+### Monitoring on Flink Web UI
+
+We can run the Flink application on AWS console with the *Run without snapshot* option as we haven't enabled [snapshots](https://docs.aws.amazon.com/managed-flink/latest/java/how-fault-snapshot.html).
 
 ![](kda-run.png#center)
 
@@ -647,11 +651,15 @@ We can inspect an individual job in the Jobs menu. It shows key details about a 
 
 ![](cluster-dashboard-02.png#center)
 
+### CloudWatch Logging
+
 The application log messages can be checked in the CloudWatch Console, and it gives additional capability to debug the application.
 
 ![](kda-logging.png#center)
 
-Finally, we can see details of all the topics in *Kpow*. The total number of messages matches between the source and output topics but not within partitions.
+### Application Output
+
+We can see details of all the topics in *Kpow*. The total number of messages matches between the source and output topics but not within partitions.
 
 ![](all-topics.png#center)
 

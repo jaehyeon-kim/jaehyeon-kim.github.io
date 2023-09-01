@@ -31,7 +31,7 @@ In this series of posts, we discuss a Flink (Pyflink) application that reads/wri
 
 * [Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1)
 * [Part 2 Local Flink and MSK](#) (this post)
-* Part 3 AWS Managed Flink and MSK
+* [Part 3 AWS Managed Flink and MSK](/blog/2023-09-04-getting-started-with-pyflink-on-aws-part-3)
 
 [**Update 2023-08-30**] Amazon Kinesis Data Analytics is renamed into [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/). In this post, Kinesis Data Analytics (KDA) and Amazon Managed Service for Apache Flink will be used interchangeably.
 

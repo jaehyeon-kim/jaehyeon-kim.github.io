@@ -38,7 +38,7 @@ This series aims to help those who are new to [Apache Flink](https://flink.apach
 
 ## Architecture
 
-There are two Python applications that send transaction and flagged account records into the corresponding topics - the transaction app sends records indefinitely in a loop. Note that the record generating apps run in the developer machine that is connected via VPN for simplicity. Both the topics are consumed by a Flink application, and it filters the transactions from the flagged accounts followed by sending them into an output topic of flagged transactions. Finally, the flagged transaction records are sent into a DynamoDB table by the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) in order to serve real-time requests from an API.
+There are two Python applications that send transaction and flagged account records into the corresponding topics - the transaction app sends records indefinitely in a loop. Note that, as the Kafka cluster is deployed in private subnets, a VPN server is used to generate records from the developer machine. Both the topics are consumed by a Flink application, and it filters the transactions from the flagged accounts followed by sending them into an output topic of flagged transactions. Finally, the flagged transaction records are sent into a DynamoDB table by the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) in order to serve real-time requests from an API.
 
 ![](featured.png#center)
 
@@ -103,8 +103,11 @@ curl -o $CONN_PATH/camel-aws-ddb-sink-kafka-connector.tar.gz $CONNECTOR_SRC_DOWN
 
 Once completed, we can obtain the following zip files.
 
-* Flink application - *connectors/camel-aws-ddb-sink-kafka-connector.zip*
-* Kafka sink connector - *kda-package.zip*
+- Kafka sink connector - *connectors/camel-aws-ddb-sink-kafka-connector.zip*
+- Flink application - *kda-package.zip*
+  - Flink application - *processor.py*
+  - Pipeline jar file - *package/lib/pyflink-getting-started-1.0.0.jar*
+  - kafka-python package - *package/site_packages/kafka*
 
 #### Kafka Management App
 
@@ -516,9 +519,9 @@ resource "aws_kinesisanalyticsv2_application" "kda_app" {
 The Flink application configurations constitute of the following.
 
 - [Checkpoints](https://docs.aws.amazon.com/managed-flink/latest/java/disaster-recovery-resiliency.html) - Checkpoints are backups of application state that Managed Service for Apache Flink automatically creates periodically and uses to restore from faults. By default, the following values are configured.
-  - CheckpointingEnabled: true
-  - CheckpointInterval: 60000
-  - MinPauseBetweenCheckpoints: 5000
+  - *CheckpointingEnabled: true*
+  - *CheckpointInterval: 60000*
+  - *MinPauseBetweenCheckpoints: 5000*
 - [Monitoring](https://docs.aws.amazon.com/managed-flink/latest/java/monitoring.html) - The metrics level determines which metrics are created to CloudWatch - see [this page](https://docs.aws.amazon.com/managed-flink/latest/java/metrics-dimensions.html) for details. The supported values are *APPLICATION*, *OPERATOR*, *PARALLELISM*, and *TASK*. Here *APPLICATION* is selected as the metrics level value.
 - [Parallelism](https://docs.aws.amazon.com/managed-flink/latest/java/how-scaling.html) - We can configure the [parallel execution](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/datastream/execution/parallel/) of tasks and the allocation of resources to implement scaling. The *parallelism* indicates the initial number of parallel tasks that an application can perform while the *parallelism_per_kpu* is the number of parallel tasks that an application can perform per Kinesis Processing Unit (KPU). The application parallelism can be updated by enabling auto-scaling.
 
@@ -840,7 +843,7 @@ The sink connector can be checked on AWS Console as shown below.
 
 We first need to create records in the source Kafka topics. It is performed by executing the data generator app (*producer.py*). See [part 1](/blog/2023-08-10-fraud-detection-part-1) for details about the generator app and how to execute it. Note that we should connect to the VPN server in order to create records from the developer machine.
 
-Once executed, we can check the source are created and messages are ingested.
+Once executed, we can check the source topics are created and messages are ingested.
 
 ![](source-topics.png#center)
 
