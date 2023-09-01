@@ -1,6 +1,6 @@
 ---
-title: Kafka, Flink and DynamoDB for Real Time Fraud Detection - Part 1 Local Development
-date: 2023-08-10
+title: Kafka, Flink and DynamoDB for Real Time Fraud Detection - Part 2 Deployment via AWS Managed Flink
+date: 2023-09-14
 draft: true
 featured: true
 comment: true
@@ -17,42 +17,42 @@ tags:
   - Apache Flink
   - Apache Kafka
   - Kafka Connect
+  - Amazon MSK
+  - MSK Connect
+  - Amazon Managed Service for Apache Flink
   - Amazon DynamoDB
-  - Python
-  - Docker
-  - Docker Compose
   - Fraud Detection
 authors:
   - JaehyeonKim
 images: []
 cevo: 32
-description: Apache Flink is widely used for building real-time stream processing applications. On AWS, Amazon Managed Service for Apache Flink is the easiest option to develop a Flink app as it provides the underlying infrastructure. Re-implementing a solution from an AWS workshop, this series of posts discuss how to develop and deploy a fraud detection app using Kafka, Flink and DynamoDB. Part 1 covers local development using Docker while deployment via KDA will be discussed in part 2.
+description: This series aims to help those who are new to Apache Flink and Amazon Managed Service for Apache Flink by re-implementing a simple fraud detection application that is discussed in an AWS workshop titled AWS Kafka and DynamoDB for real time fraud detection. In part 1, I demonstrated how to develop the application locally, and the app will be deployed via Amazon Managed Service for Apache Flink in this post.
 ---
 
-[Apache Flink](https://flink.apache.org/) is an open-source, unified stream-processing and batch-processing framework. Its core is a distributed streaming data-flow engine that you can use to run real-time stream processing on high-throughput data sources. Currently, it is widely used to build applications for fraud/anomaly detection, rule-based alerting, business process monitoring, and continuous ETL to name a few. On AWS, we can deploy a Flink application via [Amazon Kinesis Data Analytics (KDA)](https://aws.amazon.com/kinesis/data-analytics/), [Amazon EMR](https://aws.amazon.com/emr/) and [Amazon EKS](https://aws.amazon.com/eks/). Among those, KDA is the easiest option as it provides the underlying infrastructure for your Apache Flink applications.
+This series aims to help those who are new to [Apache Flink](https://flink.apache.org/) and [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/) by re-implementing a simple fraud detection application that is discussed in an AWS workshop titled [AWS Kafka and DynamoDB for real time fraud detection](https://catalog.us-east-1.prod.workshops.aws/workshops/ad026e95-37fd-4605-a327-b585a53b1300/en-US). In part 1, I demonstrated how to develop the application locally, and the app will be deployed via *Amazon Managed Service for Apache Flink* in this post.
 
-There are a number of AWS workshops and blog posts where we can learn Flink development on AWS and one of those is [AWS Kafka and DynamoDB for real time fraud detection](https://catalog.us-east-1.prod.workshops.aws/workshops/ad026e95-37fd-4605-a327-b585a53b1300/en-US). While this workshop targets a Flink application on KDA, it would have been easier if it illustrated local development before moving into deployment via KDA. In this series of posts, we will re-implement the fraud detection application of the workshop for those who are new to Flink and KDA. Specifically the app will be developed locally using Docker in part 1, and it will be deployed via KDA in part 2.
-
-* [Part 1 Local Development](#) (this post)
-* Part 2 Deployment via AWS Managed Flink
+* [Part 1 Local Development](/blog/2023-08-10-fraud-detection-part-1)
+* [Part 2 Deployment via AWS Managed Flink](#) (this post)
 
 [**Update 2023-08-30**] Amazon Kinesis Data Analytics is renamed into [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/). In this post, Kinesis Data Analytics (KDA) and Amazon Managed Service for Apache Flink will be used interchangeably.
 
 ## Architecture
 
-There are two Python applications that send transaction and flagged account records into the corresponding topics - the transaction app sends records indefinitely in a loop. Both the topics are consumed by a Flink application, and it filters the transactions from the flagged accounts followed by sending them into an output topic of flagged transactions. Finally, the flagged transaction records are sent into a DynamoDB table by the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) in order to serve real-time requests from an API.
+There are two Python applications that send transaction and flagged account records into the corresponding topics - the transaction app sends records indefinitely in a loop. Note that the record generating apps run in the developer machine that is connected via VPN for simplicity. Both the topics are consumed by a Flink application, and it filters the transactions from the flagged accounts followed by sending them into an output topic of flagged transactions. Finally, the flagged transaction records are sent into a DynamoDB table by the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) in order to serve real-time requests from an API.
 
 ![](featured.png#center)
 
 ## Infrastructure
 
-The Kafka cluster, Kafka connect and management app (kpow) are created using Docker while the python apps including the Flink app run in a virtual environment. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/fraud-detection/remote) of this post.
+The infrastructure resources are created using Terraform. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/fraud-detection/remote) of this post.
 
 ### Preparation
 
-#### MSK Connect and Flink Application Packages
+#### Flink Application and Kafka Connector Packages
 
-As discussed later, the Flink application needs the Kafka connector artifact (*flink-sql-connector-kafka-1.15.2.jar*) in order to connect a Kafka cluster. Also, the source of the Camel DynamoDB sink connector should be available in the Kafka connect service. They can be downloaded by executing the following script.
+The Flink application has multiple jar dependencies as the Kafka cluster is authenticated via IAM. Therefore, the jar files have to be combined into a single Uber jar file because KDA does not allow you to specify multiple pipeline jar files. The details about how to create the custom jar file can be found in [this post](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2). Also, the Camel DynamoDB sink connector needs to be packaged into a zip file, and it can be performed after downloading the binaries from the Maven repository.
+
+The following script (*build.sh*) creates the Flink app and Kafka connector packages. For the former, it builds the Uber Jar file, followed by downloading the *kafka-python* package, creating a zip file that can be used to deploy the Flink app via KDA. Note that, although the Flink app does not need the *kafka-python* package, it is added in order to check if `--pyFiles` option works.
 
 ```bash
 # build.sh
@@ -101,9 +101,10 @@ curl -o $CONN_PATH/camel-aws-ddb-sink-kafka-connector.tar.gz $CONNECTOR_SRC_DOWN
   && rm $CONN_PATH/camel-aws-ddb-sink-kafka-connector.tar.gz
 ```
 
-Once downloaded, they can be found in the corresponding folders as shown below. Although the Flink app doesn't need the *kafka-python* package, it is included in the *site_packages* folder in order to check if `--pyFiles` option works in KDA - it'll be checked in part 2.
+Once completed, we can obtain the following zip files.
 
-![](source-folders.png#center)
+* Flink application - *connectors/camel-aws-ddb-sink-kafka-connector.zip*
+* Kafka sink connector - *kda-package.zip*
 
 #### Kafka Management App
 
@@ -141,11 +142,11 @@ networks:
 
 ### VPC and VPN
 
-A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*infra/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*infra/vpn.tf*). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in an [earlier post](/blog/2022-02-06-dev-infra-terraform).
+A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*infra/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*infra/vpn.tf*). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in [this post](/blog/2022-02-06-dev-infra-terraform).
 
 ### MSK Cluster
 
-A MSK cluster with 2 brokers is created. The broker nodes are deployed with the *kafka.m5.large* instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion. Note that the Flink application needs to have access to the Kafka brokers, and it is allowed by adding an inbound connection from the KDA app into the brokers on port 9098.
+A MSK cluster with 2 brokers is created. The broker nodes are deployed with the *kafka.m5.large* instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion.
 
 ```terraform
 # infra/variable.tf
@@ -225,6 +226,8 @@ resource "aws_msk_configuration" "msk_config" {
 
 #### Security Group
 
+The security group of the MSK cluster allows all inbound traffic from itself and all outbound traffic into all IP addresses. The Kafka connectors will use the same security group and the former is necessary. Both the rules are configured too generously, however, we can limit the protocol and port ranges in production. Also, the security group has an additional inbound rule that permits to connect on port 9098 from the security group of the Flink application.
+
 ```terraform
 resource "aws_security_group" "msk" {
   name   = "${local.name}-msk-sg"
@@ -270,7 +273,7 @@ resource "aws_security_group_rule" "msk_kda_inbound" {
 
 ### DynamoDB Table
 
-The destination table is named *fraud-detection-flagged-transactions* (`${local.name}-flagged-transactions`), and it has the primary key where *order_id* and *ordered_at* are the hash and range key respectively. It also has a global secondary index where *customer_id* and *ordered_at* constitute the primary key. Note that *ordered_at* is not generated by the source connector as the Java faker library doesn't have a method to generate a current timestamp. As illustrated below it'll be created by the sink connector using SMTs. The table can be created using as shown below.
+The destination table is configured to have a composite primary key where *transaction_id* and *transaction_date* are the hash and range key respectively. It also has a global secondary index (GSI) where *account_id* and *transaction_date* constitute the primary key. The GSI is to facilitate querying by account id.
 
 ```terraform
 # infra/ddb.tf
@@ -312,7 +315,7 @@ resource "aws_dynamodb_table" "transactions_table" {
 
 ### Flink Application
 
-The Flink application and related resources are created conditionally by setting a flag named *local.kda.to_create* to *true*. When it comes to the runtime environment, the latest supported Flink version (1.15.2) is chosen. Also, the application requires permission to access AWS resources (*service_execution_role*) and it will be discussed in a later section. Furthermore, we need to specify more configurations that are related to the Flink application and CloudWatch logging, and they will be covered below in detail as well.
+The runtime environment and service execution role are required to create a Flink app. The latest supported Flink version (1.15.2) is specified for the former and an IAM role is created for the latter - it'll be discussed more in a later section. Furthermore, we need to specify more configurations that are related to the Flink application and CloudWatch logging, and they will be covered below in detail as well.
 
 ```terraform
 # infra/variable.tf
@@ -719,14 +722,11 @@ resource "aws_iam_role" "kda_app_role" {
 
 Once deployed, we can see the application on AWS console, and it stays in the ready status.
 
-![](kda-app.png#center)
-
+![](flink-app.png#center)
 
 ### Camel DynamoDB Sink Connector
 
-The connector is configured to write messages from the *order* topic into the DynamoDB table created earlier. It requires to specify the table name, AWS region, operation, write capacity and whether to use the [default credential provider](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) - see the [documentation](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) for details. Note that, if you don't use the default credential provider, you have to specify the *access key id* and *secret access key*. Note further that, although the current LTS version is *v3.18.2*, the default credential provider option didn't work for me, and I was recommended [to use *v3.20.3* instead](https://github.com/apache/camel-kafka-connector/issues/1533). Finally, the [*camel.sink.unmarshal* option](https://github.com/apache/camel-kafka-connector/blob/camel-kafka-connector-3.20.3/connectors/camel-aws-ddb-sink-kafka-connector/src/main/resources/kamelets/aws-ddb-sink.kamelet.yaml#L123) is to convert data from the internal *java.util.HashMap* type into the required *java.io.InputStream* type. Without this configuration, the [connector fails](https://github.com/apache/camel-kafka-connector/issues/1532) with *org.apache.camel.NoTypeConversionAvailableException* error.
-
-Although the destination table has *ordered_at* as the range key, it is not created by the source connector because the Java faker library doesn't have a method to generate a current timestamp. Therefore, it is created by the sink connector using two SMTs - *InsertField* and *TimestampConverter*. Specifically they add a timestamp value to the *order_at* attribute, format the value as *yyyy-MM-dd HH:mm:ss:SSS*, and convert its type into string.
+The connector is configured to write messages from the *flagged-transactions* topic into the DynamoDB table created earlier. It requires to specify the table name, AWS region, operation, write capacity and whether to use the [default credential provider](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) - see the [documentation](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) for details. See [this post](/blog/2023-07-03-kafka-connect-for-aws-part-3) for details about how to set up the sink connector.
 
 ```terraform
 # infra/msk-connect.tf
@@ -838,41 +838,46 @@ The sink connector can be checked on AWS Console as shown below.
 
 ## Run Application
 
-* flagged account - `DATE_TYPE=account python producer.py`
-* transaction - `DATE_TYPE=transaction python producer.py`
+We first need to create records in the source Kafka topics. It is performed by executing the data generator app (*producer.py*). See [part 1](/blog/2023-08-10-fraud-detection-part-1) for details about the generator app and how to execute it. Note that we should connect to the VPN server in order to create records from the developer machine.
 
-We first need to create records in the source Kafka topic. It is done by executing the data generator app (*producer.py*). See [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2) for details about the generator app and how to execute it. Once executed, we can check the topic for the source data is created and messages are ingested.
+Once executed, we can check the source are created and messages are ingested.
 
-![](source-topic.png#center)
+![](source-topics.png#center)
 
-We can run the Flink application on AWS console. There are multiple options and, as we haven't enabled [snapshots](https://docs.aws.amazon.com/managed-flink/latest/java/how-fault-snapshot.html), we can run the application without snapshot.
+### Monitoring on Flink Web UI
 
-![](kda-run.png#center)
+We can run the Flink application on AWS console with the *Run without snapshot* option as we haven't enabled [snapshots](https://docs.aws.amazon.com/managed-flink/latest/java/how-fault-snapshot.html).
+
+![](flink-run.png#center)
 
 Once the app is running, we can monitor it on the Flink Web UI available on AWS Console. 
 
-![](cluster-dashboard-00.png#center)
+![](flink-dashboard-00.png#center)
 
 In the Overview section, it shows the available task slots, running jobs and completed jobs.
 
-![](cluster-dashboard-01.png#center)
+![](flink-dashboard-01.png#center)
 
 We can inspect an individual job in the Jobs menu. It shows key details about a job execution in *Overview*, *Exceptions*, *TimeLine*, *Checkpoints* and *Configuration* tabs.
 
-![](cluster-dashboard-02.png#center)
+![](flink-dashboard-02.png#center)
+
+### CloudWatch Logging
 
 The application log messages can be checked in the CloudWatch Console, and it gives additional capability to debug the application.
 
-![](kda-logging.png#center)
+![](flink-logging.png#center)
 
-Finally, we can see details of all the topics in *Kpow*. The total number of messages matches between the source and output topics but not within partitions.
+### Application Output
+
+We can see details of all the topics in *Kpow*. The output topic (*flagged-transactions*) is created by the Flink application, and fraudulent transaction records are created in it.
 
 ![](all-topics.png#center)
 
-We can check the ingested records on the DynamoDB table items view. Below shows a list of scanned records.
+Finally, we can check the output records on the DynamoDB table items view. All account IDs end with odd numbers, and it indicates they are from flagged accounts.
 
 ![](ddb-output.png#center)
 
 ## Summary
 
-Apache Flink is widely used for building real-time stream processing applications. On AWS, Kinesis Data Analytics (KDA) is the easiest option to develop a Flink app as it provides the underlying infrastructure. Re-implementing a solution from an AWS workshop, this series of posts discuss how to develop and deploy a fraud detection app using Kafka, Flink and DynamoDB. In this post, we covered local development using Docker, and deployment via KDA will be discussed in part 2.
+This series aims to help those who are new to Apache Flink and Amazon Managed Service for Apache Flink by re-implementing a simple fraud detection application that is discussed in an AWS workshop titled AWS Kafka and DynamoDB for real time fraud detection. In part 1, I demonstrated how to develop the application locally, and the app was deployed via Amazon Managed Service for Apache Flink in this post.

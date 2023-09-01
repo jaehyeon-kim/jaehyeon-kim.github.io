@@ -34,7 +34,7 @@ description: Apache Flink is widely used for building real-time stream processin
 There are a number of AWS workshops and blog posts where we can learn Flink development on AWS and one of those is [AWS Kafka and DynamoDB for real time fraud detection](https://catalog.us-east-1.prod.workshops.aws/workshops/ad026e95-37fd-4605-a327-b585a53b1300/en-US). While this workshop targets a Flink application on KDA, it would have been easier if it illustrated local development before moving into deployment via KDA. In this series of posts, we will re-implement the fraud detection application of the workshop for those who are new to Flink and KDA. Specifically the app will be developed locally using Docker in part 1, and it will be deployed via KDA in part 2.
 
 * [Part 1 Local Development](#) (this post)
-* Part 2 Deployment via AWS Managed Flink
+* [Part 2 Deployment via AWS Managed Flink](/blog/2023-09-14-fraud-detection-part-2)
 
 [**Update 2023-08-30**] Amazon Kinesis Data Analytics is renamed into [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/). In this post, Kinesis Data Analytics (KDA) and Amazon Managed Service for Apache Flink will be used interchangeably.
 
