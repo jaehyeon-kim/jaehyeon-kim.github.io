@@ -1,7 +1,7 @@
 ---
 title: Kafka, Flink and DynamoDB for Real Time Fraud Detection - Part 2 Deployment via AWS Managed Flink
 date: 2023-09-14
-draft: true
+draft: false
 featured: true
 comment: true
 toc: true
@@ -15,17 +15,20 @@ categories:
   - Data Streaming
 tags:
   - Apache Flink
+  - Pyflink
   - Apache Kafka
   - Kafka Connect
+  - Amazon DynamoDB
   - Amazon MSK
   - MSK Connect
   - Amazon Managed Service for Apache Flink
-  - Amazon DynamoDB
+  - Python
   - Fraud Detection
 authors:
   - JaehyeonKim
 images: []
 cevo: 32
+docs: https://docs.google.com/document/d/1kRB3XeccUAjNwRH_sFwjJ_fCSnUw3NrQnzF202QGx4o
 description: This series aims to help those who are new to Apache Flink and Amazon Managed Service for Apache Flink by re-implementing a simple fraud detection application that is discussed in an AWS workshop titled AWS Kafka and DynamoDB for real time fraud detection. In part 1, I demonstrated how to develop the application locally, and the app will be deployed via Amazon Managed Service for Apache Flink in this post.
 ---
 
@@ -229,7 +232,7 @@ resource "aws_msk_configuration" "msk_config" {
 
 #### Security Group
 
-The security group of the MSK cluster allows all inbound traffic from itself and all outbound traffic into all IP addresses. The Kafka connectors will use the same security group and the former is necessary. Both the rules are configured too generously, however, we can limit the protocol and port ranges in production. Also, the security group has an additional inbound rule that permits to connect on port 9098 from the security group of the Flink application.
+The security group of the MSK cluster allows all inbound traffic from itself and all outbound traffic into all IP addresses. The Kafka connectors will use the same security group and the former is necessary. Both the rules are configured too generously, however, we can limit the protocol and port ranges in production. Also, the security group has an additional inbound rule that permits it to connect on port 9098 from the security group of the Flink application.
 
 ```terraform
 resource "aws_security_group" "msk" {
@@ -516,7 +519,7 @@ resource "aws_kinesisanalyticsv2_application" "kda_app" {
 
 ##### Flink Application Configuration
 
-The Flink application configurations constitute of the following.
+The Flink application configurations consist of the following.
 
 - [Checkpoints](https://docs.aws.amazon.com/managed-flink/latest/java/disaster-recovery-resiliency.html) - Checkpoints are backups of application state that Managed Service for Apache Flink automatically creates periodically and uses to restore from faults. By default, the following values are configured.
   - *CheckpointingEnabled: true*

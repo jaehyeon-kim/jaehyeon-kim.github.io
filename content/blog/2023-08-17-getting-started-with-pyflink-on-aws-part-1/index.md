@@ -15,6 +15,7 @@ categories:
   - Apache Flink
 tags:
   - Apache Flink
+  - Pyflink
   - Apache Kafka
   - Amazon Managed Service for Apache Flink
   - Amazon MSK  
