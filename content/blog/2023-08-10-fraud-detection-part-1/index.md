@@ -1,7 +1,7 @@
 ---
 title: Kafka, Flink and DynamoDB for Real Time Fraud Detection - Part 1 Local Development
 date: 2023-08-10
-draft: true
+draft: false
 featured: true
 comment: true
 toc: true
@@ -15,6 +15,7 @@ categories:
   - Data Streaming
 tags:
   - Apache Flink
+  - Pyflink
   - Apache Kafka
   - Kafka Connect
   - Amazon DynamoDB
@@ -26,6 +27,7 @@ authors:
   - JaehyeonKim
 images: []
 cevo: 31
+docs: https://docs.google.com/document/d/1dmWCqay1fBfAjRwcdJvX3eJRXB44XYLE-5TGgayp8As
 description: Apache Flink is widely used for building real-time stream processing applications. On AWS, Amazon Managed Service for Apache Flink is the easiest option to develop a Flink app as it provides the underlying infrastructure. Re-implementing a solution from an AWS workshop, this series of posts discuss how to develop and deploy a fraud detection app using Kafka, Flink and DynamoDB. Part 1 covers local development using Docker while deployment via KDA will be discussed in part 2.
 ---
 
