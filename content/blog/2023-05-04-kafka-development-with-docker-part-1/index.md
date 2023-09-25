@@ -28,14 +28,14 @@ I'm teaching myself [modern data streaming architectures](https://docs.aws.amazo
 * [Part 1 Cluster Setup](#) (this post)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
 * [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3)
-* Part 4 Producer and Consumer
-* Part 5 Glue Schema Registry
-* Part 6 Kafka Connect with Glue Schema Registry
-* Part 7 Producer and Consumer with Glue Schema Registry
-* Part 8 SSL Encryption
-* Part 9 SSL Authentication
-* Part 10 SASL Authentication
-* Part 11 Kafka Authorization
+* [Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4)
+* [Part 5 Glue Schema Registry](/blog/2023-06-08-kafka-development-with-docker-part-5)
+* [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6)
+* [Part 7 Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7)
+* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8)
+* [Part 9 SSL Authentication](/blog/2023-07-06-kafka-development-with-docker-part-9)
+* [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10)
+* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11)
 
 ## Setup Kafka Cluster
 
@@ -62,6 +62,12 @@ The following Docker Compose file is used to create the Kafka cluster indicated 
 - volumes
   - Each service has its own volume that will be mapped to the container's data folder. We can check contents of the folder in the Docker volume path. More importantly data is preserved in the Docker volume unless it is deleted so that we don't have to recreate data every time the Kafka cluster gets started.
   - Docker volume mapping doesn't work as expected for me with WSL 2 and Docker Desktop. Therefore, I installed [Docker](https://docs.docker.com/engine/install/ubuntu/) and [Docker Compose](https://docs.docker.com.zh.xy2401.com/v17.12/compose/install/#install-compose) as Linux apps on WSL 2 and start the Docker daemon as `sudo service docker start`. Note I only need to run the command when the system (WSL 2) boots, and I haven't found a way to start it automatically.
+    - [UPDATE 2023-08-17] A newer version of WSL2 (0.67.6+) supports *Systemd* on Windows 11. I updated my WSL version (`wsl --update`) and was able to start Docker automatically by enabling *Systemd* in */etc/wsl.conf*.
+      - ```
+        #/etc/wsl.conf
+        [boot]
+        systemd=true
+        ``` 
 
 ```yaml
 # /kafka-dev-with-docker/part-01/compose-kafka.yml
@@ -95,7 +101,7 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29092
       - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-0:9092,EXTERNAL://localhost:29092
-      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
     volumes:
       - kafka_0_data:/bitnami/kafka
     depends_on:
@@ -116,7 +122,7 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29093
       - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-1:9092,EXTERNAL://localhost:29093
-      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
     volumes:
       - kafka_1_data:/bitnami/kafka
     depends_on:
@@ -137,7 +143,7 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29094
       - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-2:9092,EXTERNAL://localhost:29094
-      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
     volumes:
       - kafka_2_data:/bitnami/kafka
     depends_on:

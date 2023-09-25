@@ -1,7 +1,7 @@
 ---
 title: Kafka Development with Docker - Part 4 Producer and Consumer
 date: 2023-06-01
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -21,23 +21,23 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Kafka includes the Producer/Consumer APIs that allow client applications to send/read streams of data to/from topics in the Kafka cluster. While the main Kafka project maintains only the Java clients, there are several open source projects that provides Kafka client functionalities in Python. In this post, I'll demonstrate how to develop producer/consumer applications using the kafka-python package.
+description: Kafka includes the Producer/Consumer APIs that allow client applications to send/read streams of data to/from topics in a Kafka cluster. While the main Kafka project maintains only the Java clients, there are several open source projects that provide the Kafka client APIs in Python. In this post, I'll demonstrate how to develop producer/consumer applications using the kafka-python package.
 ---
 
-In the previous post, we discussed [Kafka Connect](https://kafka.apache.org/documentation/#connect) to stream data to/from a Kafka cluster. Kafka also includes the [Producer/Consumer APIs](https://kafka.apache.org/documentation/#api) that allow client applications to send/read streams of data to/from topics in the Kafka cluster. While the main Kafka project maintains only the Java clients, there are several [open source projects](https://cwiki.apache.org/confluence/display/KAFKA/Clients#Clients-Python) that provides Kafka client functionalities in Python. In this post, I'll demonstrate how to develop producer/consumer applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package.
+In the previous post, we discussed [Kafka Connect](https://kafka.apache.org/documentation/#connect) to stream data to/from a Kafka cluster. Kafka also includes the [Producer/Consumer APIs](https://kafka.apache.org/documentation/#api) that allow client applications to send/read streams of data to/from topics in a Kafka cluster. While the main Kafka project maintains only the Java clients, there are several [open source projects](https://cwiki.apache.org/confluence/display/KAFKA/Clients#Clients-Python) that provide the Kafka client APIs in Python. In this post, I'll demonstrate how to develop producer/consumer applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package.
 
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
 * [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3)
 * [Part 4 Producer and Consumer](#) (this post)
-* Part 5 Glue Schema Registry
-* Part 6 Kafka Connect with Glue Schema Registry
-* Part 7 Producer and Consumer with Glue Schema Registry
-* Part 8 SSL Encryption
-* Part 9 SSL Authentication
-* Part 10 SASL Authentication
-* Part 11 Kafka Authorization
+* [Part 5 Glue Schema Registry](/blog/2023-06-08-kafka-development-with-docker-part-5)
+* [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6)
+* [Part 7 Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7)
+* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8)
+* [Part 9 SSL Authentication](/blog/2023-07-06-kafka-development-with-docker-part-9)
+* [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10)
+* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11)
 
 
 ## Producer
@@ -161,7 +161,7 @@ A sample order record is shown below.
 
 ## Consumer
 
-The *Consumer* class instantiates *KafkaConsumer* in the *create* method. The main consumer configuration values are provided by the constructor arguments: Kafka bootstrap server addresses (*bootstrap_servers*), topic names (*topics*) and [consumer group ID](https://kafka.apache.org/documentation/#consumerconfigs_group.id) (*group_id*). The `process()` method of the class polls messages and logs details of consumer records.
+The *Consumer* class instantiates the [*KafkaConsumer*](https://kafka-python.readthedocs.io/en/master/apidoc/KafkaConsumer.html) in the *create* method. The main consumer configuration values are provided by the constructor arguments: Kafka bootstrap server addresses (*bootstrap_servers*), topic names (*topics*) and [consumer group ID](https://kafka.apache.org/documentation/#consumerconfigs_group.id) (*group_id*). The `process()` method of the class polls messages and logs details of consumer records.
 
 ```python
 # kafka-pocs/kafka-dev-with-docker/part-04/consumer.py
@@ -223,7 +223,7 @@ if __name__ == "__main__":
 
 ### Consumer Services
 
-The default number of partitions is set to be 3 in the [compose-kafka.yml](https://github.com/jaehyeon-kim/kafka-pocs/blob/main/kafka-dev-with-docker/part-04/compose-kafka.yml). A docker compose file is created for the consumer in order to deploy multiple instances of the app using the [scale option](https://docs.docker.com/engine/reference/commandline/compose_up/#options). As the service uses the same docker network (*kafkanet*), we can take the service names of the brokers (e.g. *kafka-0*) on port 9092. Once started, it installs required packages and starts the consumer.
+As the default number of partitions is set to be 3 in the [compose-kafka.yml](https://github.com/jaehyeon-kim/kafka-pocs/blob/main/kafka-dev-with-docker/part-04/compose-kafka.yml), a docker compose file is created for the consumer in order to deploy 3 instances of the app using the [scale option](https://docs.docker.com/engine/reference/commandline/compose_up/#options). As the service uses the same docker network (*kafkanet*), we can take the service name of the brokers (e.g. *kafka-0*) on port 9092. Once started, it installs required packages and starts the consumer.
 
 ```yaml
 # kafka-pocs/kafka-dev-with-docker/part-04/compose-consumer.yml
@@ -263,7 +263,7 @@ part-04_app_2   sh -c pip install -r requi ...   Up      8000/tcp
 part-04_app_3   sh -c pip install -r requi ...   Up      8000/tcp
 ```
 
-Each instance of the consumer subscribes to its own topic partition, and we can check that by container logs. Below shows the last 10 log entries of one of the instances. It shows it polls messages from partition 0 only.
+Each instance of the consumer subscribes to its own topic partition, and we can check that by container logs. Below shows the last 10 log entries of one of the instances. It shows that it polls messages from partition 0 only.
 
 ```bash
 $ docker logs -f --tail 10 part-04_app_1
@@ -280,10 +280,10 @@ INFO:root:key={"order_id": "74b06957-2c6c-4e46-be49-d2915cc80b74"}, value={"orde
 INFO:root:key={"order_id": "fce38c6b-4806-4579-b11e-8eac24b5166b"}, value={"order_id": "fce38c6b-4806-4579-b11e-8eac24b5166b", "ordered_at": "2023-05-13T18:02:54.510863", "user_id": "071", "order_items": [{"product_id": 751, "quantity": 8}]}, topic=orders, partition=0, offset=11416, ts=1684000974515
 ```
 
-We can also check the consumers with the management apps. For example, the 3 running consumers can be seen in the *Consumers* menu of *kafka-ui*. As expected, each consumer subscribes to its own topic partition. We can run the management apps by `docker-compose -f compose-ui.yml up -d`.
+We can also check the consumers with management apps. For example, the 3 running consumers can be seen in the *Consumers* menu of *kafka-ui*. As expected, each consumer subscribes to its own topic partition. We can run the management apps by `docker-compose -f compose-ui.yml up -d`.
 
 ![](consumers.png#center)
 
 ## Summary
 
-Kafka includes the Producer/Consumer APIs that allow client applications to send/read streams of data to/from topics in the Kafka cluster. While the main Kafka project maintains only the Java clients, there are several open source projects that provides Kafka client functionalities in Python. In this post, I demonstrated how to develop producer/consumer applications using the *kafka-python* package.
+Kafka includes the Producer/Consumer APIs that allow client applications to send/read streams of data to/from topics in a Kafka cluster. While the main Kafka project maintains only the Java clients, there are several open source projects that provide the Kafka client APIs in Python. In this post, I demonstrated how to develop producer/consumer applications using the *kafka-python* package.

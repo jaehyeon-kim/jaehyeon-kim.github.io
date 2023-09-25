@@ -1,7 +1,7 @@
 ---
 title: Kafka Development with Docker - Part 7 Producer and Consumer with Glue Schema Registry
 date: 2023-06-22
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -25,7 +25,7 @@ images: []
 description: In Part 4, we developed Kafka producer and consumer applications using the kafka-python package without integrating schema registry. Later we discussed the benefits of schema registry when developing Kafka applications in Part 5. In this post, I'll demonstrate how to enhance the existing applications by integrating AWS Glue Schema Registry.
 ---
 
-In [Part 4](/blog/2023-06-01-kafka-development-with-docker-part-4), we developed a Kafka producer and consumer applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package. The Kafka messages are serialized as Json, but are not associated with a schema as there was not an integrated schema registry. In [Part 5](/blog/2023-06-08-kafka-development-with-docker-part-5), we discussed how schema registry can improve robustness of Kafka applications by validating schemas. In this post, I'll demonstrate how to enhance the existing applications by integrating [*AWS Glue Schema Registry*](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html).
+In [Part 4](/blog/2023-06-01-kafka-development-with-docker-part-4), we developed Kafka producer and consumer applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package. The Kafka messages are serialized as Json, but are not associated with a schema as there was not an integrated schema registry. Later we discussed how producers and consumers to Kafka topics can use schemas to ensure data consistency and compatibility as schemas evolve in [Part 5](/blog/2023-06-08-kafka-development-with-docker-part-5). In this post, I'll demonstrate how to enhance the existing applications by integrating [*AWS Glue Schema Registry*](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html).
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
@@ -34,18 +34,18 @@ In [Part 4](/blog/2023-06-01-kafka-development-with-docker-part-4), we developed
 * [Part 5 Glue Schema Registry](/blog/2023-06-08-kafka-development-with-docker-part-5)
 * [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6)
 * [Part 7 Producer and Consumer with Glue Schema Registry](#) (this post)
-* Part 8 SSL Encryption
-* Part 9 SSL Authentication
-* Part 10 SASL Authentication
-* Part 11 Kafka Authorization
+* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8)
+* [Part 9 SSL Authentication](/blog/2023-07-06-kafka-development-with-docker-part-9)
+* [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10)
+* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11)
 
 ## Producer
 
-Fake order data is generated using the [Faker](https://faker.readthedocs.io/en/master/) package and the [dataclasses_avroschema](https://pypi.org/project/dataclasses-avroschema/) package is used to automatically generate the Avro schema according to its attributes. A mixin class called *InjectCompatMixin* is injected into the *Order* class, which specifies a schema [compatibility mode](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html#schema-registry-compatibility) into the generated schema. The `auto()` class method is used to instantiate the class automatically.
+Fake order data is generated using the [Faker](https://faker.readthedocs.io/en/master/) package and the [dataclasses_avroschema](https://pypi.org/project/dataclasses-avroschema/) package is used to automatically generate the Avro schema according to its attributes. A mixin class called *InjectCompatMixin* is injected into the *Order* class, which specifies a schema [compatibility mode](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html#schema-registry-compatibility) into the generated schema. The `auto()` class method is used to generate an order record by instantiating the class.
 
-The [aws-glue-schema-registry](https://pypi.org/project/aws-glue-schema-registry/) package is used serialize the value of order messages. It provides the *KafkaSerializer* class that validates, registers and serializes the relevant records. It supports Json and Avro schemas, and we can add it to the *value_serializer* argument of the *KafkaProducer* class. By default, the schemas are named as `<topic>-key` and `<topic>-value` and it can be changed by updating the [*schema_naming_strategy* argument](https://github.com/DisasterAWARE/aws-glue-schema-registry-python/blob/main/src/aws_schema_registry/serde.py#L54). Note that, when sending a message, the value should be a tuple of data and schema.
+The [aws-glue-schema-registry](https://pypi.org/project/aws-glue-schema-registry/) package is used serialize order records. It provides the *KafkaSerializer* class that validates, registers and serializes the relevant records. It supports Json and Avro schemas, and we can add it to the *value_serializer* argument of the *KafkaProducer* class. By default, the schemas are named as `<topic>-key` and `<topic>-value` and it can be changed by updating the [*schema_naming_strategy* argument](https://github.com/DisasterAWARE/aws-glue-schema-registry-python/blob/main/src/aws_schema_registry/serde.py#L54). Note that, when sending a message, the value should be a tuple of data and schema.
 
-It can run simply by `python producer.py`. Note that, as the producer runs outside the Docker network, the host name of the external listener (`localhost:29092`) should be used as the bootstrap server address. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-07) of this post.
+The producer application can be run simply by `python producer.py`. Note that, as the producer runs outside the Docker network, the host name of the external listener (`localhost:29092`) should be used as the bootstrap server address. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-07) of this post.
 
 ```python
 # kafka-pocs/kafka-dev-with-docker/part-07/producer.py
@@ -285,7 +285,7 @@ Below shows an example order record.
 
 ## Consumer
 
-The *Consumer* class instantiates *KafkaConsumer* in the *create* method. The main consumer configuration values are provided by the constructor arguments: Kafka bootstrap server addresses (*bootstrap_servers*), topic names (*topics*) and [consumer group ID](https://kafka.apache.org/documentation/#consumerconfigs_group.id) (*group_id*). Note that the *aws-glue-schema-registry* package provides the *KafkaDeserializer* class that deserializes messages according to the corresponding schema version, and we should use it as the *value_deserializer*. The `process()` method of the class polls messages and logs details of consumer records.
+The *Consumer* class instantiates the *KafkaConsumer* class in the *create* method. The main consumer configuration values are provided by the constructor arguments: Kafka bootstrap server addresses (*bootstrap_servers*), topic names (*topics*) and [consumer group ID](https://kafka.apache.org/documentation/#consumerconfigs_group.id) (*group_id*). Note that the *aws-glue-schema-registry* package provides the *KafkaDeserializer* class that deserializes messages according to the corresponding schema version, and we should use it as the *value_deserializer*. The `process()` method of the class polls messages and logs details of consumer records.
 
 ```python
 # kafka-pocs/kafka-dev-with-docker/part-07/consumer.py
@@ -396,7 +396,7 @@ networks:
 
 We should configure additional details in environment variables in order to integrate Glue Schema Registry. While both apps provide serializers/deserializers, *kpow* supports to manage schemas to some extent as well.
 
-For *kafka-ui*, we can add one or more [serialization plugins](https://docs.kafka-ui.provectus.io/configuration/serialization-serde). I added the [Glue registry serializer](https://github.com/provectus/kafkaui-glue-sr-serde) as a plugin and named it *online-order*. It requires the plugin binary file path, class name, registry name and AWS region name. Another key configuration values are the key and value schema templates values, which are used for finding schema names. Only the value schema template is updated as it is different from the default value. Note that the template values are applicable for producing messages on the UI. Therefore, we can leave them commented out if we don't produce messages on it. Finally, the Glue registry serializer binary should be downloaded as it is volume-mapped in the compose file. It can be downloaded from the project repository - see [*download.sh*](https://github.com/jaehyeon-kim/kafka-pocs/blob/main/kafka-dev-with-docker/part-07/download.sh).
+For *kafka-ui*, we can add one or more [serialization plugins](https://docs.kafka-ui.provectus.io/configuration/serialization-serde). I added the [Glue registry serializer](https://github.com/provectus/kafkaui-glue-sr-serde) as a plugin and named it *online-order*. It requires the plugin binary file path, class name, registry name and AWS region name. Another key configuration values are the key and value schema templates values, which are used for finding schema names. Only the value schema template is updated as it is different from the default value. Note that the template values are applicable for producing messages on the UI. Therefore, we can leave them commented out if we don't want to produce messages on it. Finally, the Glue registry serializer binary should be downloaded as it is volume-mapped in the compose file. It can be downloaded from the project repository - see [*download.sh*](https://github.com/jaehyeon-kim/kafka-pocs/blob/main/kafka-dev-with-docker/part-07/download.sh).
 
 The configuration of *kpow* is simpler as it only requires the registry ARN and AWS region. Note that the app fails to start if the registry doesn't exit. I created the registry named *online-order* before starting it.
 
@@ -469,7 +469,7 @@ part-07_app_2   sh -c pip install -r requi ...   Up      8000/tcp
 part-07_app_3   sh -c pip install -r requi ...   Up      8000/tcp
 ```
 
-Each instance of the consumer subscribes to its own topic partition, and we can check that by container logs. Below shows the last 10 log entries of one of the instances. It shows it polls messages from partition 0 only.
+Each instance of the consumer subscribes to its own topic partition, and we can check that in container logs. Below shows the last 10 log entries of one of the instances. It shows it polls messages from partition 0 only.
 
 ```bash
 $ docker logs -f --tail 10 part-07_app_1

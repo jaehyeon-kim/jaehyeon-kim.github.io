@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Simplify Streaming Ingestion on AWS
 categories:
-  - Apache Kafka
+  - Data Streaming
 tags: 
   - AWS
   - Amazon MSK

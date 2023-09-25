@@ -1,7 +1,7 @@
 ---
 title: Kafka Development with Docker - Part 5 Glue Schema Registry
 date: 2023-06-08
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -19,24 +19,24 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: The Glue Schema Registry supports features to manage and enforce schemas on data streaming applications using convenient integrations with Apache Kafka and other AWS managed services. In order to utilise those features, we need to use the client library. In this post, I'll illustrate how to build the client library after briefly introducing how it works to integrate the Glue Schema Registry with Kafka producer and consumer apps.
+description: The Glue Schema Registry supports features to manage and enforce schemas on data streaming applications using convenient integrations with Apache Kafka and other AWS managed services. In order to utilise those features, we need to use the client library. In this post, I'll illustrate how to build the client library after introducing how it works to integrate the Glue Schema Registry with Kafka producer and consumer apps.
 ---
 
 As described in the [Confluent document](https://docs.confluent.io/platform/current/schema-registry/index.html#sr-overview), _Schema Registry_ provides a centralized repository for managing and validating schemas for topic message data, and for serialization and deserialization of the data over the network. Producers and consumers to Kafka topics can use schemas to ensure data consistency and compatibility as schemas evolve. In AWS, the [Glue Schema Registry](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html) supports features to manage and enforce schemas on data streaming applications using convenient integrations with Apache Kafka, [Amazon Managed Streaming for Apache Kafka](https://aws.amazon.com/msk/), [Amazon Kinesis Data Streams](https://aws.amazon.com/kinesis/data-streams/), [Amazon Kinesis Data Analytics for Apache Flink](https://aws.amazon.com/kinesis/data-analytics/), and [AWS Lambda](https://aws.amazon.com/lambda/).
 
-In order to integrate the *Glue Schema Registry* with an application, we need to use the [AWS Glue Schema Registry Client library](https://github.com/awslabs/aws-glue-schema-registry), which primarily provides serializers and deserializers for Avro, Json and Portobuf formats. It also supports other necessary features such as registering schemas and performing compatibility check. As the project doesn't provide pre-built binaries, we have to build them on our own. In this post, I'll illustrate how to build the client library followed by briefly introducing how it works to integrate the Glue Schema Registry with Kafka producer and consumer apps.
+In order to integrate the *Glue Schema Registry* with an application, we need to use the [AWS Glue Schema Registry Client library](https://github.com/awslabs/aws-glue-schema-registry), which primarily provides serializers and deserializers for Avro, Json and Portobuf formats. It also supports other necessary features such as registering schemas and performing compatibility check. As the project doesn't provide pre-built binaries, we have to build them on our own. In this post, I'll illustrate how to build the client library after introducing how it works to integrate the Glue Schema Registry with Kafka producer and consumer apps. Once built successfully, we can obtain multiple binaries not only for Kafka Connect but also other applications such as Flink for Kinesis Data Analytics. Therefore, this post can be considered as a stepping stone for later posts.
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
 * [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3)
 * [Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4)
 * [Part 5 Glue Schema Registry](#) (this post)
-* Part 6 Kafka Connect with Glue Schema Registry
-* Part 7 Producer and Consumer with Glue Schema Registry
-* Part 8 SSL Encryption
-* Part 9 SSL Authentication
-* Part 10 SASL Authentication
-* Part 11 Kafka Authorization
+* [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6)
+* [Part 7 Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7)
+* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8)
+* [Part 9 SSL Authentication](/blog/2023-07-06-kafka-development-with-docker-part-9)
+* [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10)
+* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11)
 
 ## How It Works with Apache Kafka
 
@@ -76,7 +76,7 @@ It can work with Apache Kafka as well as other AWS services. See this [AWS docum
 * Apache Kafka Streams
 * Apache Kafka Connect
 
-## Build the Client Library
+## Build Glue Schema Registry Client Library
 
 In order to build the client library, we need to have both the [JDK](https://openjdk.org/) and [Maven](https://maven.apache.org/) installed. I use Ubuntu 18.04 on WSL2 and both the apps are downloaded from the Ubuntu package manager.
 
@@ -91,7 +91,7 @@ Default locale: en, platform encoding: UTF-8
 OS name: "linux", version: "5.4.72-microsoft-standard-wsl2", arch: "amd64", family: "unix"
 ```
 
-We first need to download the source archive from the project repository. The latest version is *v.1.1.15*, and it can be downloaded using *curl* with *-L* flag in order to follow the redirected download URL. Once downloaded, we can build the binaries as indicated in the [project repository](https://github.com/awslabs/aws-glue-schema-registry#using-kafka-connect-with-aws-glue-schema-registry). The script can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-05) of this post.
+We first need to download the source archive from the project repository. The latest version is *v.1.1.15* at the time of writing this post, and it can be downloaded using *curl* with *-L* flag in order to follow the redirected download URL. Once downloaded, we can build the binaries as indicated in the [project repository](https://github.com/awslabs/aws-glue-schema-registry#using-kafka-connect-with-aws-glue-schema-registry). The script shown below downloads and builds the client library. It can also be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-with-docker/part-05) of this post.
 
 ```bash
 # kafka-dev-with-docker/part-05/build.sh
@@ -119,13 +119,13 @@ cd plugins/$SOURCE_NAME/build-tools \
   && mvn dependency:copy-dependencies
 ```
 
-Note that I skipped tests with the `-DskipTests` option in order to save build time. I also skipped [checkstyle execution](https://maven.apache.org/plugins/maven-checkstyle-plugin/) with the `-Dcheckstyle.skip` option as I encountered the following error.  
+Note that I skipped tests with the `-DskipTests` option in order to save build time. Note further that I also skipped [checkstyle execution](https://maven.apache.org/plugins/maven-checkstyle-plugin/) with the `-Dcheckstyle.skip` option as I encountered the following error.  
 
 ```bash
 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-checkstyle-plugin:3.1.2:check (default) on project schema-registry-build-tools: Failed during checkstyle execution: Unable to find suppressions file at location: /tmp/kafka-pocs/kafka-dev-with-docker/part-05/plugins/aws-glue-schema-registry-v.1.1.15/build-tools/build-tools/src/main/resources/suppressions.xml: Could not find resource '/tmp/kafka-pocs/kafka-dev-with-docker/part-05/plugins/aws-glue-schema-registry-v.1.1.15/build-tools/build-tools/src/main/resources/suppressions.xml'. -> [Help 1]
 ```
 
-I saw the messages shown below when it was successfully built.
+Once it was built successfully, I was able to see the following messages.
 
 ```bash
 [INFO] ------------------------------------------------------------------------
@@ -151,7 +151,7 @@ I saw the messages shown below when it was successfully built.
 [INFO] ------------------------------------------------------------------------
 ```
 
-Once built successfully, we can obtain binaries not only for Kafka Connect but also other applications such as Flink for Kinesis Data Analytics. Below shows all the available binaries.
+As can be checked in the build messages, we can obtain binaries not only for Kafka Connect but also other applications such as Flink for Kinesis Data Analytics. Below shows all the available binaries.
 
 ```bash
 ## kafka connect
@@ -183,4 +183,4 @@ plugins/aws-glue-schema-registry-v.1.1.15/serializer-deserializer-msk-iam/target
 
 ## Summary
 
-The Glue Schema Registry supports features to manage and enforce schemas on data streaming applications using convenient integrations with Apache Kafka and other AWS managed services. In order to utilise those features, we need to use the client library. In this post, I illustrated how to build the client library after briefly introducing how it works to integrate the Glue Schema Registry with Kafka producer and consumer apps.
+The Glue Schema Registry supports features to manage and enforce schemas on data streaming applications using convenient integrations with Apache Kafka and other AWS managed services. In order to utilise those features, we need to use the client library. In this post, I illustrated how to build the client library after introducing how it works to integrate the Glue Schema Registry with Kafka producer and consumer apps.

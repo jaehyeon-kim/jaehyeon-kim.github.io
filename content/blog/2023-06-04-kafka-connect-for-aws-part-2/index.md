@@ -1,7 +1,7 @@
 ---
 title: Kafka Connect for AWS Services Integration - Part 2 Develop Camel DynamoDB Sink Connector using Docker
 date: 2023-06-04
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -12,11 +12,13 @@ featuredImage: false
 series:
   - Kafka Connect for AWS Services Integration
 categories:
-  - Data Engineering
+  - Apache Kafka
 tags: 
   - AWS
   - Apache Kafka
   - Kafka Connect
+  - Apache Camel
+  - Amazon DynamoDB
   - Docker
   - Docker Compose
 authors:
@@ -26,11 +28,13 @@ cevo: 29
 description: The suite of Apache Camel Kafka connectors and the Kinesis Kafka connector from the AWS Labs can be effective for building data ingestion pipelines that integrate AWS services. In this post, I will illustrate how to develop the Camel DynamoDB sink connector using Docker. Fake order data will be generated using the MSK Data Generator source connector, and the sink connector will be configured to consume the topic messages to ingest them into a DynamoDB table.
 ---
 
+**[This article](https://cevo.com.au/post/kafka-connect-for-aws-part-2/) was originally posted on Tech Insights of [Cevo Australia](https://cevo.com.au/).**
+
 In [Part 1](/blog/2023-05-03-kafka-connect-for-aws-part-1), we reviewed Kafka connectors focusing on AWS services integration. Among the available connectors, the suite of [Apache Camel Kafka connectors](https://camel.apache.org/camel-kafka-connector/3.18.x/index.html) and the [Kinesis Kafka connector](https://github.com/awslabs/kinesis-kafka-connector) from the AWS Labs can be effective for building data ingestion pipelines on AWS. In this post, I will illustrate how to develop the Camel DynamoDB sink connector using Docker. Fake order data will be generated using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) source connector, and the sink connector will be configured to consume the topic messages to ingest them into a DynamoDB table.
 
 * [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1)
 * [Part 2 Develop Camel DynamoDB Sink Connector using Docker](#) (this post)
-* Part 3 Deploy Camel DynamoDB Sink Connector on MSK Connect
+* [Part 3 Deploy Camel DynamoDB Sink Connector on MSK Connect](/blog/2023-07-03-kafka-connect-for-aws-part-3)
 * Part 4 Develop Kinesis Kafka Connector for OpenSearch using Docker
 * Part 5 Deploy Kinesis Kafka Connector for OpenSearch on MSK Connect
 
@@ -82,7 +86,7 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29092
       - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-0:9092,EXTERNAL://localhost:29092
-      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
       - KAFKA_CFG_NUM_PARTITIONS=3
       - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=3
     volumes:
@@ -105,7 +109,7 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29093
       - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-1:9092,EXTERNAL://localhost:29093
-      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
       - KAFKA_CFG_NUM_PARTITIONS=3
       - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=3
     volumes:
@@ -128,7 +132,7 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29094
       - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-2:9092,EXTERNAL://localhost:29094
-      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
       - KAFKA_CFG_NUM_PARTITIONS=3
       - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=3
     volumes:
