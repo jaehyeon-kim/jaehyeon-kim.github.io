@@ -50,10 +50,10 @@ description: Real Time Streaming with Kafka and Flink updates an AWS workshop th
 
 * [Introduction](#) (this post)
 * Lab 1 Produce data to Kafka using Lambda
-* Lab 2 Write data from S3 to Kafka using MSF
-* Lab 3 Transform and write data into S3 from Kafka using MSF
+* Lab 2 Write data to Kafka from S3 using MSF
+* Lab 3 Transform and write data to S3 from Kafka using MSF
 * Lab 4 Clean, Aggregate, and Enrich Events with MSF
-* Lab 5 Kafka Connect to sink data into DynamoDB
+* Lab 5 Write data to DynamoDB using Kafka Connect
 * Lab 6 Consume data from Kafka using Lambda
 
 ## Workshop Architecture
@@ -79,14 +79,14 @@ description: Real Time Streaming with Kafka and Flink updates an AWS workshop th
 
 * Lab 1 - Produce data to Kafka using Lambda
   * We will create Kafka producers using an EventBridge schedule rule and Lambda producer function. The schedule rule is set to run *every minute* and has a *configurable* number of targets where each of them invokes the producer function. The producer function send messages to a Kafka cluster on [Amazon MSK](https://aws.amazon.com/msk/). In this way we are able to generate events using multiple Lambda functions according to the desired volume of events.
-* Lab 2 - Write data from S3 to Kafka using MSF
+* Lab 2 - Write data to Kafka from S3 using MSF
   * We will develop a Pyflink application that reads *Taxi Ride* data from S3 and inserts into Kafka. As [Apache Flink](https://flink.apache.org/) supports both stream and batch processing, we are able to process static data without an issue. This kind of exercise can be useful for data enrichment that joins static data into stream events. 
-* Lab 3 - Transform and write data into S3 from Kafka using MSF
+* Lab 3 - Transform and write data to S3 from Kafka using MSF
   * We will write Kafka messages to a S3 bucket using a Pyflink application. Although Kafka Connect supports simple data transformations by the [single message transforms](https://kafka.apache.org/documentation.html#connect_transforms), they are quite limited compared to the scope that Apache Flink supports. Note that writing data to S3 allows us to build a data lake with real time data.
 * Lab 4 - Clean, Aggregate, and Enrich Events with MSF
   * We will learn how to connect a Pyflink application to the existing Kafka topics and clean, aggregate, and enrich the incoming events. The derived insights are finally persisted in [Amazon OpenSearch Service](https://aws.amazon.com/opensearch-service/), where they can be accessed and visualized using OpenSearch Dashboard. 
   * Note that the OpenSearch Flink connector is supported on Apache Flink version 1.16+ where the [latest supported version of Amazon MSF](https://docs.aws.amazon.com/managed-flink/latest/java/earlier.html) is 1.15.2. Normally Amazon MSF lags two minor versions behind and a newer version would be supported by the time when the lab is performed - The release of [Apache Flink version 1.18](https://cwiki.apache.org/confluence/display/FLINK/1.18+Release) is expected at the end of September 2023.
-* Lab 5 - Kafka Connect to sink data into DynamoDB
+* Lab 5 - Write data to DynamoDB using Kafka Connect
   * We will learn how to write data into a DynamoDB table using [Kafka Connect](https://kafka.apache.org/documentation/#connect). *Kafka Connect* is a tool for scalably and reliably streaming data between Apache Kafka and other systems. [Apache Camel](https://camel.apache.org/manual/faq/what-is-camel.html) provides a number of open source [Kafka connectors](https://camel.apache.org/camel-kafka-connector) that can be used to integrate AWS services. 
 * Lab 6 - Consume data from Kafka using Lambda
   * We will consume and process data with a Lambda function. Lambda internally polls for new messages from Kafka topics and then synchronously invokes the target Lambda function. Lambda reads the messages in batches and provides these to your function as an event payload.
