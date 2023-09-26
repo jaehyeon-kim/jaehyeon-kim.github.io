@@ -16,7 +16,7 @@ categories:
 tags: 
   - AWS
   - Amazon MSK
-  - MSK Connect
+  - Amazon MSK Connect
   - Apache Kafka
   - Kafka Connect
   - Apache Camel

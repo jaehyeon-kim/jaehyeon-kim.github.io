@@ -20,8 +20,9 @@ tags:
   - Kafka Connect
   - Amazon DynamoDB
   - Amazon MSK
-  - MSK Connect
+  - Amazon MSK Connect
   - Amazon Managed Service for Apache Flink
+  - Amazon MSF
   - Python
   - Fraud Detection
 authors:
