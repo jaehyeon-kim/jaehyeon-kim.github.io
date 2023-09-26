@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In the previous post, we discussed how to develop a data pipeline from Apache Kafka into OpenSearch locally using Docker. The pipeline will be deployed on AWS using Amazon MSK, Amazon MSK Connect and Amazon OpenSearch Service using Terraform in this post.
+description: In the previous post, we discussed how to develop a data pipeline from Apache Kafka into OpenSearch locally using Docker. The pipeline will be deployed on AWS using Amazon MSK, Amazon MSK Connect and Amazon OpenSearch Service using Terraform in this post. First the infrastructure will be deployed that covers a VPC, VPN server, MSK Cluster and OpenSearch domain. Then Kafka source and sink connectors will be deployed on MSK Connect, followed by performing quick data analysis.
 ---
 
 <!-- **[This article](https://cevo.com.au/post/kafka-connect-for-aws-part-1/) was originally posted on Tech Insights of [Cevo Australia](https://cevo.com.au/).** -->
