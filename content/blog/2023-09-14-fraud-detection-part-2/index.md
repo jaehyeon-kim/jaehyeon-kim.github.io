@@ -22,7 +22,7 @@ tags:
   - Amazon MSK
   - Amazon MSK Connect
   - Amazon Managed Service for Apache Flink
-  - Amazon MSF
+  - Amazon Managed Flink
   - Python
   - Fraud Detection
 authors:
