@@ -1,7 +1,7 @@
 ---
 title: How I Prepared for Certified Kubernetes Application Developer (CKAD)
 date: 2023-10-12
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
