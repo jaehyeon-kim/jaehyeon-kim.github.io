@@ -2,7 +2,7 @@
 title: Kafka, Flink and DynamoDB for Real Time Fraud Detection - Part 2 Deployment via AWS Managed Flink
 date: 2023-09-14
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 reward: false
