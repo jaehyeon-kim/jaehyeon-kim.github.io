@@ -1,8 +1,8 @@
 ---
-title: How I Prepared for Certified Kubernetes Application Developer (CKAD)
-date: 2023-10-12
-draft: false
-featured: false
+title: Building Apache Flink Applications in Python
+date: 2023-10-19
+draft: true
+featured: true
 comment: true
 toc: true
 reward: false
@@ -12,60 +12,154 @@ featuredImage: false
 # series:
 #   - Kafka Development with Docker
 categories:
-  - General
+  - Data Streaming
 tags: 
-  - Kubernetes
-  - Certification
+  - Apache Kafka
+  - Apache Flink
+  - Pyflink
+  - Docker
+  - Docker Compose
+  - Python
 authors:
   - JaehyeonKim
 images: []
-description: I recently obtained the Certified Kubernetes Application Developer (CKAD) certification.  It is for Kubernetes engineers, cloud engineers and other IT professionals responsible for building, deploying, and configuring cloud native applications with Kubernetes. In this post, I will summarise how I prepared for the exam by reviewing three online courses and two practice tests that I went through.
+description: Building Apache Flink Applications in Java by Confluent is a course to introduce Apache Flink through a series of hands-on exercises. Utilising the Flink DataStream API,  the course develops three Flink applications from ingesting source data into calculating usage statistics. As part of learning the Flink DataStream API in Pyflink, I converted the Java apps into Python equivalent while performing the course exercises in Pyflink. This post summarises the progress of the conversion and shows the final output.
 ---
 
-I recently obtained the [Certified Kubernetes Application Developer (CKAD)](https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/) certification. CKAD has been developed by [The Linux Foundation](https://www.linuxfoundation.org/) and the [Cloud Native Computing Foundation (CNCF)](https://www.cncf.io/), to help expand the Kubernetes ecosystem through standardized training and certification. Specifically this certification is for Kubernetes engineers, cloud engineers and other IT professionals responsible for building, deploying, and configuring cloud native applications with Kubernetes. In this post, I will summarise how I prepared for the exam by reviewing three online courses and two practice tests that I went through.
+[Building Apache Flink Applications in Java](https://developer.confluent.io/courses/flink-java/overview/) is a course to introduce [Apache Flink](https://flink.apache.org/) through a series of hands-on exercises, and it is provided by [Confluent](https://www.confluent.io/). Utilising the [Flink DataStream API](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/dev/datastream/overview/), the course develops three Flink applications that populate multiple source data sets, collect them into a standardised data set, and aggregate it to produce usage statistics. As part of learning the Flink DataStream API in Pyflink, I converted the Java apps into Python equivalent while performing the course exercises in Pyflink. This post summarises the progress of the conversion and shows the final output.
 
-## Online Courses
+## Architecture
 
-I took the following courses.
+There are two airlines (*SkyOne* and *Sunset*) and they have their own flight data in different schemas. While the course ingests the source data into corresponding topics using a Flink application that makes use of the [DataGen DataStream Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/datastream/datagen/), we use a [Kafka producer application](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s05_data_gen.py) here because the DataGen connector is not available for python.
 
-- Udemy
-  - [Kubernetes Certified Application Developer (CKAD) with Tests](https://www.udemy.com/course/certified-kubernetes-application-developer/)
-- Cloud Academy
-  - [Certified Kubernetes Application Developer (CKAD) Exam Preparation](https://cloudacademy.com/learning-paths/certified-kubernetes-application-developer-ckad-exam-preparation-1-3086/)
-- A Cloud Guru
-  - [Certified Kubernetes Application Developer (CKAD)](https://learn.acloud.guru/course/certified-kubernetes-application-developer)
+The [flight importer job](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s16_merge.py) reads the messages from the source topics, standardises them into the flight data schema, and pushed into another Kafka topic, called *flightdata*. It is developed using Pyflink.
 
-### Udemy
+The [usage statistics calculator](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s20_manage_state.py) sources the *flightdata* topic and calculates usage statistics over a one-minute window, which is grouped by email address. Moreover, while accessing the global state, it produces cumulative usage statistics, which carries information from one window to the next. It is developed using Pyflink as well.
 
-I began with the *Udemy* course. The lectures are okay *individually*, and labs and practice tests are performed in an exam-like environment where questions are shown on the left side while the terminal is located on the right side. The course seems to had a major update and lots of lectures are located in the *Updates for Sep 2021 Changes* section. Those updated lectures are not according to the exam curriculum and I felt confused to figure out how they are related. Therefore, I'm not sure if the lectures are good *collectively* for those who are new to Kubernetes. Regardless its lightning labs and mock exams are quite useful. Besides, the course includes a 20% exam discount coupon, and it covers more than the course price.
+![](featured.png#center)
 
-### Cloud Academy
+## Course Contents
 
-Because of the confusion, I decided to take the *Cloud Academy* course. Starting from a mini course titled *an introduction to Kubernetes*, it covers individual exam topics mostly via hands-on labs. This course was the most beneficial for me because it has a dedicated lecture for the Kubernetes command line tool (*kubectl*) and makes use of it in all labs and exam challenges. As you would have found out from other sources already, we can save a lot of time with *kubectl*, although the exam allows you to refer to the Kubernetes document site. The following lists some useful cases where the command line tool becomes beneficial significantly.
+Below describes course contents. ✅ and ☑️ indicate exercises and course materials respectively. The lesson 3 covers how to set up Kafka and Flink clusters using Docker Compose. The Kafka producer app is created as the lesson 5 exercise. The final versions of the flight importer job and usage statistics calculator can be found as exercises of the lesson 16 and 20 respectively.
 
-1. Creating Kubenetes resources (pod, job, cron job, deployment, service ...) with basic configurations easily (or saving their YAML manifests for further updates),
-2. Saving quite some time of checking configuration objects via `kubectl explain` rather than searching the Kubenetes document, and
-3. Creating a dummy resource to see how specific configurations are applied
-    - e.g. for rolling update configuration of a deployment, we can create a dummy deployment and copy/paste from it
+1. Apache Flink with Java - An Introduction
+2. Datastream Programming
+3. ✅ How to Start Flink and Get Setup (Exercise)
+   - Built Kafka and Flink clusters using Docker
+   - Bitnami images are used for the Kafka cluster - see [this page](https://jaehyeon.me/blog/2023-05-04-kafka-development-with-docker-part-1/) for details.
+   - A custom Docker image (_building-pyflink-apps:1.17.1_) is created to install Python and the Pyflink package as well as to save dependent Jar files
+     - See the [Dockerfile](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/Dockerfile), and it can be built by `docker build -t=building-pyflink-apps:1.17.1 .`
+   - See the [docker-compose.yml](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/docker-compose.yml) and the clusters can be started by `docker-compose up -d`
+4. ☑️ The Flink Job Lifecycle
+   - A minimal example of executing a Pyflink app is added.
+   - **See course content(s) below**
+     - [s04_intro.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s04_intro.py)
+5. ✅ Running a Flink Job (Exercise)
+   - Pyflink doesn't have the DataGen DataStream connector. Used a Kafka producer instead to create topics and send messages.
+     - 4 topics are created (_skyone_, _sunset_, _flightdata_ and _userstatistics_) and messages are sent to the first two topics.
+   - **See course content(s) below**
+     - [s05_data_gen.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s05_data_gen.py)
+       - Topics are created by a flag argument so add it if it is the first time running it. i.e. `python src/s05_data_gen.py --create`. Basically it deletes the topics if exits and creates them.
+6. Anatomy of a Stream
+7. Flink Data Sources
+8. ✅ Creating a Flink Data Source (Exercise)
+   - It reads from the _skyone_ topic and prints the values. The values are deserialized as string in this exercise.
+   - This and all the other Pyflink applications can be executed locally or run in the Flink cluster. See the script for details.
+   - **See course content(s) below**
+     - [s08_create_source.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s08_create_source.py)
+9. Serializers & Deserializers
+10. ✅ Deserializing Messages in Flink (Exercise)
+    - The _skyone_ message values are deserialized as Json string and they are returned as the [named Row type](https://nightlies.apache.org/flink/flink-docs-master/api/python/reference/pyflink.common/api/pyflink.common.typeinfo.Types.ROW_NAMED.html#pyflink.common.typeinfo.Types.ROW_NAMED). As the Flink type is not convenient for processing, it is converted into a Python object, specifically [Data Classes](https://docs.python.org/3/library/dataclasses.html).
+    - **See course content(s) below**
+      - [s10_deserialization.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s10_deserialization.py)
+11. ☑️ Transforming Data in Flink
+    - _Map_, _FlatMap_, _Filter_ and _Reduce_ transformations are illustrated using built-in operators and process functions.
+    - **See course content(s) below**
+      - [s11_transformation.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s11_transformation.py)
+      - [s11_process_function.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s11_process_function.py)
+12. ✅ Flink Data Transformations (Exercise)
+    - The source data is transformed into the flight data. Later data from _skyone_ and _sunset_ will be converted into this schema for merging them.
+    - The transformation is performed in a function called _define_workflow_ for being tested. This function will be updated gradually.
+    - **See course content(s) below**
+      - [s12_transformation.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s12_transformation.py)
+      - [test_s12_transformation.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/test_s12_transformation.py)
+        - Expected to run testing scripts individually eg) `pytest src/test_s12_transformation.py -svv`
+13. Flink Data Sinks
+14. ✅ Creating a Flink Data Sink (Exercise)
+    - The converted data from _skyone_ will be pushed into a Kafka topic (_flightdata_).
+    - Note that, as the Python Data Classes cannot be serialized, records are converted into the named Row type before being sent.
+    - **See course content(s) below**
+      - [s14_sink.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s14_sink.py)
+15. ☑️ Creating Branching Data Streams in Flink
+    - Various branching methods are illustrated, which covers _Union_, _CoProcessFunction_, _CoMapFunction_, _CoFlatMapFunction_, and _Side Outputs_.
+    - **See course content(s) below**
+      - [s15_branching.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s15_branching.py)
+16. ✅ Merging Flink Data Streams (Exercise)
+    - Records from the _skyone_ and _sunset_ topics are merged and sent into the _flightdata_ topic after being converted into the flight data.
+    - **See course content(s) below**
+      - [s16_merge.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s16_merge.py)
+      - [test_s16_merge.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/test_s16_merge.py)
+17. Windowing and Watermarks in Flink
+18. ✅ Aggregating Flink Data using Windowing (Exercise)
+    - Usage statistics (total flight duration and number of flights) are calculated by email address, and they are sent into the _userstatistics_ topic.
+    - Note the transformation is _stateless_ in a sense that aggregation is entirely within a one-minute tumbling window.
+    - **See course content(s) below**
+      - [s18_aggregation.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s18_aggregation.py)
+      - [test_s18_aggregation.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/test_s18_aggregation.py)
+19. Working with Keyed State in Flink
+20. ✅ Managing State in Flink (Exercise)
+    - The transformation gets _stateful_ so that usage statistics are continuously updated by accessing the state values.
+    - The _reduce_ function includes a window function that allows you to access the global state. The window function takes the responsibility to keep updating the global state and to return updated values.
+    - **See course content(s) below**
+      - [s20_manage_state.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s20_manage_state.py)
+      - [test_s20_manage_state.py](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/test_s20_manage_state.py)
+21. Closing Remarks
 
-Where you're familiar with *kubectl* or not, you will be able to learn how to manage Kubenetes resources quickly and efficiently using it throughout the course, which I find one of the most important abilities for the exam. On the other hand, I think some parts of the course don't specifically match the exam scope. For example, it has a full course of Helm, and it covers way too much by ending-up creating your own helm charts. You may skip it if you just focus on the exam. Instead, you can learn from the [Introduction](https://helm.sh/docs/intro/using_helm/) section of the Helm document. 
+## Start Applications
 
-### A Cloud Guru
+After creating the Kafka and Flink clusters using Docker Compose, we need to start the Python producer in one terminal. Then we can submit the other Pyflink applications in another terminal.
 
-A friend of mine recommended the *A Cloud Guru* course and I took it as I had a good memory while I was preparing for my [Kafka certification](/blog/2023-05-11-how-i-prepared-for-ccdak). The lectures are well-organised and matches the exam curriculum suitably. It also provides good study notes that keep key points and relevant document links. Although I enjoyed the lectures, I find quite a significant drawback of this course. The lectures and answers to hands-on labs/practice exams rely on YAML manifests, and I don't think it is a good approach for exam preparation. Nonetheless, this concise and focused course can be beneficial if you're familiar with the Kubernetes command line tool already.
+```bash
+#### build docker image for Pyflink
+docker build -t=building-pyflink-apps:1.17.1 .
 
-## Practice Exams
+#### create kafka and flink clusters and kafka-ui
+docker-compose up -d
 
-### CKAD Exercises
+#### start kafka producer in one terminal
+python -m venv venv
+source venv/bin/activate
+# upgrade pip (optional)
+pip install pip --upgrade
+# install required packages
+pip install -r requirements-dev.txt
+## start with --create flag to create topics before sending messages
+python src/s05_data_gen.py --create
 
-After finishing the courses, I searched practice exams and found [CKAD exercises](https://github.com/dgkanatsios/CKAD-exercises) by Dimitris-Ilias Gkanatsios. Although the questions are grouped in the old curriculum, they do cover the current curriculum suitably as well. It also includes relevant Kubernetes document links, and you may go through them before or after attempting the questions if you'd like to learn more.
+#### submit pyflink apps in another terminal
+## flight importer
+docker exec jobmanager /opt/flink/bin/flink run \
+    --python /tmp/src/s16_merge.py \
+    --pyFiles file:///tmp/src/models.py,file:///tmp/src/utils.py \
+    -d
 
-### KodeKloud
+## usage calculator
+docker exec jobmanager /opt/flink/bin/flink run \
+    --python /tmp/src/s20_manage_state.py \
+    --pyFiles file:///tmp/src/models.py,file:///tmp/src/utils.py \
+    -d
+```
 
-Even after I completed the CKAD exercises, I still was not sure if I was prepared enough. Luckily the KodeKloud (folks who created the Udemy course) started a free week until the 1st of October, and I took the [Ultimate Certified Kubernetes Application Developer (CKAD) Mock Exam Series](https://kodekloud.com/courses/ultimate-certified-kubernetes-application-developer-ckad-mock-exam-series/). It has a total of 10 exams and each exam has 20 questions. Not every question is new, however, some of them are repeated in later exams. The questions are quite good as I was able to practice complicated scenarios and learn more especially *Custom Resource Definition* and *Ingress*.
+We can check the Pyflink jobs are running on the Flink Dashboard via *localhost:8081*.
 
-## Actual Exam
+![](flink-jobs.png#center)
 
-I was given 16 questions that requires to create/update/fix Kubernetes resources. The final question was about creating a Docker image and saving it to a local folder, which is also a part of the curriculum. For me, the questions were not tricky as the instructions were quite specific. Overall I find the level of difficulty is similar to the *CKAD exercises*. Unlike what others mention, I had 30 minutes left after I attempted all questions, and I had a chance to review all of them starting from flagged ones.
+Also, we can check the Kafka topics on *kafka-ui* via *localhost:8080*.
 
-I hope you find this post useful and good luck with your exam!
+![](kafka-topics.png#center)
+
+## Unit Testing
+
+Four lessons have unit testing cases, and they are expected to run separately by specifying a testing script. For example, below shows running unit testing cases of the final usage statistics calculator job.
+
+![](unit-testing.png#center)
