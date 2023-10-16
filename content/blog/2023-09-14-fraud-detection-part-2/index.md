@@ -2,7 +2,7 @@
 title: Kafka, Flink and DynamoDB for Real Time Fraud Detection - Part 2 Deployment via AWS Managed Flink
 date: 2023-09-14
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 reward: false
@@ -152,7 +152,7 @@ A VPC with 3 public and private subnets is created using the [AWS VPC Terraform 
 
 ### MSK Cluster
 
-A MSK cluster with 2 brokers is created. The broker nodes are deployed with the *kafka.m5.large* instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion.
+An MSK cluster with 2 brokers is created. The broker nodes are deployed with the *kafka.m5.large* instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion.
 
 ```terraform
 # infra/variable.tf
