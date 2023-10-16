@@ -49,7 +49,7 @@ The infrastructure is built by Terraform and the AWS SAM CLI is used to develop 
 A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (`vpc.tf`). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (`vpn.tf`). It is particularly useful to monitor and manage the MSK cluster and Kafka topic as well as developing the Kafka producer Lambda function locally. The details about how to configure the VPN server can be found in an [earlier post](/blog/2022-02-06-dev-infra-terraform). The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/glue-schema-registry) of this post.
 
 ### MSK
-A MSK cluster with 3 brokers is created. The broker nodes are deployed with the `kafka.m5.large` instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion.
+An MSK cluster with 3 brokers is created. The broker nodes are deployed with the `kafka.m5.large` instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion.
 
 ```terraform
 # glue-schema-registry/infra/variable.tf

@@ -126,7 +126,7 @@ A VPC with 3 public and private subnets is created using the [AWS VPC Terraform 
 
 ### MSK Cluster
 
-A MSK cluster with 2 brokers is created. The broker nodes are deployed with the *kafka.m5.large* instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion. Note that the Flink application needs to have access to the Kafka brokers, and it is allowed by adding an inbound connection from the KDA app into the brokers on port 9098.
+An MSK cluster with 2 brokers is created. The broker nodes are deployed with the *kafka.m5.large* instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion. Note that the Flink application needs to have access to the Kafka brokers, and it is allowed by adding an inbound connection from the KDA app into the brokers on port 9098.
 
 ```terraform
 # infra/variable.tf

@@ -16,6 +16,7 @@ categories:
 tags: 
   - Apache Kafka
   - Confluent
+  - Certification
 authors:
   - JaehyeonKim
 images: []
