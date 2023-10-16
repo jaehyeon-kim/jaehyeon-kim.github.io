@@ -28,6 +28,9 @@ description: We'll discuss how to set up a development infrastructure on AWS wit
 
 When I wrote my data lake demo series ([part 1](/blog/2021-12-05-datalake-demo-part1), [part 2](/blog/2021-12-12-datalake-demo-part2) and [part 3](/blog/2021-12-19-datalake-demo-part3)) recently, I used an Aurora PostgreSQL, MSK and EMR cluster. All of them were deployed to private subnets and dedicated infrastructure was created using CloudFormation. Using the infrastructure as code (IaC) tool helped a lot, but it resulted in creating 7 CloudFormation stacks, which was a bit harder to manage in the end. Then I looked into how to simplify building infrastructure and managing resources on AWS and decided to use Terraform instead. I find it has useful constructs (e.g. [meta-arguments](https://blog.knoldus.com/meta-arguments-in-terraform/)) to make it simpler to create and manage resources. It also has a wide range of useful [modules](https://registry.terraform.io/namespaces/terraform-aws-modules) that facilitate development significantly. In this post, we’ll build an infrastructure for development on AWS with Terraform. A VPN server will also be included in order to improve developer experience by accessing resources in private subnets from developer machines.
 
+[**UPDATE 2023-10-13**]
+- In later projects, the VPN admin password and VPN pre shared key are auto-generated and saved as a secret in AWS Secrets Manager. The changes are added to VPN section. 
+
 ## Architecture
 
 The infrastructure that we’ll discuss in this post is shown below. The database is deployed in a private subnet, and it is not possible to access it from the developer machine. We can construct a PC-to-PC VPN with [SoftEther VPN](https://www.softether.org/). The VPN server runs in a public subnet, and it is managed by an autoscaling group where only a single instance will be maintained. An elastic IP address is associated by a bootstrap script so that its public IP doesn't change even if the EC2 instance is recreated. We can add users with the server manager program, and they can access the server with the client program. Access from the VPN server to the database is allowed by adding an inbound rule where the source security group ID is set to the VPN server’s security group ID. Note that another option is [AWS Client VPN](https://aws.amazon.com/vpn/client-vpn/), but it is way more expensive. We’ll create 2 private subnets, and it’ll cost $0.30/hour for endpoint association in the Sydney region. It also charges $0.05/hour for each connection and the minimum charge will be $0.35/hour. On the other hand, the SorftEther VPN server runs in the `t3.nano` instance and its cost is only $0.0066/hour.
@@ -261,6 +264,123 @@ docker run -d \
   -e SPW=${admin_password} \
   -e HPW=DEFAULT \
   siomiz/softethervpn:debian
+```
+
+[**UPDATE 2023-10-13**] In later projects, the VPN admin password and VPN pre shared key are auto-generated and saved as a secret in AWS Secrets Manager. The secret is named as `"${local.name}-vpn-secrets"` and can be obtained on AWS Console. Or the VPN secret ID are added to a Terraform output value, it can be obtained as shown below.
+
+```bash
+aws secretsmanager get-secret-value \
+  --secret-id $(terraform output -raw vpn_secret_id) | jq -c '.SecretString | fromjson'
+# {"vpn_pre_shared_key":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx","vpn_admin_password":"xxxxxxxxxxxxxxxx"}
+```
+
+Below shows relevant Terraform changes.
+
+```terraform
+# vpn.tf
+module "vpn" {
+  source  = "terraform-aws-modules/autoscaling/aws"
+  version = "~> 6.5"
+  count   = local.vpn.to_create ? 1 : 0
+
+  name = "${local.name}-vpn-asg"
+
+  ...
+
+  # Launch template
+  create_launch_template = true
+  update_default_version = true
+
+  user_data = base64encode(join("\n", [
+    "#cloud-config",
+    yamlencode({
+      # https://cloudinit.readthedocs.io/en/latest/topics/modules.html
+      write_files : [
+        {
+          path : "/opt/vpn/bootstrap.sh",
+          content : templatefile("${path.module}/scripts/bootstrap.sh", {
+            aws_region     = local.region,
+            allocation_id  = aws_eip.vpn[0].allocation_id,
+            vpn_psk        = "${random_password.vpn_pre_shared_key[0].result}", # <- internally generated value
+            admin_password = "${random_password.vpn_admin_pw[0].result}" # <- internally generated value
+          }),
+          permissions : "0755",
+        }
+      ],
+      runcmd : [
+        ["/opt/vpn/bootstrap.sh"],
+      ],
+    })
+  ]))
+
+  ...
+
+  tags = local.tags
+}
+
+...
+
+## create VPN secrets - IPsec Pre-Shared Key and admin password for VPN
+##  see https://cloud.google.com/network-connectivity/docs/vpn/how-to/generating-pre-shared-key
+resource "random_password" "vpn_pre_shared_key" {
+  count            = local.vpn.to_create ? 1 : 0
+  length           = 32
+  override_special = "/+"
+}
+
+resource "random_password" "vpn_admin_pw" {
+  count   = local.vpn.to_create ? 1 : 0
+  length  = 16
+  special = false
+}
+
+resource "aws_secretsmanager_secret" "vpn_secrets" {
+  count                   = local.vpn.to_create ? 1 : 0
+  name                    = "${local.name}-vpn-secrets"
+  description             = "Service Account Password for the API"
+  recovery_window_in_days = 0
+
+  tags = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "vpn_secrets" {
+  count         = local.vpn.to_create ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.vpn_secrets[0].id
+  secret_string = <<EOF
+  {
+    "vpn_pre_shared_key": "${random_password.vpn_pre_shared_key[0].result}",
+    "vpn_admin_password": "${random_password.vpn_admin_pw[0].result}"
+  }
+EOF
+}
+
+resource "tls_private_key" "pk" {
+  count     = local.vpn.to_create ? 1 : 0
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "key_pair" {
+  count      = local.vpn.to_create ? 1 : 0
+  key_name   = "${local.name}-vpn-key"
+  public_key = tls_private_key.pk[0].public_key_openssh
+}
+
+...
+
+# outputs.tf
+...
+
+output "vpn_secret_id" {
+  description = "VPN secret ID"
+  value       = local.vpn.to_create ? aws_secretsmanager_secret.vpn_secrets[0].id : null
+}
+
+output "vpn_secret_version" {
+  description = "VPN secret version ID"
+  value       = local.vpn.to_create ? aws_secretsmanager_secret_version.vpn_secrets[0].version_id : null
+}
+...
 ```
 
 ### Database
