@@ -1,6 +1,6 @@
 ---
 title: Kafka Connect for AWS Services Integration - Part 4 Develop Aiven OpenSearch Sink Connector
-date: 2023-09-28
+date: 2023-10-23
 draft: true
 featured: false
 comment: true

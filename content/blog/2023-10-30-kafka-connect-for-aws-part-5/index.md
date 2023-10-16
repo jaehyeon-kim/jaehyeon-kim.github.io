@@ -1,6 +1,6 @@
 ---
 title: Kafka Connect for AWS Services Integration - Part 5 Deploy Aiven OpenSearch Sink Connector
-date: 2023-10-02
+date: 2023-10-30
 draft: true
 featured: false
 comment: true
@@ -181,7 +181,7 @@ resource "aws_security_group_rule" "opensearch_vpn_inbound_rest" {
 
 ### MSK Cluster
 
-A MSK cluster with 2 brokers is created. The broker nodes are deployed with the *kafka.m5.large* instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion.
+An MSK cluster with 2 brokers is created. The broker nodes are deployed with the *kafka.m5.large* instance type in private subnets and IAM authentication is used for the client authentication method. Finally, additional server configurations are added such as enabling auto creation of topics and topic deletion.
 
 ```terraform
 # variable.tf
