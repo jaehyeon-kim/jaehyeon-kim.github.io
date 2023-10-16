@@ -49,7 +49,7 @@ description: This series updates a real time analytics app based on Amazon Kines
 [Apache Kafka](https://kafka.apache.org/) is a popular distributed event store and stream processing platform, and it stores incoming events in topics. As part of learning real time streaming analytics on AWS, we can rebuild the analytics applications by replacing the Kinesis streams with Kafka topics. As an introduction, this post compares the workshop architecture with the updated architecture of this series. The labs of the updated architecture will be implemented in subsequent posts.
 
 * [Introduction](#) (this post)
-* Lab 1 Produce data to Kafka using Lambda
+* [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-2)
 * Lab 2 Write data to Kafka from S3 using Flink
 * Lab 3 Transform and write data to S3 from Kafka using Flink
 * Lab 4 Clean, Aggregate, and Enrich Events with Flink
