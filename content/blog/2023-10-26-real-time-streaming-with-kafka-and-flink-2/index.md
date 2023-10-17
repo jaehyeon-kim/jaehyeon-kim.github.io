@@ -25,7 +25,7 @@ authors:
   - JaehyeonKim
 images: []
 cevo: 34
-docs: https://docs.google.com/document/d/1emCpTlDkPCQUhWKcO7crrybeH5YFM6MMtHz9owM-Uj4
+docs: https://docs.google.com/document/d/1noUCJwNq9LCQRbW58axYjpn8L8ICSseLizVS-744WoE
 description: In this lab, we will create a Kafka producer application using AWS Lambda, which sends fake taxi ride data into a Kafka topic on Amazon MSK. A configurable number of the producer Lambda function will be invoked by an Amazon EventBridge schedule rule. Therefore, we are able to generate test data concurrently based on the desired volume of messages. 
 ---
 
@@ -578,7 +578,7 @@ Once deployed, we can see that the schedule rule has 5 targets of the same Lambd
 
 ### Monitor Topic
 
-A Kafka management app can be a good companion for development as it helps monitor and manage resources on an easy-to-use user interface. We'll use [Kpow Community Edition](https://docs.kpow.io/ce/) in this post, which allows you to link a single Kafka cluster, Kafka connect server and schema registry. Note that the community edition is valid for 12 months and the license can be requested in this [page](https://kpow.io/get-started/#individual). Once requested, the license details will be emailed, and they can be added as an environment file (*env_file*).
+A Kafka management app can be a good companion for development as it helps monitor and manage resources on an easy-to-use user interface. We'll use [Kpow Community Edition](https://docs.kpow.io/ce/) in this post, which allows you to link a single Kafka cluster, Kafka connect server and schema registry. Note that the community edition is valid for 12 months and the licence can be requested on this [page](https://kpow.io/get-started/#individual). Once requested, the licence details will be emailed, and they can be added as an environment file (*env_file*).
 
 The app needs additional configurations in environment variables because the Kafka cluster on Amazon MSK is authenticated by IAM - see [this page](https://docs.kpow.io/config/msk/) for details. The bootstrap server address can be found on AWS Console or executing the following Terraform command. 
 
