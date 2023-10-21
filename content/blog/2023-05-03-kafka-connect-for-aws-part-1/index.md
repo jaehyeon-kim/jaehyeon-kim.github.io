@@ -31,8 +31,8 @@ description: Kafka Connect is a tool for scalably and reliably streaming data be
 * [Part 1 Introduction](#) (this post)
 * [Part 2 Develop Camel DynamoDB Sink Connector](/blog/2023-06-04-kafka-connect-for-aws-part-2)
 * [Part 3 Deploy Camel DynamoDB Sink Connector](/blog/2023-07-03-kafka-connect-for-aws-part-3)
-* [Part 4 Develop Aiven OpenSearch Sink Connector](/blog/2023-09-28-kafka-connect-for-aws-part-4)
-* [Part 5 Deploy Aiven OpenSearch Sink Connector](/blog/2023-10-02-kafka-connect-for-aws-part-5)
+* [Part 4 Develop Aiven OpenSearch Sink Connector](/blog/2023-10-23-kafka-connect-for-aws-part-4)
+* Part 5 Deploy Aiven OpenSearch Sink Connector
 
 ## Amazon
 
@@ -43,6 +43,7 @@ As far as I've searched, there are two GitHub repositories by AWS. The [Kinesis 
 |[Kinesis](https://github.com/awslabs/kinesis-kafka-connector)||✔|
 |[Kinesis - Firehose](https://github.com/awslabs/kinesis-kafka-connector)||✔|
 |[Personalize](https://github.com/aws/personalize-kafka-connector)||✔|
+|[EventBridge](https://github.com/awslabs/eventbridge-kafka-connector)||✔|
 
 Note that, if we use the sink connector for Kinesis Data Firehose, we can build data pipelines to the [AWS services that are supported by it](https://docs.aws.amazon.com/firehose/latest/dev/create-name.html), which covers S3, Redshift and OpenSearch mainly. 
 
@@ -110,4 +111,4 @@ Two other vendors ([Aiven](https://aiven.io/) and [Lenses](https://lenses.io/)) 
 
 ## Summary
 
-Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It can be used to build real-time data pipelines on AWS effectively. Among available connectors, those that are provided by Amazon and Apache Camel have good potential.
+Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It can be used to build real-time data pipelines on AWS effectively. We have discussed a range of Kafka connectors both from Amazon and 3rd-party projects. We will showcase some of them in later posts.
