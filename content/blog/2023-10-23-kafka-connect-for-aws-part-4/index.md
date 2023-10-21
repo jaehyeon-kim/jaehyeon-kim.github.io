@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: We can use Kafka Connect to ingesting data from Apache Kafka into OpenSearch. In this post, we will discuss how to develop a data pipeline from Apache Kafka into OpenSearch locally using Docker while the pipeline will be deployed on AWS in the next post. Fake impressions and clicks data will be pushed into Kafka topics using a Kafka source connector and those records will be ingested into OpenSearch indexes using a sink connector for near-real time analytics.
+description: Kafka Connect can be an effective tool to ingest data from Apache Kafka into OpenSearch. In this post, we will discuss how to develop a data pipeline from Apache Kafka into OpenSearch locally using Docker while the pipeline will be deployed on AWS in the next post. Fake impressions and clicks data will be pushed into Kafka topics using a Kafka source connector and those records will be ingested into OpenSearch indexes using a sink connector for near-real time analytics.
 ---
 
 <!-- **[This article](https://cevo.com.au/post/kafka-connect-for-aws-part-1/) was originally posted on Tech Insights of [Cevo Australia](https://cevo.com.au/).** -->
