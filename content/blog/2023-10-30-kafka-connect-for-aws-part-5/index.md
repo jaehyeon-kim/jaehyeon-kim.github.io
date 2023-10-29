@@ -1,7 +1,7 @@
 ---
 title: Kafka Connect for AWS Services Integration - Part 5 Deploy Aiven OpenSearch Sink Connector
 date: 2023-10-30
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -15,6 +15,9 @@ categories:
   - Apache Kafka
 tags: 
   - AWS
+  - Amazon MSK
+  - MSK Connect
+  - Amazon OpenSearch Service
   - Apache Kafka
   - Kafka Connect
   - OpenSearch
