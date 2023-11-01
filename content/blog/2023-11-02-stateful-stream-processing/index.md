@@ -19,6 +19,7 @@ tags:
   - Data Pipeline
   - Streaming Analytics
   - Apache Flink
+  - Apache Kafka
 authors:
   - JaehyeonKim
 images: []
