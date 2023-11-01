@@ -18,6 +18,7 @@ tags:
   - Event Driven Architecture
   - Data Pipeline
   - Streaming Analytics
+  - Apache Flink
 authors:
   - JaehyeonKim
 images: []
@@ -26,7 +27,7 @@ description: Stream processing technology is becoming more and more popular with
 
 Stream processing technology is becoming more and more popular with companies big and small because it provides superior solutions for many established use cases such as data analytics, ETL, and transactional applications, but also facilitates novel applications, software architectures, and business opportunities. Beginning with traditional data infrastructures and application/data development patterns, this post introduces stateful stream processing and demonstrates to what extent it can improve the traditional development patterns. A consulting company can partner with her clients on their journeys of adopting stateful stream processing, and it can bring huge opportunities. Those opportunities are summarised at the end.
 
-> Note Section 1 and 2 are based on [Stream Processing with Apache Flink by Fabian Hueske and Vasiliki Kalavri (O'Reilly)](https://www.oreilly.com/library/view/stream-processing-with/9781491974285/).
+> Note Section 1 and 2 are based on _Stream Processing with Apache Flink by Fabian Hueske and Vasiliki Kalavri (O'Reilly)_. You can see the original article on the [publisher website](https://www.oreilly.com/library/view/stream-processing-with/9781491974285/ch01.html).
 
 ## 1. Traditional Data Infrastructures
 
