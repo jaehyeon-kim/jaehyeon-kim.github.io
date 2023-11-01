@@ -36,7 +36,7 @@ In [Part 1](/blog/2023-05-03-kafka-connect-for-aws-part-1), we reviewed Kafka co
 * [Part 2 Develop Camel DynamoDB Sink Connector](#) (this post)
 * [Part 3 Deploy Camel DynamoDB Sink Connector](/blog/2023-07-03-kafka-connect-for-aws-part-3)
 * [Part 4 Develop Aiven OpenSearch Sink Connector](/blog/2023-10-23-kafka-connect-for-aws-part-4)
-* Part 5 Deploy Aiven OpenSearch Sink Connector
+* [Part 5 Deploy Aiven OpenSearch Sink Connector](/blog/2023-10-30-kafka-connect-for-aws-part-5)
 
 ## Kafka Cluster
 
