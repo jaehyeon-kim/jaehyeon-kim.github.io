@@ -4,7 +4,7 @@ date: 2023-10-26
 draft: true
 featured: false
 comment: true
-toc: false
+toc: true
 reward: false
 pinned: false
 carousel: false
@@ -35,11 +35,16 @@ In this lab, we will create a Kafka producer application using [AWS Lambda](http
 
 * [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
 * [Lab 1 Produce data to Kafka using Lambda](#) (this post)
-* Lab 2 Write data to Kafka from S3 using Flink
+* [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3)
 * Lab 3 Transform and write data to S3 from Kafka using Flink
 * Lab 4 Clean, Aggregate, and Enrich Events with Flink
 * Lab 5 Write data to DynamoDB using Kafka Connect
 * Lab 6 Consume data from Kafka using Lambda
+
+[**Update 2023-11-06**] Initially I planned to deploy Pyflink applications on [Amazon Managed Service for Apache Flink](https://aws.amazon.com/managed-service-apache-flink/), but I changed the plan to use a local Flink cluster deployed on Docker. The main reasons are
+
+1. It is not clear how to configure a Pyflink application for the managed service. For example, Apache Flink supports [pluggable file systems](https://nightlies.apache.org/flink/flink-docs-release-1.18/docs/deployment/filesystems/overview/) and the required dependency (eg *flink-s3-fs-hadoop-1.15.2.jar*) should be placed under the *plugins* folder. However, the sample Pyflink applications from [pyflink-getting-started](https://github.com/aws-samples/pyflink-getting-started/tree/main/pyflink-examples/StreamingFileSink) and [amazon-kinesis-data-analytics-blueprints](https://github.com/aws-samples/amazon-kinesis-data-analytics-blueprints/tree/main/apps/python-table-api/msk-serverless-to-s3-tableapi-python) either ignore the S3 jar file for deployment or package it together with other dependencies - *none of them uses the S3 jar file as a plugin*. I tried multiple different configurations, but all ended up with having an error whose code is *CodeError.InvalidApplicationCode*. I don't have such an issue when I deploy the app on a local Flink cluster and I haven't found a way to configure the app for the managed service as yet.
+2. The Pyflink app for *Lab 4* requires the OpenSearch sink connector and the connector is available on *1.16.0+*. However, the latest Flink version of the managed service is still *1.15.2* and the sink connector is not available on it. Normally the latest version of the managed service is behind two minor versions of the official release, but it seems to take a little longer to catch up at the moment - the version 1.18.0 was released a while ago.
 
 ## Architecture
 

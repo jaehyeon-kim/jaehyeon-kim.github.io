@@ -4,7 +4,7 @@ date: 2023-11-09
 draft: true
 featured: false
 comment: true
-toc: false
+toc: true
 reward: false
 pinned: false
 carousel: false
@@ -44,8 +44,8 @@ In this lab, we will create a Pyflink application that reads records from S3 and
 
 [**Update 2023-11-06**] Initially I planned to deploy Pyflink applications on [Amazon Managed Service for Apache Flink](https://aws.amazon.com/managed-service-apache-flink/), but I changed the plan to use a local Flink cluster deployed on Docker. The main reasons are
 
-1. It is not clear how to configure a Pyflink application for the managed service. For example, Apache Flink supports [pluggable file systems](https://nightlies.apache.org/flink/flink-docs-release-1.18/docs/deployment/filesystems/overview/) and the required dependency (eg *flink-s3-fs-hadoop-1.15.2.jar*) should be placed under the *plugins* folder. However, the sample Pyflink applications from [pyflink-getting-started](https://github.com/aws-samples/pyflink-getting-started/tree/main/pyflink-examples/StreamingFileSink) and [amazon-kinesis-data-analytics-blueprints](https://github.com/aws-samples/amazon-kinesis-data-analytics-blueprints/tree/main/apps/python-table-api/msk-serverless-to-s3-tableapi-python) either ignore the S3 jar file for deployment or package it together with other dependencies - *none of them uses the S3 jar file as a plugin*. I tried multiple different configurations, but all ended up with having an error whose code is *CodeError.InvalidApplicationCode*. I don't have such an issue when I deployed the app on a local Flink cluster and I haven't found a way to configure the app for the managed service as yet.
-2. The Pyflink app for *Lab 4* requires the OpenSearch sink connector and the connector is available on *1.16.0+*. However, the latest Flink version of the managed service is still *1.15.2* and the sink connector is not available on it. Normally the latest version of the managed service is behind two minor versions of the official release, but it seems to take a little longer to catch up at the moment as the version 1.18.0 was released a while ago.
+1. It is not clear how to configure a Pyflink application for the managed service. For example, Apache Flink supports [pluggable file systems](https://nightlies.apache.org/flink/flink-docs-release-1.18/docs/deployment/filesystems/overview/) and the required dependency (eg *flink-s3-fs-hadoop-1.15.2.jar*) should be placed under the *plugins* folder. However, the sample Pyflink applications from [pyflink-getting-started](https://github.com/aws-samples/pyflink-getting-started/tree/main/pyflink-examples/StreamingFileSink) and [amazon-kinesis-data-analytics-blueprints](https://github.com/aws-samples/amazon-kinesis-data-analytics-blueprints/tree/main/apps/python-table-api/msk-serverless-to-s3-tableapi-python) either ignore the S3 jar file for deployment or package it together with other dependencies - *none of them uses the S3 jar file as a plugin*. I tried multiple different configurations, but all ended up with having an error whose code is *CodeError.InvalidApplicationCode*. I don't have such an issue when I deploy the app on a local Flink cluster and I haven't found a way to configure the app for the managed service as yet.
+2. The Pyflink app for *Lab 4* requires the OpenSearch sink connector and the connector is available on *1.16.0+*. However, the latest Flink version of the managed service is still *1.15.2* and the sink connector is not available on it. Normally the latest version of the managed service is behind two minor versions of the official release, but it seems to take a little longer to catch up at the moment - the version 1.18.0 was released a while ago.
 
 ## Architecture
 
@@ -55,7 +55,9 @@ Sample taxi ride data is stored in a S3 bucket, and a Pyflink application reads 
 
 ## Infrastructure
 
-The AWS infrastructure is created using [Terraform](https://www.terraform.io/) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post - see the [previous post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details especially. The infrastructure can be deployed (as well as destroyed) using Terraform CLI as shown below. 
+### AWS Infrastructure
+
+The AWS infrastructure is created using [Terraform](https://www.terraform.io/) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post - see the [previous post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details. The infrastructure can be deployed (as well as destroyed) using Terraform CLI as shown below. 
 
 ```bash
 # initialize
@@ -73,7 +75,7 @@ $ terraform apply -auto-approve=true
 
 #### Docker Image with Python and Pyflink
 
-The [official Flink docker image](https://hub.docker.com/_/flink) doesn't include Python and the Pyflink package, and we need to build a custom image from it. Beginning with placing the S3 jar file (*flink-s3-fs-hadoop-1.15.2.jar*) under the *plugins* folder, it installs Python and the Pyflink package. It can be built as following.
+The [official Flink docker image](https://hub.docker.com/_/flink) doesn't include Python and the Pyflink package, and we need to build a custom image from it. Beginning with placing the S3 jar file (*flink-s3-fs-hadoop-1.15.2.jar*) under the *plugins* folder, the following image installs Python and the Pyflink package. It can be built as following.
 
 ```bash
 $ docker build -t=real-time-streaming-aws:1.17.1 .
@@ -113,12 +115,13 @@ RUN pip3 install apache-flink==${FLINK_VERSION}
 
 The docker compose file includes services for a Flink cluster and [Kpow Community Edition](https://docs.kpow.io/ce/). For the Flink cluster, each of a single master container (*jobmanager*) and task container (*taskmanager*) is created. The former runs the job *Dispatcher* and *ResourceManager* while *TaskManager* is run in the latter. Once a Flink app (job) is submitted to the *Dispatcher*, it starts a *JobManager* thread and provides the *JobGraph* for execution. The *JobManager* requests the necessary processing slots from the *ResourceManager* and deploys the job for execution once the requested slots have been received.
 
-Kafka bootstrap server addresses and AWS credentials are required for the Flink cluster and kpow app and they are specified as environment variables. The bootstrap server addresses can be obtained via terraform (`terraform output -json | jq -r '.msk_bootstrap_brokers_sasl_iam.value'`) or from AWS Console.
+Kafka bootstrap server addresses and AWS credentials are required for the Flink cluster and kpow app, which are specified as environment variables. The bootstrap server addresses can be obtained via terraform (`terraform output -json | jq -r '.msk_bootstrap_brokers_sasl_iam.value'`) or from AWS Console.
 
 Finally, see the [previous post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details about how to configure the *kpow* app.
 
 ```yaml
 # compose-msk.yml
+# see compose-local-kafka.yml for a local kafka cluster instead of msk
 version: "3.5"
 
 services:
@@ -230,7 +233,7 @@ We are going to include all dependent Jar files with the `--jarfile` option, and
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<flink.version>1.15.2</flink.version>
+		<flink.version>1.17.1</flink.version>
 		<target.java.version>1.11</target.java.version>
 		<jdk.version>11</jdk.version>
 		<scala.binary.version>2.12</scala.binary.version>
@@ -436,14 +439,9 @@ mvn clean install -f $SRC_PATH/pyflink-pipeline/pom.xml \
 
 ### Application Source
 
-<!-- KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
+The Flink application is developed using the [Table API](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/python/table_api_tutorial/). The source uses the [FileSystem SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/table/filesystem/) and a table is created to read records in a S3 bucket. As mentioned earlier, the S3 file system is accessible as the S3 jar file (*flink-s3-fs-hadoop-1.17.1.jar*) is placed under the *plugins* folder of the custom Docker image. The sink table is created to write the source records into a Kafka topic. As the Kafka cluster is authenticated via IAM, additional table options are configured.
 
-
-Caused by: org.apache.kafka.common.errors.TimeoutException: Topic taxi-trip not present in metadata after 60000 ms.
-
-venv/lib/python3.8/site-packages/pyflink/lib/flink-s3-fs-hadoop-1.17.1.jar
-
-docker-compose -f compose-msk.yml up -d -->
+In the *main* method, we create all the source and sink tables after mapping relevant application properties. Then the output records are inserted into the output Kafka topic. Note that the output records are printed in the terminal additionally when the app is running locally for ease of checking them.
 
 ```python
 # loader/processor.py
@@ -648,7 +646,7 @@ if __name__ == "__main__":
     "PropertyGroupId": "source.config.0",
     "PropertyMap": {
       "table.name": "taxi_trip_source",
-      "file.path": "s3://real-time-streaming-ap-southeast-2/taxi-csv/"
+      "file.path": "s3://<s3-bucket-name-to-replace>/taxi-csv/"
     }
   },
   {
@@ -664,13 +662,17 @@ if __name__ == "__main__":
 
 ### Run Application
 
+#### Execute on Local Flink Cluster
+
+We can run the application in the Flink cluster on Docker and the steps are shown below. Either the Kafka cluster on Amazon MSK or a local Kafka cluster can be used depending on which Docker Compose file we use. In this option, we can check the job details on the Flink web UI on *localhost:8081*. 
+
 ```bash
-## update s3 bucket name in loader/application_properties.json if different
+## prep - update s3 bucket name in loader/application_properties.json
 
 ## set aws credentials environment variables
-export AWS_ACCESS_KEY_ID=aws-access-key-id
-export AWS_SECRET_ACCESS_KEY=aws-secret-access-key
-export AWS_SESSION_TOKEN=aws-session-token
+export AWS_ACCESS_KEY_ID=<aws-access-key-id>
+export AWS_SECRET_ACCESS_KEY=<aws-secret-access-key>
+export AWS_SESSION_TOKEN=<aws-session-token>
 
 ## run docker compose service
 # with MSK
@@ -687,19 +689,19 @@ docker exec jobmanager /opt/flink/bin/flink run \
 
 ![](flink-job.png#center)
 
-### Monitor Topic
+#### Execute Locally
 
-A Kafka management app can be a good companion for development as it helps monitor and manage resources on an easy-to-use user interface. We'll use [Kpow Community Edition](https://docs.kpow.io/ce/) in this post, which allows you to link a single Kafka cluster, Kafka connect server and schema registry. Note that the community edition is valid for 12 months and the licence can be requested on this [page](https://kpow.io/get-started/#individual). Once requested, the licence details will be emailed, and they can be added as an environment file (*env_file*).
-
-The app needs additional configurations in environment variables because the Kafka cluster on Amazon MSK is authenticated by IAM - see [this page](https://docs.kpow.io/config/msk/) for details. The bootstrap server address can be found on AWS Console or executing the following Terraform command. 
+The application can also be executed locally by specifying the runtime environment (*RUNTIME_ENV*) and bootstrap server addresses (*BOOTSTRAP_SERVERS*) as shown below.
 
 ```bash
-$ terraform output -json | jq -r '.msk_bootstrap_brokers_sasl_iam.value'
+$ RUNTIME_ENV=LOCAL BOOTSTRAP_SERVERS=localhost:29092 python loader/processor.py
 ```
 
-Note that we need to specify the compose file name when starting it because the file name (*compose-ui.yml*) is different from the default file name (*docker-compose.yml*). We can run it by `docker-compose -f compose-ui.yml up -d` and access on a browser via *localhost:3000*.
+Note, in order for the Flink app to be able to access the S3 file system, we have to place the S3 jar file (*flink-s3-fs-hadoop-1.17.1.jar*) in the *lib* folder of the Pyflink package. For example, my virtual environment is in the *venv* folder and I can add the Jar file in the *venv/lib/python3.8/site-packages/pyflink/lib* folder. The package also has the *plugins* folder but it didn't work when I placed the Jar file under it.
 
-We can see the topic (*taxi-rides*) is created, and it has 5 partitions, which is the default number of partitions.
+### Monitor Topic
+
+We can see the topic (*taxi-rides*) is created, and the records are ingested into it on *localhost:3000*.
 
 ![](kafka-topic.png#center)
 
@@ -709,4 +711,4 @@ Also, we can inspect topic messages in the *Data* tab as shown below.
 
 ## Summary
 
-In this lab, we created a Kafka producer application using AWS Lambda, which sends fake taxi ride data into a Kafka topic on Amazon MSK. It was developed so that a configurable number of the producer Lambda function can be invoked by an Amazon EventBridge schedule rule. In this way, we are able to generate test data concurrently based on the desired volume of messages. 
+In this lab, we created a Pyflink application that reads records from S3 and sends them into a Kafka topic. A custom pipeline Jar file is created as the Kafka cluster is authenticated by IAM, and it is demonstrated how to execute the app in a Flink cluster deployed on Docker and locally as a typical Python app.
