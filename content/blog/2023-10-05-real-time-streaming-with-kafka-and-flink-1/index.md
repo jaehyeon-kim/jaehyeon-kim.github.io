@@ -17,8 +17,6 @@ tags:
   - AWS
   - Amazon MSK
   - Amazon MSK Connect
-  - Amazon Managed Service for Apache Flink
-  - Amazon Managed Flink
   - AWS Lambda
   - Amazon S3
   - Amazon DyanmoDB
