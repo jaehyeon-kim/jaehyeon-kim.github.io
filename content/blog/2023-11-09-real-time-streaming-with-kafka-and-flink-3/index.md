@@ -113,7 +113,7 @@ RUN pip3 install apache-flink==${FLINK_VERSION}
 
 #### Flink Cluster on Docker Compose
 
-The docker compose file includes services for a Flink cluster and [Kpow Community Edition](https://docs.kpow.io/ce/). For the Flink cluster, each of a single master container (*jobmanager*) and task container (*taskmanager*) is created. The former runs the job *Dispatcher* and *ResourceManager* while *TaskManager* is run in the latter. Once a Flink app (job) is submitted to the *Dispatcher*, it starts a *JobManager* thread and provides the *JobGraph* for execution. The *JobManager* requests the necessary processing slots from the *ResourceManager* and deploys the job for execution once the requested slots have been received.
+The docker compose file includes services for a Flink cluster and [Kpow Community Edition](https://docs.kpow.io/ce/). For the Flink cluster, both a single master container (*jobmanager*) and a task container (*taskmanager*) are created. The former runs the job *Dispatcher* and *ResourceManager* while *TaskManager* is run in the latter. Once a Flink app (job) is submitted to the *Dispatcher*, it spawns a *JobManager* thread and provides the *JobGraph* for execution. The *JobManager* requests the necessary processing slots from the *ResourceManager* and deploys the job for execution once the requested slots have been received.
 
 Kafka bootstrap server addresses and AWS credentials are required for the Flink cluster and kpow app, which are specified as environment variables. The bootstrap server addresses can be obtained via terraform (`terraform output -json | jq -r '.msk_bootstrap_brokers_sasl_iam.value'`) or from AWS Console.
 
