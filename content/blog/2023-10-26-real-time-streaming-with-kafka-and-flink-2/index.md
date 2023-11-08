@@ -29,8 +29,6 @@ docs: https://docs.google.com/document/d/1noUCJwNq9LCQRbW58axYjpn8L8ICSseLizVS-7
 description: In this lab, we will create a Kafka producer application using AWS Lambda, which sends fake taxi ride data into a Kafka topic on Amazon MSK. A configurable number of the producer Lambda function will be invoked by an Amazon EventBridge schedule rule. In this way we are able to generate test data concurrently based on the desired volume of messages. 
 ---
 
-**[This article](https://cevo.com.au/post/real-time-streaming-with-kafka-and-flink-2/) was originally posted on Tech Insights of [Cevo Australia](https://cevo.com.au/).**
-
 In this lab, we will create a Kafka producer application using [AWS Lambda](https://aws.amazon.com/lambda/), which sends fake taxi ride data into a Kafka topic on [Amazon MSK](https://aws.amazon.com/msk/). A configurable number of the producer Lambda function will be invoked by an [Amazon EventBridge](https://aws.amazon.com/eventbridge/) schedule rule. In this way we are able to generate test data concurrently based on the desired volume of messages. 
 
 * [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)

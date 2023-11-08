@@ -30,8 +30,6 @@ docs: https://docs.google.com/document/d/1e7APiPwxUcl4nBtbN9_TkprS8qIp9MUqCIbcgv
 description: In this lab, we will create a Pyflink application that reads records from S3 and sends them into a Kafka topic. A custom pipeline Jar file will be created as the Kafka cluster is authenticated by IAM, and it will be demonstrated how to execute the app in a Flink cluster deployed on Docker and locally as a typical Python app. We can assume the S3 data is static metadata that needs to be joined into another stream, and this exercise can be useful for data enrichment.
 ---
 
-**[This article](https://cevo.com.au/post/real-time-streaming-with-kafka-and-flink-3/) was originally posted on Tech Insights of [Cevo Australia](https://cevo.com.au/).**
-
 In this lab, we will create a Pyflink application that reads records from S3 and sends them into a Kafka topic. A custom pipeline Jar file will be created as the Kafka cluster is authenticated by IAM, and it will be demonstrated how to execute the app in a Flink cluster deployed on Docker and locally as a typical Python app. We can assume the S3 data is static metadata that needs to be joined into another stream, and this exercise can be useful for data enrichment.
 
 * [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
