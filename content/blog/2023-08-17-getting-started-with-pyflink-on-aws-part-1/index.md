@@ -18,6 +18,7 @@ tags:
   - Pyflink
   - Apache Kafka
   - Amazon Managed Service for Apache Flink
+  - Amazon Managed Flink
   - Amazon MSK  
   - Python
   - Docker

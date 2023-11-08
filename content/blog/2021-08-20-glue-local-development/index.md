@@ -28,8 +28,6 @@ cevo: 2
 description: In this post, I'll demonstrate how to build development environments for AWS Glue 1.0 and 2.0 using the Docker image and the Visual Studio Code Remote - Containers extension.
 ---
 
-**[This article](https://cevo.com.au/post/aws-glue-local-development/) was originally posted on Tech Insights of [Cevo Australia](https://cevo.com.au/).**
-
 As described in the product page, [AWS Glue](https://aws.amazon.com/glue) is a _serverless_ data integration service that makes it easy to discover, prepare, and combine data for analytics, machine learning, and application development. For development, a development endpoint is recommended, but it can be costly, inconvenient or [unavailable (for Glue 2.0)](https://docs.aws.amazon.com/glue/latest/dg/reduced-start-times-spark-etl-jobs.html). The [AWS Glue team published a Docker image](https://aws.amazon.com/blogs/big-data/developing-aws-glue-etl-jobs-locally-using-a-container/) that includes the AWS Glue binaries and all the dependencies packaged together. After inspecting it, I find some modifications are necessary in order to build a development environment on it. In this post, I'll demonstrate how to build development environments for AWS Glue 1.0 and 2.0 using the Docker image and the [Visual Studio Code Remote - Containers](https://code.visualstudio.com/docs/remote/containers) extension.
 
 
