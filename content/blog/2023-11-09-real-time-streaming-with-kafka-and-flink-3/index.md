@@ -1,7 +1,7 @@
 ---
 title: Real Time Streaming with Kafka and Flink - Lab 2 Write data to Kafka from S3 using Flink
 date: 2023-11-09
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true

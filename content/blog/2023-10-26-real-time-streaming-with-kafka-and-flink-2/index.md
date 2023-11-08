@@ -1,7 +1,7 @@
 ---
 title: Real Time Streaming with Kafka and Flink - Lab 1 Produce data to Kafka using Lambda
 date: 2023-10-26
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true

@@ -1,7 +1,7 @@
 ---
 title: Real Time Streaming with Kafka and Flink - Introduction
 date: 2023-10-05
-draft: true
+draft: false
 featured: true
 comment: true
 toc: true
