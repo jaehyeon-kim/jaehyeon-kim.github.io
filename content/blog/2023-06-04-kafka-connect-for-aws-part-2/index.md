@@ -1,5 +1,5 @@
 ---
-title: Kafka Connect for AWS Services Integration - Part 2 Develop Camel DynamoDB Sink Connector using Docker
+title: Kafka Connect for AWS Services Integration - Part 2 Develop Camel DynamoDB Sink Connector
 date: 2023-06-04
 draft: false
 featured: false
@@ -33,10 +33,10 @@ description: The suite of Apache Camel Kafka connectors and the Kinesis Kafka co
 In [Part 1](/blog/2023-05-03-kafka-connect-for-aws-part-1), we reviewed Kafka connectors focusing on AWS services integration. Among the available connectors, the suite of [Apache Camel Kafka connectors](https://camel.apache.org/camel-kafka-connector/3.18.x/index.html) and the [Kinesis Kafka connector](https://github.com/awslabs/kinesis-kafka-connector) from the AWS Labs can be effective for building data ingestion pipelines on AWS. In this post, I will illustrate how to develop the Camel DynamoDB sink connector using Docker. Fake order data will be generated using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) source connector, and the sink connector will be configured to consume the topic messages to ingest them into a DynamoDB table.
 
 * [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1)
-* [Part 2 Develop Camel DynamoDB Sink Connector using Docker](#) (this post)
-* [Part 3 Deploy Camel DynamoDB Sink Connector on MSK Connect](/blog/2023-07-03-kafka-connect-for-aws-part-3)
-* Part 4 Develop Kinesis Kafka Connector for OpenSearch using Docker
-* Part 5 Deploy Kinesis Kafka Connector for OpenSearch on MSK Connect
+* [Part 2 Develop Camel DynamoDB Sink Connector](#) (this post)
+* [Part 3 Deploy Camel DynamoDB Sink Connector](/blog/2023-07-03-kafka-connect-for-aws-part-3)
+* [Part 4 Develop Aiven OpenSearch Sink Connector](/blog/2023-10-23-kafka-connect-for-aws-part-4)
+* [Part 5 Deploy Aiven OpenSearch Sink Connector](/blog/2023-10-30-kafka-connect-for-aws-part-5)
 
 ## Kafka Cluster
 
