@@ -35,14 +35,14 @@ In this lab, we will create a Pyflink application that reads records from S3 and
 * [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
 * [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2)
 * [Lab 2 Write data to Kafka from S3 using Flink](#) (this post)
-* Lab 3 Transform and write data to S3 from Kafka using Flink
+* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4)
 * Lab 4 Clean, Aggregate, and Enrich Events with Flink
 * Lab 5 Write data to DynamoDB using Kafka Connect
 * Lab 6 Consume data from Kafka using Lambda
 
 [**Update 2023-11-06**] Initially I planned to deploy Pyflink applications on [Amazon Managed Service for Apache Flink](https://aws.amazon.com/managed-service-apache-flink/), but I changed the plan to use a local Flink cluster deployed on Docker. The main reasons are
 
-1. It is not clear how to configure a Pyflink application for the managed service. For example, Apache Flink supports [pluggable file systems](https://nightlies.apache.org/flink/flink-docs-release-1.18/docs/deployment/filesystems/overview/) and the required dependency (eg *flink-s3-fs-hadoop-1.15.2.jar*) should be placed under the *plugins* folder. However, the sample Pyflink applications from [pyflink-getting-started](https://github.com/aws-samples/pyflink-getting-started/tree/main/pyflink-examples/StreamingFileSink) and [amazon-kinesis-data-analytics-blueprints](https://github.com/aws-samples/amazon-kinesis-data-analytics-blueprints/tree/main/apps/python-table-api/msk-serverless-to-s3-tableapi-python) either ignore the S3 jar file for deployment or package it together with other dependencies - *none of them uses the S3 jar file as a plugin*. I tried multiple different configurations, but all ended up with an error whose code is *CodeError.InvalidApplicationCode*. I don't have such an issue when I deploy the app on a local Flink cluster and I haven't found a way to configure the app for the managed service as yet.
+1. It is not clear how to configure a Pyflink application for the managed service. For example, Apache Flink supports [pluggable file systems](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/deployment/filesystems/overview/) and the required dependency (eg *flink-s3-fs-hadoop-1.15.2.jar*) should be placed under the *plugins* folder. However, the sample Pyflink applications from [pyflink-getting-started](https://github.com/aws-samples/pyflink-getting-started/tree/main/pyflink-examples/StreamingFileSink) and [amazon-kinesis-data-analytics-blueprints](https://github.com/aws-samples/amazon-kinesis-data-analytics-blueprints/tree/main/apps/python-table-api/msk-serverless-to-s3-tableapi-python) either ignore the S3 jar file for deployment or package it together with other dependencies - *none of them uses the S3 jar file as a plugin*. I tried multiple different configurations, but all ended up with an error whose code is *CodeError.InvalidApplicationCode*. I don't have such an issue when I deploy the app on a local Flink cluster and I haven't found a way to configure the app for the managed service as yet.
 2. The Pyflink app for *Lab 4* requires the OpenSearch sink connector and the connector is available on *1.16.0+*. However, the latest Flink version of the managed service is still *1.15.2* and the sink connector is not available on it. Normally the latest version of the managed service is behind two minor versions of the official release, but it seems to take a little longer to catch up at the moment - the version 1.18.0 was released a while ago.
 
 ## Architecture
@@ -107,6 +107,9 @@ RUN apt-get update -y && \
 
 # install PyFlink
 RUN pip3 install apache-flink==${FLINK_VERSION}
+
+# add kafka client for Flink SQL client, will be added manually
+RUN wget -P /etc/lib/ https://repo.maven.apache.org/maven2/org/apache/kafka/kafka-clients/3.2.3/kafka-clients-3.2.3.jar;
 ```
 
 #### Flink Cluster on Docker Compose
@@ -133,13 +136,14 @@ services:
       - appnet
     volumes:
       - ./loader:/etc/flink
+      - ./exporter:/etc/flink/exporter
       - ./package:/etc/package
     environment:
       - BOOTSTRAP_SERVERS=$BOOTSTRAP_SERVERS
       - RUNTIME_ENV=DOCKER
       - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-      - AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
+      # - AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
@@ -157,14 +161,13 @@ services:
       - appnet
     volumes:
       - flink_data:/tmp/
-      - ./loader:/etc/flink
-      - ./package:/etc/package
+      - ./:/etc/flink
     environment:
       - BOOTSTRAP_SERVERS=$BOOTSTRAP_SERVERS
       - RUNTIME_ENV=DOCKER
       - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-      - AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
+      # - AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
@@ -185,7 +188,7 @@ services:
     environment:
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-      AWS_SESSION_TOKEN: $AWS_SESSION_TOKEN
+      # AWS_SESSION_TOKEN: $AWS_SESSION_TOKEN
       BOOTSTRAP: $BOOTSTRAP_SERVERS
       SECURITY_PROTOCOL: SASL_SSL
       SASL_MECHANISM: AWS_MSK_IAM
@@ -214,16 +217,16 @@ $ docker-compose -f compose-msk.yml up -d
 
 ### Flink Pipeline Jar
 
-We are going to include all dependent Jar files with the `--jarfile` option, and it only accepts a single Jar file. Therefore, we have to create a custom Uber jar file that consolidates all dependent Jar files. On top of the [Apache Kafka SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/), we also need the [Amazon MSK Library for AWS Identity and Access Management (MSK IAM Auth)](https://github.com/aws/aws-msk-iam-auth) as the MSK cluster is authenticated via IAM. Note that, as the *MSK IAM Auth* library is not compatible with the *Apache Kafka SQL Connector* due to shade relocation, we have to build the Jar file based on the [Apache Kafka Connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/datastream/kafka/) instead. After some search, I found an example from the [amazon-kinesis-data-analytics-blueprints](https://github.com/aws-samples/amazon-kinesis-data-analytics-blueprints/tree/main/apps/python-table-api/msk-serverless-to-s3-tableapi-python/src/uber-jar-for-pyflink) and was able to modify the POM file with necessary dependencies for this post. The modified POM file can be shown below, and it creates the Uber Jar for this post - *pyflink-pipeline-1.0.0.jar*.
+We are going to include all dependent Jar files with the `--jarfile` option, and it only accepts a single Jar file. Therefore, we have to create a custom Uber jar file that consolidates all dependent Jar files. On top of the [Apache Kafka SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/), we also need the [Amazon MSK Library for AWS Identity and Access Management (MSK IAM Auth)](https://github.com/aws/aws-msk-iam-auth) as the MSK cluster is authenticated via IAM. Note that we have to build the Jar file based on the [Apache Kafka Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/datastream/kafka/) instead of the [Apache Kafka SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/table/kafka/) because the *MSK IAM Auth* library is not compatible with the latter due to shade relocation. After some search, I found an example from the [amazon-kinesis-data-analytics-blueprints](https://github.com/aws-samples/amazon-kinesis-data-analytics-blueprints/tree/main/apps/python-table-api/msk-serverless-to-s3-tableapi-python/src/uber-jar-for-pyflink) and was able to modify the POM file with necessary dependencies for this post. The modified POM file can be shown below, and it creates the Uber Jar for this post - *lab2-pipeline-1.0.0.jar*.
 
 ```xml
-<!-- package/pyflink-pipeline/pom.xml -->
+<!-- package/lab2-pipeline/pom.xml -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.amazonaws.services.kinesisanalytics</groupId>
-	<artifactId>pyflink-pipeline</artifactId>
+	<artifactId>lab2-pipeline</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
@@ -423,21 +426,21 @@ The Uber Jar file can be built using the following script (*build.sh*).
 SCRIPT_DIR="$(cd $(dirname "$0"); pwd)"
 SRC_PATH=$SCRIPT_DIR/package
 
-# remove contents under $SRC_PATH (except for pyflink-pipeline)
+# remove contents under $SRC_PATH (except for the folders beginging with lab)
 shopt -s extglob
-rm -rf $SRC_PATH/!(pyflink-pipeline)
+rm -rf $SRC_PATH/!(lab*)
 
 ## Generate Uber Jar for PyFlink app for MSK cluster with IAM authN
 echo "generate Uber jar for PyFlink app..."
 mkdir $SRC_PATH/lib
-mvn clean install -f $SRC_PATH/pyflink-pipeline/pom.xml \
-  && mv $SRC_PATH/pyflink-pipeline/target/pyflink-pipeline-1.0.0.jar $SRC_PATH/lib \
-  && rm -rf $SRC_PATH/pyflink-pipeline/target
+mvn clean install -f $SRC_PATH/lab2-pipeline/pom.xml \
+  && mv $SRC_PATH/lab2-pipeline/target/lab2-pipeline-1.0.0.jar $SRC_PATH/lib \
+  && rm -rf $SRC_PATH/lab2-pipeline/target
 ```
 
 ### Application Source
 
-The Flink application is developed using the [Table API](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/dev/python/table_api_tutorial/). The source uses the [FileSystem SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/table/filesystem/) and a table is created to read records in a S3 bucket. As mentioned earlier, the S3 file system is accessible as the S3 jar file (*flink-s3-fs-hadoop-1.17.1.jar*) is placed under the *plugins* folder of the custom Docker image. The sink table is created to write the source records into a Kafka topic. As the Kafka cluster is authenticated via IAM, additional table options are configured.
+The Flink application is developed using the [Table API](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/dev/python/table_api_tutorial/). The source uses the [FileSystem SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/table/filesystem/) and a table is created to read records in a S3 bucket. As mentioned earlier, the S3 file system is accessible as the S3 jar file (*flink-s3-fs-hadoop-1.17.1.jar*) is placed under the *plugins* folder of the custom Docker image. The sink table is created to write the source records into a Kafka topic. As the Kafka cluster is authenticated via IAM, additional table options are configured.
 
 In the *main* method, we create all the source and sink tables after mapping relevant application properties. Then the output records are inserted into the output Kafka topic. Note that the output records are printed in the terminal additionally when the app is running locally for ease of checking them.
 
@@ -458,7 +461,7 @@ table_env = TableEnvironment.create(env_settings)
 if RUNTIME_ENV == "LOCAL":
     CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
     PARENT_DIR = os.path.dirname(CURRENT_DIR)
-    PIPELINE_JAR = "pyflink-pipeline-1.0.0.jar"
+    PIPELINE_JAR = "lab2-pipeline-1.0.0.jar"
     APPLICATION_PROPERTIES_FILE_PATH = os.path.join(CURRENT_DIR, "application_properties.json")
     print(f"file://{os.path.join(PARENT_DIR, 'package', 'lib', PIPELINE_JAR)}")
     table_env.get_config().set(
@@ -466,7 +469,7 @@ if RUNTIME_ENV == "LOCAL":
         f"file://{os.path.join(PARENT_DIR, 'package', 'lib', PIPELINE_JAR)}",
     )
 else:
-    APPLICATION_PROPERTIES_FILE_PATH = "/etc/flink/application_properties.json"
+    APPLICATION_PROPERTIES_FILE_PATH = "/etc/flink/loader/application_properties.json"
 
 
 def get_application_properties():
@@ -637,7 +640,7 @@ if __name__ == "__main__":
     "PropertyGroupId": "kinesis.analytics.flink.run.options",
     "PropertyMap": {
       "python": "processor.py",
-      "jarfile": "package/lib/s3-data-loader-1.0.0.jar"
+      "jarfile": "package/lib/lab2-pipeline-1.0.0.jar"
     }
   },
   {
@@ -662,7 +665,7 @@ if __name__ == "__main__":
 
 #### Execute on Local Flink Cluster
 
-We can run the application in the Flink cluster on Docker and the steps are shown below. Either the Kafka cluster on Amazon MSK or a local Kafka cluster can be used depending on which Docker Compose file we use. In this option, we can check the job details on the Flink web UI on *localhost:8081*. 
+We can run the application in the Flink cluster on Docker and the steps are shown below. Either the Kafka cluster on Amazon MSK or a local Kafka cluster can be used depending on which Docker Compose file we use. In either way, we can check the job details on the Flink web UI on *localhost:8081*. Note that, if we use the local Kafka cluster option, we have to start the producer application in a different terminal.
 
 ```bash
 ## prep - update s3 bucket name in loader/application_properties.json
@@ -670,18 +673,21 @@ We can run the application in the Flink cluster on Docker and the steps are show
 ## set aws credentials environment variables
 export AWS_ACCESS_KEY_ID=<aws-access-key-id>
 export AWS_SECRET_ACCESS_KEY=<aws-secret-access-key>
-export AWS_SESSION_TOKEN=<aws-session-token>
+# export AWS_SESSION_TOKEN=<aws-session-token>
 
 ## run docker compose service
-# with MSK
+# with msk cluster
 docker-compose -f compose-msk.yml up -d
 # # or with local Kafka cluster
 # docker-compose -f compose-local-kafka.yml up -d
 
+## run the producer application in another terminal
+# python producer/app.py 
+
 ## submit pyflink application
 docker exec jobmanager /opt/flink/bin/flink run \
-    --python /etc/flink/processor.py \
-    --jarfile /etc/package/lib/pyflink-pipeline-1.0.0.jar \
+    --python /etc/flink/loader/processor.py \
+    --jarfile /etc/flink/package/lib/lab2-pipeline-1.0.0.jar \
     -d
 ```
 
@@ -699,7 +705,7 @@ Note, in order for the Flink app to be able to access the S3 file system, we hav
 
 ### Monitor Topic
 
-We can see the topic (*taxi-rides*) is created, and the records are ingested into it on *localhost:3000*.
+We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*.
 
 ![](kafka-topic.png#center)
 
