@@ -34,7 +34,7 @@ In this lab, we will create a Kafka producer application using [AWS Lambda](http
 * [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
 * [Lab 1 Produce data to Kafka using Lambda](#) (this post)
 * [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3)
-* Lab 3 Transform and write data to S3 from Kafka using Flink
+* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4)
 * Lab 4 Clean, Aggregate, and Enrich Events with Flink
 * Lab 5 Write data to DynamoDB using Kafka Connect
 * Lab 6 Consume data from Kafka using Lambda
@@ -492,7 +492,7 @@ def lambda_function(event, context):
     s = datetime.datetime.now()
     total_records = 0
     while True:
-        items = TaxiRide.create(100)
+        items = TaxiRide.create(10)
         producer.send(items)
         total_records += len(items)
         print(f"sent {len(items)} messages")

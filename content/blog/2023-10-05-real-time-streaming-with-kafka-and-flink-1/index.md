@@ -47,7 +47,7 @@ description: This series updates a real time analytics app based on Amazon Kines
 * [Introduction](#) (this post)
 * [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-2)
 * [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3)
-* Lab 3 Transform and write data to S3 from Kafka using Flink
+* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4)
 * Lab 4 Clean, Aggregate, and Enrich Events with Flink
 * Lab 5 Write data to DynamoDB using Kafka Connect
 * Lab 6 Consume data from Kafka using Lambda
