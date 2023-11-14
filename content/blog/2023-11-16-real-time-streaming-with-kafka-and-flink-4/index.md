@@ -42,7 +42,7 @@ In this lab, we will create a Pyflink application that exports Kafka topic messa
 
 ## Architecture
 
-Fake taxi ride data is sent to a Kafka topic by a Kafka producer application as discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The records are read by a Pyflink application, and it writes them into a S3 bucket. The app enriches the records by adding a new column named *source* using a user defined function. The records in the S3 bucket can be queried by Amazon Athena after creating an external table that sources the bucket.
+Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The records are read by a Pyflink application, and it writes them into a S3 bucket. The app enriches the records by adding a new column named *source* using a user defined function. The records in the S3 bucket can be queried on Amazon Athena after creating an external table that sources the bucket.
 
 ![](featured.png#center)
 
@@ -68,7 +68,7 @@ Note that deploying the AWS infrastructure is optional because we can create a l
 
 ### Kafka and Flink Cluster on Docker Compose
 
-In the [previous post](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3), we discussed how to create a local Flink cluster on Docker. We can add additional Docker Compose services (*zookeeper* and *kafka-0*) for a Kafka cluster and the updated compose file can be found below.
+In the [previous post](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3), we discussed how to create a local Flink cluster on Docker. We can add additional Docker Compose services (*zookeeper* and *kafka-0*) for a Kafka cluster and the updated compose file can be found below. See [this post](/blog/2023-05-04-kafka-development-with-docker-part-1) for details how to set up a Kafka cluster on Docker.
 
 ```yaml
 # compose-local-kafka.yml
@@ -202,7 +202,7 @@ $ docker-compose -f compose-local-kafka.yml up -d
 
 ### Flink Pipeline Jar
 
-The application has multiple dependencies and a single Jar file is created so that it can be specified in the `--jarfile` option. The dependencies can be grouped as shown below.
+The application has multiple dependencies and a single Jar file is created so that it can be specified in the `--jarfile` option. Note that we have to build the Jar file based on the [Apache Kafka Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/datastream/kafka/) instead of the [Apache Kafka SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/table/kafka/) because the *MSK IAM Auth* library is not compatible with the latter due to shade relocation. The dependencies can be grouped as shown below.
 
 - Flink Connectors
   - flink-connector-base
@@ -224,7 +224,7 @@ The application has multiple dependencies and a single Jar file is created so th
     - for IAM authentication
     - *It can be placed in the Flink library folder (/opt/flink/lib)*
 
-A single Jar file is created in this post as the app needs to be deployed via Amazon Managed Flink potentially. If we do not have to deploy on it, however, they can be added to the Flink library folder separately, which is a more comprehensive way of managing dependency in my opinion. I added comments about how they may be placed into the Flink library folder in the dependencies list above. Note that the S3 file system Jar file (*flink-s3-fs-hadoop-1.17.1.jar*) is placed under the plugins (*/opt/flink/plugins/s3-fs-hadoop*) folder of the custom Docker image, and it is according to the [Flink documentation](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/deployment/filesystems/overview/).
+A single Jar file is created in this post as the app may need to be deployed via Amazon Managed Flink potentially. If we do not have to deploy on it, however, they can be added to the Flink library folder separately, which is a more comprehensive way of managing dependency in my opinion. I added comments about how they may be placed into the Flink library folder in the dependencies list above. Note that the S3 file system Jar file (*flink-s3-fs-hadoop-1.17.1.jar*) is placed under the plugins (*/opt/flink/plugins/s3-fs-hadoop*) folder of the custom Docker image according to the [Flink documentation](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/deployment/filesystems/overview/).
 
 The single Uber jar file is created by the following POM file and the Jar file is named as *lab3-pipeline-1.0.0.jar*.
 
@@ -520,7 +520,7 @@ SRC_PATH=$SCRIPT_DIR/package
 shopt -s extglob
 rm -rf $SRC_PATH/!(lab*)
 
-## Generate Uber Jar for PyFlink app for MSK cluster with IAM authN
+## Generate Uber jar file for individual labs
 echo "generate Uber jar for PyFlink app..."
 mkdir $SRC_PATH/lib
 mvn clean install -f $SRC_PATH/lab2-pipeline/pom.xml \
@@ -834,7 +834,7 @@ docker-compose -f compose-local-kafka.yml up -d
 # docker-compose -f compose-msk.yml up -d
 
 ## run the producer application in another terminal
-python producer/app.py 
+# python producer/app.py 
 
 ## submit pyflink application
 docker exec jobmanager /opt/flink/bin/flink run \
@@ -859,13 +859,13 @@ Also, we can inspect topic messages in the *Data* tab as shown below.
 
 #### S3 Files
 
-We can see the Pyflink app writes the records into the S3 bucket as expected. The files are written in Apache Hive style partitions and only completed files are found. Note that, when I tested the sink connector on the local file system, the file names of *in-progress* and *pending* files begin with dot (.). I don't see those files in the bucket, and it seems that only completed files are moved. Note also that, as the checkpoint interval is 60 seconds, new files are created every minute. We can adjust the interval if it creates too many small files.
+We can see the Pyflink app writes the records into the S3 bucket as expected. The files are written in Apache Hive style partitions and only completed files are found. Note that, when I tested the sink connector on the local file system, the file names of *in-progress* and *pending* files begin with dot (.) and the dot is removed when they are completed. I don't see those incomplete files in the S3 bucket, and it seems that only completed files are moved. Note also that, as the checkpoint interval is set to 60 seconds, new files are created every minute. We can adjust the interval if it creates too many small files.
 
 ![](s3-files.png#center)
 
 #### Athena Table
 
-To query the output records, we can create a partitioned table in Amazon Athena by specifying the S3 location. It can be created by executing the following SQL statement.
+To query the output records, we can create a partitioned table on Amazon Athena by specifying the S3 location. It can be created by executing the following SQL statement.
 
 ```sql
 CREATE EXTERNAL TABLE taxi_rides (

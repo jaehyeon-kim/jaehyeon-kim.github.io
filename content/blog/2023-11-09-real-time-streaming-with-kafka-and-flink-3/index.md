@@ -217,7 +217,7 @@ $ docker-compose -f compose-msk.yml up -d
 
 ### Flink Pipeline Jar
 
-We are going to include all dependent Jar files with the `--jarfile` option, and it only accepts a single Jar file. Therefore, we have to create a custom Uber jar file that consolidates all dependent Jar files. On top of the [Apache Kafka SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/), we also need the [Amazon MSK Library for AWS Identity and Access Management (MSK IAM Auth)](https://github.com/aws/aws-msk-iam-auth) as the MSK cluster is authenticated via IAM. Note that, as the *MSK IAM Auth* library is not compatible with the *Apache Kafka SQL Connector* due to shade relocation, we have to build the Jar file based on the [Apache Kafka Connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/datastream/kafka/) instead. After some search, I found an example from the [amazon-kinesis-data-analytics-blueprints](https://github.com/aws-samples/amazon-kinesis-data-analytics-blueprints/tree/main/apps/python-table-api/msk-serverless-to-s3-tableapi-python/src/uber-jar-for-pyflink) and was able to modify the POM file with necessary dependencies for this post. The modified POM file can be shown below, and it creates the Uber Jar for this post - *lab2-pipeline-1.0.0.jar*.
+We are going to include all dependent Jar files with the `--jarfile` option, and it only accepts a single Jar file. Therefore, we have to create a custom Uber jar file that consolidates all dependent Jar files. On top of the [Apache Kafka SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/kafka/), we also need the [Amazon MSK Library for AWS Identity and Access Management (MSK IAM Auth)](https://github.com/aws/aws-msk-iam-auth) as the MSK cluster is authenticated via IAM. Note that we have to build the Jar file based on the [Apache Kafka Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/datastream/kafka/) instead of the [Apache Kafka SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/table/kafka/) because the *MSK IAM Auth* library is not compatible with the latter due to shade relocation. After some search, I found an example from the [amazon-kinesis-data-analytics-blueprints](https://github.com/aws-samples/amazon-kinesis-data-analytics-blueprints/tree/main/apps/python-table-api/msk-serverless-to-s3-tableapi-python/src/uber-jar-for-pyflink) and was able to modify the POM file with necessary dependencies for this post. The modified POM file can be shown below, and it creates the Uber Jar for this post - *lab2-pipeline-1.0.0.jar*.
 
 ```xml
 <!-- package/lab2-pipeline/pom.xml -->
@@ -680,6 +680,9 @@ export AWS_SECRET_ACCESS_KEY=<aws-secret-access-key>
 docker-compose -f compose-msk.yml up -d
 # # or with local Kafka cluster
 # docker-compose -f compose-local-kafka.yml up -d
+
+## run the producer application in another terminal
+# python producer/app.py 
 
 ## submit pyflink application
 docker exec jobmanager /opt/flink/bin/flink run \
