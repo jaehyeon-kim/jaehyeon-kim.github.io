@@ -40,6 +40,8 @@ In this lab, we will create a Pyflink application that exports Kafka topic messa
 * Lab 5 Write data to DynamoDB using Kafka Connect
 * Lab 6 Consume data from Kafka using Lambda
 
+[**Update 2023-11-22**] Amazon MSK now supports fully managed data delivery to Amazon S3 using Kinesis Data Firehose, and you may consider this feature rather than relying on a Flink application. See [this page](https://aws.amazon.com/about-aws/whats-new/2023/09/amazon-msk-data-s3-kinesis-data-firehose/) for details.
+
 ## Architecture
 
 Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The records are read by a Pyflink application, and it writes them into a S3 bucket. The app enriches the records by adding a new column named *source* using a user defined function. The records in the S3 bucket can be queried on Amazon Athena after creating an external table that sources the bucket.
