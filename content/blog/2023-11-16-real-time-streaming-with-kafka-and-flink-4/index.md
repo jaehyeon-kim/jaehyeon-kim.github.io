@@ -36,7 +36,7 @@ In this lab, we will create a Pyflink application that exports Kafka topic messa
 * [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2)
 * [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3)
 * [Lab 3 Transform and write data to S3 from Kafka using Flink](#) (this post)
-* Lab 4 Clean, Aggregate, and Enrich Events with Flink
+* [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5)
 * Lab 5 Write data to DynamoDB using Kafka Connect
 * Lab 6 Consume data from Kafka using Lambda
 
