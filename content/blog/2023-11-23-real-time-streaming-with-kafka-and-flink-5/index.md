@@ -1,7 +1,7 @@
 ---
 title: Real Time Streaming with Kafka and Flink - Lab 4 Clean, Aggregate, and Enrich Events with Flink
 date: 2023-11-23
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -52,7 +52,7 @@ The AWS infrastructure is created using [Terraform](https://www.terraform.io/) a
 
 ### OpenSearch Cluster
 
-In this post, an OpenSearch cluster is created additionally, and it is deployed with the *m5.large.search* instance type in private subnets. For simplicity, [anonymous authentication](https://opensearch.org/docs/latest/security/configuration/configuration/#http) is enabled so that we don't have to specify user credentials when making an HTTP request. Overall only network-level security is enforced on the OpenSearch domain. Note that the cluster is created only when the *opensearch_to_create* variable is set to *true*.
+For this lab, an OpenSearch cluster is created additionally, and it is deployed with the *m5.large.search* instance type in private subnets. For simplicity, [anonymous authentication](https://opensearch.org/docs/latest/security/configuration/configuration/#http) is enabled so that we don't have to specify user credentials when making an HTTP request. Overall only network-level security is enforced on the OpenSearch domain. Note that the cluster is created only when the *opensearch_to_create* variable is set to *true*.
 
 ```terraform
 # infra/variables.tf
@@ -134,7 +134,7 @@ resource "aws_opensearch_domain" "opensearch" {
 }
 ```
 
-### OpenSearch Security Group
+#### OpenSearch Security Group
 
 The security group of the OpenSearch domain has inbound rules that allow connection from the security groups of the VPN server. It is important to configure those rules because the Pyflink application will be executed in the developer machine and access to the OpenSearch cluster will be made through the VPN server. Only port 443 and 9200 are open for accessing the OpenSearch Dashboard and making HTTP requests.
 
@@ -196,9 +196,57 @@ Once the resources are deployed, we can check the OpenSearch cluster on AWS Cons
 
 ![](opensearch-cluster.png#center)
 
+### Local OpenSearch Cluster on Docker (Optional)
+
+As discussed further later, we can use a local Kafka cluster deployed on Docker instead of one on Amazon MSK. For this option, we need to deploy a local OpenSearch cluster on Docker and the following Docker Compose file defines a single node OpenSearch Cluster and OpenSearch Dashboard services.
+
+```yaml
+# compose-extra.yml
+version: "3.5"
+
+services:
+  opensearch:
+    image: opensearchproject/opensearch:2.7.0
+    container_name: opensearch
+    environment:
+      - discovery.type=single-node
+      - node.name=opensearch
+      - DISABLE_SECURITY_PLUGIN=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    ports:
+      - 9200:9200
+      - 9600:9600
+    networks:
+      - appnet
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.7.0
+    container_name: opensearch-dashboards
+    ports:
+      - 5601:5601
+    expose:
+      - "5601"
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: true
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    external: true
+    name: app-network
+
+volumes:
+  opensearch_data:
+    driver: local
+    name: opensearch_data
+```
+
 ### Flink Cluster on Docker Compose
 
-There are two Docker Compose files that deploy a Flink Cluster locally. The first one ([*compose-msk.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-msk.yml)) relies on the Kafka cluster on Amazon MSK while a local Kafka cluster is created together with a Flink cluster in the second file ([*compose-local-kafka.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-local-kafka.yml)) - see [Lab 2](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3) and [Lab 3](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4) respectively for details about them. Note that, if we use a local Kafka and Flink clusters, we don't have to deploy the AWS resources. Instead, we can use a local OpenSearch cluster, and it can be deployed by running the [*compose-extra.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-extra.yml).
+There are two Docker Compose files that deploy a Flink Cluster locally. The first one ([*compose-msk.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-msk.yml)) relies on the Kafka cluster on Amazon MSK while a local Kafka cluster is created together with a Flink cluster in the second file ([*compose-local-kafka.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-local-kafka.yml)) - see [Lab 2](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3) and [Lab 3](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4) respectively for details about them. Note that, if we use a local Kafka and Flink clusters, we don't have to deploy the AWS resources. Instead, we can use a local OpenSearch cluster, and it can be deployed by using [*compose-extra.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-extra.yml).
 
 The Docker Compose services can be deployed as shown below.
 
@@ -216,7 +264,7 @@ $ docker-compose -f compose-extra.yml up -d
 
 ### Flink Pipeline Jar
 
-The application has multiple dependencies and a single Jar file is created so that it can be specified in the `--jarfile` option. Note that we have to build the Jar file based on the [Apache Kafka Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/datastream/kafka/) instead of the [Apache Kafka SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/table/kafka/) because the *MSK IAM Auth* library is not compatible with the latter due to shade relocation. The dependencies can be grouped as shown below.
+The application has multiple dependencies and a single Jar file is created so that it can be specified in the `--jarfile` option. Note that we have to build the Jar file based on the [Apache Kafka Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/datastream/kafka/) instead of the [Apache Kafka SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/table/kafka/) because the *MSK IAM Auth* library is not compatible with the latter due to shade relocation. The dependencies are grouped as shown below.
 
 - Kafka Connector
   - flink-connector-base
@@ -229,7 +277,7 @@ The application has multiple dependencies and a single Jar file is created so th
   - org.apache.httpcomponents
   - httpcore-nio
 
-A single Jar file is created in this post as the app may need to be deployed via Amazon Managed Flink potentially. If we do not have to deploy on it, however, they can be added to the Flink library folder (*/opt/flink/lib*) separately.
+A single Jar file is created for this lab as the app may need to be deployed via Amazon Managed Flink potentially. If we do not have to deploy on it, however, they can be added to the Flink library folder (*/opt/flink/lib*) separately.
 
 The single Uber jar file is created by the following POM file and the Jar file is named as *lab4-pipeline-1.0.0.jar*.
 
@@ -485,9 +533,9 @@ mvn clean install -f $SRC_PATH/lab4-pipeline/pom.xml \
 
 ### Application Source
 
-A source table is created to read messages from the *taxi-rides* topic using the Kafka Connector. The source records are *bucketed* in a window of 5 seconds using the [*TUMBLE* windowing table-valued function](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/dev/table/sql/queries/window-tvf/#tumble). The records within buckets are aggregated by vendor ID, window start and window end variables before they are inserted into the sink table. The records in the sink table are ingested into an OpenSearch index named *trip_stats* using the OpenSearch connector.
+A source table is created to read messages from the *taxi-rides* topic using the Kafka Connector. The source records are *bucketed* in a window of 5 seconds using the [*TUMBLE* windowing table-valued function](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/dev/table/sql/queries/window-tvf/#tumble), and those within buckets are aggregated by vendor ID, window start and window end variables. Then they are inserted into the sink table, which leads to ingesting them into an OpenSearch index named *trip_stats* using the OpenSearch connector.
 
-In the *main* method, we create all the source and sink tables after mapping relevant application properties. Then the output records are written to the OpenSearch index. Note that the output records are printed in the terminal additionally when the app is running locally for ease of checking them.
+In the *main* method, we create all the source and sink tables after mapping relevant application properties. Then the output records are written to the OpenSearch index. Note that the output records are printed in the terminal additionally when the app is running locally for checking them easily.
 
 ```python
 # forwarder/processor.py
@@ -736,7 +784,11 @@ We can run the application in the Flink cluster on Docker and the steps are show
 ## set aws credentials environment variables
 export AWS_ACCESS_KEY_ID=<aws-access-key-id>
 export AWS_SECRET_ACCESS_KEY=<aws-secret-access-key>
-# export AWS_SESSION_TOKEN=<aws-session-token>
+
+# set addtional environment variables when using AWS services if using compose-msk.yml
+#   values can be obtained in Terraform outputs or AWS Console
+export BOOTSTRAP_SERVERS=<bootstrap-servers>
+export OPENSEARCH_HOSTS=<opensearch-hosts>
 
 ## run docker compose service
 # or with msk cluster
@@ -756,6 +808,8 @@ docker exec jobmanager /opt/flink/bin/flink run \
     -d
 ```
 
+Once the Pyflink application is submitted, we can check the details of it on the Flink UI as shown below.
+
 ![](flink-job.png#center)
 
 ### Application Result
@@ -768,7 +822,7 @@ We can see the topic (*taxi-rides*) is created, and the details of the topic can
 
 #### OpenSearch Index
 
-We can check the ingested data using the [Query Workbench](https://opensearch.org/docs/latest/dashboards/query-workbench/) as shown below.
+The ingested data can be checked easily using the [Query Workbench](https://opensearch.org/docs/latest/dashboards/query-workbench/) as shown below.
 
 ![](opensearch-query.png#center)
 
