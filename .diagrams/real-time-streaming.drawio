@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="NlVpntADeIrK-Tqx7FUk" name="Page-1">
-        <mxGraphModel dx="1386" dy="797" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+        <mxGraphModel dx="1124" dy="797" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -13,7 +13,7 @@
                 <mxCell id="32" value="LAB 5" style="fillColor=none;strokeColor=#007FFF;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#050505;strokeWidth=3;fontSize=16;" parent="1" vertex="1">
                     <mxGeometry x="920" y="280" width="289" height="216" as="geometry"/>
                 </mxCell>
-                <mxCell id="38" value="LAB 3" style="fillColor=none;strokeColor=#3333FF;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#050505;strokeWidth=10;fontSize=26;" parent="1" vertex="1">
+                <mxCell id="38" value="LAB 3" style="fillColor=none;strokeColor=#3333FF;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#050505;strokeWidth=3;fontSize=16;" parent="1" vertex="1">
                     <mxGeometry x="920" y="538" width="290" height="341" as="geometry"/>
                 </mxCell>
                 <mxCell id="2" value="Amazon MSK" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=#945DF2;gradientDirection=north;fillColor=#5A30B5;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.managed_streaming_for_kafka;" parent="1" vertex="1">
@@ -85,7 +85,7 @@
                 <mxCell id="20" value="Amazon&lt;br&gt;OpenSearch" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=#945DF2;gradientDirection=north;fillColor=#5A30B5;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elasticsearch_service;strokeWidth=3;" parent="1" vertex="1">
                     <mxGeometry x="723" y="307" width="78" height="78" as="geometry"/>
                 </mxCell>
-                <mxCell id="21" value="LAB 6" style="fillColor=none;strokeColor=#FF8000;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#050505;strokeWidth=3;fontSize=16;" parent="1" vertex="1">
+                <mxCell id="21" value="LAB 6" style="fillColor=none;strokeColor=#FF8000;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#050505;strokeWidth=10;fontSize=26;" parent="1" vertex="1">
                     <mxGeometry x="560" y="720" width="260" height="160" as="geometry"/>
                 </mxCell>
                 <mxCell id="22" value="Kafka Consumer 1" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=#F78E04;gradientDirection=north;fillColor=#D05C17;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" parent="1" vertex="1">
