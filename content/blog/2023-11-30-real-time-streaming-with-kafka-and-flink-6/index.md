@@ -451,7 +451,15 @@ $ curl http://localhost:8083/connectors/real-time-streaming-taxi-rides-sink/stat
 # $ curl -X DELETE http://localhost:8083/connectors/real-time-streaming-taxi-rides-sink
 ```
 
-## Table Records
+## Application Result
+
+### Kafka Topic
+
+We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using *compose-ui.yml* - see [this post](/blog/http://localhost:1313/blog/2023-10-23-kafka-connect-for-aws-part-4) for details about *kpow* configuration.
+
+![](kafka-topic.png#center)
+
+### Table Records
 
 We can check the ingested records on the DynamoDB table items view. Below shows a list of scanned records.
 
