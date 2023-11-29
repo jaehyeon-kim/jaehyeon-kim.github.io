@@ -38,7 +38,7 @@ In this lab, we will create a Pyflink application that exports Kafka topic messa
 * [Lab 3 Transform and write data to S3 from Kafka using Flink](#) (this post)
 * [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5)
 * [Lab 5 Write data to DynamoDB using Kafka Connect](/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6)
-* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-07-real-time-streaming-with-kafka-and-flink-7)
+* Lab 6 Consume data from Kafka using Lambda
 
 [**Update 2023-11-22**] Amazon MSK now supports fully managed data delivery to Amazon S3 using Kinesis Data Firehose, and you may consider this feature rather than relying on a Flink application. See [this page](https://aws.amazon.com/about-aws/whats-new/2023/09/amazon-msk-data-s3-kinesis-data-firehose/) for details.
 

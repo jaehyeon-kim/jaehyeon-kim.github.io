@@ -36,7 +36,7 @@ description: Kafka Connect is a tool for scalably and reliably streaming data be
 * [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4)
 * [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5)
 * [Lab 5 Write data to DynamoDB using Kafka Connect](#) (this post)
-* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-07-real-time-streaming-with-kafka-and-flink-7)
+* Lab 6 Consume data from Kafka using Lambda
 
 ## Architecture
 
@@ -54,7 +54,7 @@ For this lab, a Kafka sink connector and DynamoDB table are created additionally
 
 #### Download Connector Source
 
-Before we deploy the sink connector, its source should be downloaded into the *infra/connectors* path. From there, the source can be saved into a S3 bucket followed by being used to create a custom plugin. The connector source has multiple Jar files, and they should be compressed as the zip format. The archive file can be created by executing the *download.sh* file.
+Before we deploy the sink connector, its source should be downloaded into the *infra/connectors* folder. From there, the source can be saved into a S3 bucket followed by being used to create a custom plugin. The connector source has multiple Jar files, and they should be compressed as the zip format. The archive file can be created by executing the *download.sh* file.
 
 ```bash
 # download.sh
@@ -77,7 +77,7 @@ curl -o ${SRC_PATH}/camel-aws-ddb-sink-kafka-connector.tar.gz ${DOWNLOAD_URL} \
   && rm ${SRC_PATH}/camel-aws-ddb-sink-kafka-connector.tar.gz
 ```
 
-Below shows the sink connector source. As mentioned, the zip file will be used to create a custom plugin. Note that the unarchived connect source is kept because we can use it on a local Kafka Connect server deployed on Docker.
+Below shows the sink connector source. As mentioned, the zip file will be used to create a custom plugin. Note that the unarchived connect source is kept because we can use it on a local Kafka Connect server deployed on Docker, which can be used for local development.
 
 ```bash
 $ tree infra/connectors -P 'camel-aws-ddb-sink-kafka-connector*' -I 'docs'
@@ -205,7 +205,7 @@ resource "aws_cloudwatch_log_group" "camel_ddb_sink" {
 
 #### Connector IAM Role
 
-The managed policy of the connector role has permission on MSK cluster resources (cluster, topic and group). It also has permission on S3 bucket and CloudWatch Log for logging. Finally, as the connector should be able to create records in a DynamoDB table, the DynamoDB full access policy (*AmazonDynamoDBFullAccess*) is attached to the role for simplicity.
+The managed policy of the connector role has permission on MSK cluster resources (cluster, topic and group). It also has permission on S3 bucket and CloudWatch Log for logging. Finally, as the connector should be able to create records in a DynamoDB table, the DynamoDB full access policy (*AmazonDynamoDBFullAccess*) is attached to the role. Note that the DynamoDB policy is too generous, and it is recommended limiting its scope in production environment.
 
 ```terraform
 # infra/msk-connect.tf
@@ -299,7 +299,7 @@ resource "aws_iam_policy" "kafka_connector_policy" {
 
 ### DynamoDB Table
 
-A simple DynamoDB table that has the *id* attribute as the partition key is configured as shown below. 
+A DynamoDB table is defined, and it will be used to export the topic messages. The table has the *id* attribute as the partition key.
 
 ```terraform
 # infra/msk-connect.tf
@@ -437,7 +437,7 @@ As Kafka Connect provides a REST API that manages connectors, we can create a co
 }
 ```
 
-The connector can be created (or deleted) using *Curl* as shown below.
+The connector can be created (as well as deleted) using *Curl* as shown below.
 
 ```bash
 # deploy sink connector
@@ -455,7 +455,7 @@ $ curl http://localhost:8083/connectors/real-time-streaming-taxi-rides-sink/stat
 
 ### Kafka Topic
 
-We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using *compose-ui.yml* - see [this post](/blog/http://localhost:1313/blog/2023-10-23-kafka-connect-for-aws-part-4) for details about *kpow* configuration.
+We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using [*compose-ui.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-ui.yml) - see [this post](/blog/http://localhost:1313/blog/2023-10-23-kafka-connect-for-aws-part-4) for details about *kpow* configuration.
 
 ![](kafka-topic.png#center)
 
