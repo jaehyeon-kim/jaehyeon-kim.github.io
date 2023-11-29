@@ -38,7 +38,7 @@ The value of data can be maximised when it is used without delay. With Apache Fl
 * [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4)
 * [Lab 4 Clean, Aggregate, and Enrich Events with Flink](#) (this post)
 * [Lab 5 Write data to DynamoDB using Kafka Connect](/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6)
-* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-07-real-time-streaming-with-kafka-and-flink-7)
+* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7)
 
 ## Architecture
 

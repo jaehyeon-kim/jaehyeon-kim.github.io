@@ -1,6 +1,6 @@
 ---
 title: Real Time Streaming with Kafka and Flink - Lab 6 Consume data from Kafka using Lambda
-date: 2023-12-07
+date: 2023-12-14
 draft: true
 featured: false
 comment: true
@@ -39,7 +39,7 @@ Amazon MSK can be configured as an [event source](https://docs.aws.amazon.com/la
 
 ## Architecture
 
-Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The messages of the *taxi-rides* topic can be consumed by a Lambda function where the MSK cluster is configured as an event source of the function.
+Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The messages of the *taxi-rides* topic are consumed by a Lambda function where the MSK cluster is configured as an event source of the function.
 
 ![](featured.png#center)
 
@@ -185,7 +185,7 @@ resource "aws_iam_policy" "kafka_consumer" {
 
 #### Function Source
 
-The *records* attribute of the Lambda event payload includes Kafka consumer records. Each record contains details of the Amazon MSK topic and partition identifier, together with a timestamp and a base64-encoded message (key and value). The Lambda function simply prints those records after decoding the message key and value as well as formatting the timestamp into the ISO format.
+The *records* attribute of the Lambda event payload includes Kafka consumer records. Each of the records contains details of the Amazon MSK topic and partition identifier, together with a timestamp and a base64-encoded message (key and value). The Lambda function simply prints those records after decoding the message key and value as well as formatting the timestamp into the ISO format.
 
 ```python
 # consumer/app.py
@@ -266,13 +266,13 @@ Once the resources are deployed, we can check the Lambda function on AWS Console
 
 ### Kafka Topic
 
-We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using *compose-ui.yml* - see [this post](/blog/http://localhost:1313/blog/2023-10-23-kafka-connect-for-aws-part-4) for details about *kpow* configuration.
+We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using [*compose-ui.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-ui.yml) - see [this post](/blog/http://localhost:1313/blog/2023-10-23-kafka-connect-for-aws-part-4) for details about *kpow* configuration.
 
 ![](kafka-topic.png#center)
 
 ### Consumer Output
 
-We can check the outputs of the Lambda function on CloudWatch Logs. The output shows that the message key and value are decoded as expected.
+We can check the outputs of the Lambda function on CloudWatch Logs. As expected, the message key and value are decoded.
 
 ![](cloudwatch-log.png#center)
 
