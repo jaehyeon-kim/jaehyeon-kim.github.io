@@ -189,7 +189,7 @@ When it comes to inbound rules of the cluster security group, we need to configu
 Finally, a cluster configuration is created manually as it's not supported by CloudFormation and its ARN and revision number are added as parameters. The configuration is shown below.
 
 
-```conf
+```properties
 auto.create.topics.enable = true
 delete.topic.enable = true
 ```
@@ -228,7 +228,7 @@ The connector has a number of connector properties including name, connector cla
 Note once the connector is deployed, the CDC event records will be published to `msk.datalake.cdc_events` topic.
 
 
-```conf
+```properties
 # ./connector/msk/source-debezium.properties
 connector.class=io.debezium.connector.postgresql.PostgresConnector
 tasks.max=1
@@ -297,7 +297,7 @@ I find the Lenses S3 connector is more straightforward to configure than the Con
 * stored as the JSON format and,
 * flushed every 60 seconds or when there are 50 records.
 
-```conf
+```properties
 # ./connector/msk/sink-s3-lenses.properties
 connector.class=io.lenses.streamreactor.connect.aws.s3.sink.S3SinkConnector
 tasks.max=1

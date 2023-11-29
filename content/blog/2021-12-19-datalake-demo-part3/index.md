@@ -154,7 +154,7 @@ spark-submit --jars /usr/lib/spark/external/lib/spark-avro.jar,/usr/lib/hudi/hud
 Below shows the additional Hudi properties. For Hive sync, the database, table, partition fields and JDBC URL are specified. Note that the private IP address of the master instance is added to the host of the JDBC URL. It is required when submitting the application by the cluster deploy mode. By default, the host is set to localhost and the connection failure error will be thrown if the app doesn't run in the master. The remaining Hudi datasource properties are to configure the [primary key of the Hudi table](https://hudi.apache.org/blog/2021/02/13/hudi-key-generators/) - every record in Hudi is uniquely identified by a pair of record key and partition path fields. The Hudi DeltaStreamer properties specify the source schema file and the S3 location where the source data files exist. More details about the configurations can be found in the [Hudi website](https://hudi.apache.org/docs/configurations/).
 
 
-```conf
+```properties
 # ./hudi/config/cdc_events_deltastreamer_s3.properties
 ## base properties
 hoodie.upsert.shuffle.parallelism=2

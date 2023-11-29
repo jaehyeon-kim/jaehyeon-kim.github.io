@@ -88,7 +88,7 @@ Then I changed the custom AWS credentials provider class from [WebIdentityTokenC
 Finally, I enabled Hive support and set _AWSGlueDataCatalogHiveClientFactory_ as the Hive metastore factory class. When we start an EMR job, we can [override application configuration](https://docs.aws.amazon.com/emr-on-eks/latest/APIReference/API_ConfigurationOverrides.html) to use AWS Glue Data Catalog as the metastore for Spark SQL and these are the relevant configuration changes for it.
 
 
-```conf
+```properties
 # .devcontainer/spark/spark-defaults.conf
 
 ...
@@ -112,7 +112,7 @@ spark.hadoop.hive.metastore.client.factory.class  com.amazonaws.glue.catalog.met
 Even if the credentials provider class is changed, it keeps showing long warning messages while fetching EC2 metadata. The following lines are added to the Log4j properties in order to disable those messages.
 
 
-```conf
+```properties
 # .devcontainer/spark/log4j.properties
 
 ...

@@ -341,7 +341,7 @@ emr-remote-dev
 Now we have two users that have access to the EMR cluster and their connection details are saved into an [SSH configuration file](https://linuxize.com/post/using-the-ssh-config-file/) as shown below.
 
 
-```conf
+```properties
 Host emr-hadoop
   HostName ip-10-0-113-113.ap-southeast-2.compute.internal
   User hadoop
