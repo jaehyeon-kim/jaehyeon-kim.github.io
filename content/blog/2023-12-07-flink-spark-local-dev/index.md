@@ -244,7 +244,7 @@ volumes:
 
 ### Spark Setup
 
-In an [earlier post](/blog/2022-05-08-emr-local-dev), I illustrated how to set up a local development environment using an EMR container image. That post is based the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension of VS Code where it is assumed that development takes place after attaching the project folder into a Docker container. Thanks to the [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) extension, however, we no longer have to attach the project folder into a container always because the extension allows us to do so with just a few mouse clicks if necessary - see the screenshot below. Moreover, as a Spark application developed in the host folder can easily be submitted to the Spark container via volume-mapping, we can simplify Spark setup quite a lot without creating a custom Docker image. Therefore, Spark will be set up using the EMR image where updated Spark configuration files and the project folder are volume-mapped to the container.
+In an [earlier post](/blog/2022-05-08-emr-local-dev), I illustrated how to set up a local development environment using an EMR container image. That post is based the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension of VS Code, and it is assumed that development takes place after attaching the project folder into a Docker container. Thanks to the [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) extension, however, we no longer have to attach the project folder into a container always because the extension allows us to do so with just a few mouse clicks if necessary - see the screenshot below. Moreover, as Spark applications developed in the host folder can easily be submitted to the Spark container via volume-mapping, we can simplify Spark setup dramatically without creating a custom Docker image. Therefore, Spark will be set up using the EMR image where updated Spark configuration files and the project folder are volume-mapped to the container. Also, the Spark History Server will be running in the container, which allows us to monitor completed and running Spark applications.
 
 ![](vscode-attach.png#center)
 
@@ -292,7 +292,7 @@ logger.EC2MetadataUtils.level = fatal
 
 #### Docker Compose Service
 
-The Spark container is created with the EMR image (*public.ecr.aws/emr-on-eks/spark/emr-6.15.0:latest*), and it is made to run indefinitely so that a Spark application can run by a separate process. As mentioned, the updated Spark configuration files and the project folder are volume-mapped. Note that I tried to create a Spark cluster by deploying the driver and executor separately, but I didn't have luck. I would try to create a Spark cluster later because it can be beneficial by allowing us to access the Spark Web UI for monitoring.
+The Spark container is created with the EMR image (*public.ecr.aws/emr-on-eks/spark/emr-6.15.0:latest*), and it starts the Spark History Server, which provides an interface to debug and diagnose completed and running Spark applications. Note that the server is configured to run in foreground (*SPARK_NO_DAEMONIZE=true*) in order for the container to keep alive. As mentioned, the updated Spark configuration files and the project folder are volume-mapped.
 
 ```yaml
 # docker-compose.yml
@@ -305,7 +305,9 @@ services:
   spark:
     image: public.ecr.aws/emr-on-eks/spark/emr-6.15.0:latest
     container_name: spark
-    command: /usr/bin/bash -c "while true; do sleep 2000; done"
+    command: /usr/lib/spark/sbin/start-history-server.sh
+    ports:
+      - "18080:18080"
     networks:
       - appnet
     environment:
@@ -313,6 +315,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-not_set}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-not_set}
       - AWS_REGION=${AWS_REGION:-not_set}
+      - SPARK_NO_DAEMONIZE=true
     volumes:
       - ./:/home/hadoop/project
       - ./dockers/spark/spark-defaults.conf:/usr/lib/spark/conf/spark-defaults.conf
@@ -694,6 +697,10 @@ docker exec spark /usr/lib/spark/bin/spark-submit \
 The app queries the output table successfully and shows the result as expected.
 
 ![](spark-consumer.png#center)
+
+We can check the performance of the Spark application on the Spark History Server (*localhost:18080*).
+
+![](spark-history-server.png#center)
 
 ## Summary
 
