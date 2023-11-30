@@ -39,7 +39,7 @@ A PyFlink application produces messages into a Kafka topic and those messages ar
 
 ## Infrastructure
 
-We create a Flink cluster, Spark container, Kafka cluster and Kafka management app. They are deployed using Docker Compose and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/general-demos/tree/master/spark-flink-local-dev) of this post.
+We create a Flink cluster, Spark container, Kafka cluster and Kafka management app. They are deployed using Docker Compose and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/general-demos/tree/master/flink-spark-local-dev) of this post.
 
 ### Flink Setup
 
