@@ -690,8 +690,11 @@ if __name__ == "__main__":
 The Spark app can be submitted as shown below. Note that the application is accessible in the container because the project folder is volume-mapped to the container folder (*/home/hadoop/project*).
 
 ```bash
-docker exec spark /usr/lib/spark/bin/spark-submit \
-  --master local[*] --deploy-mode client /home/hadoop/project/apps/spark/consumer.py
+## spark submit
+docker exec spark spark-submit \
+    --master local[*] \
+    --deploy-mode client \
+    /home/hadoop/project/apps/spark/consumer.py
 ```
 
 The app queries the output table successfully and shows the result as expected.
