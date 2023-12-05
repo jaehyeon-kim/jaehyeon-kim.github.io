@@ -140,7 +140,7 @@ Creating custom plugins and connectors is illustrated in detail in [one of my ea
 The [Debezium Postgres Connector](https://debezium.io/documentation/reference/stable/connectors/postgresql.html) is used as the source connector. Here the main difference from the earlier post is using the Confluent Avro Converter class for key and value converter properties and adding the schema registry URL.
 
 
-```conf
+```properties
 # connect/msk/debezium.properties
 connector.class=io.debezium.connector.postgresql.PostgresConnector
 tasks.max=1
@@ -170,7 +170,7 @@ transforms.unwrap.add.fields=op,db,table,schema,lsn,source.ts_ms
 The sink connector also uses the Confluent Avro Converter class for key and value converter properties and the schema registry URL is added accordingly.
 
 
-```conf
+```properties
 # connect/msk/confluent.properties
 connector.class=io.confluent.connect.s3.S3SinkConnector
 storage.class=io.confluent.connect.s3.storage.S3Storage
