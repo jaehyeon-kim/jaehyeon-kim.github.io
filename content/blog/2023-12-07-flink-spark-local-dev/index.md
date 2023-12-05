@@ -45,7 +45,7 @@ We create a Flink cluster, Spark container, Kafka cluster and Kafka management a
 
 #### Custom Docker Image
 
-The custom Docker image extends the EMR Flink image (*public.ecr.aws/emr-on-eks/flink/emr-6.15.0-flink:latest*). It begins with downloading dependent Jar files into the Flink library folder (*/usr/lib/flink/lib*), which are in relation to the [Kafka](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/table/kafka/) and [Flink Faker](https://github.com/knaufk/flink-faker) connectors. 
+Flink 1.17.1 is installed in the EMR Flink image (*public.ecr.aws/emr-on-eks/flink/emr-6.15.0-flink:latest*) and a custom Docker image is created, which extends it. It begins with downloading dependent Jar files into the Flink library folder (*/usr/lib/flink/lib*), which are in relation to the [Kafka](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/table/kafka/) and [Flink Faker](https://github.com/knaufk/flink-faker) connectors. 
 
 When I started to run the [Flink SQL client](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/dev/table/sqlclient/), I encountered a number of process startup issues. First, I had a runtime exception whose error message is *java.lang.RuntimeException: Could not find a free permitted port on the machine*. When it gets started, it reserves a port and writes the port details into a folder via the [*getAvailablePort*](https://github.com/apache/flink/blob/master/flink-core/src/main/java/org/apache/flink/util/NetUtils.java#L190) method of the *NetUtils* class. Unlike the official Flink Docker image where the details are written to the */tmp* folder, the EMR image writes into the */mnt/tmp* folder, and it throws an error due to insufficient permission. I was able to fix the issue by creating the */mnt/tmp* folder beforehand. Secondly, I also had additional issues that were caused by the *NoClassDefFoundError*, and they were fixed by adding the [Javax Inject](https://mvnrepository.com/artifact/javax.inject/javax.inject/1) and [AOP Alliance](https://mvnrepository.com/artifact/aopalliance/aopalliance/1.0) Jar files into the Flink library folder.
 
@@ -292,7 +292,7 @@ logger.EC2MetadataUtils.level = fatal
 
 #### Docker Compose Service
 
-The Spark container is created with the EMR image (*public.ecr.aws/emr-on-eks/spark/emr-6.15.0:latest*), and it starts the Spark History Server, which provides an interface to debug and diagnose completed and running Spark applications. Note that the server is configured to run in foreground (*SPARK_NO_DAEMONIZE=true*) in order for the container to keep alive. As mentioned, the updated Spark configuration files and the project folder are volume-mapped.
+Spark 3.4.1 is installed in the EMR image (*public.ecr.aws/emr-on-eks/spark/emr-6.15.0:latest*) and the Spark container is created with it. It starts the Spark History Server, which provides an interface to debug and diagnose completed and running Spark applications. Note that the server is configured to run in foreground (*SPARK_NO_DAEMONIZE=true*) in order for the container to keep alive. As mentioned, the updated Spark configuration files and the project folder are volume-mapped.
 
 ```yaml
 # docker-compose.yml
