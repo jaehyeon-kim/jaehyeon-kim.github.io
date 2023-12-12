@@ -36,7 +36,7 @@ description: Kafka Connect is a tool for scalably and reliably streaming data be
 * [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4)
 * [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5)
 * [Lab 5 Write data to DynamoDB using Kafka Connect](#) (this post)
-* Lab 6 Consume data from Kafka using Lambda
+* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7)
 
 ## Architecture
 
@@ -455,7 +455,7 @@ $ curl http://localhost:8083/connectors/real-time-streaming-taxi-rides-sink/stat
 
 ### Kafka Topic
 
-We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using [*compose-ui.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-ui.yml) - see [this post](/blog/http://localhost:1313/blog/2023-10-23-kafka-connect-for-aws-part-4) for details about *kpow* configuration.
+We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using [*compose-ui.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-ui.yml) - see [this post](/blog/2023-10-23-kafka-connect-for-aws-part-4) for details about *kpow* configuration.
 
 ![](kafka-topic.png#center)
 
