@@ -1,7 +1,7 @@
 ---
 title: Real Time Streaming with Kafka and Flink - Lab 6 Consume data from Kafka using Lambda
 date: 2023-12-14
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
