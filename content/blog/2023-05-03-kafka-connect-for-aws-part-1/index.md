@@ -65,36 +65,36 @@ There is one more source connector by AWS Labs to be noted, although it doesn't 
 
 ## Camel Kafka Connector
 
-[Apache Camel](https://camel.apache.org/manual/faq/what-is-camel.html) is a versatile open-source integration framework based on known [Enterprise Integration Patterns](https://camel.apache.org/components/3.20.x/eips/enterprise-integration-patterns.html). It supports [Camel Kafka connectors](https://camel.apache.org/camel-kafka-connector/3.18.x/index.html), which allows you to use all [Camel components](https://camel.apache.org/components/3.20.x/index.html) as Kafka Connect connectors. The latest LTS version is *3.18.x (LTS)*, and it is supported until July 2023. Note that it works with Apache Kafka at version 2.8.0 as a dependency. In spite of the compatibility requirement, the connectors are using the Kafka Client which often is [compatible with different broker versions](https://github.com/apache/camel-kafka-connector/issues/1525), especially when the two versions are closer. Therefore, we can use them with a different Kafka version e.g. [2.8.1, which is recommended by Amazon MSK](https://docs.aws.amazon.com/msk/latest/developerguide/supported-kafka-versions.html).
+[Apache Camel](https://camel.apache.org/manual/faq/what-is-camel.html) is a versatile open-source integration framework based on known [Enterprise Integration Patterns](https://camel.apache.org/components/3.20.x/eips/enterprise-integration-patterns.html). It supports [Camel Kafka connectors](https://camel.apache.org/camel-kafka-connector/latest/index.html), which allows you to use all [Camel components](https://camel.apache.org/components/3.20.x/index.html) as Kafka Connect connectors. The latest LTS version is *3.18.x (LTS)*, and it is supported until July 2023. Note that it works with Apache Kafka at version 2.8.0 as a dependency. In spite of the compatibility requirement, the connectors are using the Kafka Client which often is [compatible with different broker versions](https://github.com/apache/camel-kafka-connector/issues/1525), especially when the two versions are closer. Therefore, we can use them with a different Kafka version e.g. [2.8.1, which is recommended by Amazon MSK](https://docs.aws.amazon.com/msk/latest/developerguide/supported-kafka-versions.html).
 
 At the time of writing this post, there are 23 source and sink connectors that target specific AWS services - see the summary table below. Moreover, there are connectors targeting popular RDBMS, which cover MariaDB, MySQL, Oracle, PostgreSQL and MS SQL Server. Together with the [Debezium connectors](https://debezium.io/), we can build effective data pipelines on Amazon RDS as well. Overall Camel connectors can be quite beneficial when building real-time data pipelines on AWS. 
 
 |Service|Source|Sink|
 |:------|:-----:|:---:|
-|[S3](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-s3-sink-kafka-sink-connector.html)||✔|
-|[S3](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-s3-source-kafka-source-connector.html)|✔||
-|[S3 - Streaming Upload](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-s3-streaming-upload-sink-kafka-sink-connector.html)||✔|
-|[Redshift](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-redshift-sink-kafka-sink-connector.html)||✔|
-|[Redshift](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-redshift-source-kafka-source-connector.html)|✔||
-|[SQS](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-sqs-sink-kafka-sink-connector.html)||✔|
-|[SQS](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-sqs-source-kafka-source-connector.html)|✔||
-|[SQS - FIFO](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-sqs-fifo-sink-kafka-sink-connector.html)||✔|
-|[SQS - Batch](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-sqs-batch-sink-kafka-sink-connector.html)||✔|
-|[Kinesis](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-kinesis-sink-kafka-sink-connector.html)||✔|
-|[Kinesis](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-kinesis-source-kafka-source-connector.html)|✔||
-|[Kinesis - Firehose](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-kinesis-firehose-sink-kafka-sink-connector.html)||✔|
-|[DynamoDB](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html)||✔|
-|[DynamoDB - Streams](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ddb-streams-source-kafka-source-connector.html)|✔||
-|[CloudWatch Metrics](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-cloudwatch-sink-kafka-sink-connector.html)||✔|
-|[Lambda](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-lambda-sink-kafka-sink-connector.html)||✔|
-|[EC2](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ec2-sink-kafka-sink-connector.html)||✔|
-|[EventBridge](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-eventbridge-sink-kafka-sink-connector.html)||✔|
-|[Secrets Manager](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-secrets-manager-sink-kafka-sink-connector.html)||✔|
-|[SES](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ses-sink-kafka-sink-connector.html)||✔|
-|[SNS](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-sns-sink-kafka-sink-connector.html)||✔|
-|[SNS - FIFO](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-sns-fifo-sink-kafka-sink-connector.html)||✔|
-|[IAM](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws2-iam-kafka-sink-connector.html)||✔|
-|[KMS](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws2-kms-kafka-sink-connector.html)||✔|
+|[S3](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-s3-sink-kafka-sink-connector.html)||✔|
+|[S3](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-s3-source-kafka-source-connector.html)|✔||
+|[S3 - Streaming Upload](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-s3-streaming-upload-sink-kafka-sink-connector.html)||✔|
+|[Redshift](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-redshift-sink-kafka-sink-connector.html)||✔|
+|[Redshift](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-redshift-source-kafka-source-connector.html)|✔||
+|[SQS](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-sqs-sink-kafka-sink-connector.html)||✔|
+|[SQS](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-sqs-source-kafka-source-connector.html)|✔||
+|[SQS - FIFO](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-sqs-fifo-sink-kafka-sink-connector.html)||✔|
+|[SQS - Batch](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-sqs-batch-sink-kafka-sink-connector.html)||✔|
+|[Kinesis](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-kinesis-sink-kafka-sink-connector.html)||✔|
+|[Kinesis](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-kinesis-source-kafka-source-connector.html)|✔||
+|[Kinesis - Firehose](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-kinesis-firehose-sink-kafka-sink-connector.html)||✔|
+|[DynamoDB](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html)||✔|
+|[DynamoDB - Streams](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-ddb-streams-source-kafka-source-connector.html)|✔||
+|[CloudWatch Metrics](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-cloudwatch-sink-kafka-sink-connector.html)||✔|
+|[Lambda](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-lambda-sink-kafka-sink-connector.html)||✔|
+|[EC2](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-ec2-sink-kafka-sink-connector.html)||✔|
+|[EventBridge](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-eventbridge-sink-kafka-sink-connector.html)||✔|
+|[Secrets Manager](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-secrets-manager-sink-kafka-sink-connector.html)||✔|
+|[SES](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-ses-sink-kafka-sink-connector.html)||✔|
+|[SNS](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-sns-sink-kafka-sink-connector.html)||✔|
+|[SNS - FIFO](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-sns-fifo-sink-kafka-sink-connector.html)||✔|
+|[IAM](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws2-iam-kafka-sink-connector.html)||✔|
+|[KMS](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws2-kms-kafka-sink-connector.html)||✔|
 
 ## Other Providers
 

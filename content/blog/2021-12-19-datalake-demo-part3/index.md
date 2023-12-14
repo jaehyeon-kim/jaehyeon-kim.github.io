@@ -118,7 +118,7 @@ As shown below, it runs as a Spark application. Some important options are illus
 * Hudi-related jar files are specified directly because Amazon EMR release version 5.28.0 and later installs Hudi components by default.
     * [Hudi 0.8.0 is installed for EMR release 6.4.0](https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-hudi.html). 
 * It is deployed by the [cluster deploy mode](https://spark.apache.org/docs/latest/cluster-overview.html) where the driver and executor have 2G and 4G of memory respectively.
-* [Copy on Write (CoW)](https://hudi.apache.org/learn/faq/#what-is-the-difference-between-copy-on-write-cow-vs-merge-on-read-mor-storage-types) is configured as the storage type.
+* [Copy on Write (CoW)](https://hudi.apache.org/docs/concepts/#copy-on-write-table#what-is-the-difference-between-copy-on-write-cow-vs-merge-on-read-mor-storage-types) is configured as the storage type.
 * Additional Hudi properties are saved in S3 (`cdc_events_deltastreamer_s3.properties`) - it'll be discussed below. 
 * The JSON type is configured as the source file type - note we use the built-in JSON converter for the Kafka connectors.
 * The S3 target base path indicates the place where the Hudi data is stored, and the target table configures the resulting table.

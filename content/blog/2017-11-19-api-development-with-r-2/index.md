@@ -85,7 +85,7 @@ CMD ["/usr/bin/supervisord", "-c", "/home/docker/api-supervisor.conf"]
 
 ### Plumber
 
-As can be seen in [api-supervisor.conf](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/api-supervisor.conf), the _plumber_ API can be started at _port 9000_ as following. ([plumber-src.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/plumber/plumber-src.R) and [plumber-serve.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/plumber/plumber-serve.R) are discussed in [Part I](/blog/2017-11-18-API-Development-with-R-Part-I))
+As can be seen in [api-supervisor.conf](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/api-supervisor.conf), the _plumber_ API can be started at _port 9000_ as following. ([plumber-src.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/plumber/plumber-src.R) and [plumber-serve.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/plumber/plumber-serve.R) are discussed in [Part I](/blog/2017-11-18-api-development-with-r-1))
 
 ```bash
 /usr/local/bin/Rscript /home/docker/plumber/plumber-serve.R
@@ -103,7 +103,7 @@ daemon disable
 control disable
 ```
 
-Then it is possible to start the _Rserve_ API at _port 8000_ as shown below. ([rserve-src.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/rserve/rserve-src.R) is discussed in [Part I](/blog/2017-11-18-API-Development-with-R-Part-I).)
+Then it is possible to start the _Rserve_ API at _port 8000_ as shown below. ([rserve-src.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/rserve/rserve-src.R) is discussed in [Part I](/blog/2017-11-18-api-development-with-r-1).)
 
 ```bash
 /usr/local/bin/R CMD Rserve --slave --RS-conf /home/docker/rserve/rserve.conf \
@@ -122,7 +122,7 @@ LoadModule R_module /usr/lib/apache2/modules/mod_R.so
 </Location>
 ```
 
-It is possible to start the _rApache_ API at _port 80_ as following. ([rapache-app.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/rapache/rapache-app.R) is discussed in [Part I](/blog/2017-11-18-API-Development-with-R-Part-I).)
+It is possible to start the _rApache_ API at _port 80_ as following. ([rapache-app.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/rapache/rapache-app.R) is discussed in [Part I](/blog/2017-11-18-api-development-with-r-1).)
 
 ```bash
 apache2ctl -DFOREGROUND

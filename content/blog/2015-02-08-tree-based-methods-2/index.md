@@ -28,7 +28,7 @@ description: Part II of tree based methods in R series. Cost-sensitive classific
 * [Part V](/blog/2015-03-05-tree-based-methods-5)
 * [Part VI](/blog/2015-03-07-tree-based-methods-6)
 
-In the previous article ([Tree Based Methods in R - Part I](/blog/2015-02-01-tree-based-methods-1)), a decision tree is created on the *Carseats* data which is in the chapter 8 lab of [ISLR](http://www-bcf.usc.edu/~gareth/ISL/). In that article, potentially asymetric costs due to misclassification are not taken into account. When unbalance between false positive and false negative can have a significant impact, it can be explicitly adjusted either by altering prior (or empirical) probabilities or by adding a loss matrix. 
+In the previous article ([Tree Based Methods in R - Part I](/blog/2015-02-01-tree-based-methods-1)), a decision tree is created on the *Carseats* data which is in the chapter 8 lab of [ISLR](https://www.statlearning.com/). In that article, potentially asymetric costs due to misclassification are not taken into account. When unbalance between false positive and false negative can have a significant impact, it can be explicitly adjusted either by altering prior (or empirical) probabilities or by adding a loss matrix. 
 
 A comprehensive summary of this topic, as illustrated in [Berk (2008)](http://www.springer.com/mathematics/probability/book/978-0-387-77500-5), is shown below.
 
@@ -137,7 +137,7 @@ test.res.summary = with(testData,rbind(table(High),table(High)/length(High)))
 trControl = trainControl(method="repeatedcv",number=10,repeats=5)
 ```
 
-Rather than tuning the complexity parameter (*cp*) using the built-in `tuneLength`, a grid is created. At first, it was intended to use this grid together with altered priors in the `expand.grid()` function of the **caret** package as `rpart()` has an argument named *parms* to enter altered priors (*prior*) or a loss matrix (*loss*) as a list. Later, however, it was found that the function does not accept an argument if it is not set as a tuning parameter. Therefore *cp* is not tuned when each of *parms* values is modified. (Although it is not considered in this article, the **mlr** package seems to support cost sensitive classification by adding a loss matrix as can be checked [here](http://berndbischl.github.io/mlr/tutorial/html/cost_sensitive_classif/index.html))
+Rather than tuning the complexity parameter (*cp*) using the built-in `tuneLength`, a grid is created. At first, it was intended to use this grid together with altered priors in the `expand.grid()` function of the **caret** package as `rpart()` has an argument named *parms* to enter altered priors (*prior*) or a loss matrix (*loss*) as a list. Later, however, it was found that the function does not accept an argument if it is not set as a tuning parameter. Therefore *cp* is not tuned when each of *parms* values is modified. (Although it is not considered in this article, the **mlr** package seems to support cost sensitive classification by adding a loss matrix as can be checked [here](https://mlr.mlr-org.com/articles/tutorial/cost_sensitive_classif.html))
 
 
 ```r
