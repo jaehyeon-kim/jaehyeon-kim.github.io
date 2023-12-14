@@ -141,7 +141,7 @@ do.call("sum",x) # (2)
 There are some options to control a loop or to change the return data type. Some of them are
 
 - `.combine`: A function can be specified to reduce the outcome variable. `c`, `+ - * / ...`, `rbind/cbind` and `min/max` are some of useful built-in functions. A user-defined function can also be created.
-    + `.multicombine` and `.maxcombine` can be set to determine how a function is applied - actually I don't fully understand these options and see the [vignette](http://cran.r-project.org/web/packages/foreach/vignettes/foreach.pdf) for further details.
+    + `.multicombine` and `.maxcombine` can be set to determine how a function is applied - actually I don't fully understand these options and see the [vignette](https://cran.r-project.org/web/packages/foreach/index.html) for further details.
 
 
 ```r
@@ -242,7 +242,7 @@ foreach(i=1:10, .combine="c") %:% when(i %% 2 == 0) %do% i
 ## [1]  2  4  6  8 10
 ```
 
-Below shows an example of nested looping by *for* and *foreach*. According to the [vignette](http://cran.r-project.org/web/packages/foreach/vignettes/foreach.pdf), it is not necessary to determine which loop (inner or outer) to parallize as `%:%` turns multiple foreach loops into a single stream of tasks that can be parallelized.
+Below shows an example of nested looping by *for* and *foreach*. According to the [vignette](https://cran.r-project.org/web/packages/foreach/index.html), it is not necessary to determine which loop (inner or outer) to parallize as `%:%` turns multiple foreach loops into a single stream of tasks that can be parallelized.
 
 
 ```r
