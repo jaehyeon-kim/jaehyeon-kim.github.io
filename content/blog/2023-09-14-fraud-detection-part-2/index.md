@@ -42,7 +42,7 @@ This series aims to help those who are new to [Apache Flink](https://flink.apach
 
 ## Architecture
 
-There are two Python applications that send transaction and flagged account records into the corresponding topics - the transaction app sends records indefinitely in a loop. Note that, as the Kafka cluster is deployed in private subnets, a VPN server is used to generate records from the developer machine. Both the topics are consumed by a Flink application, and it filters the transactions from the flagged accounts followed by sending them into an output topic of flagged transactions. Finally, the flagged transaction records are sent into a DynamoDB table by the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) in order to serve real-time requests from an API.
+There are two Python applications that send transaction and flagged account records into the corresponding topics - the transaction app sends records indefinitely in a loop. Note that, as the Kafka cluster is deployed in private subnets, a VPN server is used to generate records from the developer machine. Both the topics are consumed by a Flink application, and it filters the transactions from the flagged accounts followed by sending them into an output topic of flagged transactions. Finally, the flagged transaction records are sent into a DynamoDB table by the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) in order to serve real-time requests from an API.
 
 ![](featured.png#center)
 
@@ -733,7 +733,7 @@ Once deployed, we can see the application on AWS console, and it stays in the re
 
 ### Camel DynamoDB Sink Connector
 
-The connector is configured to write messages from the *flagged-transactions* topic into the DynamoDB table created earlier. It requires to specify the table name, AWS region, operation, write capacity and whether to use the [default credential provider](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) - see the [documentation](https://camel.apache.org/camel-kafka-connector/3.18.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) for details. See [this post](/blog/2023-07-03-kafka-connect-for-aws-part-3) for details about how to set up the sink connector.
+The connector is configured to write messages from the *flagged-transactions* topic into the DynamoDB table created earlier. It requires to specify the table name, AWS region, operation, write capacity and whether to use the [default credential provider](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) - see the [documentation](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) for details. See [this post](/blog/2023-07-03-kafka-connect-for-aws-part-3) for details about how to set up the sink connector.
 
 ```terraform
 # infra/msk-connect.tf

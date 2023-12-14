@@ -435,7 +435,7 @@ aws s3 cp s3://${S3_BUCKET_NAME}/output/${OUTPUT_FILE} - | head -n 15
 
 ### Hudi DeltaStreamer
 
-In an [earlier post](/blog/2021-12-19-datalake-demo-part3), we discussed a Hudi table generation using the [DeltaStreamer utility](https://hudi.apache.org/docs/hoodie_deltastreamer#deltastreamer) as part of a CDC-based data ingestion solution. In that exercise, we executed the spark job in an EMR cluster backed by EC2 instances. We can run the spark job in our EKS cluster.
+In an [earlier post](/blog/2021-12-19-datalake-demo-part3), we discussed a Hudi table generation using the [DeltaStreamer utility](https://hudi.apache.org/docs/hoodie_streaming_ingestion#deltastreamer) as part of a CDC-based data ingestion solution. In that exercise, we executed the spark job in an EMR cluster backed by EC2 instances. We can run the spark job in our EKS cluster.
 
 We can configure to run the executors in spot instances in order to save cost. A spot node group can be created by the following configuration file.
 
