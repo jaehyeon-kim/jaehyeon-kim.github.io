@@ -99,7 +99,7 @@ sparkR.stop()
 
 ### standalone cluster
 
-In order to run the script in the cluster mode, the two data files (*iris.json* and *iris_up.csv*) are copied to `~/data` in both the master and slave machines. (Files should exist in the same location if you're not using HDFS, S3 ...) I simply used WinSCP and you may find [this post](http://jaehyeon-kim.github.io/2015/11/Connecting-to-VirtualBox-Guest-via-SSH-And-RStudio-Server) useful. Also I started a cluster by `~/spark/sbin/start-all.sh` - see [this post](http://jaehyeon-kim.github.io/2016/02/Spark-Cluster-Setup-on-VirtualBox) for further details.
+In order to run the script in the cluster mode, the two data files (*iris.json* and *iris_up.csv*) are copied to `~/data` in both the master and slave machines. (Files should exist in the same location if you're not using HDFS, S3 ...) Note that I started a cluster by `~/spark/sbin/start-all.sh` - see [this post](/blog/2016-02-22-spark-cluster-setup-on-virtualbox) for further details.
 
 The main difference is the Spark master, which is set to be *spark://192.168.1.10:7077*.
 

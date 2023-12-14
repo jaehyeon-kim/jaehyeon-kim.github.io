@@ -105,7 +105,7 @@ result$tot.withinss
 
 ## random forest
 
-This example is from **foreach** packages's [vignette](http://cran.r-project.org/web/packages/foreach/vignettes/foreach.pdf).
+This example is from **foreach** packages's [vignette](https://cran.r-project.org/web/packages/foreach/index.html).
 
 According to the package document,
 
@@ -113,7 +113,7 @@ According to the package document,
 
 ### parallel package
 
-*x* and *y* keep the predictors and response. A function (`rf()`) is created to implement the algorithm. If data has to be sent to each worker, it can be sent either by `clusterCall()` or by a function. If `clusterApply()` or `clusterApplyLB()` are used, the former should be used to reduce I/O operations time and it'd be alright to send by a function if `parLapply()` or `parLapplyLB()` are used - single I/O for each task split. (for details, see the [first article](http://jaehyeon-kim.github.io/r/2015/03/14/Parallel-Processing-on-Single-Machine-Part-I/)) As the **randomForest** package provides a function to combine the objects (`combine()`), it is used in `do.call()`. Finally a confusion table is created.
+*x* and *y* keep the predictors and response. A function (`rf()`) is created to implement the algorithm. If data has to be sent to each worker, it can be sent either by `clusterCall()` or by a function. If `clusterApply()` or `clusterApplyLB()` are used, the former should be used to reduce I/O operations time and it'd be alright to send by a function if `parLapply()` or `parLapplyLB()` are used - single I/O for each task split. (for details, see the [first article](/blog/2015-03-14-parallel-processing-on-single-machine-1)) As the **randomForest** package provides a function to combine the objects (`combine()`), it is used in `do.call()`. Finally a confusion table is created.
 
 
 ```r
