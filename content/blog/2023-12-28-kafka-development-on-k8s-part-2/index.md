@@ -23,266 +23,264 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Apache Kafka is one of the key technologies for modern data streaming architectures on AWS. Developing and testing Kafka-related applications can be easier using Docker and Docker Compose. In this series of posts, I will demonstrate reference implementations of those applications in Dockerized environments.
+description: Foo Bar
 ---
 
-I'm teaching myself [modern data streaming architectures](https://docs.aws.amazon.com/whitepapers/latest/build-modern-data-streaming-analytics-architectures/build-modern-data-streaming-analytics-architectures.html) on AWS, and [Apache Kafka](https://kafka.apache.org/) is one of the key technologies, which can be used for messaging, activity tracking, stream processing and so on. While applications tend to be deployed to cloud, it can be much easier if we develop and test those with [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) locally. As the series title indicates, I plan to publish articles that demonstrate Kafka and related tools in *Dockerized* environments. Although I covered some of them in previous posts, they are implemented differently in terms of the Kafka Docker image, the number of brokers, Docker volume mapping etc. It can be confusing, and one of the purposes of this series is to illustrate reference implementations that can be applied to future development projects. Also, I can extend my knowledge while preparing for this series. In fact Kafka security is one of the areas that I expect to learn further. Below shows a list of posts that I plan for now.
 
 * [Part 1 Cluster Setup](/blog/2023-12-21-kafka-development-on-k8s-part-1)
 * [Part 2 Producer and Consumer](#) (this post)
 * Part 3 Kafka Connect
 
-## Setup Kafka Cluster
+## Kafka Client Apps
 
-We are going to create a Kafka cluster with 3 brokers and 1 Zookeeper node. Having multiple brokers are advantageous to test Kafka features. For example, the number of replication factor of a topic partition is limited to the number of brokers. Therefore, if we have multiple brokers, we can check what happens when the minimum in-sync replica configuration doesn't meet due to broker failure. We also need Zookeeper for metadata management - see [this article](https://www.conduktor.io/kafka/zookeeper-with-kafka/) for details about the role of Zookeeper. 
+### Producer
 
-![](featured.png#center)
+```python
+# clients/producer.py
+import os
+import datetime
+import time
+import json
+import typing
+import logging
+import dataclasses
 
-### Docker Compose File
+from faker import Faker
+from kafka import KafkaProducer
 
-There are popular docker images for Kafka development. Some of them are [confluentinc/cp-kafka](https://hub.docker.com/r/confluentinc/cp-kafka) from Confluent, [wurstmeister/kafka](https://hub.docker.com/r/wurstmeister/kafka) from wurstmeister, and [bitnami/kafka](https://hub.docker.com/r/bitnami/kafka) from Bitnami. I initially used the image from Confluent, but I was not sure how to select a specific version of Kafka - note the [recommended Kafka version of Amazon MSK](https://docs.aws.amazon.com/msk/latest/developerguide/supported-kafka-versions.html#2.8.1) is 2.8.1. Also, the second image doesn't cover Kafka 3+ and it may be limited to use a newer version of Kafka in the future. In this regard, I chose the image from Bitnami.
+logging.basicConfig(level=logging.INFO)
 
-The following Docker Compose file is used to create the Kafka cluster indicated earlier - it can also be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/blob/main/kafka-dev-with-docker/part-01/compose-kafka.yml) of this post. The resources created by the compose file is illustrated below.
-- services
-  - zookeeper
-    - A Zookeeper node is created with minimal configuration. It allows anonymous login.
-  - kafka-*[id]*
-    - Each broker has a unique ID (*KAFKA_CFG_BROKER_ID*) and shares the same Zookeeper connect parameter (*KAFKA_CFG_ZOOKEEPER_CONNECT*). These are required to connect to the Zookeeper node.
-    - Each has two listeners - *INTERNAL* and *EXTERNAL*. The former is accessed on port 9092, and it is used within the same Docker network. The latter is mapped from port 9093 to 9095, and it can be used to connect from outside the network.
-      - [**UPDATE 2023-05-09**] The external ports are updated from 29092 to 29094, which is because it is planned to use 9093 for SSL encryption.
-      - [**UPDATE 2023-05-15**] The inter broker listener name is changed from *CLIENT* to *INTERNAL*. 
-    - Each can be accessed without authentication (*ALLOW_PLAINTEXT_LISTENER*). 
-- networks
-  - A network named *kafka-network* is created and used by all services. Having a custom network can be beneficial when services are launched by multiple Docker Compose files. This custom network can be referred by services in other compose files.
-- volumes
-  - Each service has its own volume that will be mapped to the container's data folder. We can check contents of the folder in the Docker volume path. More importantly data is preserved in the Docker volume unless it is deleted so that we don't have to recreate data every time the Kafka cluster gets started.
-  - Docker volume mapping doesn't work as expected for me with WSL 2 and Docker Desktop. Therefore, I installed [Docker](https://docs.docker.com/engine/install/ubuntu/) and [Docker Compose](https://docs.docker.com.zh.xy2401.com/v17.12/compose/install/#install-compose) as Linux apps on WSL 2 and start the Docker daemon as `sudo service docker start`. Note I only need to run the command when the system (WSL 2) boots, and I haven't found a way to start it automatically.
-    - [UPDATE 2023-08-17] A newer version of WSL2 (0.67.6+) supports *Systemd* on Windows 11. I updated my WSL version (`wsl --update`) and was able to start Docker automatically by enabling *Systemd* in */etc/wsl.conf*.
-      - ```
-        #/etc/wsl.conf
-        [boot]
-        systemd=true
-        ``` 
 
-```yaml
-# /kafka-dev-with-docker/part-01/compose-kafka.yml
-version: "3.5"
+@dataclasses.dataclass
+class OrderItem:
+    product_id: int
+    quantity: int
 
-services:
-  zookeeper:
-    image: bitnami/zookeeper:3.5
-    container_name: zookeeper
-    ports:
-      - "2181"
-    networks:
-      - kafkanet
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-    volumes:
-      - zookeeper_data:/bitnami/zookeeper
-  kafka-0:
-    image: bitnami/kafka:2.8.1
-    container_name: kafka-0
-    expose:
-      - 9092
-    ports:
-      - "29092:29092"
-    networks:
-      - kafkanet
-    environment:
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_CFG_BROKER_ID=0
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-0:9092,EXTERNAL://localhost:29092
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
-    volumes:
-      - kafka_0_data:/bitnami/kafka
-    depends_on:
-      - zookeeper
-  kafka-1:
-    image: bitnami/kafka:2.8.1
-    container_name: kafka-1
-    expose:
-      - 9092
-    ports:
-      - "29093:29093"
-    networks:
-      - kafkanet
-    environment:
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_CFG_BROKER_ID=1
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-1:9092,EXTERNAL://localhost:29093
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
-    volumes:
-      - kafka_1_data:/bitnami/kafka
-    depends_on:
-      - zookeeper
-  kafka-2:
-    image: bitnami/kafka:2.8.1
-    container_name: kafka-2
-    expose:
-      - 9092
-    ports:
-      - "29094:29094"
-    networks:
-      - kafkanet
-    environment:
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_CFG_BROKER_ID=2
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:29094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka-2:9092,EXTERNAL://localhost:29094
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
-    volumes:
-      - kafka_2_data:/bitnami/kafka
-    depends_on:
-      - zookeeper
 
-networks:
-  kafkanet:
-    name: kafka-network
+@dataclasses.dataclass
+class Order:
+    order_id: str
+    ordered_at: datetime.datetime
+    user_id: str
+    order_items: typing.List[OrderItem]
 
-volumes:
-  zookeeper_data:
-    driver: local
-    name: zookeeper_data
-  kafka_0_data:
-    driver: local
-    name: kafka_0_data
-  kafka_1_data:
-    driver: local
-    name: kafka_1_data
-  kafka_2_data:
-    driver: local
-    name: kafka_2_data
+    def asdict(self):
+        return dataclasses.asdict(self)
+
+    @classmethod
+    def auto(cls, fake: Faker = Faker()):
+        user_id = str(fake.random_int(1, 100)).zfill(3)
+        order_items = [
+            OrderItem(fake.random_int(1, 1000), fake.random_int(1, 10))
+            for _ in range(fake.random_int(1, 4))
+        ]
+        return cls(fake.uuid4(), datetime.datetime.utcnow(), user_id, order_items)
+
+    def create(self, num: int):
+        return [self.auto() for _ in range(num)]
+
+
+class Producer:
+    def __init__(self, bootstrap_servers: list, topic: str):
+        self.bootstrap_servers = bootstrap_servers
+        self.topic = topic
+        self.producer = self.create()
+
+    def create(self):
+        return KafkaProducer(
+            bootstrap_servers=self.bootstrap_servers,
+            value_serializer=lambda v: json.dumps(v, default=self.serialize).encode("utf-8"),
+            key_serializer=lambda v: json.dumps(v, default=self.serialize).encode("utf-8"),
+            api_version=(2, 8, 1)
+        )
+
+    def send(self, orders: typing.List[Order]):
+        for order in orders:
+            try:
+                self.producer.send(
+                    self.topic, key={"order_id": order.order_id}, value=order.asdict()
+                )
+            except Exception as e:
+                raise RuntimeError("fails to send a message") from e
+        self.producer.flush()
+
+    def serialize(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        if isinstance(obj, datetime.date):
+            return str(obj)
+        return obj
+
+
+if __name__ == "__main__":
+    producer = Producer(
+        bootstrap_servers=os.environ["BOOTSTRAP_SERVERS"].split(","),
+        topic=os.getenv("TOPIC_NAME", "orders"),
+    )
+    max_run = int(os.getenv("MAX_RUN", "-1"))
+    logging.info(f"max run - {max_run}")
+    current_run = 0
+    while True:
+        current_run += 1
+        logging.info(f"current run - {current_run}")
+        if current_run > max_run and max_run >= 0:
+            logging.info(f"exceeds max run, finish")
+            producer.producer.close()
+            break
+        producer.send(Order.auto().create(100))
+        time.sleep(1)
 ```
 
-### Start Containers
+### Consumer
 
-The Kafka cluster can be started by the `docker-compose up` command. As the compose file has a custom name (*compose-kafka.yml*), we need to specify the file name with the `-f` flag, and the `-d` flag makes the containers to run in the background. We can see that it creates the network, volumes and services in order.
+```python
+# clients/consumer.py
+import os
+import time
+import logging
 
-```bash
-$ cd kafka-dev-with-docker/part-01
-$ docker-compose -f compose-kafka.yml up -d
-# Creating network "kafka-network" with the default driver
-# Creating volume "zookeeper_data" with local driver
-# Creating volume "kafka_0_data" with local driver
-# Creating volume "kafka_1_data" with local driver
-# Creating volume "kafka_2_data" with local driver
-# Creating zookeeper ... done
-# Creating kafka-0   ... done
-# Creating kafka-2   ... done
-# Creating kafka-1   ... done
+from kafka import KafkaConsumer
+from kafka.errors import KafkaError
+
+logging.basicConfig(level=logging.INFO)
+
+
+class Consumer:
+    def __init__(self, bootstrap_servers: list, topics: list, group_id: str) -> None:
+        self.bootstrap_servers = bootstrap_servers
+        self.topics = topics
+        self.group_id = group_id
+        self.consumer = self.create()
+
+    def create(self):
+        return KafkaConsumer(
+            *self.topics,
+            bootstrap_servers=self.bootstrap_servers,
+            auto_offset_reset="earliest",
+            enable_auto_commit=True,
+            group_id=self.group_id,
+            key_deserializer=lambda v: v.decode("utf-8"),
+            value_deserializer=lambda v: v.decode("utf-8"),
+            api_version=(2, 8, 1)
+        )
+
+    def process(self):
+        try:
+            while True:
+                msg = self.consumer.poll(timeout_ms=1000)
+                if msg is None:
+                    continue
+                self.print_info(msg)
+                time.sleep(1)
+        except KafkaError as error:
+            logging.error(error)
+
+    def print_info(self, msg: dict):
+        for t, v in msg.items():
+            for r in v:
+                logging.info(
+                    f"key={r.key}, value={r.value}, topic={t.topic}, partition={t.partition}, offset={r.offset}, ts={r.timestamp}"
+                )
+
+
+if __name__ == "__main__":
+    consumer = Consumer(
+        bootstrap_servers=os.environ["BOOTSTRAP_SERVERS"].split(","),
+        topics=os.getenv("TOPIC_NAME", "orders").split(","),
+        group_id=os.getenv("GROUP_ID", "orders-group"),
+    )
+    consumer.process()
 ```
 
-Once created, we can check the state of the containers with the `docker-compose ps` command.
+## Testing on Host
 
 ```bash
-$ docker-compose -f compose-kafka.yml ps
-#   Name                 Command               State                                    Ports                                  
-# -----------------------------------------------------------------------------------------------------------------------------
-# kafka-0     /opt/bitnami/scripts/kafka ...   Up      9092/tcp, 0.0.0.0:9093->9093/tcp,:::9093->9093/tcp                      
-# kafka-1     /opt/bitnami/scripts/kafka ...   Up      9092/tcp, 0.0.0.0:9094->9094/tcp,:::9094->9094/tcp                      
-# kafka-2     /opt/bitnami/scripts/kafka ...   Up      9092/tcp, 0.0.0.0:9095->9095/tcp,:::9095->9095/tcp                      
-# zookeeper   /opt/bitnami/scripts/zooke ...   Up      0.0.0.0:49153->2181/tcp,:::49153->2181/tcp, 2888/tcp, 3888/tcp, 8080/tcp
+minikube service kafka-ui --url
+
+# http://127.0.0.1:36477
+# ❗  Because you are using a Docker driver on linux, the terminal needs to be open to run it.
 ```
 
-## Produce and Consume Messages
-
-I will demonstrate how to produce and consume messages with Kafka command utilities after entering into one of the broker containers.
-
-### Produce Messages
-
-The command utilities locate in the `/opt/bitnami/kafka/bin/` directory. After moving to that directory, we can first create a topic with `kafka-topics.sh` by specifying the bootstrap server, topic name, number of partitions and replication factors - the last two are optional. Once the topic is created, we can produce messages with `kafka-console-producer.sh`, and it can be finished by pressing *Ctrl + C*.
-
 ```bash
-$ docker exec -it kafka-0 bash
-I have no name!@b04233b0bbba:/$ cd /opt/bitnami/kafka/bin/
-## create topic
-I have no name!@b04233b0bbba:/opt/bitnami/kafka/bin$ ./kafka-topics.sh \
-  --bootstrap-server localhost:9092 --create \
-  --topic orders --partitions 3 --replication-factor 3
-# Created topic orders.
+minikube service demo-cluster-kafka-external-bootstrap --url
 
-## produce messages
-I have no name!@b04233b0bbba:/opt/bitnami/kafka/bin$ ./kafka-console-producer.sh \
-  --bootstrap-server localhost:9092 --topic orders
->product: apples, quantity: 5
->product: lemons, quantity: 7
-# press Ctrl + C to finish
+# http://127.0.0.1:42289
+# ❗  Because you are using a Docker driver on linux, the terminal needs to be open to run it.
 ```
 
-### Consume Messages
-
-We can use `kafka-console-consumer.sh` to consume messages. In this example, it polls messages from the beginning. Again we can finish it by pressing *Ctrl + C*.
-
 ```bash
-$ docker exec -it kafka-0 bash
-I have no name!@b04233b0bbba:/$ cd /opt/bitnami/kafka/bin/
-## consume messages
-I have no name!@b04233b0bbba:/opt/bitnami/kafka/bin$ ./kafka-console-consumer.sh \
-  --bootstrap-server localhost:9092 --topic orders --from-beginning
-product: apples, quantity: 5
-product: lemons, quantity: 7
-# press Ctrl + C to finish
+BOOTSTRAP_SERVERS=127.0.0.1:42289 python clients/producer.py
+BOOTSTRAP_SERVERS=127.0.0.1:42289 python clients/consumer.py
 ```
 
-### Note on Data Persistence
+![](topic.png#center)
 
-Sometimes we need to remove and recreate the Kafka containers, and it can be convenient if we can preserve data of the previous run. It is possible with the Docker volumes as data gets persisted in a later run as long as we keep using the same volumes. Note, by default, Docker Compose doesn't remove volumes, and they remain even if we run `docker-compose down`. Therefore, if we recreate the containers later, data is persisted in the volumes.
+![](consumer-group.png#center)
 
-To give additional details, below shows the volumes created by the Docker Compose file and data of one of the brokers.  
+## Deploy on Minikube
 
 ```bash
-$ docker volume ls | grep data$
-# local     kafka_0_data
-# local     kafka_1_data
-# local     kafka_2_data
-# local     zookeeper_data
-$ sudo ls -l /var/lib/docker/volumes/kafka_0_data/_data/data
-# total 96
-# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-0
-# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-12
-
-...
-
-# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 __consumer_offsets-6
-# drwxr-xr-x 2 hadoop root 4096 May  3 07:58 __consumer_offsets-9
-# -rw-r--r-- 1 hadoop root    0 May  3 07:52 cleaner-offset-checkpoint
-# -rw-r--r-- 1 hadoop root    4 May  3 07:59 log-start-offset-checkpoint
-# -rw-r--r-- 1 hadoop root   88 May  3 07:52 meta.properties
-# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 orders-0
-# drwxr-xr-x 2 hadoop root 4096 May  3 07:57 orders-1
-# drwxr-xr-x 2 hadoop root 4096 May  3 07:59 orders-2
-# -rw-r--r-- 1 hadoop root  442 May  3 07:59 recovery-point-offset-checkpoint
-# -rw-r--r-- 1 hadoop root  442 May  3 07:59 replication-offset-checkpoint
+# use docker daemon inside minikube cluster
+eval $(minikube docker-env)
+# Host added: /home/jaehyeon/.ssh/known_hosts ([127.0.0.1]:32772)
 ```
 
-If you want to remove everything including the volumes, add `-v` flag as shown below.
+```Dockerfile
+# clients/Dockerfile
+FROM bitnami/python:3.8
+
+COPY . /app
+RUN pip install -r requirements.txt
+```
 
 ```bash
-$ docker-compose -f compose-kafka.yml down -v
-# Stopping kafka-1   ... done
-# Stopping kafka-0   ... done
-# Stopping kafka-2   ... done
-# Stopping zookeeper ... done
-# Removing kafka-1   ... done
-# Removing kafka-0   ... done
-# Removing kafka-2   ... done
-# Removing zookeeper ... done
-# Removing network kafka-network
-# Removing volume zookeeper_data
-# Removing volume kafka_0_data
-# Removing volume kafka_1_data
-# Removing volume kafka_2_data
+docker build -t=order-clients:0.1.0 clients/.
+
+docker images order-clients
+# REPOSITORY      TAG       IMAGE ID       CREATED          SIZE
+# order-clients   0.1.0     bc48046837b1   26 seconds ago   589MB
+```
+
+```bash
+kubectl create -f manifests/kafka-clients.yml
+
+# kubectl get all -l group=client
+# NAME                                  READY   STATUS    RESTARTS   AGE
+# pod/order-consumer-79785749d5-67bxz   1/1     Running   0          12s
+# pod/order-producer-759d568fb8-rrl6w   1/1     Running   0          12s
+
+# NAME                             READY   UP-TO-DATE   AVAILABLE   AGE
+# deployment.apps/order-consumer   1/1     1            1           12s
+# deployment.apps/order-producer   1/1     1            1           12s
+
+# NAME                                        DESIRED   CURRENT   READY   AGE
+# replicaset.apps/order-consumer-79785749d5   1         1         1       12s
+# replicaset.apps/order-producer-759d568fb8   1         1         1       12s
+```
+
+```bash
+kubectl logs deploy/order-producer --tail=3
+# INFO:root:current run - 104
+# INFO:root:current run - 105
+# INFO:root:current run - 106
+
+kubectl logs deploy/order-consumer --tail=3
+# INFO:root:key={"order_id": "d9b9e577-7a02-401e-b0e1-2d0cdcda51a3"}, value={"order_id": "d9b9e577-7a02-401e-b0e1-2d0cdcda51a3", "ordered_at": "2023-12-18T18:17:13.065654", "user_id": "061", "order_items": [{"product_id": 866, "quantity": 7}, {"product_id": 970, "quantity": 1}]}, topic=orders, partition=1, offset=7000, ts=1702923433077
+# INFO:root:key={"order_id": "dfbd2e1f-1b18-4772-83b9-c689a3da4c03"}, value={"order_id": "dfbd2e1f-1b18-4772-83b9-c689a3da4c03", "ordered_at": "2023-12-18T18:17:13.065754", "user_id": "016", "order_items": [{"product_id": 853, "quantity": 10}]}, topic=orders, partition=1, offset=7001, ts=1702923433077
+# INFO:root:key={"order_id": "eaf43f0b-53ed-419a-ba75-1d74bd0525a4"}, value={"order_id": "eaf43f0b-53ed-419a-ba75-1d74bd0525a4", "ordered_at": "2023-12-18T18:17:13.065795", "user_id": "072", "order_items": [{"product_id": 845, "quantity": 1}, {"product_id": 944, "quantity": 7}, {"product_id": 454, "quantity": 10}, {"product_id": 834, "quantity": 9}]}, topic=orders, partition=1, offset=7002, ts=1702923433078
+```
+
+## Delete Resources
+
+```bash
+## delete resources
+kubectl delete -f manifests/kafka-clients.yml
+kubectl delete -f manifests/kafka-cluster.yaml
+kubectl delete -f manifests/kafka-ui.yaml
+kubectl delete -f manifests/strimzi-cluster-operator-$STRIMZI_VERSION.yaml
+
+## delete minikube
+minikube delete
 ```
 
 ## Summary
-
-In this post, we discussed how to set up a Kafka cluster with 3 brokers and a single Zookeeper node. A simple example of producing and consuming messages are illustrated. More reference implementations in relation to Kafka and related tools will be discussed in subsequent posts.
