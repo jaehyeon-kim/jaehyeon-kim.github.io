@@ -1,7 +1,7 @@
 ---
 title: Kafka Development on Kubernetes - Part 1 Cluster Setup
 date: 2023-12-21
-draft: true
+draft: false
 featured: true
 comment: true
 toc: true
@@ -22,9 +22,10 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Foo Bar
+description: Apache Kafka is one of the key technologies for implementing data streaming architectures. Strimzi provides a way to run an Apache Kafka cluster and related resources on Kubernetes in various deployment configurations. In this series of posts, we will discuss how to create a Kafka cluster, to develop Kafka client applications in Python and to build a data pipeline using Kafka connectors on Kubernetes.
 ---
 
+[Apache Kafka](https://kafka.apache.org/) is one of the key technologies for implementing data streaming architectures. [Strimzi](https://strimzi.io/) provides a way to run an Apache Kafka cluster and related resources on Kubernetes in various deployment configurations. In this series of posts, we will discuss how to create a Kafka cluster, to develop Kafka client applications in Python and to build a data pipeline using Kafka connectors on Kubernetes.
 
 * [Part 1 Cluster Setup](#) (this post)
 * Part 2 Producer and Consumer
@@ -32,21 +33,27 @@ description: Foo Bar
 
 ## Setup Kafka Cluster
 
-### Deploy Strimzi Operator
+The Kafka cluster is deployed using the [Strimzi Operator](https://strimzi.io/) on a [Minikube](https://minikube.sigs.k8s.io/docs/) cluster. We install Strimzi version 0.27.1 and Kubernetes version 1.24.7 as we use Kafka version 2.8.1 - see [this page](https://strimzi.io/downloads/) for details about Kafka version compatibility. Once the [Minikube CLI](https://minikube.sigs.k8s.io/docs/start/) and [Docker](https://www.docker.com/) are installed, a Minikube cluster can be created by specifying the desired Kubernetes version as shown below.
 
 ```bash
-## create minikube cluster
 minikube start --cpus='max' --memory=10240 --addons=metrics-server --kubernetes-version=v1.24.7
+```
 
-## download and deploy strimzi oeprator
+### Deploy Strimzi Operator
+
+The project repository keeps manifest files that can be used to deploy the Strimzi Operator and related resources. We can download the relevant manifest file by specifying the desired version. By default, the manifest file assumes the resources are deployed in the *myproject* namespace. As we deploy them in the *default* namespace, however, we need to change the resource namespace accordingly using [sed](https://www.gnu.org/software/sed/manual/sed.html). The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-on-k8s/part-01) of this post.
+
+The resources that are associated with the Strimzi Operator can be deployed using the *kubectl create* command. Note that over 20 resources are deployed from the manifest file including Kafka-related [custom resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/). Among those, we use the *Kafka*, *KafkaConnect* and *KafkaConnector* custom resources in this series.
+
+```bash
+## download and update strimzi oeprator manifest
 STRIMZI_VERSION="0.27.1"
 DOWNLOAD_URL=https://github.com/strimzi/strimzi-kafka-operator/releases/download/$STRIMZI_VERSION/strimzi-cluster-operator-$STRIMZI_VERSION.yaml
 curl -L -o manifests/strimzi-cluster-operator-$STRIMZI_VERSION.yaml ${DOWNLOAD_URL}
+# update namespace from myproject to default
+sed -i 's/namespace: .*/namespace: default/' manifests/strimzi-cluster-operator-$STRIMZI_VERSION.yaml
 
 ## deploy strimzi cluster operator
-# change namespace from myproject to default
-sed -i 's/namespace: .*/namespace: default/' manifests/strimzi-cluster-operator-$STRIMZI_VERSION.yaml
-# deploy operator
 kubectl create -f manifests/strimzi-cluster-operator-$STRIMZI_VERSION.yaml
 
 # rolebinding.rbac.authorization.k8s.io/strimzi-cluster-operator-entity-operator-delegation created
@@ -74,6 +81,8 @@ kubectl create -f manifests/strimzi-cluster-operator-$STRIMZI_VERSION.yaml
 # clusterrole.rbac.authorization.k8s.io/strimzi-cluster-operator-namespaced created
 ```
 
+We can check the Strimzi Operator runs as a [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/).
+
 ```bash
 kubectl get deploy,rs,po
 # NAME                                       READY   UP-TO-DATE   AVAILABLE   AGE
@@ -88,9 +97,64 @@ kubectl get deploy,rs,po
 
 ### Deploy Kafka Cluster
 
+We deploy a Kafka cluster with two brokers and one Zookeeper node. It has both internal and external listeners on port 9092 and 29092 respectively. Note that the external listener is configured as the *nodeport* type so that the associating service can be accessed from the host machine. Also, the cluster is configured to allow automatic creation of topics (*auto.create.topics.enable: "true"*) and the default number of partition is set to 3 (*num.partitions: 3*).
+
+```yaml
+# manifests/kafka-cluster.yaml
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: demo-cluster
+spec:
+  kafka:
+    replicas: 2
+    version: 2.8.1
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: external
+        port: 29092
+        type: nodeport
+        tls: false
+    storage:
+      type: jbod
+      volumes:
+        - id: 0
+          type: persistent-claim
+          size: 20Gi
+          deleteClaim: true
+    config:
+      offsets.topic.replication.factor: 1
+      transaction.state.log.replication.factor: 1
+      transaction.state.log.min.isr: 1
+      default.replication.factor: 1
+      min.insync.replicas: 1
+      inter.broker.protocol.version: 2.8
+      auto.create.topics.enable: "true"
+      num.partitions: 3
+  zookeeper:
+    replicas: 1
+    storage:
+      type: persistent-claim
+      size: 10Gi
+      deleteClaim: true
+```
+
+The Kafka cluster can be deployed using the *kubectl create* command as shown below.
+
 ```bash
 kubectl create -f manifests/kafka-cluster.yaml
 ```
+
+The Kafka and Zookeeper nodes are deployed as [StatefulSets](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) as it provides guarantees about the ordering and uniqueness of the associating [Pods](https://kubernetes.io/docs/concepts/workloads/pods/). It also creates multiple [services](https://kubernetes.io/docs/concepts/services-networking/service/), and we use the following services in this series.
+
+- communication within Kubernetes cluster
+  - *demo-cluster-kafka-bootstrap* - to access Kafka brokers from the client and management apps
+  - *demo-cluster-zookeeper-client* - to access Zookeeper node from the management app
+- communication from host
+  - *demo-cluster-kafka-external-bootstrap* - to access Kafka brokers from the client apps
 
 ```bash
 kubectl get all -l app.kubernetes.io/instance=demo-cluster
@@ -115,11 +179,60 @@ kubectl get all -l app.kubernetes.io/instance=demo-cluster
 
 ### Deploy Kafka UI
 
-```bash
-kubectl create -f manifests/kafka-ui.yaml
+[UI for Apache Kafka (kafka-ui)](https://docs.kafka-ui.provectus.io/overview/readme) is a free and open-source Kafka management application, and it is deployed as a Kubernetes Deployment. The Deployment is configured to have a single instance, and the Kafka cluster access details are specified as environment variables. The app is associated by a service of the *NodePort* type for external access.
+
+```yaml
+# manifests/kafka-ui.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kafka-ui
+  name: kafka-ui
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: kafka-ui
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: kafka-ui
+  name: kafka-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-ui
+  template:
+    metadata:
+      labels:
+        app: kafka-ui
+    spec:
+      containers:
+        - image: provectuslabs/kafka-ui:v0.7.1
+          name: kafka-ui-container
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KAFKA_CLUSTERS_0_NAME
+              value: demo-cluster
+            - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+              value: demo-cluster-kafka-bootstrap:9092
+            - name: KAFKA_CLUSTERS_0_ZOOKEEPER
+              value: demo-cluster-zookeeper-client:2181
+          resources: {}
 ```
 
+The Kafka management app (*kafka-ui*) can be deployed using the *kubectl create* command as shown below.
+
 ```bash
+kubectl create -f manifests/kafka-ui.yaml
+
 kubectl get all -l app=kafka-ui
 # NAME                            READY   STATUS    RESTARTS   AGE
 # pod/kafka-ui-6d55c756b8-tznlp   1/1     Running   0          54s
@@ -134,6 +247,8 @@ kubectl get all -l app=kafka-ui
 # replicaset.apps/kafka-ui-6d55c756b8   1         1         1       54s
 ```
 
+We can use the [*minikube service*](https://minikube.sigs.k8s.io/docs/handbook/accessing/) command to obtain the Kubernetes URL for the *kafka-ui* service in the host's local cluster.
+
 ```bash
 minikube service kafka-ui --url
 # http://127.0.0.1:38257
@@ -144,7 +259,7 @@ minikube service kafka-ui --url
 
 ## Produce and Consume Messages
 
-### Produce Messages
+We can produce and consume messages with Kafka command utilities by creating two Pods in separate terminals. The Pods start the producer (*kafka-console-producer.sh*) and consumer (*kafka-console-consumer.sh*) scripts respectively while specifying necessary arguments such as the bootstrap server address and topic name. We can see that the records created by the producer are appended in the consumer terminal.
 
 ```bash
 kubectl run kafka-producer --image=quay.io/strimzi/kafka:0.27.1-kafka-2.8.1 --rm -it --restart=Never \
@@ -154,8 +269,6 @@ kubectl run kafka-producer --image=quay.io/strimzi/kafka:0.27.1-kafka-2.8.1 --rm
 # >product: lemons, quantity: 7
 ```
 
-### Consume Messages
-
 ```bash
 kubectl run kafka-consumer --image=quay.io/strimzi/kafka:0.27.1-kafka-2.8.1 --rm -it --restart=Never \
   -- bin/kafka-console-consumer.sh --bootstrap-server demo-cluster-kafka-bootstrap:9092 --topic demo-topic --from-beginning
@@ -164,9 +277,13 @@ kubectl run kafka-consumer --image=quay.io/strimzi/kafka:0.27.1-kafka-2.8.1 --rm
 # product: lemons, quantity: 7
 ```
 
+We can also check the messages in the management app as shown below.
+
 ![](messages.png#center)
 
 ## Delete Resources
+
+The Kubernetes resources and Minikube cluster can be removed by the *kubectl delete* and *minikube delete* commands respectively.
 
 ```bash
 ## delete resources
@@ -179,3 +296,5 @@ minikube delete
 ```
 
 ## Summary
+
+Apache Kafka is one of the key technologies for implementing data streaming architectures. Strimzi provides a way to run an Apache Kafka cluster and related resources on Kubernetes in various deployment configurations. In this post, we discussed how to deploy a Kafka cluster on a Minikube cluster using the Strimzi Operator. Also, it is demonstrated how to produce and consume messages using the Kafka command line utilities.
