@@ -247,7 +247,7 @@ kubectl get all -l app=kafka-ui
 # replicaset.apps/kafka-ui-6d55c756b8   1         1         1       54s
 ```
 
-We can use the [*minikube service*](https://minikube.sigs.k8s.io/docs/handbook/accessing/) command to obtain the Kubernetes URL for the *kafka-ui* service in the host's local cluster.
+We can use the [*minikube service*](https://minikube.sigs.k8s.io/docs/handbook/accessing/) command to obtain the Kubernetes URL for the *kafka-ui* service.
 
 ```bash
 minikube service kafka-ui --url
