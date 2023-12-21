@@ -2,7 +2,7 @@
 title: Kafka Development on Kubernetes - Part 2 Producer and Consumer
 date: 2023-12-28
 draft: true
-featured: true
+featured: false
 comment: true
 toc: true
 reward: false

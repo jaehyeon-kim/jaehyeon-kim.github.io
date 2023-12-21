@@ -2,7 +2,7 @@
 title: Kafka Development on Kubernetes - Part 3 Kafka Connect
 date: 2024-01-04
 draft: true
-featured: true
+featured: false
 comment: true
 toc: true
 reward: false
