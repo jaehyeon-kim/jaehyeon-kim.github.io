@@ -279,7 +279,7 @@ COPY . /app
 RUN pip install -r requirements.txt
 ```
 
-We can check the image exists in the Docker daemon inside the Minikube cluster after building it with a name of *order-clients:0.1.0*.
+We can check the image is found in the Docker daemon inside the Minikube cluster after building it with a name of *order-clients:0.1.0*.
 
 ```bash
 docker build -t=order-clients:0.1.0 clients/.
@@ -367,7 +367,7 @@ The client apps can be deployed using the *kubectl create* command, and we can c
 ```bash
 kubectl create -f manifests/kafka-clients.yml
 
-# kubectl get all -l group=client
+kubectl get all -l group=client
 # NAME                                  READY   STATUS    RESTARTS   AGE
 # pod/order-consumer-79785749d5-67bxz   1/1     Running   0          12s
 # pod/order-producer-759d568fb8-rrl6w   1/1     Running   0          12s
