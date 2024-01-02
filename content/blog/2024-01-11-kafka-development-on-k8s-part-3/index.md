@@ -1,6 +1,6 @@
 ---
 title: Kafka Development on Kubernetes - Part 3 Kafka Connect
-date: 2024-01-04
+date: 2024-01-11
 draft: true
 featured: false
 comment: true
@@ -29,7 +29,7 @@ description: Kafka Connect is a tool for scalably and reliably streaming data be
 [Kafka Connect](https://kafka.apache.org/documentation/#connect) is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It makes it simple to quickly define connectors that move large collections of data into and out of Kafka. In this post, we discuss how to set up a data ingestion pipeline using Kafka connectors. Fake customer and order data is ingested into Kafka topics using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator). Also, we use the [Confluent S3](https://www.confluent.io/hub/confluentinc/kafka-connect-s3) sink connector to save the messages of the topics into a S3 bucket. The Kafka Connect servers and individual connectors are deployed using the custom resources of [Strimzi](https://strimzi.io/) on Kubernetes.
 
 * [Part 1 Cluster Setup](/blog/2023-12-21-kafka-development-on-k8s-part-1)
-* [Part 2 Producer and Consumer](/blog/2023-12-28-kafka-development-on-k8s-part-2)
+* [Part 2 Producer and Consumer](/blog/2024-01-04-kafka-development-on-k8s-part-2)
 * [Part 3 Kafka Connect](#) (this post)
 
 ## Kafka Connect

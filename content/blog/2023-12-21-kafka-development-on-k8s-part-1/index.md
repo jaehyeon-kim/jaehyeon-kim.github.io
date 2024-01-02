@@ -28,7 +28,7 @@ description: Apache Kafka is one of the key technologies for implementing data s
 [Apache Kafka](https://kafka.apache.org/) is one of the key technologies for implementing data streaming architectures. [Strimzi](https://strimzi.io/) provides a way to run an Apache Kafka cluster and related resources on Kubernetes in various deployment configurations. In this series of posts, we will discuss how to create a Kafka cluster, to develop Kafka client applications in Python and to build a data pipeline using Kafka connectors on Kubernetes.
 
 * [Part 1 Cluster Setup](#) (this post)
-* Part 2 Producer and Consumer
+* [Part 2 Producer and Consumer](/blog/2024-01-04-kafka-development-on-k8s-part-2)
 * Part 3 Kafka Connect
 
 ## Setup Kafka Cluster

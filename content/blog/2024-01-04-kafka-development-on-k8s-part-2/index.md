@@ -1,7 +1,7 @@
 ---
 title: Kafka Development on Kubernetes - Part 2 Producer and Consumer
-date: 2023-12-28
-draft: true
+date: 2024-01-04
+draft: false
 featured: false
 comment: true
 toc: true
@@ -23,10 +23,10 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Apache Kafka includes five core APIs, and we can develop applications to send/read streams of data to/from topics in a Kafka cluster using the producer and consumer APIs. While the main Kafka project maintains only the Java APIs, there are several open source projects that provide the Kafka client APIs in Python. In this post, we discuss how to develop Kafka client applications using the kafka-python package on Kubernetes.
+description: Apache Kafka has five core APIs, and we can develop applications to send/read streams of data to/from topics in a Kafka cluster using the producer and consumer APIs. While the main Kafka project maintains only the Java APIs, there are several open source projects that provide the Kafka client APIs in Python. In this post, we discuss how to develop Kafka client applications using the kafka-python package on Kubernetes.
 ---
 
-Apache Kafka includes five [core APIs](https://kafka.apache.org/documentation/#api), and we can develop applications to send/read streams of data to/from topics in a Kafka cluster using the producer and consumer APIs. While the main Kafka project maintains only the Java APIs, there are several [open source projects](https://cwiki.apache.org/confluence/display/KAFKA/Clients#Clients-Python) that provide the Kafka client APIs in Python. In this post, we discuss how to develop Kafka client applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package on Kubernetes.
+Apache Kafka has five [core APIs](https://kafka.apache.org/documentation/#api), and we can develop applications to send/read streams of data to/from topics in a Kafka cluster using the producer and consumer APIs. While the main Kafka project maintains only the Java APIs, there are several [open source projects](https://cwiki.apache.org/confluence/display/KAFKA/Clients#Clients-Python) that provide the Kafka client APIs in Python. In this post, we discuss how to develop Kafka client applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package on Kubernetes.
 
 
 * [Part 1 Cluster Setup](/blog/2023-12-21-kafka-development-on-k8s-part-1)
@@ -412,4 +412,4 @@ minikube delete
 
 ## Summary
 
-Apache Kafka includes five core APIs, and we can develop applications to send/read streams of data to/from topics in a Kafka cluster using the producer and consumer APIs. In this post, we discussed how to develop Kafka client applications using the kafka-python package on Kubernetes.
+Apache Kafka has five core APIs, and we can develop applications to send/read streams of data to/from topics in a Kafka cluster using the producer and consumer APIs. In this post, we discussed how to develop Kafka client applications using the kafka-python package on Kubernetes.
