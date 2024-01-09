@@ -31,7 +31,7 @@ Apache Kafka has five [core APIs](https://kafka.apache.org/documentation/#api), 
 
 * [Part 1 Cluster Setup](/blog/2023-12-21-kafka-development-on-k8s-part-1)
 * [Part 2 Producer and Consumer](#) (this post)
-* Part 3 Kafka Connect
+* [Part 3 Kafka Connect](/blog/2024-01-11-kafka-development-on-k8s-part-3)
 
 ## Kafka Client Apps
 

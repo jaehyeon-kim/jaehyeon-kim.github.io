@@ -29,7 +29,7 @@ description: Apache Kafka is one of the key technologies for implementing data s
 
 * [Part 1 Cluster Setup](#) (this post)
 * [Part 2 Producer and Consumer](/blog/2024-01-04-kafka-development-on-k8s-part-2)
-* Part 3 Kafka Connect
+* [Part 3 Kafka Connect](/blog/2024-01-11-kafka-development-on-k8s-part-3)
 
 ## Setup Kafka Cluster
 
