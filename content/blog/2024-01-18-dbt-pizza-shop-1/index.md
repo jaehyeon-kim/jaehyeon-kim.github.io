@@ -1,7 +1,7 @@
 ---
-title: Data Build Tool (dbt) for Effective Data Transformation on AWS – Part 1 Redshift
-date: 2022-09-28
-draft: false
+title: Data Build Tool (dbt) Pizza Shop Demo - Part 1 Modelling on PostgreSQL
+date: 2024-01-18
+draft: true
 featured: true
 comment: true
 toc: true
@@ -10,7 +10,7 @@ pinned: false
 carousel: false
 featuredImage: false
 series:
-  - DBT for Effective Data Transformation on AWS
+  - DBT Pizza Shop Demo
 categories:
   - Data Engineering
 tags: 
@@ -27,12 +27,12 @@ description: The data build tool (dbt) is an effective data transformation tool 
 
 The [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) is an effective data transformation tool and it supports key AWS analytics services - Redshift, Glue, EMR and Athena. In part 1 of the dbt on AWS series, we discuss data transformation pipelines using dbt on [Redshift Serverless](https://aws.amazon.com/redshift/redshift-serverless/). [Subsets of IMDb data](https://www.imdb.com/interfaces/) are used as source and data models are developed in multiple layers according to the [dbt best practices](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview).
 
-* [Part 1 Redshift](#) (this post)
-* [Part 2 Glue](/blog/2022-10-09-dbt-on-aws-part-2-glue)
-* [Part 3 EMR on EC2](/blog/2022-10-19-dbt-on-aws-part-3-emr-ec2)
-* [Part 4 EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks)
-* [Part 5 Athena](/blog/2023-04-12-integrate-glue-schema-registry)
-
+* [Part 1 Modelling on PostgreSQL](#) (this post)
+* Part 2 ETL on PostgreSQL via Airflow
+* Part 3 Modelling on Amazon Athena
+* Part 4 ETL on Amazon Athena via Airflow
+* Part 5 Modelling on Apache Spark
+* Part 6 ETL on Apache Spark via Airflow
 
 ## Motivation
 
