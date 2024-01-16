@@ -1,7 +1,7 @@
 ---
 title: Data Build Tool (dbt) Pizza Shop Demo - Part 1 Modelling on PostgreSQL
 date: 2024-01-18
-draft: true
+draft: false
 featured: true
 comment: true
 toc: true
@@ -14,18 +14,21 @@ series:
 categories:
   - Data Engineering
 tags: 
-  - AWS
-  - Amazon Redshift
   - Data Build Tool (DBT)
-  - Terraform
+  - PostgreSQL
+  - Docker
+  - Docker Compose
+  - Python
 authors:
   - JaehyeonKim
 images: []
-cevo: 18
-description: The data build tool (dbt) is an effective data transformation tool and it supports key AWS analytics services - Redshift, Glue, EMR and Athena. In part 1 of the dbt on AWS series, we discuss data transformation pipelines using dbt on Redshift Serverless. Subsets of IMDb data are used as source and data models are developed in multiple layers according to the dbt best practices.
+description: The data build tool (dbt) is a popular data transformation tool for data warehouse development. Moreover, it can be used for data lakehouse development thanks to open table formats such as Apache Iceberg, Apache Hudi and Delta Lake. dbt supports key AWS analytics services and I wrote a series of posts that discuss how to utilise dbt with Redshift, Glue, EMR on EC2, EMR on EKS, and Athena. Those posts focus on platform integration, however, they do not show realistic ETL scenarios. In this series of posts, we discuss practical data warehouse/lakehouse examples including ETL orchestration with Apache Airflow. As a starting point, we develop a dbt project on PostgreSQL using fictional pizza shop data in this post.
 ---
 
-The [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) is an effective data transformation tool and it supports key AWS analytics services - Redshift, Glue, EMR and Athena. In part 1 of the dbt on AWS series, we discuss data transformation pipelines using dbt on [Redshift Serverless](https://aws.amazon.com/redshift/redshift-serverless/). [Subsets of IMDb data](https://www.imdb.com/interfaces/) are used as source and data models are developed in multiple layers according to the [dbt best practices](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview).
+The [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) is a popular data transformation tool for data warehouse development. Moreover, it can be used for [data lakehouse](https://www.databricks.com/glossary/data-lakehouse) development thanks to open table formats such as Apache Iceberg, Apache Hudi and Delta Lake. *dbt* supports key AWS analytics services and I wrote a series of posts that discuss how to utilise *dbt* with [Redshift](/blog/2022-09-28-dbt-on-aws-part-1-redshift), [Glue](/blog/2022-10-09-dbt-on-aws-part-2-glue), [EMR on EC2](/blog/2022-10-19-dbt-on-aws-part-3-emr-ec2), [EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks), and [Athena](/blog/2023-04-12-integrate-glue-schema-registry). Those posts focus on platform integration, however, they do not show realistic ETL scenarios. 
+
+In this series of posts, we discuss practical data warehouse/lakehouse examples including ETL orchestration with Apache Airflow. As a starting point, we develop a *dbt* project on PostgreSQL using fictional pizza shop data in this post.
+
 
 * [Part 1 Modelling on PostgreSQL](#) (this post)
 * Part 2 ETL on PostgreSQL via Airflow
@@ -34,768 +37,616 @@ The [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) is an eff
 * Part 5 Modelling on Apache Spark
 * Part 6 ETL on Apache Spark via Airflow
 
-## Motivation
+## Setup Database
 
-In our experience delivering data solutions for our customers, we have observed a desire to move away from a centralised team function, responsible for the data collection, analysis and reporting, towards shifting this responsibility to an organisation's lines of business (LOB) teams. The key driver for this comes from the recognition that LOBs retain the deep data knowledge and business understanding for their respective data domain; which improves the speed with which these teams can develop data solutions and gain customer insights. This shift away from centralised data engineering to LOBs exposed a skills and tooling gap.
+PostgreSQL is used in the post, and it is deployed locally using Docker Compose. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/general-demos/tree/master/dbt-postgres-demo) of this post.
 
-Let's assume as a starting point that the central data engineering team has chosen a project that migrates an on-premise data warehouse into a data lake (spark + iceberg + redshift) on AWS, to provide a cost-effective way to serve data consumers thanks to iceberg's ACID transaction features. The LOB data engineers are new to spark, and they have a little bit of experience in python while the majority of their work is based on SQL. Thanks to their expertise in SQL, however, they are able to get started building data transformation logic on jupyter notebooks using Pyspark. However, they soon find the codebase gets quite bigger even during the minimum valuable product (MVP) phase, which would only amplify the issue as they extend it to cover the entire data warehouse. Additionally the use of notebooks makes development challenging mainly due to lack of modularity and fai,ling to incorporate testing. Upon contacting the central data engineering team for assistance they are advised that the team uses scala and many other tools (e.g. Metorikku) that are successful for them, however cannot be used directly by the engineers of the LOB. Moreover, the engineering team don't even have a suitable data transformation framework that supports iceberg. The LOB data engineering team understand that the data democratisation plan of the enterprise can be more effective if there is a tool or framework that:
-* can be shared across LOBs although they can have different technology stack and practices,
-* fits into various project types from traditional data warehousing to data lakehouse projects, and
-* supports more than a notebook environment by facilitating code modularity and incorporating testing.
+### Prepare Data
 
-The [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) is an open-source command line tool, and it does the **T** in ELT (Extract, Load, Transform) processes well. It supports a wide range of [data platforms](https://docs.getdbt.com/docs/supported-data-platforms) and the following key AWS analytics services are covered - Redshift, Glue, EMR and Athena. It is one of the most popular tools in the [modern data stack](https://www.getdbt.com/blog/future-of-the-modern-data-stack/) that originally covers data warehousing projects. Its scope is extended to data lake projects by the addition of the [dbt-spark](https://github.com/dbt-labs/dbt-spark) and [dbt-glue](https://github.com/aws-samples/dbt-glue) adapter where we can develop data lakes with spark SQL. Recently the spark adapter added open source table formats (hudi, iceberg and delta lake) as the supported file formats, and it allows you to work on data lake house projects with it. As discussed in this [blog post](https://towardsdatascience.com/modern-data-stack-which-place-for-spark-8e10365a8772), dbt has clear advantages compared to spark in terms of
-* low learning curve as SQL is easier than spark
-* better code organisation as there is no correct way of organising transformation pipeline with spark
+Fictional pizza shop data from [Building Real-Time Analytics Systems](https://www.oreilly.com/library/view/building-real-time-analytics/9781098138783/) is used in this post. There are three data sets - *products*, *users* and *orders*. The first two data sets are copied from the book's [GitHub repository](https://github.com/mneedham/real-time-analytics-book/tree/main/mysql/data) and saved into *initdb/data/products.csv* and *initdb/data/users.csv* respectively. The last data set is generated by a Python script, and multiple order records are saved into *initdb/data/orders.csv*. Note that the order data file is not included in the project repository to save disk space, and it can be created by executing the following script instead.
 
-On the other hand, its weaknesses are 
-* lack of expressiveness as [Jinja](https://docs.getdbt.com/docs/building-a-dbt-project/jinja-macros) is quite heavy and verbose, not very readable, and unit-testing is rather tedious
-* limitation of SQL as some logic is much easier to implement with user defined functions rather than SQL
-
-Those weaknesses can be overcome by [Python models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/python-models) as it allows you to apply transformations as DataFrame operations. Unfortunately the beta feature is not available on any of the AWS services, however it is available on Snowflake, Databricks and BigQuery. Hopefully we can use this feature on Redshift, Glue and EMR in the near future.
-
-Finally, the following areas are supported by spark, however not supported by DBT:
-* E and L of ELT processes
-* real time data processing
-
-Overall dbt can be used as an effective tool for data transformation in a wide range of data projects from data warehousing to data lake to data lakehouse. Also it can be more powerful with spark by its Python models feature. Below shows an overview diagram of the scope of this dbt on AWS series. Redshift is highlighted as it is discussed in this post. 
-
-![](featured.png#center)
-
-## Infrastructure
-
-A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest). The following Redshift serverless resources are deployed to work with the dbt project. As explained in the [Redshift user guide](https://docs.aws.amazon.com/redshift/latest/mgmt/serverless-workgroup-namespace.html), a namespace is a collection of database objects and users and a workgroup is a collection of compute resources. We also need a [Redshift-managed VPC endpoint](https://docs.aws.amazon.com/redshift/latest/mgmt/managing-cluster-cross-vpc.html) for a private connection from a client tool. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/dbt-on-aws) of this post.
+```python
+# initdb/generate_orders.py
+import os
+import csv
+import dataclasses
+import random
+import json
 
 
-```terraform
-# redshift-sls/infra/redshift-sls.tf
-resource "aws_redshiftserverless_namespace" "namespace" {
-  namespace_name = "${local.name}-namespace"
+@dataclasses.dataclass
+class Order:
+    user_id: int
+    items: str
 
-  admin_username       = local.redshift.admin_username
-  admin_user_password  = local.secrets.redshift_admin_password
-  db_name              = local.redshift.db_name
-  default_iam_role_arn = aws_iam_role.redshift_serverless_role.arn
-  iam_roles            = [aws_iam_role.redshift_serverless_role.arn]
+    @classmethod
+    def create(self):
+        order_items = [
+            {"product_id": id, "quantity": random.randint(1, 5)}
+            for id in set(random.choices(range(1, 82), k=random.randint(1, 10)))
+        ]
+        return Order(
+            user_id=random.randint(1, 10000),
+            items=json.dumps([item for item in order_items]),
+        )
 
-  tags = local.tags
-}
 
-resource "aws_redshiftserverless_workgroup" "workgroup" {
-  namespace_name = aws_redshiftserverless_namespace.namespace.id
-  workgroup_name = "${local.name}-workgroup"
+if __name__ == "__main__":
+    """
+    Generate random orders given by the NUM_ORDERS environment variable.
+        - orders.csv will be written to ./data folder
+    
+    Example:
+        python generate_orders.py
+        NUM_ORDERS=10000 python generate_orders.py
+    """
+    NUM_ORDERS = int(os.getenv("NUM_ORDERS", "20000"))
+    CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+    orders = [Order.create() for _ in range(NUM_ORDERS)]
 
-  base_capacity      = local.redshift.base_capacity # 128 
-  subnet_ids         = module.vpc.private_subnets
-  security_group_ids = [aws_security_group.vpn_redshift_serverless_access.id]
+    filepath = os.path.join(CURRENT_DIR, "data", "orders.csv")
+    if os.path.exists(filepath):
+        os.remove(filepath)
 
-  tags = local.tags
-}
-
-resource "aws_redshiftserverless_endpoint_access" "endpoint_access" {
-  endpoint_name = "${local.name}-endpoint"
-
-  workgroup_name = aws_redshiftserverless_workgroup.workgroup.id
-  subnet_ids     = module.vpc.private_subnets
-}
+    with open(os.path.join(CURRENT_DIR, "data", "orders.csv"), "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["user_id", "items"])
+        for order in orders:
+            writer.writerow(dataclasses.asdict(order).values())
 ```
 
+Below shows sample order records generated by the script. It includes user ID and order items. As discussed further later, the items will be kept as the *JSONB* type in the staging table and transposed into rows in the fact table.
 
-As in the [previous post](/blog/2022-02-06-dev-infra-terraform), we connect to Redshift via [SoftEther VPN](https://www.softether.org/) to improve developer experience significantly by accessing the database directly from the developer machine. Instead of providing VPN related secrets as Terraform variables in the earlier post, they are created internally and stored to AWS Secrets Manager. Also, the Redshift admin username and password are included so that the secrets can be accessed securely. The details can be found in [redshift-sls/infra/secrets.tf](https://github.com/jaehyeon-kim/dbt-on-aws/blob/main/redshift-sls/infra/secrets.tf) and the secret string can be retrieved as shown below. 
-
-
-```bash
-$ aws secretsmanager get-secret-value --secret-id redshift-sls-all-secrets --query "SecretString" --output text
-  {
-    "vpn_pre_shared_key": "<vpn-pre-shared-key>",
-    "vpn_admin_password": "<vpn-admin-password>",
-    "redshift_admin_username": "master",
-    "redshift_admin_password": "<redshift-admin-password>"
-  }
+```txt
+user_id,items
+6845,"[{""product_id"": 52, ""quantity"": 4}, {""product_id"": 68, ""quantity"": 5}]"
+6164,"[{""product_id"": 77, ""quantity"": 4}]"
+9303,"[{""product_id"": 5, ""quantity"": 2}, {""product_id"": 71, ""quantity"": 3}, {""product_id"": 74, ""quantity"": 2}, {""product_id"": 10, ""quantity"": 5}, {""product_id"": 12, ""quantity"": 2}]"
 ```
 
+### Run Database
 
-The [previous post](/blog/2022-02-06-dev-infra-terraform) demonstrates how to create a VPN user and to establish connection in detail. An example of a successful connection is shown below.
+A PostgreSQL server is deployed using Docker Compose. Also, the compose file creates a database (*devdb*) and user (*devuser*) by specifying corresponding environment variables (*POSTGRES*_*). Moreover, the database bootstrap script (*bootstrap.sql*) is volume-mapped into the docker entry point directory, and it creates necessary schemas and tables followed by loading initial records into the staging tables at startup. See below for details about the bootstrap script.
 
-![](vpn-connection.png#center)
+```yaml
+# compose-postgres.yml
+version: "3"
 
-## Project
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./initdb/scripts:/docker-entrypoint-initdb.d
+      - ./initdb/data:/tmp
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=devdb
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=password
+      - TZ=Australia/Sydney
 
-We build a data transformation pipeline using [subsets of IMDb data](https://www.imdb.com/interfaces/) - seven titles and names related datasets are provided as gzipped, tab-separated-values (TSV) formatted files. This results in three tables that can be used for reporting and analysis.
+volumes:
+  postgres_data:
+    driver: local
+    name: postgres_data
+```
 
+#### Database Bootstrap Script
 
-### Create Database Objects
-
-The majority of data transformation is performed in the _imdb_ schema, which is configured as the dbt target schema. We create the final three tables in a custom schema named _imdb_analytics_. Note that its name is according to the naming convention of the [dbt custom schema](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-custom-schemas), which is _&lt;target_schema>_&lt;custom_schema>_. After creating the database schemas, we create a development user (dbt) and a group that the user belongs to, followed by granting necessary permissions of the new schemas to the new group and reassigning schema ownership to the new user.
-
+The bootstrap script begins with creating schemas and granting permission to the development user. Then the tables for the pizza shop data are created in the *staging* schema, and initial records are copied from data files into corresponding tables.
 
 ```sql
--- redshift-sls/setup-redshift.sql
--- // create db schemas
-create schema if not exists imdb;
-create schema if not exists imdb_analytics;
+-- initdb/scripts/bootstrap.sql
 
--- // create db user and group
-create user dbt with password '<password>';
-create group dbt with user dbt;
+-- // create schemas and grant permission
+CREATE SCHEMA staging;
+GRANT ALL ON SCHEMA staging TO devuser;
 
--- // grant permissions to new schemas
-grant usage on schema imdb to group dbt;
-grant create on schema imdb to group dbt;
-grant all on all tables in schema imdb to group dbt;
+CREATE SCHEMA dev;
+GRANT ALL ON SCHEMA dev TO devuser;
 
-grant usage on schema imdb_analytics to group dbt;
-grant create on schema imdb_analytics to group dbt;
-grant all on all tables in schema imdb_analytics to group dbt;
+-- // create tables
+DROP TABLE IF EXISTS staging.users;
+DROP TABLE IF EXISTS staging.products;
+DROP TABLE IF EXISTS staging.orders;
 
--- reassign schema ownership to dbt
-alter schema imdb owner to dbt;
-alter schema imdb_analytics owner to dbt;
+CREATE TABLE staging.users
+(
+    id SERIAL,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    email VARCHAR(255),
+    residence VARCHAR(500),
+    lat DECIMAL(10, 8),
+    lon DECIMAL(10, 8),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS staging.products
+(
+    id SERIAL,
+    name VARCHAR(100),
+    description VARCHAR(500),
+    price FLOAT,
+    category VARCHAR(100),
+    image VARCHAR(200),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS staging.orders
+(
+    id SERIAL,
+    user_id INT,
+    items JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- // copy data
+COPY staging.users(first_name, last_name, email, residence, lat, lon)
+FROM '/tmp/users.csv' DELIMITER ',' CSV HEADER;
+
+COPY staging.products(name, description, price, category, image)
+FROM '/tmp/products.csv' DELIMITER ',' CSV HEADER;
+
+COPY staging.orders(user_id, items)
+FROM '/tmp/orders.csv' DELIMITER ',' CSV HEADER;
 ```
 
-### Save Data to S3
+## Setup DBT Project
 
-The [Axel download accelerator](https://github.com/axel-download-accelerator/axel) is used to download the data files locally followed by decompressing with the gzip utility. Note that simple retry logic is added as I see download failure from time to time. Finally the decompressed files are saved into the project S3 bucket using the [S3 sync](https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html) command.,
-
- 
-```bash
-# redshift-sls/upload-data.sh
-#!/usr/bin/env bash
-
-s3_bucket="<s3-bucket-name>"
-hostname="datasets.imdbws.com"
-declare -a file_names=(
-  "name.basics.tsv.gz" \
-  "title.akas.tsv.gz" \
-  "title.basics.tsv.gz" \
-  "title.crew.tsv.gz" \
-  "title.episode.tsv.gz" \
-  "title.principals.tsv.gz" \
-  "title.ratings.tsv.gz"
-  )
-
-rm -rf imdb-data
-
-for fn in "${file_names[@]}"
-do
-  download_url="https://$hostname/$fn"
-  prefix=$(echo ${fn::-7} | tr '.' '_')
-  echo "download imdb-data/$prefix/$fn from $download_url"
-  # download can fail, retry after removing temporary files if failed
-  while true;
-  do
-    mkdir -p imdb-data/$prefix
-    axel -n 32 -a -o imdb-data/$prefix/$fn $download_url
-    gzip -d imdb-data/$prefix/$fn
-    num_files=$(ls imdb-data/$prefix | wc -l)
-    if [ $num_files == 1 ]; then
-      break
-    fi
-    rm -rf imdb-data/$prefix
-  done
-done
-
-aws s3 sync ./imdb-data s3://$s3_bucket
-```
-
-### Copy Data
-
-The data files in S3 are loaded into Redshift using the [COPY command](https://docs.aws.amazon.com/redshift/latest/dg/r_COPY.html) as shown below.
-
-
-```sql
--- redshift-sls/setup-redshift.sql
--- // copy data to tables
--- name_basics
-drop table if exists imdb.name_basics;
-create table imdb.name_basics (
-    nconst text,
-    primary_name text,
-    birth_year text,
-    death_year text,
-    primary_profession text,
-    known_for_titles text
-);
-
-copy imdb.name_basics
-from 's3://<s3-bucket-name>/name_basics'
-iam_role default
-delimiter '\t'
-region 'ap-southeast-2'
-ignoreheader 1;
-
--- title_akas
-drop table if exists imdb.title_akas;
-create table imdb.title_akas (
-    title_id text,
-    ordering int,
-    title varchar(max),
-    region text,
-    language text,
-    types text,
-    attributes text,
-    is_original_title boolean
-);
-
-copy imdb.title_akas
-from 's3://<s3-bucket-name>/title_akas'
-iam_role default
-delimiter '\t'
-region 'ap-southeast-2'
-ignoreheader 1;
-
--- title_basics
-drop table if exists imdb.title_basics;
-create table imdb.title_basics (
-    tconst text,
-    title_type text,
-    primary_title varchar(max),
-    original_title varchar(max),
-    is_adult boolean,
-    start_year text,
-    end_year text,
-    runtime_minutes text,
-    genres text
-);
-
-copy imdb.title_basics
-from 's3://<s3-bucket-name>/title_basics'
-iam_role default
-delimiter '\t'
-region 'ap-southeast-2'
-ignoreheader 1;
-
--- title_crews
-drop table if exists imdb.title_crews;
-create table imdb.title_crews (
-    tconst text,
-    directors varchar(max),
-    writers varchar(max)
-);
-
-copy imdb.title_crews
-from 's3://<s3-bucket-name>/title_crew'
-iam_role default
-delimiter '\t'
-region 'ap-southeast-2'
-ignoreheader 1;
-
--- title_episodes
-drop table if exists imdb.title_episodes;
-create table imdb.title_episodes (
-    tconst text,
-    parent_tconst text,
-    season_number int,
-    episode_number int
-);
-
-copy imdb.title_episodes
-from 's3://<s3-bucket-name>/title_episode'
-iam_role default
-delimiter '\t'
-region 'ap-southeast-2'
-ignoreheader 1;
-
--- title_principals
-drop table if exists imdb.title_principals;
-create table imdb.title_principals (
-    tconst text,
-    ordering int,
-    nconst text,
-    category text,
-    job varchar(max),
-    characters varchar(max)
-);
-
-copy imdb.title_principals
-from 's3://<s3-bucket-name>/title_principals'
-iam_role default
-delimiter '\t'
-region 'ap-southeast-2'
-ignoreheader 1;
-
--- title_ratings
-drop table if exists imdb.title_ratings;
-create table imdb.title_ratings (
-    tconst text,
-    average_rating float,
-    num_votes int
-);
-
-copy imdb.title_ratings
-from 's3://<s3-bucket-name>/title_ratings'
-iam_role default
-delimiter '\t'
-region 'ap-southeast-2'
-ignoreheader 1;
-```
-
-### Initialise dbt Project
-
-We need the [dbt-core](https://pypi.org/project/dbt-core/) and [dbt-redshift](https://pypi.org/project/dbt-redshift/). Once installed, we can initialise a dbt project with the [dbt init command](https://docs.getdbt.com/reference/commands/init). We are required to specify project details such as project name, [database adapter](https://docs.getdbt.com/docs/supported-data-platforms#supported-data-platforms) and database connection info. Note dbt creates the [project profile](https://docs.getdbt.com/dbt-cli/configure-your-profile) to _.dbt/profile.yml_ of the user home directory by default.
-
-
-```bash
-$ dbt init
-07:07:16  Running with dbt=1.2.1
-Enter a name for your project (letters, digits, underscore): dbt_redshift_sls
-Which database would you like to use?
-[1] postgres
-[2] redshift
-
-(Don't see the one you want? https://docs.getdbt.com/docs/available-adapters)
-
-Enter a number: 2
-host (hostname.region.redshift.amazonaws.com): <redshift-endpoint-url>
-port [5439]:
-user (dev username): dbt
-[1] password
-[2] iam
-Desired authentication method option (enter a number): 1
-password (dev password):
-dbname (default database that dbt will build objects in): main
-schema (default schema that dbt will build objects in): gdelt
-threads (1 or more) [1]: 4
-07:08:13  Profile dbt_redshift_sls written to /home/<username>/.dbt/profiles.yml using target's profile_template.yml and your supplied values. Run 'dbt debug' to validate the connection.
-07:08:13  
-Your new dbt project "dbt_redshift_sls" was created!
-
-For more information on how to configure the profiles.yml file,
-please consult the dbt documentation here:
-
-  https://docs.getdbt.com/docs/configure-your-profile
-
-One more thing:
-
-Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
-
-  https://community.getdbt.com/
-
-Happy modeling!
-```
-
-
-dbt initialises a project in a folder that matches to the project name and generates project boilerplate as shown below. Some of the main objects are _[dbt_project.yml](https://docs.getdbt.com/reference/dbt_project.yml)_, and the [model](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) folder. The former is required because dbt doesn't know if a folder is a dbt project without it. Also it contains information that tells dbt how to operate on the project. The latter is for including dbt models, which is basically a set of SQL select statements. See [dbt documentation](https://docs.getdbt.com/docs/introduction) for more details.
-
-
-```bash
-$ tree dbt_redshift_sls/ -L 1
-dbt_redshift_sls/
-├── README.md
-├── analyses
-├── dbt_project.yml
-├── macros
-├── models
-├── seeds
-├── snapshots
-└── tests
-```
-
-
-We can check the database connection with the [dbt debug command](https://docs.getdbt.com/reference/commands/debug). Do not forget to connect to VPN as mentioned earlier.
-
-
-```bash
-$ dbt debug
-03:50:58  Running with dbt=1.2.1
-dbt version: 1.2.1
-python version: 3.8.10
-python path: <path-to-python-path>
-os info: Linux-5.4.72-microsoft-standard-WSL2-x86_64-with-glibc2.29
-Using profiles.yml file at /home/<username>/.dbt/profiles.yml
-Using dbt_project.yml file at <path-to-dbt-project>/dbt_project.yml
-
-Configuration:
-  profiles.yml file [OK found and valid]
-  dbt_project.yml file [OK found and valid]
-
-Required dependencies:
- - git [OK found]
-
-Connection:
-  host: <redshift-endpoint-url>
-  port: 5439
-  user: dbt
-  database: main
-  schema: imdb
-  search_path: None
-  keepalives_idle: 240
-  sslmode: None
-  method: database
-  cluster_id: None
-  iam_profile: None
-  iam_duration_seconds: 900
-  Connection test: [OK connection ok]
-
-All checks passed!
-```
-
-
-After initialisation, the model configuration is updated. The project [materialisation](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/materializations) is specified as view although it is the default materialisation. Also [tags](https://docs.getdbt.com/reference/resource-configs/tags) are added to the entire model folder as well as folders of specific layers - staging, intermediate and marts. As shown below, tags can simplify model execution.
-
+A *dbt* project named *pizza_shop* is created using the *dbt-postgres* package (*dbt-postgres==1.7.4*). Specifically, it is created using the `dbt init` command, and it bootstraps the project in the *pizza_shop* folder as well as adds the project profile to the *dbt* profiles file as shown below.
 
 ```yaml
-# redshift-sls/dbt_redshift_sls/dbt_project.yml
-name: "dbt_redshift_sls"
-...
-
-models:
-  dbt_redshift_sls:
-    +materialized: view
-    +tags:
-      - "imdb"
-    staging:
-      +tags:
-        - "staging"
-    intermediate:
-      +tags:
-        - "intermediate"
-    marts:
-      +tags:
-        - "marts"
+# $HOME/.dbt/profiles.yml
+pizza_shop:
+  outputs:
+    dev:
+      dbname: devdb
+      host: localhost
+      pass: password
+      port: 5432
+      schema: dev
+      threads: 4
+      type: postgres
+      user: devuser
+  target: dev
 ```
 
+### Project Sources
 
-Two [dbt packages](https://docs.getdbt.com/docs/building-a-dbt-project/package-management) are used in this project. The [dbt-labs/codegen](https://hub.getdbt.com/dbt-labs/codegen/latest/) is used to save typing when generating the source and base models while [dbt-labda/dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) for adding tests to the final marts models. The packages can be installed by the [dbt deps command](https://docs.getdbt.com/reference/commands/deps).
-
-
-```yaml
-# redshift-sls/dbt_redshift_sls/packages.yml
-packages:
-  - package: dbt-labs/codegen
-    version: 0.8.0
-  - package: dbt-labs/dbt_utils
-    version: 0.9.2
-```
-
-### Create dbt Models
-
-The models for this post are organised into three layers according to the [dbt best practices](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview) - staging, intermediate and marts.
-
-
-#### Staging
-
-The seven tables that are loaded from S3 are [dbt source](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) tables and their details are declared in a YAML file (__imdb_sources.yml_). By doing so, we are able to refer to the source tables with the `{{ source() }}` function. Also we can add tests to source tables. For example below two tests (unique, not_null) are added to the _tconst_ column of the _title_basics_ table below and these tests can be executed by the [dbt test command](https://docs.getdbt.com/reference/commands/test).
-
+Recall that three tables are created in the *staging* schema by the database bootstrap script. They are used as sources of the project and their details are kept in *sources.yml* to be referred easily in other models.
 
 ```yaml
-# redshift-sls/dbt_redshift_sls/models/staging/imdb/_imdb__sources.yml
+# pizza_shop/models/sources.yml
 version: 2
 
 sources:
-  - name: imdb
-    description: Subsets of IMDb data, which are available for access to customers for personal and non-commercial use
+  - name: raw
+    schema: staging
     tables:
-      ...
-      - name: title_basics
-        description: Table that contains basic information of titles
-        columns:
-          - name: tconst
-            description: alphanumeric unique identifier of the title
-            tests:
-              - unique
-              - not_null
-          - name: title_type
-            description: the type/format of the title (e.g. movie, short, tvseries, tvepisode, video, etc)
-          - name: primary_title
-            description: the more popular title / the title used by the filmmakers on promotional materials at the point of release
-          - name: original_title
-            description: original title, in the original language
-          - name: is_adult
-            description: flag that indicates whether it is an adult title or not
-          - name: start_year
-            description: represents the release year of a title. In the case of TV Series, it is the series start year
-          - name: end_year
-            description: TV Series end year. NULL for all other title types
-          - name: runtime_minutes
-            description: primary runtime of the title, in minutes
-          - name: genres
-            description: includes up to three genres associated with the title
-      ...
+      - name: users
+        identifier: users
+      - name: products
+        identifier: products
+      - name: orders
+        identifier: orders
 ```
 
-
-Based on the source tables, staging models are created. They are created as views, which is the project's default [materialisation](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/materializations). In the SQL statements, column names and data types are modified mainly. 
-
+Using the raw sources, three models are created by performing simple transformations such as adding [surrogate keys](https://docs.getdbt.com/terms/surrogate-key) using the *dbt_utils* package and changing column names. Note that, as the *products* and *users* dimension tables are kept by [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension), the surrogate keys will be used to uniquely identify each dimension record.
 
 ```sql
--- // redshift-sls/dbt_redshift_sls/models/staging/imdb/stg_imdb__title_basics.sql
-with source as (
-
-    select * from {{ source('imdb', 'title_basics') }}
-
-),
-
-renamed as (
-
-    select
-        tconst as title_id,
-        title_type,
-        primary_title,
-        original_title,
-        is_adult,
-        start_year::int as start_year,
-        end_year::int as end_year,
-        runtime_minutes::int as runtime_minutes,
-        genres
-    from source
-
+-- pizza_shop/models/src/src_products.sql
+WITH raw_products AS (
+  SELECT * FROM {{ source('raw', 'products') }}
 )
-
-select * from renamed
+SELECT
+  {{ dbt_utils.generate_surrogate_key(['name', 'description', 'price', 'category', 'image']) }} as product_key,
+  id AS product_id,
+  name,
+  description,
+  price,
+  category,
+  image,
+  created_at
+FROM raw_products
 ```
-
-
-Below shows the file tree of the staging models. The staging models can be executed using the [dbt run command](https://docs.getdbt.com/reference/commands/run). As we've added [tags](https://docs.getdbt.com/reference/resource-configs/tags) to the staging layer models, we can limit to execute only this layer by `dbt run --select staging`.
-
-
-```bash
-redshift-sls/dbt_redshift_sls/models/staging/
-└── imdb
-    ├── _imdb__models.yml
-    ├── _imdb__sources.yml
-    ├── stg_imdb__name_basics.sql
-    ├── stg_imdb__title_akas.sql
-    ├── stg_imdb__title_basics.sql
-    ├── stg_imdb__title_crews.sql
-    ├── stg_imdb__title_episodes.sql
-    ├── stg_imdb__title_principals.sql
-    └── stg_imdb__title_ratings.sql
-```
-
-#### Intermediate
-
-We can keep intermediate results in this layer so that the models of the final marts layer can be simplified. The source data includes columns where array values are kept as comma separated strings. For example, the genres column of the _stg_imdb__title_basics_ model includes up to 3 genre values as shown below. 
-
-![](gnere-before.png#center)
-
-A total of seven columns in three models are columns of comma-separated strings and it is better to flatten them in the intermediate layer. Also, in order to avoid repetition, a [dbt macro](https://docs.getdbt.com/docs/building-a-dbt-project/jinja-macros) (f_latten_fields_) is created to share the column-flattening logic. 
-
 
 ```sql
-# redshift-sls/dbt_redshift_sls/macros/flatten_fields.sql
-{% macro flatten_fields(model, field_name, id_field_name) %}
-    with subset as (
-        select
-            {{ id_field_name }} as id,
-            regexp_count({{ field_name }}, ',') + 1 AS num_fields,
-            {{ field_name }} as fields
-        from {{ model }}
-    )
-    select
-        id,
-        1 as idx,
-        split_part(fields, ',', 1) as field
-    from subset
-    union all
-    select
-        s.id,
-        idx + 1 as idx,
-        split_part(s.fields, ',', idx + 1)
-    from subset s
-    join cte on s.id = cte.id
-    where idx < num_fields
-{% endmacro %}
-```
-
-The macro function can be added inside a [recursive cte](https://docs.aws.amazon.com/redshift/latest/dg/r_WITH_clause.html) by specifying the relevant model, field name to flatten and ID field name. 
-
-
-```sql
--- dbt_redshift_sls/models/intermediate/title/int_genres_flattened_from_title_basics.sql
-with recursive cte (id, idx, field) as (
-    {{ flatten_fields(ref('stg_imdb__title_basics'), 'genres', 'title_id') }}
+-- pizza_shop/models/src/src_users.sql
+WITH raw_users AS (
+  SELECT * FROM {{ source('raw', 'users') }}
 )
-
-select
-    id as title_id,
-    field as genre
-from cte
-order by id
+SELECT
+  {{ dbt_utils.generate_surrogate_key(['first_name', 'last_name', 'email', 'residence', 'lat', 'lon']) }} as user_key,
+  id AS user_id,
+  first_name,
+  last_name,
+  email,
+  residence,
+  lat AS latitude,
+  lon AS longitude,
+  created_at
+FROM raw_users
 ```
-
-The intermediate models are also materialised as views, and we can check the array columns are flattened as expected.
-
-![](gnere-after.png#center)
-
-Below shows the file tree of the intermediate models. Similar to the staging models, the intermediate models can be executed by `dbt run --select intermediate`.
-
-
-```bash
-redshift-sls/dbt_redshift_sls/models/intermediate/
-├── name
-│   ├── _int_name__models.yml
-│   ├── int_known_for_titles_flattened_from_name_basics.sql
-│   └── int_primary_profession_flattened_from_name_basics.sql
-└── title
-    ├── _int_title__models.yml
-    ├── int_directors_flattened_from_title_crews.sql
-    ├── int_genres_flattened_from_title_basics.sql
-    └── int_writers_flattened_from_title_crews.sql
-
-redshift-sls/dbt_redshift_sls/macros/
-└── flatten_fields.sql
-```
-
-#### Marts
-
-The models in the marts layer are configured to be materialised as tables in a custom schema. Their materialisation is set to _table_ and the custom schema is specified as _analytics_. Note that the custom schema name becomes _imdb_analytics_ according to the naming convention of dbt custom schemas. Models of both the staging and intermediate layers are used to create final models to be used for reporting and analytics.
-
 
 ```sql
--- redshift-sls/dbt_redshift_sls/models/marts/analytics/titles.sql
+-- pizza_shop/models/src/src_orders.sql
+WITH raw_orders AS (
+  SELECT * FROM {{ source('raw', 'orders') }}
+)
+SELECT
+  id AS order_id,
+  user_id,
+  items,
+  created_at
+FROM raw_orders
+```
+
+### Data Modelling
+
+For SCD Type 2, the dimension tables are materialized as *table* and two additional columns are included - *valid_from* and *valid_to*. The extra columns are for setting up a time range where a record is applicable, and they are used to map a relevant surrogate key in the fact table when there are multiple dimension records according to the same natural key. Note that SCD Type 2 tables can also be maintained by [*dbt* snapshots](https://docs.getdbt.com/docs/build/snapshots).
+
+```sql
+-- pizza_shop/models/dim/dim_products.sql
 {{
-    config(
-        schema='analytics',
-        materialized='table',
-        sort='title_id',
-        dist='title_id'
+  config(
+    materialized = 'table',
     )
 }}
-
-with titles as (
-
-    select * from {{ ref('stg_imdb__title_basics') }}
-
-),
-
-principals as (
-
-    select
-        title_id,
-        count(name_id) as num_principals
-    from {{ ref('stg_imdb__title_principals') }}
-    group by title_id
-
-),
-
-names as (
-
-    select
-        title_id,
-        count(name_id) as num_names
-    from {{ ref('int_known_for_titles_flattened_from_name_basics') }}
-    group by title_id
-
-),
-
-ratings as (
-
-    select
-        title_id,
-        average_rating,
-        num_votes
-    from {{ ref('stg_imdb__title_ratings') }}
-
-),
-
-episodes as (
-
-    select
-        parent_title_id,
-        count(title_id) as num_episodes
-    from {{ ref('stg_imdb__title_episodes') }}
-    group by parent_title_id
-
-),
-
-distributions as (
-
-    select
-        title_id,
-        count(title) as num_distributions
-    from {{ ref('stg_imdb__title_akas') }}
-    group by title_id
-
-),
-
-final as (
-
-    select
-        t.title_id,
-        t.title_type,
-        t.primary_title,
-        t.original_title,
-        t.is_adult,
-        t.start_year,
-        t.end_year,
-        t.runtime_minutes,
-        t.genres,
-        p.num_principals,
-        n.num_names,
-        r.average_rating,
-        r.num_votes,
-        e.num_episodes,
-        d.num_distributions
-    from titles as t
-    left join principals as p on t.title_id = p.title_id
-    left join names as n on t.title_id = n.title_id
-    left join ratings as r on t.title_id = r.title_id
-    left join episodes as e on t.title_id = e.parent_title_id
-    left join distributions as d on t.title_id = d.title_id
-
+WITH src_products AS (
+  SELECT * FROM {{ ref('src_products') }}
 )
-
-select * from final
+SELECT
+    *, 
+    created_at AS valid_from,
+    COALESCE(
+      LEAD(created_at, 1) OVER (PARTITION BY product_id ORDER BY created_at), 
+      '2199-12-31'::TIMESTAMP
+    ) AS valid_to
+FROM src_products
 ```
 
+```sql
+-- pizza_shop/models/dim/dim_users.sql
+{{
+  config(
+    materialized = 'table',
+    )
+}}
+WITH src_users AS (
+  SELECT * FROM {{ ref('src_users') }}
+)
+SELECT
+    *, 
+    created_at AS valid_from,
+    COALESCE(
+      LEAD(created_at, 1) OVER (PARTITION BY user_id ORDER BY created_at), 
+      '2199-12-31'::TIMESTAMP
+    ) AS valid_to
+FROM src_users
+```
 
-The details of the three models can be found in a YAML file (__analytics__models.yml_). We can add tests to models and below we see tests of row count matching to their corresponding staging models. 
+The transactional fact table is materialized as *incremental* so that only new records are appended. Also, order items are transposed into rows using the *jsonb_array_elements* function. Finally, the records are joined with the dimension tables to add relevant surrogate keys from them. Note that the surrogate key of the fact table is constructed by a combination of all natural keys.
 
+```sql
+-- pizza_shop/models/fct/fct_orders.sql
+{{
+  config(
+    materialized = 'incremental'
+    )
+}}
+WITH dim_products AS (
+  SELECT * FROM {{ ref('dim_products') }}
+), dim_users AS (
+  SELECT * FROM {{ ref('dim_users') }}
+), src_orders AS (
+  SELECT 
+    order_id,
+    user_id,
+    jsonb_array_elements(items) AS order_item,
+    created_at    
+  FROM {{ ref('src_orders') }}
+), expanded_orders AS (
+  SELECT 
+    order_id,
+    user_id,
+    (order_item ->> 'product_id')::INT AS product_id,
+    (order_item ->> 'quantity')::INT AS quantity,    
+    created_at
+  FROM src_orders
+)
+SELECT
+  {{ dbt_utils.generate_surrogate_key(['order_id', 'p.product_id', 'u.user_id']) }} as order_key,
+  p.product_key,
+  u.user_key,
+  o.order_id,
+  o.user_id,
+  o.product_id,
+  o.quantity,
+  o.created_at
+FROM expanded_orders o
+JOIN dim_products p 
+  ON o.product_id = p.product_id
+    AND o.created_at >= p.valid_from
+    AND o.created_at < p.valid_to
+JOIN dim_users u 
+  ON o.user_id = u.user_id
+    AND o.created_at >= u.valid_from
+    AND o.created_at < u.valid_to
+{% if is_incremental() %}
+  WHERE o.created_at > (SELECT created_at from {{ this }} ORDER BY created_at DESC LIMIT 1)
+{% endif %}
+```
+
+We can keep the final models in a separate YAML file for testing and enhanced documentation.
 
 ```yaml
-# redshift-sls/dbt_redshift_sls/models/marts/analytics/_analytics__models.yml
+# pizza_shop/models/schema.yml
 version: 2
 
 models:
-  - name: names
-    description: Table that contains all names with additional details
-    tests:
-      - dbt_utils.equal_rowcount:
-          compare_model: ref('stg_imdb__name_basics')
-  - name: titles
-    description: Table that contains all titles with additional details
-    tests:
-      - dbt_utils.equal_rowcount:
-          compare_model: ref('stg_imdb__title_basics')
-  - name: genre_titles
-    description: Table that contains basic title details after flattening genres
+  - name: dim_products
+    description: Products table, which is converted into SCD Type 2
+    columns:
+      - name: product_key
+        description: |
+          Primary key of the table
+          Surrogate key, which is generated by md5 hash using the following columns
+            - name, description, price, category, image
+        tests:
+          - not_null
+          - unique
+      - name: product_id
+        description: Natural key of products
+      - name: name
+        description: Porduct name
+      - name: description
+        description: Product description
+      - name: price
+        description: Product price
+      - name: category
+        description: Product category
+      - name: image
+        description: Product image
+      - name: created_at
+        description: Timestamp when the record is loaded
+      - name: valid_from
+        description: Effective start timestamp of the corresponding record (inclusive)
+      - name: valid_to
+        description: Effective end timestamp of the corresponding record (exclusive)
+  - name: dim_users
+    description: Users table, which is converted into SCD Type 2
+    columns:
+      - name: user_key
+        description: |
+          Primary key of the table
+          Surrogate key, which is generated by md5 hash using the following columns
+            - first_name, last_name, email, residence, lat, lon
+        tests:
+          - not_null
+          - unique
+      - name: user_id
+        description: Natural key of users
+      - name: first_name
+        description: First name
+      - name: last_name
+        description: Last name
+      - name: email
+        description: Email address
+      - name: residence
+        description: User address
+      - name: latitude
+        description: Latitude of user address
+      - name: longitude
+        description: Longitude of user address
+      - name: created_at
+        description: Timestamp when the record is loaded
+      - name: valid_from
+        description: Effective start timestamp of the corresponding record (inclusive)
+      - name: valid_to
+        description: Effective end timestamp of the corresponding record (exclusive)
+  - name: fct_orders
+    description: Orders fact table. Order items are exploded into rows
+    columns:
+      - name: order_key
+        description: |
+          Primary key of the table
+          Surrogate key, which is generated by md5 hash using the following columns
+            - order_id, product_id, user_id
+        tests:
+          - not_null
+          - unique
+      - name: product_key
+        description: Product surrogate key which matches the product dimension record
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_products')
+              field: product_key
+      - name: user_key
+        description: User surrogate key which matches the user dimension record
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_users')
+              field: user_key
+      - name: order_id
+        description: Natural key of orders
+      - name: user_id
+        description: Natural key of users
+      - name: product_id
+        description: Natural key of products
+      - name: quantity
+        description: Amount of products ordered
+      - name: created_at
+        description: Timestamp when the record is loaded
 ```
 
-
-Below shows the file tree of the marts models. As with the other layers, the marts models can be executed by <code>dbt run <em>--select marts</em></code>.
-
+The project can be executed using the `dbt run` command as shown below.
 
 ```bash
-redshift-sls/dbt_redshift_sls/models/marts/
-└── analytics
-    ├── _analytics__models.yml
-    ├── genre_titles.sql
-    ├── names.sql
-    └── titles.sql
+$ dbt run
+04:39:32  Running with dbt=1.7.4
+04:39:33  Registered adapter: postgres=1.7.4
+04:39:33  Found 6 models, 10 tests, 3 sources, 0 exposures, 0 metrics, 515 macros, 0 groups, 0 semantic models
+04:39:33  
+04:39:33  Concurrency: 4 threads (target='dev')
+04:39:33  
+04:39:33  1 of 6 START sql view model dev.src_orders ..................................... [RUN]
+04:39:33  2 of 6 START sql view model dev.src_products ................................... [RUN]
+04:39:33  3 of 6 START sql view model dev.src_users ...................................... [RUN]
+04:39:33  2 of 6 OK created sql view model dev.src_products .............................. [CREATE VIEW in 0.14s]
+04:39:33  1 of 6 OK created sql view model dev.src_orders ................................ [CREATE VIEW in 0.15s]
+04:39:33  3 of 6 OK created sql view model dev.src_users ................................. [CREATE VIEW in 0.14s]
+04:39:33  4 of 6 START sql table model dev.dim_products .................................. [RUN]
+04:39:33  5 of 6 START sql table model dev.dim_users ..................................... [RUN]
+04:39:33  5 of 6 OK created sql table model dev.dim_users ................................ [SELECT 10000 in 0.12s]
+04:39:33  4 of 6 OK created sql table model dev.dim_products ............................. [SELECT 81 in 0.13s]
+04:39:33  6 of 6 START sql incremental model dev.fct_orders .............................. [RUN]
+04:39:33  6 of 6 OK created sql incremental model dev.fct_orders ......................... [SELECT 105789 in 0.33s]
+04:39:33  
+04:39:33  Finished running 3 view models, 2 table models, 1 incremental model in 0 hours 0 minutes and 0.70 seconds (0.70s).
+04:39:33  
+04:39:33  Completed successfully
+04:39:33  
+04:39:33  Done. PASS=6 WARN=0 ERROR=0 SKIP=0 TOTAL=6
 ```
 
-
-Using the [Redshift query editor v2](https://docs.aws.amazon.com/redshift/latest/mgmt/query-editor-v2-using.html), we can quickly create charts with the final models. The example below shows a pie chart and we see about 50% of titles are from the top 5 genres.  
-
-![](pie-chart.png#center)
-
-### Generate dbt Documentation
-
-A nice feature of dbt is [documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation). It provides information about the project and the data warehouse, and it facilitates consumers as well as other developers to discover and understand the datasets better. We can generate the project documents and start a document server as shown below.
-
+Also, the project can be tested using the `dbt test` command.
 
 ```bash
-$ dbt docs generate
-$ dbt docs serve
+$ dbt test
+04:40:53  Running with dbt=1.7.4
+04:40:53  Registered adapter: postgres=1.7.4
+04:40:53  Found 6 models, 10 tests, 3 sources, 0 exposures, 0 metrics, 515 macros, 0 groups, 0 semantic models
+04:40:53  
+04:40:53  Concurrency: 4 threads (target='dev')
+04:40:53  
+04:40:53  1 of 10 START test not_null_dim_products_product_key ........................... [RUN]
+04:40:53  2 of 10 START test not_null_dim_users_user_key ................................. [RUN]
+04:40:53  3 of 10 START test not_null_fct_orders_order_key ............................... [RUN]
+04:40:53  4 of 10 START test not_null_fct_orders_product_key ............................. [RUN]
+04:40:53  1 of 10 PASS not_null_dim_products_product_key ................................. [PASS in 0.11s]
+04:40:53  5 of 10 START test not_null_fct_orders_user_key ................................ [RUN]
+04:40:53  2 of 10 PASS not_null_dim_users_user_key ....................................... [PASS in 0.11s]
+04:40:53  4 of 10 PASS not_null_fct_orders_product_key ................................... [PASS in 0.11s]
+04:40:53  3 of 10 PASS not_null_fct_orders_order_key ..................................... [PASS in 0.12s]
+04:40:53  6 of 10 START test relationships_fct_orders_product_key__product_key__ref_dim_products_  [RUN]
+04:40:53  7 of 10 START test relationships_fct_orders_user_key__user_key__ref_dim_users_ . [RUN]
+04:40:53  8 of 10 START test unique_dim_products_product_key ............................. [RUN]
+04:40:53  5 of 10 PASS not_null_fct_orders_user_key ...................................... [PASS in 0.09s]
+04:40:53  9 of 10 START test unique_dim_users_user_key ................................... [RUN]
+04:40:53  8 of 10 PASS unique_dim_products_product_key ................................... [PASS in 0.06s]
+04:40:53  10 of 10 START test unique_fct_orders_order_key ................................ [RUN]
+04:40:53  6 of 10 PASS relationships_fct_orders_product_key__product_key__ref_dim_products_  [PASS in 0.10s]
+04:40:53  7 of 10 PASS relationships_fct_orders_user_key__user_key__ref_dim_users_ ....... [PASS in 0.11s]
+04:40:53  9 of 10 PASS unique_dim_users_user_key ......................................... [PASS in 0.06s]
+04:40:53  10 of 10 PASS unique_fct_orders_order_key ...................................... [PASS in 0.11s]
+04:40:53  
+04:40:53  Finished running 10 tests in 0 hours 0 minutes and 0.42 seconds (0.42s).
+04:40:53  
+04:40:53  Completed successfully
+04:40:53  
+04:40:53  Done. PASS=10 WARN=0 ERROR=0 SKIP=0 TOTAL=10
 ```
 
-![](dbt-doc-01.png#center)
+## Update Records
 
-A very useful element of dbt documentation is [data lineage](https://docs.getdbt.com/terms/data-lineage), which provides an overall view about how data is transformed and consumed. Below we can see that the final titles model consumes all title-related stating models and an intermediate model from the name basics staging model. 
+Although we will discuss ETL orchestration with Apache Airflow in the next post, here I illustrate how the dimension and fact tables change when records are updated.
 
-![](dbt-doc-02.png#center)
+### Product
 
+First, a new record is inserted into the *products* table in the *staging* schema, and the price is set to increase by 10.
+
+```sql
+-- // update a product record
+INSERT INTO staging.products (id, name, description, price, category, image)
+    SELECT 1, name, description, price + 10, category, image
+    FROM staging.products
+    WHERE id = 1;
+
+SELECT id, name, price, category, created_at 
+FROM staging.products 
+WHERE id = 1;
+
+id|name                            |price|category  |created_at         |
+--+--------------------------------+-----+----------+-------------------+
+ 1|Moroccan Spice Pasta Pizza - Veg|335.0|veg pizzas|2024-01-14 15:38:30|
+ 1|Moroccan Spice Pasta Pizza - Veg|345.0|veg pizzas|2024-01-14 15:43:15|
+```
+
+When we execute the `dbt run` command again, we see the corresponding dimension table reflects the change by adding the new record and updating *valid_from* and *valid_to* columns accordingly. With this change, any later order record that has this product should be mapped into the new product surrogate key.
+
+```sql
+SELECT product_key, price, created_at, valid_from, valid_to 
+FROM dev.dim_products 
+WHERE product_id = 1;
+
+product_key                     |price|created_at         |valid_from         |valid_to           |
+--------------------------------+-----+-------------------+-------------------+-------------------+
+a8c5f8c082bcf52a164f2eccf2b493f6|335.0|2024-01-14 15:38:30|2024-01-14 15:38:30|2024-01-14 15:43:15|
+c995d7e1ec035da116c0f37e6284d1d5|345.0|2024-01-14 15:43:15|2024-01-14 15:43:15|2199-12-31 00:00:00|
+```
+
+### User
+
+Also, a new record is inserted into the *users* table in the *staging* schema while modifying the email address.
+
+```sql
+-- // update a user record
+INSERT INTO staging.users (id, first_name, last_name, email, residence, lat, lon)
+    SELECT 1, first_name, last_name, 'john.doe@example.com', residence, lat, lon
+    FROM staging.users
+    WHERE id = 1;
+
+SELECT id, first_name, last_name, email, created_at 
+FROM staging.users 
+WHERE id = 1;
+
+id|first_name|last_name|email                     |created_at         |
+--+----------+---------+--------------------------+-------------------+
+ 1|Kismat    |Shroff   |drishyamallick@hotmail.com|2024-01-14 15:38:30|
+ 1|Kismat    |Shroff   |john.doe@example.com      |2024-01-14 15:43:35|
+```
+
+Again the corresponding dimension table reflects the change by adding the new record and updating *valid_from* and *valid_to* columns accordingly.
+
+```sql
+SELECT user_key, email, valid_from, valid_to 
+FROM dev.dim_users 
+WHERE user_id = 1;
+
+user_key                        |email                     |valid_from         |valid_to           |
+--------------------------------+--------------------------+-------------------+-------------------+
+7f530277c15881c328b67c4764205a9c|drishyamallick@hotmail.com|2024-01-14 15:38:30|2024-01-14 15:43:35|
+f4b2344f893f50597cdc4a12c7e87e81|john.doe@example.com      |2024-01-14 15:43:35|2199-12-31 00:00:00|
+```
+
+### Order
+
+We add a new order that has two order items where the IDs of the first and second products are 1 and 2 respectively. In this example, we expect the first product maps to the updated product surrogate key while the surrogate key of the second product remains the same. We can check it works as expected by querying relevant order records. For comparison, existing and new order records are queried together, and we see the product surrogate key is updated correctly for the new order item where its product ID is 1.
+
+```sql
+INSERT INTO staging.orders(user_id, items)
+VALUES (1,'[{"product_id": 1, "quantity": 2}, {"product_id": 2, "quantity": 3}]');
+
+SELECT o.order_key, o.product_key, o.order_id, o.product_id, p.price, o.quantity, o.created_at 
+FROM dev.fct_orders o
+JOIN dev.dim_products p ON o.product_key = p.product_key
+WHERE o.order_id IN (249, 20001)
+ORDER BY o.order_id, o.product_id;
+
+order_key                       |  product_key                     |order_id|product_id|price|quantity|created_at         |
+--------------------------------+----------------------------------+--------+----------+-----+--------+-------------------+
+5c8f7a8bc27d825efdb2e8167c9ae481|* a8c5f8c082bcf52a164f2eccf2b493f6|     249|         1|335.0|       1|2024-01-14 15:38:30|
+42834bd2b8f847cbd182765b43094be0|  8dd51b3981692c787baa9d4335f15345|     249|         2| 60.0|       1|2024-01-14 15:38:30|
+28d937c571bd9601c2e719e618e56f67|* c995d7e1ec035da116c0f37e6284d1d5|   20001|         1|345.0|       2|2024-01-14 15:51:04|
+75e1957ce20f188ab7502c322e2ab7d9|  8dd51b3981692c787baa9d4335f15345|   20001|         2| 60.0|       3|2024-01-14 15:51:04|
+```
 
 ## Summary
 
-In this post, we discussed how to build data transformation pipelines using dbt on Redshift Serverless. Subsets of IMDb data are used as source and data models are developed in multiple layers according to the dbt best practices. dbt can be used as an effective tool for data transformation in a wide range of data projects from data warehousing to data lake to data lakehouse, and it supports key AWS analytics services - Redshift, Glue, EMR and Athena. More examples of using dbt will be discussed in subsequent posts.
+The data build tool (dbt) is a popular data transformation tool. In this series of posts, we discuss practical ETL examples with the tool including orchestration with Apache Airflow. As a starting point, we developed a dbt project on PostgreSQL using fictional pizza shop data in this post.
