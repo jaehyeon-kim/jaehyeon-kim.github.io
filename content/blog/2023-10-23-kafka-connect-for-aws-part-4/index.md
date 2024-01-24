@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Kafka Connect for AWS Services Integration
 categories:
-  - Apache Kafka
+  - Data Streaming
 tags: 
   - AWS
   - Apache Kafka

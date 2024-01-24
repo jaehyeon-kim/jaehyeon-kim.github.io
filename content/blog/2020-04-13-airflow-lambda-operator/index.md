@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - API development with R
 categories:
-  - Apache Airflow
+  - Data Engineering
 tags: 
   - AWS
   - AWS Lambda

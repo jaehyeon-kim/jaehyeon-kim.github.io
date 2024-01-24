@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Data Lake Demo Using Change Data Capture
 categories:
-  - Change Data Capture (CDC)
+  - Data Engineering
 tags: 
   - AWS
   - Amazon EMR

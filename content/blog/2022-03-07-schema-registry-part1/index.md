@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Integrate Schema Registry with MSK Connect
 categories:
-  - Apache Kafka
+  - Data Streaming
 tags: 
   - AWS
   - Amazon MSK

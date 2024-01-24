@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - DBT for Effective Data Transformation on AWS
 categories:
-  - Apache Kafka
+  - Data Streaming
 tags: 
   - Apache Kafka
   - Python

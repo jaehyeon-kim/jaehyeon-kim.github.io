@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Getting Started with Pyflink on AWS
 categories:
-  - Apache Flink
+  - Data Streaming
 tags:
   - Apache Flink
   - Pyflink

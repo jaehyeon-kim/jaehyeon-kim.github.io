@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - Kafka Connect for AWS Services Integration
 categories:
-  - Stateful Stream Processing
+  - Data Streaming
 tags: 
   - Stateful Stream Processing
   - Event Driven Architecture

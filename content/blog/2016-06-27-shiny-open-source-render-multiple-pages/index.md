@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - API development with R
 categories:
-  - Data Product
+  - Development
 tags: 
   - R
   - Shiny

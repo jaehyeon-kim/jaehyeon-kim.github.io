@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - Data Lake Demo Using Change Data Capture
 categories:
-  - Engineering
+  - Development
 tags: 
   - AWS
   - Terraform
