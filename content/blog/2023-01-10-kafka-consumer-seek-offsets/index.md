@@ -113,7 +113,7 @@ The topic can be checked in the Kafka UI as shown below.
 
 ![](topic-01.png#center)
 
-## Kafka Producer
+## Kafka Producer Application
 
 A Kafka producer is created to send messages to the orders topic and fake messages are generated using the [Faker package](https://faker.readthedocs.io/en/master/). 
 
@@ -242,7 +242,7 @@ After a while, we can see that messages are sent to the orders topic. Out of 239
 
 ![](topic-02.png#center)
 
-## Kafka Consumer
+## Kafka Consumer Application
 
 Two consumer instances are deployed in the same consumer group. As the topic has two partitions, it is expected each instance is assigned to a single topic partition. A custom consumer rebalance listener is registered so that the fetch offset is overridden with an offset timestamp environment variable (offset_str) when a topic partition is assigned.
 
