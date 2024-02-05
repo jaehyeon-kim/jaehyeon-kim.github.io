@@ -32,10 +32,10 @@ In this series of posts, we discuss practical data warehouse/lakehouse examples 
 
 * [Part 1 Modelling on PostgreSQL](#) (this post)
 * [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2)
-* Part 3 Modelling on Amazon Athena
-* Part 4 ETL on Amazon Athena via Airflow
-* Part 5 Modelling on Apache Spark
-* Part 6 ETL on Apache Spark via Airflow
+* [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3)
+* Part 4 ETL on BigQuery via Airflow
+* Part 5 Modelling on Amazon Athena
+* Part 6 ETL on Amazon Athena via Airflow
 
 ## Setup Database
 
