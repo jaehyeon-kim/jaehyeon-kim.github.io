@@ -1,7 +1,7 @@
 ---
 title: Data Build Tool (dbt) Pizza Shop Demo - Part 4 ETL on BigQuery via Airflow
 date: 2024-02-22
-draft: true
+draft: false
 featured: true
 comment: true
 toc: true
