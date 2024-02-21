@@ -23,15 +23,15 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In this series of posts, we discuss data warehouse/lakehouse examples using data build tool (dbt) including ETL orchestration with Apache Airflow. In Part 1, we developed a dbt project on PostgreSQL with fictional pizza shop data. Two dimension tables that keep product and user records are created as Type 2 slowly changing dimension (SCD Type 2) tables, and one transactional fact table is built to keep pizza orders. In this post, we discuss how to set up an ETL process on the project using Airflow.
+description: In this series of posts, we discuss data warehouse/lakehouse examples using data build tool (dbt) including ETL orchestration with Apache Airflow. In Part 1, we developed a dbt project on PostgreSQL with fictional pizza shop data. Two dimension tables that keep product and user records are created as Type 2 slowly changing dimension (SCD Type 2) tables, and one transactional fact table is built to keep pizza orders. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.
 ---
 
-In this series of posts, we discuss data warehouse/lakehouse examples using [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) including ETL orchestration with Apache Airflow. In Part 1, we developed a *dbt* project on PostgreSQL with fictional pizza shop data. Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. In this post, we discuss how to set up an ETL process on the project using Airflow.
+In this series of posts, we discuss data warehouse/lakehouse examples using [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) including ETL orchestration with Apache Airflow. In Part 1, we developed a *dbt* project on PostgreSQL with fictional pizza shop data. Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.
 
 * [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1)
 * [Part 2 ETL on PostgreSQL via Airflow](#) (this post)
 * [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3)
-* Part 4 ETL on BigQuery via Airflow
+* [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4)
 * Part 5 Modelling on Amazon Athena
 * Part 6 ETL on Amazon Athena via Airflow
 
@@ -80,9 +80,9 @@ GRANT ALL ON DATABASE airflow TO airflow;
 
 ### Airflow
 
-For development, Airflow can be simplified by using the Local Executor where both scheduling and task execution are handled by the airflow scheduler service - i.e. *AIRFLOW__CORE__EXECUTOR: LocalExecutor*. Also, it is configured to be able to run the *dbt* project (see [Part 1](/blog/2024-01-18-dbt-pizza-shop-1) for details) within the scheduler service by 
+Airflow is simplified by using the [Local Executor](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/local.html) where both scheduling and task execution are handled by the airflow scheduler service - i.e. *AIRFLOW__CORE__EXECUTOR: LocalExecutor*. Also, it is configured to be able to run the *dbt* project (see [Part 1](/blog/2024-01-18-dbt-pizza-shop-1) for details) within the scheduler service by 
 
-- installing the *dbt-postgre* package, and
+- installing the *dbt-postgre* package as an additional pip package, and
 - volume-mapping folders that keep the *dbt* project and *dbt* project profile
 
 ```yaml
@@ -391,12 +391,12 @@ class Order:
     items: str
 
     @classmethod
-    def create(self):
+    def create(cls):
         order_items = [
             {"product_id": id, "quantity": random.randint(1, 5)}
             for id in set(random.choices(range(1, 82), k=random.randint(1, 10)))
         ]
-        return Order(
+        return cls(
             user_id=random.randint(1, 10000),
             items=json.dumps([item for item in order_items]),
         )
@@ -426,7 +426,7 @@ The details of the ETL job can be found on the Airflow web server as shown below
 
 ## Run ETL
 
-Below shows an example product dimension records after the ETL job is completed twice. The product is updated in the second job and a new surrogate key is assigned as well as the *value_from* and *valid_to* column values are updated accordingly.
+Below shows example product dimension records after the ETL job is completed twice. The product is updated in the second job and a new surrogate key is assigned as well as the *valid_from* and *valid_to* column values are updated accordingly.
 
 ```sql
 SELECT product_key, price, created_at, valid_from, valid_to 
@@ -455,4 +455,4 @@ cb650e3bb22e3be1d112d59a44482560|6a326183ce19f0db7f4af2ab779cc2dd|        61|185
 
 ## Summary
 
-In this series of posts, we discuss data warehouse/lakehouse examples using data build tool (dbt) including ETL orchestration with Apache Airflow. In this post, we discussed how to set up an ETL process on the *dbt* project from Part 1 using Airflow. A demo ETL job was created that updates records followed by running and testing the *dbt* project. Finally, the result of ETL job was validated by checking sample records.
+In this series of posts, we discuss data warehouse/lakehouse examples using data build tool (dbt) including ETL orchestration with Apache Airflow. In this post, we discussed how to set up an ETL process on the *dbt* project developed in Part 1 using Airflow. A demo ETL job was created that updates records followed by running and testing the *dbt* project. Finally, the result of ETL job was validated by checking sample records.
