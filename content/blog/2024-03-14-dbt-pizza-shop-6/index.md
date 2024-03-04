@@ -25,29 +25,29 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In Part 3, we developed a dbt project that targets Google BigQuery with fictional pizza shop data. Two dimension tables that keep product and user records are created as Type 2 slowly changing dimension (SCD Type 2) tables, and one transactional fact table is built to keep pizza orders. The fact table is denormalized using nested and repeated fields for improving query performance. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.
+description: In Part 5, we developed a dbt project that that targets Apache Iceberg where transformations are performed on Amazon Athena. Two dimension tables that keep product and user records are created as Type 2 slowly changing dimension (SCD Type 2) tables, and one transactional fact table is built to keep pizza orders. To improve query performance, the fact table is denormalized to pre-join records from the dimension tables using the array and struct data types. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.
 ---
 
-In [Part 3](/blog/2024-02-08-dbt-pizza-shop-3), we developed a [dbt](https://docs.getdbt.com/docs/introduction) project that targets Google BigQuery with fictional pizza shop data. Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. The fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested) for improving query performance. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.
+In [Part 5](/blog/2024-03-07-dbt-pizza-shop-5), we developed a [dbt](https://docs.getdbt.com/docs/introduction) project that that targets [Apache Iceberg](https://iceberg.apache.org/) where transformations are performed on [Amazon Athena](https://aws.amazon.com/athena/). Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. To improve query performance, the fact table is denormalized to pre-join records from the dimension tables using the array and struct data types. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.
 
 * [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1)
 * [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2)
 * [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3)
 * [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4)
 * [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5)
-* Part 6 ETL on Amazon Athena via Airflow
+* [Part 6 ETL on Amazon Athena via Airflow](#) (this post)
 
 ## Infrastructure
 
-Apache Airflow and Google BigQuery are used in this post, and the former is deployed locally using Docker Compose. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/general-demos/tree/master/dbt-bigquery-demo) of this post.
+Apache Airflow and Amazon Athena are used in this post, and the former is deployed locally using Docker Compose. The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/general-demos/tree/master/dbt-athena-demo) of this post.
 
 ### Airflow
 
-Airflow is simplified by using the [Local Executor](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/local.html) where both scheduling and task execution are handled by the airflow scheduler service - i.e. *AIRFLOW__CORE__EXECUTOR: LocalExecutor*. Also, it is configured to be able to run the *dbt* project (see [Part 3](/blog/2024-02-08-dbt-pizza-shop-3) for details) within the scheduler service by 
+Airflow is simplified by using the [Local Executor](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/local.html) where both scheduling and task execution are handled by the airflow scheduler service - i.e. *AIRFLOW__CORE__EXECUTOR: LocalExecutor*. Also, it is configured to be able to run the *dbt* project (see [Part 5](/blog/2024-03-07-dbt-pizza-shop-5) for details) within the scheduler service by 
 
-- installing the *dbt-bigquery* package as an additional pip package,
+- installing the *dbt-athena-community* and *awswrangler* packages as additional pip packages,
 - volume-mapping folders that keep the *dbt* project and *dbt* project profile, and
-- specifying environment variables for the *dbt* project profile (*GCP_PROJECT* and *SA_KEYFILE*)
+- specifying environment variables for access AWS services (*AWS_ACCESS_KEY_ID* and *AWS_SECRET_ACCESS_KEY*)
 
 ```yaml
 # docker-compose.yml
@@ -73,8 +73,8 @@ x-airflow-common: &airflow-common
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/plugins:/opt/airflow/plugins
     - ./airflow/logs:/opt/airflow/logs
-    - ./pizza_shop:/tmp/pizza_shop
-    - ./airflow/dbt-profiles:/opt/airflow/dbt-profiles
+    - ./pizza_shop:/tmp/pizza_shop                      # dbt project
+    - ./airflow/dbt-profiles:/opt/airflow/dbt-profiles  # dbt profiles
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on: &airflow-common-depends-on
     postgres:
@@ -156,7 +156,7 @@ networks:
     name: app-network
 ```
 
-Before we deploy the Airflow services, we need to create the BigQuery dataset and staging tables, followed by inserting initial records - see [Part 3](/blog/2024-02-08-dbt-pizza-shop-3) for details about the prerequsite steps. Then the services can be started using the *docker-compose up* command. Note that it is recommended to specify the host user's ID as the *AIRFLOW_UID* value. Otherwise, Airflow can fail to launch due to insufficient permission to write logs. Note also that the relevant GCP project ID should be included as it is read in the compose file.
+Before we deploy the Airflow services, we need to create staging tables - see [Part 5](/blog/2024-03-07-dbt-pizza-shop-5) for details about the prerequisite step. Then the services can be started using the *docker-compose up* command. Note that it is recommended to specify the host user's ID as the *AIRFLOW_UID* value. Otherwise, Airflow can fail to launch due to insufficient permission to write logs.
 
 ```bash
 ## prerequisite
@@ -368,7 +368,7 @@ The details of the ETL job can be found on the Airflow web server as shown below
 
 ## Run ETL
 
-Below shows example product dimension records after the ETL job is completed. It is shown that the product 1 is updated, and a new surrogate key is assigned to the new record as well as the *valid_from* and *valid_to* column values are updated to it.
+Below shows example product dimension records after the ETL job is completed. It is shown that the product 2 is updated, and a new surrogate key is assigned to the new record as well as the *valid_from* and *valid_to* column values are updated accordingly.
 
 ```sql
 SELECT product_key, product_id AS id, price, valid_from, valid_to 
@@ -382,7 +382,7 @@ ORDER BY product_id, valid_from;
 3 * 0f4df52917ddff1bcf618b798c8aff43  2   70.0  2024-03-01 10:16:50.932000  2199-12-31 00:00:00.000000
 ```
 
-When I query the fact table for orders with the same product ID, I can check correct product key values are mapped - note *value_to* is not inclusive.
+When we query the fact table for orders with the same product ID, we can check correct product key values are mapped - note *value_to* is not inclusive.
 
 ```sql
 SELECT o.order_id, p.key, p.id, p.price, p.quantity, o.created_at
@@ -400,4 +400,4 @@ ORDER BY o.order_id, p.id;
 
 ## Summary
 
-In this series of posts, we discuss data warehouse/lakehouse examples using data build tool (dbt) including ETL orchestration with Apache Airflow. In this post, we discussed how to set up an ETL process on the *dbt* project developed in Part 3 using Airflow. A demo ETL job was created that updates records followed by running and testing the *dbt* project. Finally, the result of ETL job was validated by checking sample records.
+In this series of posts, we discuss data warehouse/lakehouse examples using data build tool (dbt) including ETL orchestration with Apache Airflow. In this post, we discussed how to set up an ETL process on the *dbt* project developed in Part 5 using Airflow. A demo ETL job was created that updates records followed by running and testing the *dbt* project. Finally, the result of ETL job was validated by checking sample records.

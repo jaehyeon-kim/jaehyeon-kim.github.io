@@ -156,7 +156,7 @@ networks:
     name: app-network
 ```
 
-Before we deploy the Airflow services, we need to create the BigQuery dataset and staging tables, followed by inserting initial records - see [Part 3](/blog/2024-02-08-dbt-pizza-shop-3) for details about the prerequsite steps. Then the services can be started using the *docker-compose up* command. Note that it is recommended to specify the host user's ID as the *AIRFLOW_UID* value. Otherwise, Airflow can fail to launch due to insufficient permission to write logs. Note also that the relevant GCP project ID should be included as it is read in the compose file.
+Before we deploy the Airflow services, we need to create the BigQuery dataset and staging tables, followed by inserting initial records - see [Part 3](/blog/2024-02-08-dbt-pizza-shop-3) for details about the prerequisite steps. Then the services can be started using the *docker-compose up* command. Note that it is recommended to specify the host user's ID as the *AIRFLOW_UID* value. Otherwise, Airflow can fail to launch due to insufficient permission to write logs. Note also that the relevant GCP project ID should be included as it is read in the compose file.
 
 ```bash
 ## prerequisite
@@ -419,7 +419,7 @@ The details of the ETL job can be found on the Airflow web server as shown below
 
 ## Run ETL
 
-Below shows example product dimension records after the ETL job is completed. It is shown that the product 1 is updated, and a new surrogate key is assigned to the new record as well as the *valid_from* and *valid_to* column values are updated to it.
+Below shows example product dimension records after the ETL job is completed. It is shown that the product 1 is updated, and a new surrogate key is assigned to the new record as well as the *valid_from* and *valid_to* column values are updated accordingly.
 
 ```sql
 SELECT product_key, product_id AS id, price, valid_from, valid_to 
@@ -432,7 +432,7 @@ product_key                         id price valid_from          valid_to
 * c995d7e1ec035da116c0f37e6284d1d5   1 345.0 2024-02-16T22:09:37 2199-12-31T00:00:00
 ```
 
-When I query the fact table for orders with the same product ID, I can check correct product key values are mapped - note *value_to* is not inclusive.
+When we query the fact table for orders with the same product ID, we can check correct product key values are mapped - note *value_to* is not inclusive.
 
 ```sql
 SELECT o.order_id, p.key, p.id, p.price, p.quantity, o.created_at
