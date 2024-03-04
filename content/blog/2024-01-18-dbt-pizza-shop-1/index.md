@@ -661,4 +661,4 @@ order_key                       |  product_key                     |order_id|pro
 
 ## Summary
 
-The data build tool (dbt) is a popular data transformation tool. In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the data build tool (dbt) and ETL is managed by Apache Airflow. As a starting point, we developed a dbt project on PostgreSQL using fictional pizza shop data in this post. Two SCD type 2 dimension tables and a single transaction tables are modelled on a dbt project and impacts of record updates are discussed in detail.
+The data build tool (dbt) is a popular data transformation tool. In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the data build tool (dbt) and ETL is managed by Apache Airflow. As a starting point, we developed a dbt project on PostgreSQL using fictional pizza shop data in this post. Two SCD type 2 dimension tables and a single transaction tables were modelled on a dbt project and impacts of record updates were discussed in detail.

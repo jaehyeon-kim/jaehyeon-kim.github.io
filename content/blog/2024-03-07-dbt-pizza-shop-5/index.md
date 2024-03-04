@@ -1,7 +1,7 @@
 ---
 title: Data Build Tool (dbt) Pizza Shop Demo - Part 5 Modelling on Amazon Athena
 date: 2024-03-07
-draft: true
+draft: false
 featured: true
 comment: true
 toc: true
@@ -22,10 +22,12 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the data build tool (dbt) and ETL is managed by Apache Airflow. In Part 1, we developed a dbt project on PostgreSQL using fictional pizza shop data. At the end, the data sets are modelled by two SCD type 2 dimension tables and one transactional fact table. In this post, we create a new dbt project that targets Google BigQuery. While the dimension tables are kept by the same SCD type 2 approach, the fact table is denormalized using nested and repeated fields, which potentially can improve query performance by pre-joining corresponding dimension records.
+description: In Part 1 and Part 3, we developed data build tool (dbt) projects that target PostgreSQL and BigQuery using fictional pizza shop data. The data is modelled by SCD type 2 dimension tables and one transactional fact table. While the order records should be joined with dimension tables to get complete details for PostgreSQL, the fact table is denormalized using nested and repeated fields to improve query performance for BigQuery. Open Table Formats such as Apache Iceberg bring a new opportunity that implements data warehousing features in a data lake (i.e. data lakehouse) and Amazon Athena is probably the easiest way to perform such tasks on AWS. In this post, we create a new dbt project that targets Apache Iceberg where transformations are performed on Amazon Athena. Data modelling is similar to the BigQuery project where the dimension tables are modelled by the SCD type 2 approach and the fact table is denormalized using the array and struct data types.
 ---
 
-In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) and ETL is managed by [Apache Airflow](https://airflow.apache.org/). In [Part 1](/blog/2024-01-18-dbt-pizza-shop-1), we developed a *dbt* project on PostgreSQL using fictional pizza shop data. At the end, the data sets are modelled by two [SCD type 2](https://en.wikipedia.org/wiki/Slowly_changing_dimension) dimension tables and one transactional fact table. In this post, we create a new *dbt* project that targets [Google BigQuery](https://cloud.google.com/bigquery). While the dimension tables are kept by the same SCD type 2 approach, the fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested), which potentially can improve query performance by pre-joining corresponding dimension records.
+In [Part 1]((/blog/2024-01-18-dbt-pizza-shop-1)) and [Part 3]((/blog/2024-02-08-dbt-pizza-shop-3)), we developed [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) projects that target *PostgreSQL* and *BigQuery* using fictional pizza shop data. The data is modelled by [SCD type 2](https://en.wikipedia.org/wiki/Slowly_changing_dimension) dimension tables and one transactional fact table. While the order records should be joined with dimension tables to get complete details for *PostgreSQL*, the fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested) to improve query performance for *BigQuery*. 
+
+Open Table Formats such as [Apache Iceberg](https://iceberg.apache.org/) bring a new opportunity that implements data warehousing features in a data lake (i.e. data lakehouse) and [Amazon Athena](https://aws.amazon.com/athena/) is probably the easiest way to perform such tasks on AWS. In this post, we create a new *dbt* project that targets *Apache Iceberg* where transformations are performed on *Amazon Athena*. Data modelling is similar to the *BigQuery* project where the dimension tables are modelled by the *SCD type 2* approach and the fact table is denormalized using the *array* and *struct* data types. 
 
 * [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1)
 * [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2)
@@ -34,9 +36,9 @@ In this series, we discuss practical examples of data warehouse and lakehouse de
 * [Part 5 Modelling on Amazon Athena](#) (this post)
 * Part 6 ETL on Amazon Athena via Airflow
 
-## Setup BigQuery
+## Setup Amazon Athena
 
-Google BigQuery is used in the post, and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/general-demos/tree/master/dbt-bigquery-demo) of this post.
+*Amazon Athena* is used in the post, and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/general-demos/tree/master/dbt-athena-demo) of this post.
 
 ### Prepare Data
 
@@ -115,11 +117,7 @@ setup/
 
 ### Insert Source Data
 
-The source data sets are inserted into staging tables using a Python script.
-
-### Insert Records
-
-The source data is inserted using the [Python Client for Google BigQuery](https://cloud.google.com/python/docs/reference/bigquery/latest). It is a simple process that reads records from the source data files as dictionary while adding incremental ID/creation datetime and inserts them using the client library. Note that a service account is used for authentication and its key file (*key.json*) is placed in the *sa_key* folder that exists in the same level of the script's parent folder - see below for the required folder structure.
+The source data is inserted using the [AWS SDK for pandas (awswrangler)](https://aws-sdk-pandas.readthedocs.io/en/stable/) package. It is a simple process that reads records from the source data files as Pandas DataFrame, adds incremental ID/creation datetime and inserts to S3. Upon successful insertion, we can check the source records are saved into S3 and their table metadata is registered in a Glue database named *pizza_shop*.
 
 ```python
 # setup/insert_records.py
@@ -205,21 +203,9 @@ if __name__ == "__main__":
     query_helper.load_source(orders, "orders")
 ```
 
-As mentioned, the key file (*key.json*) is located in the *sa_key* folder that exists in the same level of the script's parent folder. It is kept separately as it can be shared by the dbt project and Airflow scheduler as well.
-
-```bash
-$ tree setup/ -P "insert_records.py|*.csv"
-setup/
-├── data
-│   ├── orders.csv
-│   ├── products.csv
-│   └── users.csv
-└── insert_records.py
-```
-
 ## Setup DBT Project
 
-A *dbt* project named *pizza_shop* is created using the *dbt-bigquery* package (*dbt-bigquery==1.7.4*). Specifically, it is created using the `dbt init` command, and it bootstraps the project in the *pizza_shop* folder as well as adds the project profile to the *dbt* profiles file. Note that the service account is used for authentication and the path of its key file is specified in the *keyfile* attribute. See [this page](https://docs.getdbt.com/docs/core/connect-data-platform/bigquery-setup) for details about how to set up BigQuery for a *dbt* project.
+A *dbt* project named *pizza_shop* is created using the *dbt-athena-community* package (*dbt-athena-community==1.7.1*). Specifically, it is created using the `dbt init` command, and it bootstraps the project in the *pizza_shop* folder as well as adds the project profile to the *dbt* profiles file. See [this page](https://dbt-athena.github.io/docs/getting-started/installation) for details about how to set up *Amazon Athena* for a *dbt* project.
 
 ```yaml
 # $HOME/.dbt/profiles.yml
@@ -308,7 +294,7 @@ FROM raw_orders
 
 ### Data Modelling
 
-For SCD type 2, the dimension tables are materialized as *table* and two additional columns are included - *valid_from* and *valid_to*. The extra columns are for setting up a time range where a record is applicable, and they are used to map a relevant record in the fact table when there are multiple dimension records according to the same natural key. Note that SCD type 2 tables can also be maintained by [*dbt* snapshots](https://docs.getdbt.com/docs/build/snapshots).
+The dimension tables are materialized as *table* where the table type is chosen as *iceberg*. Also, for SCD type 2, two additional columns are created - *valid_from* and *valid_to*. The extra columns are for setting up a time range where a record is applicable, and they are used to map a relevant record in the fact table when there are multiple dimension records, having the same natural key. Note that SCD type 2 tables can also be maintained by [*dbt* snapshots](https://dbt-athena.github.io/docs/configuration/snapshots).
 
 ```sql
 -- pizza_shop/models/dim/dim_products.sql
@@ -377,7 +363,7 @@ SELECT
 FROM src_users
 ```
 
-The transactional fact table is materialized as *incremental* so that only new records are appended. Also, it is created as a partitioned table for improving query performance by adding date filter. Finally, the user and order items records are pre-joined from the relevant dimension tables. See below for details about how this fact table is structured in *BigQuery*.
+When it comes to the transactional fact table, its materialization and incremental strategy are chosen to be *incremental* and *append* respectively as only new records need to be added to it. Also, it is created as a partitioned table for improving query performance by applying the [partition transform](https://iceberg.apache.org/spec/#partition-transforms) of *day* on the *created_at* column. Finally, the user and order items records are pre-joined from the relevant dimension tables. As can be seen later, the order items (*product*) and *user* fields are converted into an array of struct and struct data types.
 
 ```sql
 -- pizza_shop/models/fct/fct_orders.sql
@@ -386,7 +372,7 @@ The transactional fact table is materialized as *incremental* so that only new r
     materialized = 'incremental',
     table_type='iceberg',
     format='parquet',
-    partitioned_by=['year(created_at)'],
+    partitioned_by=['day(created_at)'],
     incremental_strategy='append',
     unique_key='order_id',
     table_properties={
@@ -586,17 +572,15 @@ $ dbt test
 
 #### Fact Table Structure
 
-The schema of the fact table can be found below. Both the *product* and *user* fields are marked as the *RECORD* type as they are *struct*s (containers of fields). Also, the mode of the *product* is indicated as *REPEATED*, which means it is an array.
+The schema of the fact table can be found below. The *product* and *user* are marked as the *array* and *struct* type respectively.
 
 ![](fct-orders-schema-01.png#center)
 
+When we click an individual link, its detailed schema appears in a pop-up window as shown below.
+
 ![](fct-orders-schema-02.png#center)
 
-REMOVE REMOVE In the query result view, non-array fields are not repeated, and a row is split to fill each of the array items.
-
-![](fct-orders-query.png#center)
-
-We can use the [*UNNEST*](https://cloud.google.com/bigquery/docs/arrays) operator if we need to convert the elements of an array into rows as shown below.
+In Athena, we can [flatten the product array](https://docs.aws.amazon.com/athena/latest/ug/flattening-arrays.html) into multiple rows by using *CROSS JOIN* in conjunction with the *UNNEST* operator.
 
 ![](fct-orders-query.png#center)
 
@@ -620,9 +604,9 @@ FROM pizza_shop.staging_products
 WHERE id = 1
 ORDER BY created_at;
 
-# id  name                              price  category    created_at
-1  1  Moroccan Spice Pasta Pizza - Veg  335.0  veg pizzas  2024-02-29 19:54:03.999
-2  1  Moroccan Spice Pasta Pizza - Veg  345.0  veg pizzas  2024-02-29 20:02:17.304
+#	id  name                                price  category    created_at
+1	 1  Moroccan  Spice  Pasta Pizza - Veg	335.0  veg pizzas  2024-02-29 19:54:03.999
+2	 1  Moroccan  Spice  Pasta Pizza - Veg	345.0  veg pizzas  2024-02-29 20:02:17.304
 ```
 
 When we execute the `dbt run` command again, we see the corresponding dimension table reflects the change by adding a new record and updating *valid_from* and *valid_to* columns accordingly. With this change, any later order record that has this product should be mapped into the new product record.
@@ -692,13 +676,13 @@ CROSS JOIN UNNEST(o.product) as t(p)
 WHERE o.order_id in (11146, 20001) AND p.id IN (1, 2)
 ORDER BY o.order_id;
 
-order_id  key                                id  price  quantity  created_at
-11146     * a8c5f8c082bcf52a164f2eccf2b493f6  1  335.0         1  2024-02-04T09:50:10
-11146     8dd51b3981692c787baa9d4335f15345    2   60.0         2  2024-02-04T09:50:10
-20001     * c995d7e1ec035da116c0f37e6284d1d5  1  345.0         2  2024-02-04T10:30:19.667473
-20001     8dd51b3981692c787baa9d4335f15345    2   60.0         3  2024-02-04T10:30:19.667473
+# order_id  key                                 id  price  quantity  created_at
+1    11146  * b8c187845db8b7e55626659cfbb8aea1   1  335.0         1  2024-02-29 19:54:05.803000
+2    11146  8311b52111a924582c0fe5cb566cfa9a     2   60.0         2  2024-02-29 19:54:05.803000
+3    20001  * 590d4eb8831d78ae84f44b90e930d2f3   1  345.0         2  2024-02-29 20:08:32.756000
+4    20001  8311b52111a924582c0fe5cb566cfa9a     2   60.0         3  2024-02-29 20:08:32.756000
 ```
 
 ## Summary
 
-In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the data build tool (dbt) and ETL is managed by Apache Airflow. In this post, we developed a dbt project on Google BigQuery using fictional pizza shop data. Two SCD type 2 dimension tables and a single transaction tables are modelled on a dbt project. The transaction table is denormalized using nested and repeated fields, which potentially can improve query performance by pre-joining corresponding dimension records. Finally, impacts of record updates are discussed in detail.
+In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the data build tool (dbt) and ETL is managed by Apache Airflow. Open Table Formats such as Apache Iceberg bring a new opportunity that implements data warehousing features in a data lake (i.e. data lakehouse). In this post, we created a new dbt project that targets Apache Iceberg where transformations are performed on Amazon Athena. Data modelling was similar to the BigQuery project in Part 3 where the dimension tables were modelled by the SCD type 2 approach and the fact table was denormalized using the array and struct data types. Finally, impacts of record updates were discussed in detail.
