@@ -34,7 +34,7 @@ In this series of posts, we discuss practical data warehouse/lakehouse examples 
 * [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2)
 * [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3)
 * [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4)
-* Part 5 Modelling on Amazon Athena
+* [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5)
 * Part 6 ETL on Amazon Athena via Airflow
 
 ## Setup Database
@@ -661,4 +661,4 @@ order_key                       |  product_key                     |order_id|pro
 
 ## Summary
 
-The data build tool (dbt) is a popular data transformation tool. In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the data build tool (dbt) and ETL is managed by Apache Airflow. As a starting point, we developed a dbt project on PostgreSQL using fictional pizza shop data in this post. Two SCD type 2 dimension tables and a single transaction tables are modelled on a dbt project and impacts of record updates are discussed in detail.
+The data build tool (dbt) is a popular data transformation tool. In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the data build tool (dbt) and ETL is managed by Apache Airflow. As a starting point, we developed a dbt project on PostgreSQL using fictional pizza shop data in this post. Two SCD type 2 dimension tables and a single transaction tables were modelled on a dbt project and impacts of record updates were discussed in detail.

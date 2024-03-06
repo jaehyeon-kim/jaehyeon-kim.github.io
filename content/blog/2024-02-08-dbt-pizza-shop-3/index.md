@@ -30,7 +30,7 @@ In this series, we discuss practical examples of data warehouse and lakehouse de
 * [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2)
 * [Part 3 Modelling on BigQuery](#) (this post)
 * [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4)
-* Part 5 Modelling on Amazon Athena
+* [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5)
 * Part 6 ETL on Amazon Athena via Airflow
 
 ## Setup BigQuery
@@ -520,7 +520,7 @@ models:
       - name: product
         description: |
           Array of products in an order.
-          A product is a struct where the following attributes are pre-joined from the dim_products table:
+          A product is an array of struct where the following attributes are pre-joined from the dim_products table:
             key (product_key), id (product_id), name, price, quantity, description, category, and image
       - name: user
         description: |
@@ -701,4 +701,4 @@ order_id  key                                id  price  quantity  created_at
 
 ## Summary
 
-In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the data build tool (dbt) and ETL is managed by Apache Airflow. In this post, we developed a dbt project on Google BigQuery using fictional pizza shop data. Two SCD type 2 dimension tables and a single transaction tables are modelled on a dbt project. The transaction table is denormalized using nested and repeated fields, which potentially can improve query performance by pre-joining corresponding dimension records. Finally, impacts of record updates are discussed in detail.
+In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the data build tool (dbt) and ETL is managed by Apache Airflow. In this post, we developed a dbt project on Google BigQuery using fictional pizza shop data. Two SCD type 2 dimension tables and a single transaction tables were modelled on a dbt project. The transaction table was denormalized using nested and repeated fields, which potentially can improve query performance by pre-joining corresponding dimension records. Finally, impacts of record updates were discussed in detail.
