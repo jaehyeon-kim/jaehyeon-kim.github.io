@@ -34,7 +34,7 @@ In [Part 3](/blog/2024-02-08-dbt-pizza-shop-3), we developed a [dbt](https://doc
 * [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3)
 * [Part 4 ETL on BigQuery via Airflow](#) (this post)
 * [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5)
-* Part 6 ETL on Amazon Athena via Airflow
+* [Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6)
 
 ## Infrastructure
 
