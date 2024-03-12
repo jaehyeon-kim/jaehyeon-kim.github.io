@@ -47,7 +47,7 @@ Airflow is simplified by using the [Local Executor](https://airflow.apache.org/d
 
 - installing the *dbt-athena-community* and *awswrangler* packages as additional pip packages,
 - volume-mapping folders that keep the *dbt* project and *dbt* project profile, and
-- specifying environment variables for access AWS services (*AWS_ACCESS_KEY_ID* and *AWS_SECRET_ACCESS_KEY*)
+- specifying environment variables for accessing AWS services (*AWS_ACCESS_KEY_ID* and *AWS_SECRET_ACCESS_KEY*)
 
 ```yaml
 # docker-compose.yml
@@ -156,7 +156,7 @@ networks:
     name: app-network
 ```
 
-Before we deploy the Airflow services, we need to create staging tables - see [Part 5](/blog/2024-03-07-dbt-pizza-shop-5) for details about the prerequisite step. Then the services can be started using the *docker-compose up* command. Note that it is recommended to specify the host user's ID as the *AIRFLOW_UID* value. Otherwise, Airflow can fail to launch due to insufficient permission to write logs.
+Before we deploy the Airflow services, we need to create staging tables and insert initial records. It can be achieved by executing a Python script ([insert_records.py](https://github.com/jaehyeon-kim/general-demos/blob/master/dbt-athena-demo/setup/insert_records.py)) - see [Part 5](/blog/2024-03-07-dbt-pizza-shop-5) for details about the prerequisite step. Then the services can be started using the *docker-compose up* command. Note that it is recommended to specify the host user's ID as the *AIRFLOW_UID* value. Otherwise, Airflow can fail to launch due to insufficient permission to write logs.
 
 ```bash
 ## prerequisite
