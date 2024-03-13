@@ -31,7 +31,7 @@ In this series, we discuss practical examples of data warehouse and lakehouse de
 * [Part 3 Modelling on BigQuery](#) (this post)
 * [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4)
 * [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5)
-* Part 6 ETL on Amazon Athena via Airflow
+* [Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6)
 
 ## Setup BigQuery
 
