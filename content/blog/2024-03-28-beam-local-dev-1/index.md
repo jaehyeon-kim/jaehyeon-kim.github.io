@@ -24,10 +24,7 @@ images: []
 description: The data build tool (dbt) is a popular data transformation tool for data warehouse development. Moreover, it can be used for data lakehouse development thanks to open table formats such as Apache Iceberg, Apache Hudi and Delta Lake. dbt supports key AWS analytics services and I wrote a series of posts that discuss how to utilise dbt with Redshift, Glue, EMR on EC2, EMR on EKS, and Athena. Those posts focus on platform integration, however, they do not show realistic ETL scenarios. In this series of posts, we discuss practical data warehouse/lakehouse examples including ETL orchestration with Apache Airflow. As a starting point, we develop a dbt project on PostgreSQL using fictional pizza shop data in this post.
 ---
 
-The [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) is a popular data transformation tool for data warehouse development. Moreover, it can be used for [data lakehouse](https://www.databricks.com/glossary/data-lakehouse) development thanks to open table formats such as Apache Iceberg, Apache Hudi and Delta Lake. *dbt* supports key AWS analytics services and I wrote a series of posts that discuss how to utilise *dbt* with [Redshift](/blog/2022-09-28-dbt-on-aws-part-1-redshift), [Glue](/blog/2022-10-09-dbt-on-aws-part-2-glue), [EMR on EC2](/blog/2022-10-19-dbt-on-aws-part-3-emr-ec2), [EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks), and [Athena](/blog/2023-04-12-integrate-glue-schema-registry). Those posts focus on platform integration, however, they do not show realistic ETL scenarios. 
-
-In this series of posts, we discuss practical data warehouse/lakehouse examples including ETL orchestration with Apache Airflow. As a starting point, we develop a *dbt* project on PostgreSQL using fictional pizza shop data in this post.
-
+[Apache Beam](https://beam.apache.org/) and [Apache Flink](https://flink.apache.org/) are popular tools for unified batch and stream data processing. I spent quite some time teaching myself PyFlink (Python API of Apache Flink) last year and found the Python API is rather limited compared to the Java API. This year I had a chance to learn data engineering on Google Compute Cloud (GCP) and become aware of the potential of Apache Beam for data streaming development in Python. Beam doesn't have its own processing engine and Beam pipelines are executed on a runner such as Apache Flink, Apache Spark, or Google Cloud Dataflow instead. Therefore Flink will still be quite important because the Flink Runner supports [a wide range of features](https://beam.apache.org/documentation/runners/capability-matrix/) both in batch and streaming context.
 
 * [Part 1 Pipeline, Notebook, SQL and DataFrame](#) (this post)
 * Part 2 Batch Pipelines
@@ -35,7 +32,47 @@ In this series of posts, we discuss practical data warehouse/lakehouse examples 
 * Part 4 Streaming Pipelines
 * Part 5 Testing Pipelines
 
-## Data Generator
+## Apache Beam at a Glance
+
+Apache Beam is an open source, unified model for defining both batch and streaming data-parallel processing pipelines. One of the novel features of Apache Beam is portability. Beam is portable on several layers:
+
+- Beam's pipelines are portable between multiple runners (that is, a technology that executes the distributed computation described by a pipeline's author).
+- Beam's data processing model is portable between various programming languages.
+- Beam's data processing logic is portable between bounded and unbounded data.
+
+By runner portability, we mean the possibility to run existing pipelines written in one of the supported programming languages (for instance, Java, Python, Go, Scala, or even SQL) against a data processing engine that can be chosen at runtime. A typical example of a runner would be Apache Flink, Apache Spark, or Google Cloud Dataflow.
+
+When we say Beam's data processing model is portable between various programming languages, we mean it has the ability to provide support for multiple SDKs, regardless of the language or technology used by the runner. This way, we can code Beam pipelines in the Python language, and then run these against the Apache Flink Runner, written in Java.
+
+Last but not least, the core of Apache Beam's model is designed so that it is portable between bounded and unbounded data. Bounded data is what was historically called batch processing, while unbounded data refers to real-time processing (that is, an application crunching live data as it arrives in the system and producing a low-latency output). This feature unifies batch and streaming data processing.
+
+The unification of batch and streaming data processing is achieved by extending batch processing with the event time of each key-value pair and defining a sensible default window. Specifically batch data flow is extended to add streaming semantics by
+
+- Assigning a fixed timestamp to all input key-value pairs.
+- Assigning all input key-value pairs to the global window.
+- Moving the watermark from –inf to +inf in one hop once all the data is processed.
+
+Therefore Beam allows us to code a data pipeline as a streaming pipeline then run it in both a batch and streaming fashion.
+
+## Prerequsites
+
+```bash
+$ java --version
+openjdk 11.0.22 2024-01-16
+OpenJDK Runtime Environment (build 11.0.22+7-post-Ubuntu-0ubuntu222.04.1)
+OpenJDK 64-Bit Server VM (build 11.0.22+7-post-Ubuntu-0ubuntu222.04.1, mixed mode, sharing)
+
+$ docker --version
+Docker version 24.0.5, build 24.0.5-0ubuntu1~22.04.1
+
+$ dot -V
+dot - graphviz version 2.43.0 (0)
+
+$ python --version
+Python 3.10.12
+```
+
+### Data Generator
 
 ```python
 import os
@@ -283,6 +320,15 @@ if __name__ == "__main__":
     gen.generate_events()
 ```
 
+```bash
+$ python datagen/generate_data.py --source batch --num_users 20 --num_events 10000 --max_lag_seconds 60
+...
+$ head -n 3 inputs/4b1dba74-d970-4c67-a631-e0d7f52ad00e.out 
+{"ip": "74.236.125.208", "id": "-5227372761963790049", "lat": 26.3587, "lng": -80.0831, "user_agent": "Mozilla/5.0 (Windows; U; Windows NT 5.1) AppleWebKit/534.23.4 (KHTML, like Gecko) Version/4.0.5 Safari/534.23.4", "age_bracket": "26-40", "opted_into_marketing": true, "http_request": "GET eucharya.html HTTP/1.0", "http_response": 200, "file_size_bytes": 115, "event_datetime": "2024-03-25T04:26:55.473", "event_ts": 1711301215473}
+{"ip": "75.153.216.235", "id": "5836835583895516006", "lat": 49.2302, "lng": -122.9952, "user_agent": "Mozilla/5.0 (Android 6.0.1; Mobile; rv:11.0) Gecko/11.0 Firefox/11.0", "age_bracket": "41-55", "opted_into_marketing": true, "http_request": "GET acanthocephala.html HTTP/1.0", "http_response": 200, "file_size_bytes": 358, "event_datetime": "2024-03-25T04:27:01.930", "event_ts": 1711301221930}
+{"ip": "134.157.0.190", "id": "-5123638115214052647", "lat": 48.8534, "lng": 2.3488, "user_agent": "Mozilla/5.0 (X11; Linux i686) AppleWebKit/534.2 (KHTML, like Gecko) Chrome/23.0.825.0 Safari/534.2", "age_bracket": "55+", "opted_into_marketing": true, "http_request": "GET bacteria.html HTTP/1.0", "http_response": 200, "file_size_bytes": 402, "event_datetime": "2024-03-25T04:27:16.037", "event_ts": 1711301236037}
+```
+
 ## Basic Pipeline
 
 ```python
@@ -344,10 +390,7 @@ def run():
     logging.getLogger().setLevel(logging.INFO)
     logging.info("Building pipeline ...")
 
-    if opts.runner != "FlinkRunner":
-        p.run()
-    else:
-        p.run().wait_until_finish()
+    p.run().wait_until_finish()
 
 
 if __name__ == "__main__":
@@ -376,17 +419,10 @@ INFO:apache_beam.runners.portability.fn_api_runner.worker_handlers:Created Worke
 INFO:apache_beam.io.filebasedsink:Starting finalize_write threads with num_shards: 1 (skipped: 0), batches: 1, num_threads: 1
 INFO:apache_beam.io.filebasedsink:Renamed 1 shards in 0.01 seconds.
 
-$ head outputs/1711309448421-00000-of-00001.out 
-{'ip': '30.28.43.179', 'id': '6601570356503437554', 'lat': 37.2242, 'lng': -95.7083, 'age_bracket': '55+'}
-{'ip': '217.161.130.218', 'id': '-4587808562569740150', 'lat': 51.4015, 'lng': -1.3247, 'age_bracket': '41-55'}
-{'ip': '170.70.126.46', 'id': '976443204308231857', 'lat': 19.4285, 'lng': -99.1277, 'age_bracket': '55+'}
-{'ip': '97.36.82.86', 'id': '6551080344843772016', 'lat': 39.0437, 'lng': -77.4875, 'age_bracket': '18-25'}
-{'ip': '60.118.97.251', 'id': '2488414394279316006', 'lat': 35.65, 'lng': 139.7333, 'age_bracket': '41-55'}
-{'ip': '97.36.82.86', 'id': '6551080344843772016', 'lat': 39.0437, 'lng': -77.4875, 'age_bracket': '18-25'}
-{'ip': '30.28.43.179', 'id': '6601570356503437554', 'lat': 37.2242, 'lng': -95.7083, 'age_bracket': '55+'}
-{'ip': '217.146.147.145', 'id': '-9100325337763240340', 'lat': 52.5244, 'lng': 13.4105, 'age_bracket': '41-55'}
-{'ip': '12.76.144.217', 'id': '1329647496255812603', 'lat': 34.0522, 'lng': -118.2437, 'age_bracket': '18-25'}
-{'ip': '168.181.34.94', 'id': '1659503249510730712', 'lat': -29.7175, 'lng': -52.4258, 'age_bracket': '41-55'}
+$ head -n 3 outputs/1711341025220-00000-of-00001.out 
+{'ip': '74.236.125.208', 'id': '-5227372761963790049', 'lat': 26.3587, 'lng': -80.0831, 'age_bracket': '26-40'}
+{'ip': '75.153.216.235', 'id': '5836835583895516006', 'lat': 49.2302, 'lng': -122.9952, 'age_bracket': '41-55'}
+{'ip': '134.157.0.190', 'id': '-5123638115214052647', 'lat': 48.8534, 'lng': 2.3488, 'age_bracket': '55+'}
 ```
 
 `python section1/basic.py --runner FlinkRunner`
