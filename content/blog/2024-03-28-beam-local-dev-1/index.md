@@ -1,6 +1,6 @@
 ---
 title: Apache Beam Local Development with Python - Part 1 Pipeline, Notebook, SQL and DataFrame
-date: 2024-01-18
+date: 2024-03-28
 draft: false
 featured: true
 comment: true
@@ -21,10 +21,12 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: The data build tool (dbt) is a popular data transformation tool for data warehouse development. Moreover, it can be used for data lakehouse development thanks to open table formats such as Apache Iceberg, Apache Hudi and Delta Lake. dbt supports key AWS analytics services and I wrote a series of posts that discuss how to utilise dbt with Redshift, Glue, EMR on EC2, EMR on EKS, and Athena. Those posts focus on platform integration, however, they do not show realistic ETL scenarios. In this series of posts, we discuss practical data warehouse/lakehouse examples including ETL orchestration with Apache Airflow. As a starting point, we develop a dbt project on PostgreSQL using fictional pizza shop data in this post.
+description: Apache Beam and Apache Flink are open-source frameworks for parallel, distributed data processing at scale. Flink has DataStream and Table/SQL APIs and the former has more capacity to develop sophisticated data streaming applications. The DataStream API of PyFlink, Flink’s Python API, however, is not as complete as its Java counterpart, and it doesn’t provide enough capability to extend when there are missing features in Python. On the other hand, Apache Beam supports more possibility to extend and/or customise its features. In this series of posts, we discuss local development of Apache Beam pipelines using Python. In Part 1, a basic Beam pipeline is introduced, followed by demonstrating how to utilise Jupyter notebooks for interactive development. It also covers Beam SQL and Beam DataFrames examples on notebooks. In subsequent posts, we will discuss batch and streaming pipeline development and concludes with illustrating unit testing of existing pipelines.
 ---
 
-[Apache Beam](https://beam.apache.org/) and [Apache Flink](https://flink.apache.org/) are popular tools for unified batch and stream data processing. I spent quite some time teaching myself PyFlink (Python API of Apache Flink) last year and found the Python API is rather limited compared to the Java API. This year I had a chance to learn data engineering on Google Compute Cloud (GCP) and become aware of the potential of Apache Beam for data streaming development in Python. Beam doesn't have its own processing engine and Beam pipelines are executed on a runner such as Apache Flink, Apache Spark, or Google Cloud Dataflow instead. Therefore Flink will still be quite important because the Flink Runner supports [a wide range of features](https://beam.apache.org/documentation/runners/capability-matrix/) both in batch and streaming context.
+[Apache Beam](https://beam.apache.org/) and [Apache Flink](https://flink.apache.org/) are open-source frameworks for parallel, distributed data processing at scale. Flink has DataStream and Table/SQL APIs and the former has more capacity to develop sophisticated data streaming applications. The DataStream API of PyFlink, Flink's Python API, however, is not as complete as its Java counterpart, and it doesn't provide enough capability to extend when there are missing features in Python. Recently I had a chance to look through Apache Beam and found it supports more possibility to extend and/or customise its features.
+
+In this series of posts, we discuss local development of Apache Beam pipelines using Python. In *Part 1*, a basic Beam pipeline is introduced, followed by demonstrating how to utilise Jupyter notebooks for interactive development. Several notebook examples are covered including [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) and [Beam DataFrames](https://beam.apache.org/documentation/dsls/dataframes/overview/). Batch pipelines will be developed in *Part 2*, and we use pipelines from [GCP Python DataFlow Quest](https://github.com/GoogleCloudPlatform/training-data-analyst/tree/master/quests/dataflow_python) while modifying them to access local resources only. Each batch pipeline has two versions with/without SQL. Beam doesn't have its own processing engine and Beam pipelines are executed on a runner such as Apache Flink, Apache Spark, or Google Cloud Dataflow instead. We will use the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) for deploying streaming pipelines as it supports [a wide range of features](https://beam.apache.org/documentation/runners/capability-matrix/) especially in streaming context. In *Part 3*, we will discuss how to set up a local Flink cluster as well as a local Kafka cluster for data source and sink. A streaming pipeline with/without Beam SQL will be built in *Part 4*, and this series concludes with illustrating unit testing of existing pipelines in *Part 5*.
 
 * [Part 1 Pipeline, Notebook, SQL and DataFrame](#) (this post)
 * Part 2 Batch Pipelines
@@ -32,49 +34,50 @@ description: The data build tool (dbt) is a popular data transformation tool for
 * Part 4 Streaming Pipelines
 * Part 5 Testing Pipelines
 
-## Apache Beam at a Glance
+## Prerequisites
 
-Apache Beam is an open source, unified model for defining both batch and streaming data-parallel processing pipelines. One of the novel features of Apache Beam is portability. Beam is portable on several layers:
-
-- Beam's pipelines are portable between multiple runners (that is, a technology that executes the distributed computation described by a pipeline's author).
-- Beam's data processing model is portable between various programming languages.
-- Beam's data processing logic is portable between bounded and unbounded data.
-
-By runner portability, we mean the possibility to run existing pipelines written in one of the supported programming languages (for instance, Java, Python, Go, Scala, or even SQL) against a data processing engine that can be chosen at runtime. A typical example of a runner would be Apache Flink, Apache Spark, or Google Cloud Dataflow.
-
-When we say Beam's data processing model is portable between various programming languages, we mean it has the ability to provide support for multiple SDKs, regardless of the language or technology used by the runner. This way, we can code Beam pipelines in the Python language, and then run these against the Apache Flink Runner, written in Java.
-
-Last but not least, the core of Apache Beam's model is designed so that it is portable between bounded and unbounded data. Bounded data is what was historically called batch processing, while unbounded data refers to real-time processing (that is, an application crunching live data as it arrives in the system and producing a low-latency output). This feature unifies batch and streaming data processing.
-
-The unification of batch and streaming data processing is achieved by extending batch processing with the event time of each key-value pair and defining a sensible default window. Specifically batch data flow is extended to add streaming semantics by
-
-- Assigning a fixed timestamp to all input key-value pairs.
-- Assigning all input key-value pairs to the global window.
-- Moving the watermark from –inf to +inf in one hop once all the data is processed.
-
-Therefore Beam allows us to code a data pipeline as a streaming pipeline then run it in both a batch and streaming fashion.
-
-## Prerequsites
+We need to install Java, Docker and GraphViz.
+- [Java 11](https://nightlies.apache.org/flink/flink-docs-stable/docs/try-flink/local_installation/) to launch a local Flink cluster
+- [Docker](https://www.docker.com/) for Kafka connection/executing Beam SQL as well as deploying a Kafka cluster
+- [GraphViz](https://www.graphviz.org/about/) to visualize pipeline DAGs
 
 ```bash
 $ java --version
 openjdk 11.0.22 2024-01-16
-OpenJDK Runtime Environment (build 11.0.22+7-post-Ubuntu-0ubuntu222.04.1)
-OpenJDK 64-Bit Server VM (build 11.0.22+7-post-Ubuntu-0ubuntu222.04.1, mixed mode, sharing)
+OpenJDK Runtime Environment (build 11.0.22+7-post-Ubuntu-0ubuntu220.04.1)
+OpenJDK 64-Bit Server VM (build 11.0.22+7-post-Ubuntu-0ubuntu220.04.1, mixed mode, sharing)
 
 $ docker --version
-Docker version 24.0.5, build 24.0.5-0ubuntu1~22.04.1
+Docker version 24.0.6, build ed223bc
 
 $ dot -V
 dot - graphviz version 2.43.0 (0)
-
-$ python --version
-Python 3.10.12
 ```
+
+Also, I use Python 3.10.13 and Beam 2.53.0 - supported Python versions are 3.8, 3.9, 3.10, 3.11. The following list shows key dependent packages.
+
+- apache-beam[gcp,aws,azure,test,docs,interactive]==2.53.0
+- jupyterlab==4.1.2
+- kafka-python
+- faker
+- geocoder
+
+The source of this post can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-dev-env).
 
 ### Data Generator
 
+Website visit log is used as source data for both batch and streaming data pipelines. It begins with creating a configurable number of users and simulates their website visit history. When the source argument is *batch*, it writes the records into a folder named *inputs* while those are sent to a Kafka topic named *website-visit* if the source is *streaming* - we will talk further about streaming source generation in *Part 3*. Below shows how to execute the script for batch and streaming sources respectively.
+
+```bash
+# Batch example:
+python datagen/generate_data.py --source batch --num_users 20 --num_events 10000 --max_lag_seconds 60
+
+# Streaming example:
+python datagen/generate_data.py --source streaming --num_users 5 --delay_seconds 0.5
+```
+
 ```python
+# datagen/generate_data.py
 import os
 import json
 import uuid
@@ -320,6 +323,8 @@ if __name__ == "__main__":
     gen.generate_events()
 ```
 
+Once we execute the script for generating batch pipeline data, we see a new file is created in the *inputs* folder as shown below.
+
 ```bash
 $ python datagen/generate_data.py --source batch --num_users 20 --num_events 10000 --max_lag_seconds 60
 ...
@@ -331,7 +336,10 @@ $ head -n 3 inputs/4b1dba74-d970-4c67-a631-e0d7f52ad00e.out
 
 ## Basic Pipeline
 
+Below shows a basic Beam pipeline. It (1) reads one or more files that match a file name pattern, (2) parses lines of Json string into Python dictionaries, (3) filters records where *opted_into_marketing* is TRUE, (4) selects a subset of attributes and finally (5) writes the updated records into a folder named outputs. It uses the [Direct Runner](https://beam.apache.org/documentation/runners/direct/) by default, and we can also try a different runner by specifying the *runner* name (eg `python section1/basic.py --runner FlinkRunner`).
+
 ```python
+# section1/basic.py
 import os
 import datetime
 import argparse
@@ -397,6 +405,8 @@ if __name__ == "__main__":
     run()
 ```
 
+Once executed, we can check the output records in the *outputs* folder.
+
 ```bash
 $ python section1/basic.py 
 INFO:root:Building pipeline ...
@@ -418,35 +428,68 @@ INFO:apache_beam.runners.worker.statecache:Creating state cache with size 104857
 INFO:apache_beam.runners.portability.fn_api_runner.worker_handlers:Created Worker handler <apache_beam.runners.portability.fn_api_runner.worker_handlers.EmbeddedWorkerHandler object at 0x7f1d2c548550> for environment ref_Environment_default_environment_1 (beam:env:embedded_python:v1, b'')
 INFO:apache_beam.io.filebasedsink:Starting finalize_write threads with num_shards: 1 (skipped: 0), batches: 1, num_threads: 1
 INFO:apache_beam.io.filebasedsink:Renamed 1 shards in 0.01 seconds.
+```
 
+```bash
 $ head -n 3 outputs/1711341025220-00000-of-00001.out 
 {'ip': '74.236.125.208', 'id': '-5227372761963790049', 'lat': 26.3587, 'lng': -80.0831, 'age_bracket': '26-40'}
 {'ip': '75.153.216.235', 'id': '5836835583895516006', 'lat': 49.2302, 'lng': -122.9952, 'age_bracket': '41-55'}
 {'ip': '134.157.0.190', 'id': '-5123638115214052647', 'lat': 48.8534, 'lng': 2.3488, 'age_bracket': '55+'}
 ```
 
-`python section1/basic.py --runner FlinkRunner`
+## Interactive Beam
 
-## Notebook
+[Interactive Beam](https://github.com/apache/beam/tree/master/sdks/python/apache_beam/runners/interactive) is aimed at integrating Apache Beam with [Jupyter notebook](http://jupyter.org/) to make pipeline prototyping and data exploration much faster and easier. It provides nice features such as graphical representation of pipeline DAGs and [PCollection](https://beam.apache.org/documentation/basics/#pcollection) elements, fetching PCollections as pandas DataFrame and faster execution/re-execution of pipelines.
+
+We can start a Jupyter server while enabling Jupyter Lab and ignoring authentication as shown below. Once started, it can be accessed on *http://localhost:8888*.
+
+```bash
+$ JUPYTER_ENABLE_LAB=yes jupyter lab --ServerApp.token='' --ServerApp.password=''
+```
+
+The basic pipeline is recreated in [*section1/basic.ipynb*](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section1/basic.ipynb). The *InteractiveRunner* is used for the pipeline and, by default, the Python Direct Runner is taken as the underlying runner. When we run the first two cells, we can show the output records in a data table.
 
 ![](basic-01.png#center)
 
+The pipeline DAG can be visualized using the *show_graph* method as shown below. It helps identify or share how a pipeline is executed more effectively.
+
 ![](basic-02.png#center)
 
-## SQL
+## Beam SQL
+
+[Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) allows a Beam user (currently only available in Beam Java and Python) to query bounded and unbounded [PCollections](https://beam.apache.org/documentation/basics/#pcollection) with SQL statements. An SQL query is translated to a [PTransform](https://beam.apache.org/documentation/basics/#ptransform), and it can be particularly useful for joining multiple PCollections.
+
+In [*section1/sql.ipynb*](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section1/sql.ipynb), we first create a PCollection of 3 elements that can be used as source data.
 
 ![](sql-01.png#center)
 
+Beam SQL is executed as an IPython extension, and it should be loaded before being used. The magic function requires *query*, and we can optionally specify the output name (*OUTPUT_NAME*) and runner (*RUNNER*).
+
 ![](sql-02.png#center)
+
+After the extension is loaded, we execute a SQL query, optionally specifying the output PCollection name (*filtered*). We can use the existing PCollection named *items* as the source.
+
+There are several notes about Beam SQL on a notebook.
+
+1. The SQL query is executed in a separate Docker container and data is processed via the Java SDK.
+2. Currently it only supports the Direct Runner and Dataflow Runner.
+3. The output PCollection is accessible in the entire notebook, and we can use it in another cell.
+4. While Beam SQL supports both [Calcite SQL](https://calcite.apache.org/) and [ZetaSQL](https://github.com/google/zetasql), the magic function doesn't allow us to select which dialect to choose. Only the default Calcite SQL will be used on a notebook.
 
 ![](sql-03.png#center)
 
-## DataFrame
+## Beam DataFrames
+
+The Apache Beam Python SDK provides a [DataFrame API](https://beam.apache.org/documentation/dsls/dataframes/overview/) for working with pandas-like DataFrame objects. This feature lets you convert a PCollection to a DataFrame and then interact with the DataFrame using the standard methods available on the pandas DataFrame API.
+
+In [*section1/dataframe.ipynb*](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section1/dataframe.ipynb), we also create a PCollection of 3 elements as the Beam SQL example.
 
 ![](dataframe-01.png#center)
+
+Subsequently we convert the source PCollection into a pandas DataFrame using the *to_dataframe* method, process data via pandas API and return to PCollection using the *to_pcollection* method.
 
 ![](dataframe-02.png#center)
 
 ## Summary
 
-The data build tool (dbt) is a popular data transformation tool. In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the data build tool (dbt) and ETL is managed by Apache Airflow. As a starting point, we developed a dbt project on PostgreSQL using fictional pizza shop data in this post. Two SCD type 2 dimension tables and a single transaction tables were modelled on a dbt project and impacts of record updates were discussed in detail.
+Apache Beam and Apache Flink are open-source frameworks for parallel, distributed data processing at scale. While PyFlink, Flink's Python API, is limited to build sophisticated data streaming applications, Apache Beam's Python SDK has potential as it supports more capacity to extend and/or customise its features. In this series of posts, we discuss local development of Apache Beam pipelines using Python. In Part 1, a basic Beam pipeline was introduced, followed by demonstrating how to utilise Jupyter notebooks for interactive development. We also covered Beam SQL and Beam DataFrames examples on notebooks.
