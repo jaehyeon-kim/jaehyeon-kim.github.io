@@ -21,12 +21,10 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Apache Beam and Apache Flink are open-source frameworks for parallel, distributed data processing at scale. Flink has DataStream and Table/SQL APIs and the former has more capacity to develop sophisticated data streaming applications. The DataStream API of PyFlink, Flink’s Python API, however, is not as complete as its Java counterpart, and it doesn’t provide enough capability to extend when there are missing features in Python. On the other hand, Apache Beam supports more possibility to extend and/or customise its features. In this series of posts, we discuss local development of Apache Beam pipelines using Python. In Part 1, a basic Beam pipeline is introduced, followed by demonstrating how to utilise Jupyter notebooks for interactive development. It also covers Beam SQL and Beam DataFrames examples on notebooks. In subsequent posts, we will discuss batch and streaming pipeline development and concludes with illustrating unit testing of existing pipelines.
+description: In this series, we discuss local development of Apache Beam pipelines using Python. A basic Beam pipeline was introduced in Part 1, followed by demonstrating how to utilise Jupyter notebooks, Beam SQL and Beam DataFrames. In this post, we discuss Batch pipelines that aggregate website visit log by user and time. The pipelines are developed with and without Beam SQL. Additionally, each pipeline is implemented on a Jupyter notebook as reference.
 ---
 
-[Apache Beam](https://beam.apache.org/) and [Apache Flink](https://flink.apache.org/) are open-source frameworks for parallel, distributed data processing at scale. Flink has DataStream and Table/SQL APIs and the former has more capacity to develop sophisticated data streaming applications. The DataStream API of PyFlink, Flink's Python API, however, is not as complete as its Java counterpart, and it doesn't provide enough capability to extend when there are missing features in Python. Recently I had a chance to look through Apache Beam and found it supports more possibility to extend and/or customise its features.
-
-In this series of posts, we discuss local development of Apache Beam pipelines using Python. In *Part 1*, a basic Beam pipeline is introduced, followed by demonstrating how to utilise Jupyter notebooks for interactive development. Several notebook examples are covered including [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) and [Beam DataFrames](https://beam.apache.org/documentation/dsls/dataframes/overview/). Batch pipelines will be developed in *Part 2*, and we use pipelines from [GCP Python DataFlow Quest](https://github.com/GoogleCloudPlatform/training-data-analyst/tree/master/quests/dataflow_python) while modifying them to access local resources only. Each batch pipeline has two versions with/without SQL. Beam doesn't have its own processing engine and Beam pipelines are executed on a runner such as Apache Flink, Apache Spark, or Google Cloud Dataflow instead. We will use the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) for deploying streaming pipelines as it supports [a wide range of features](https://beam.apache.org/documentation/runners/capability-matrix/) especially in streaming context. In *Part 3*, we will discuss how to set up a local Flink cluster as well as a local Kafka cluster for data source and sink. A streaming pipeline with/without Beam SQL will be built in *Part 4*, and this series concludes with illustrating unit testing of existing pipelines in *Part 5*.
+In this series, we discuss local development of [Apache Beam](https://beam.apache.org/) pipelines using Python. A basic Beam pipeline was introduced in [Part 1](/blog/2024-03-28-beam-local-dev-1), followed by demonstrating how to utilise Jupyter notebooks, [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) and [Beam DataFrames](https://beam.apache.org/documentation/dsls/dataframes/overview/). In this post, we discuss Batch pipelines that aggregate website visit log by user and time. The pipelines are developed with and without *Beam SQL*. Additionally, each pipeline is implemented on a Jupyter notebook as reference.
 
 * [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1)
 * [Part 2 Batch Pipelines](#) (this post)
@@ -35,6 +33,8 @@ In this series of posts, we discuss local development of Apache Beam pipelines u
 * Part 5 Testing Pipelines
 
 ## Data Generation
+
+We first need to generate website visit log data. As the second pipeline aggregates data by time, the max lag seconds (`--max_lag_seconds`) is set to 300 so that records are spread over 5 minutes period. See [Part 1](/blog/2024-03-28-beam-local-dev-1) for details about the data generation script and the source of this post can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-dev-env).
 
 ```bash
 $ python datagen/generate_data.py --source batch --num_users 20 --num_events 10000 --max_lag_seconds 300
@@ -47,7 +47,13 @@ $ head -n 3 inputs/d919cc9e-dade-44be-872e-86598a4d0e47.out
 
 ## User Traffic
 
+This pipeline basically calculates the number of website visits and distribution of traffic consumption by user. 
+
 ### Beam Pipeline
+
+The pipeline begins with reading data from a folder named *inputs* and parses the Json lines. Then it creates a key value pair where the key is the user ID (`id`) and the value is the file size bytes (`file_size_bytes`). After that, the records are grouped by the key and aggregated to obtain website visit count and traffic consumption distribution per user using a [ParDo](https://beam.apache.org/documentation/transforms/python/elementwise/pardo/) transform. Finally, the output records are written to a folder named *outputs* after being converted into dictionary.
+
+Note that custom types are created for the input and output elements using [element schema](https://beam.apache.org/documentation/programming-guide/#element-schema) (*EventLog* and *UserTraffic*), and transformations become more expressive using them. Also, the custom types are [registered to the coder registry](https://beam.apache.org/documentation/programming-guide/#specifying-coders) so that they are encoded/decoded appropriately - see the transformations that specify the output types via `with_output_types`.
 
 ```python
 # section2/user_traffic.py
@@ -159,6 +165,8 @@ if __name__ == "__main__":
     run()
 ```
 
+Once we execute the pipeline, we can check the output records by reading the output file. By default, the pipeline runs via the [Direct Runner](https://beam.apache.org/documentation/runners/direct/).
+
 ```bash
 $ python section2/user_traffic.py
 ...
@@ -185,6 +193,8 @@ $ cat outputs/1712032400886-00000-of-00001.out
 {'id': '4086706052291208999', 'page_views': 503, 'total_bytes': 154038, 'max_bytes': 499, 'min_bytes': 100}
 ```
 
+We can run the pipeline using a different runner e.g. by specifying the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) in the *runner* argument. Interestingly it completes the pipeline by multiple tasks.
+
 ```bash
 $ python section2/user_traffic.py --runner FlinkRunner
 ...
@@ -197,6 +207,8 @@ $ ls outputs/ | grep 1712032503940
 ```
 
 ### Beam SQL
+
+The pipeline that calculates user statistic can also be developed using [*SqlTransform*](https://beam.apache.org/releases/pydoc/current/apache_beam.transforms.sql.html), which translates a SQL query into [PTransforms](https://beam.apache.org/documentation/basics/#ptransform). The following pipeline creates the same output to the previous pipeline.
 
 ```python
 # section2/user_traffic_sql.py
@@ -297,9 +309,16 @@ if __name__ == "__main__":
     run()
 ```
 
+When we execute the pipeline script, we see that a Docker container is launched and actual transformations are performed within it via the Java SDK. The container exits when the pipeline completes.
+
 ```bash
 $ python section2/user_traffic_sql.py
 ...
+
+$ docker ps -a --format "table {{.ID}}\t{{.Image}}\t{{.Status}}"
+CONTAINER ID   IMAGE                           STATUS
+c7d7bad6b1e9   apache/beam_java11_sdk:2.53.0   Exited (137) 5 minutes ago
+
 $ cat outputs/1712032675637-00000-of-00001.out 
 {'id': '-297761604717604766', 'page_views': 519, 'total_bytes': 157246, 'max_bytes': 499, 'min_bytes': 103}
 {'id': '3817299155409964875', 'page_views': 515, 'total_bytes': 155516, 'max_bytes': 498, 'min_bytes': 100}
@@ -323,11 +342,21 @@ $ cat outputs/1712032675637-00000-of-00001.out
 {'id': '-4225319382884577471', 'page_views': 518, 'total_bytes': 158242, 'max_bytes': 499, 'min_bytes': 101}
 ```
 
+When we develop a pipeline, [Interactive Beam](https://github.com/apache/beam/tree/master/sdks/python/apache_beam/runners/interactive) on a Jupyter notebook can be convenient. The user traffic pipelines are implemented using notebooks, and they can be found in [section2/user_traffic.ipynb](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section2/user_traffic.ipynb) and [section2/user_traffic_sql.ipynb](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section2/user_traffic_sql.ipynb) respectively. We can start a Jupyter server while enabling Jupyter Lab and ignoring authentication as shown below. Once started, it can be accessed on *http://localhost:8888*.
+
+```bash
+$ JUPYTER_ENABLE_LAB=yes jupyter lab --ServerApp.token='' --ServerApp.password=''
+```
+
 ![](user_traffic.png#center)
 
 ## Minute Traffic
 
+This pipeline aggregates the number of website visits in fixed time windows over 60 seconds. 
+
 ### Beam Pipeline
+
+As the user traffic pipeline, it begins with reading data from a folder named *inputs* and parses the Json lines. Then it adds timestamp to elements by parsing the *event_datetime* attribute, defines fixed time windows over 60 seconds, and counts the number of records within the windows. Finally, it writes the aggregated records into a folder named *outputs* after adding *window_start* and *window_end* timestamp attributes.
 
 ```python
 # section2/minute_traffic.py
@@ -439,6 +468,8 @@ if __name__ == "__main__":
     run()
 ```
 
+As mentioned earlier, we set the max lag seconds (`--max_lag_seconds`) to 300 so that records are spread over 5 minutes period. Therefore, we can see that website visit counts are found in multiple time windows.
+
 ```bash
 $ python section2/minute_traffic.py
 ...
@@ -452,6 +483,8 @@ $ cat outputs/1712033031226-00000-of-00001.out
 ```
 
 ### Beam SQL
+
+The traffic by fixed time window can also be obtained using *SqlTransform*. As mentioned in Part 1, *Beam SQL* supports two dialects - [Calcite SQL](https://calcite.apache.org/) and [ZetaSQL](https://github.com/google/zetasql). The following pipeline creates output files using both the dialects.
 
 ```python
 # section2/minute_traffic_sql.py
@@ -600,6 +633,8 @@ if __name__ == "__main__":
     run()
 ```
 
+As expected, both the SQL dialects produce the same output.
+
 ```bash
 $ python section2/minute_traffic_sql.py
 ...
@@ -620,8 +655,10 @@ $ cat outputs/1712033101760-zeta-00000-of-00001.out
 {'start_time': '2024-04-02 04:27:00+00', 'end_time': '2024-04-02 04:28:00+00', 'page_views': 1899}
 ```
 
+Jupyter notebooks are created for the minute traffic pipelines, and they can be found in [section2/minute_traffic.ipynb](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section2/minute_traffic.ipynb) and [section2/minute_traffic_sql.ipynb](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section2/minute_traffic_sql.ipynb) respectively.
+
 ![](minute_traffic.png#center)
 
 ## Summary
 
-Apache Beam and Apache Flink are open-source frameworks for parallel, distributed data processing at scale. While PyFlink, Flink's Python API, is limited to build sophisticated data streaming applications, Apache Beam's Python SDK has potential as it supports more capacity to extend and/or customise its features. In this series of posts, we discuss local development of Apache Beam pipelines using Python. In Part 1, a basic Beam pipeline was introduced, followed by demonstrating how to utilise Jupyter notebooks for interactive development. We also covered Beam SQL and Beam DataFrames examples on notebooks.
+As part of discussing local development of *Apache Beam* pipelines using Python, we developed Batch pipelines that aggregate website visit log by user and time in this post. The pipelines were developed with and without *Beam SQL*. Additionally, each pipeline was implemented on a Jupyter notebook as reference.
