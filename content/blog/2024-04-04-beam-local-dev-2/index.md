@@ -2,7 +2,7 @@
 title: Apache Beam Local Development with Python - Part 2 Batch Pipelines
 date: 2024-04-04
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 reward: false

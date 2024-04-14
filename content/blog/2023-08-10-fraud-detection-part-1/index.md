@@ -2,7 +2,7 @@
 title: Kafka, Flink and DynamoDB for Real Time Fraud Detection - Part 1 Local Development
 date: 2023-08-10
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 reward: false

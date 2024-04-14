@@ -2,7 +2,7 @@
 title: Data Build Tool (dbt) Pizza Shop Demo - Part 3 Modelling on BigQuery
 date: 2024-02-08
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 reward: false

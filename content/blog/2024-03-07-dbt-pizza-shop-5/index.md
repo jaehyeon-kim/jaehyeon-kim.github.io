@@ -2,7 +2,7 @@
 title: Data Build Tool (dbt) Pizza Shop Demo - Part 5 Modelling on Amazon Athena
 date: 2024-03-07
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 reward: false
