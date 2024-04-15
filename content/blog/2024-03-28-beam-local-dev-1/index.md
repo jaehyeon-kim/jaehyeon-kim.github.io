@@ -30,7 +30,7 @@ In this series of posts, we discuss local development of Apache Beam pipelines u
 
 * [Part 1 Pipeline, Notebook, SQL and DataFrame](#) (this post)
 * [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2)
-* Part 3 Flink Runner
+* [Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3)
 * Part 4 Streaming Pipelines
 * Part 5 Testing Pipelines
 
