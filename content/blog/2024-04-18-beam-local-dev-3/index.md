@@ -74,6 +74,8 @@ Here the challenge is how to make a non-Java SDK to be able to serialize data fo
 
 ![](expansion-service.png#center)
 
+Note this section is based on [Building Big Data Pipelines with Apache Beam by Jan Lukavský](https://www.packtpub.com/product/building-big-data-pipelines-with-apache-beam/9781800564930) and you can check more details in the book!
+
 ## Manage Streaming Environment
 
 The streaming development environment requires local Apache Flink and Apache Kafka clusters. Initially I was going to create a Flink cluster on Docker, but I had an issue that the Kafka Connect I/O fails to resolve Kafka bootstrap addresses. Specifically, for the Kafka I/O, a docker container is launched by the Flink TaskManager with the host network (`--network host`) - remind that the default SDK harness option is DOCKER. Then the SDK harness container looks for Kafka bootstrap addresses in its host, which is the Flink TaskManager container, not the Docker host machine. Therefore, the address resolution fails because the Kafka cluster doesn't run there. It would work with other SDH harness options, but I thought it requires too much setup for local development. On the other hand, the issue no longer applies if we launch a Flink cluster locally, and we will use this approach instead. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-dev-env).
