@@ -2,7 +2,7 @@
 title: Data Build Tool (dbt) Pizza Shop Demo - Part 2 ETL on PostgreSQL via Airflow
 date: 2024-01-25
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 reward: false

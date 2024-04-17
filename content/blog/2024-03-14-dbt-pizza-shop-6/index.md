@@ -2,7 +2,7 @@
 title: Data Build Tool (dbt) Pizza Shop Demo - Part 6 ETL on Amazon Athena via Airflow
 date: 2024-03-14
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 reward: false

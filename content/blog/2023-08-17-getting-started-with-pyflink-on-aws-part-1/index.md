@@ -2,7 +2,7 @@
 title: Getting Started with Pyflink on AWS - Part 1 Local Flink and Local Kafka
 date: 2023-08-17
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 reward: false
