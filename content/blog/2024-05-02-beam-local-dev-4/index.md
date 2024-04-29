@@ -20,28 +20,28 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In this series, we discuss local development of Apache Beam pipelines using Python. A basic Beam pipeline was introduced in Part 1, followed by demonstrating how to utilise Jupyter notebooks, Beam SQL and Beam DataFrames. In this post, we discuss Batch pipelines that aggregate website visit log by user and time. The pipelines are developed with and without Beam SQL. Additionally, each pipeline is implemented on a Jupyter notebook for demonstration.
+description: In Part 3, we discussed the portability layer of Apache Beam as it helps understand (1) how Python pipelines run on the Flink Runner and (2) how multiple SDKs can be used in a single pipeline, followed by demonstrating local Flink and Kafka cluster creation for developing streaming pipelines. In this post, we develop a streaming pipeline that aggregates page visits by user in a fixed time window of 20 seconds. Two versions of the pipeline are created with/without relying on Beam SQL.
 ---
 
-In this series, we discuss local development of [Apache Beam](https://beam.apache.org/) pipelines using Python. A basic Beam pipeline was introduced in [Part 1](/blog/2024-03-28-beam-local-dev-1), followed by demonstrating how to utilise Jupyter notebooks, [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) and [Beam DataFrames](https://beam.apache.org/documentation/dsls/dataframes/overview/). In this post, we discuss Batch pipelines that aggregate website visit log by user and time. The pipelines are developed with and without *Beam SQL*. Additionally, each pipeline is implemented on a Jupyter notebook for demonstration.
+In [Part 3](/blog/2024-04-18-beam-local-dev-3), we discussed the portability layer of [Apache Beam](https://beam.apache.org/) as it helps understand (1) how Python pipelines run on the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) and (2) how multiple SDKs can be used in a single pipeline, followed by demonstrating local Flink and Kafka cluster creation for developing streaming pipelines. In this post, we build a streaming pipeline that aggregates page visits by user in a [fixed time window](https://beam.apache.org/documentation/programming-guide/#fixed-time-windows) of 20 seconds. Two versions of the pipeline are created with/without relying on [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/).
 
 * [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1)
-* [Part 2 Batch Pipelines](#) (this post)
+* [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2)
 * [Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3)
-* Part 4 Streaming Pipelines
+* [Part 4 Streaming Pipelines](#) (this post)
 * Part 5 Testing Pipelines
 
 ## Streaming Pipeline
 
-The streaming pipeline we discuss in this post aggregates website visit by user ID in a [fixed time window](https://beam.apache.org/documentation/programming-guide/#fixed-time-windows) of 20 seconds. Two versions of the pipeline are created with/without relying on [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) and they run on a Flink cluster at the end. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-dev-env).
+The streaming pipeline we discuss in this post aggregates website visits by user ID in a [fixed time window](https://beam.apache.org/documentation/programming-guide/#fixed-time-windows) of 20 seconds. Two versions of the pipeline are created with/without relying on [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/), and they run on a Flink cluster at the end. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-dev-env).
 
 ### Traffic Aggregation
 
-It begins with reading and decoding messages from a Kafka topic named *website-visit*, followed by parsing the decoded Json string into a custom type named *EventLog*. Note the [coder](https://beam.apache.org/documentation/programming-guide/#data-encoding-and-type-safety) for this custom type is registered but it is not required because we don't have cross-language transformations that deal with it. On the other hand, the coder has to be registered for the SQL version because the SQL transformation is performed by the Java SDK.
+It begins with reading and decoding messages from a Kafka topic named *website-visit*, followed by parsing the decoded Json string into a custom type named *EventLog*. Note the [coder](https://beam.apache.org/documentation/programming-guide/#data-encoding-and-type-safety) for this custom type is registered, but it is not required because we don't have a cross-language transformation that deals with it. On the other hand, the coder has to be registered for the SQL version because it is used by the SQL transformation, which is performed using the Java SDK.
 
-After that, timestamp is re-assigned based on the *event_datetime* attribute and the element is converted into a key-value pair where user ID is taken as the key and 1 is given as the value. Note that, by default, the Kafka reader assigns processing time (wall clock) as the element timestamp but, with re-assigning based on record timesteamp, we would have more relevant outcomes if record timestamp is different from wall clock.
+After that, timestamp is re-assigned based on the *event_datetime* attribute and the element is converted into a key-value pair where user ID is taken as the key and 1 is given as the value. By default, the Kafka reader assigns processing time (wall clock) as the element timestamp. If record timestamp is different from wall clock, we would have more relevant outcomes by re-assigning based on record timestamp.
 
-The tuple elements are aggregated in a fixed window of 20 seconds and written to a Kafka topic named *traffic-agg*. Note that the output messages include two additional attributes (*window_start* and *window_end*) to clarify in which window they belong to.
+The tuple elements are aggregated in a fixed time window of 20 seconds and written to a Kafka topic named *traffic-agg*. The output messages include two additional attributes (*window_start* and *window_end*) to clarify in which window they belong to.
 
 ```python
 # section3/traffic_agg.py
@@ -193,7 +193,7 @@ if __name__ == "__main__":
 
 ### SQL Traffic Aggregation 
 
-Multiple transformations defined in the earlier version are combined into a single SQL transformation in this version. 
+The main difference of this version is that multiple transformations are performed by a single SQL transformation. Specifically it aggregates the number of page views by user in a fixed time window of 20 seconds. The SQL transformation performed in a separate Docker container using the Java SDK and thus the output type has to be specified before it. Otherwise, an error is thrown because the Java SDK doesn't know how to encode/decode the elements.
 
 ```python
 # section3/traffic_agg_sql.py
@@ -351,18 +351,18 @@ if __name__ == "__main__":
 
 ## Run Pipeline
 
-We can use local Flink and Kafka clusters as discussed in [Part 3](/blog/2024-04-18-beam-local-dev-3). The Flink cluster is optional as Beam runs a pipeline on an embeded Flink cluster if we do not specify a cluster URL. As discussed later, I have an issue to run the SQL version of the pipeline on a local cluster and it will be deployed on an embeded cluster instead.
+We can use local Flink and Kafka clusters as discussed in [Part 3](/blog/2024-04-18-beam-local-dev-3). The Flink cluster is optional as Beam runs a pipeline on an embedded Flink cluster if we do not specify a cluster URL.
 
 ### Start Flink/Kafka Clusters
 
-With the *-a* option, we can deploy local Flink and Kafka clusters and they are used for the pipeline without SQL version while only a local Kafka cluster is launched for the SQL version with the *-k* option.
+As shown later, I have an issue to run the SQL version of the pipeline on a local cluster, and it has to be deployed on an embedded cluster instead. With the *-a* option, we can deploy local Flink and Kafka clusters, and they are used for the pipeline without SQL while only a local Kafka cluster is launched for the SQL version with the *-k* option.
 
 ```bash
 # start both flink and kafka cluster for traffic aggregation
 $ ./setup/start-flink-env.sh -a
 
 # start only kafka cluster for sql traffic aggregation
-# $ ./setup/start-flink-env.sh -k
+$ ./setup/start-flink-env.sh -k
 ```
 
 ### Data Generation
@@ -390,16 +390,23 @@ The traffic aggregation pipeline can be executed using the local Flink cluster b
 $ python section3/traffic_agg.py --use_own
 ```
 
-![](flink-job.png#center)
+After a while, we can check both the input and output topics in the *Topics* section of *kafka-ui*. It can be accessed on *localhost:8080*.
 
 ![](kafka-topics.png#center)
 
+We can use the Flink web UI to monitor the pipeline as a Flink job. When we click the *traffic-agg* job in the *Running Jobs* section, we see 4 operations are linked in the *Overview* tab. The first two operations are polling and reading Kafka source description. All the transformations up to windowing the keyed elements are performed in the third operation, and the elements are aggregated and written to the Kafka output topic in the last operation.
+
+![](flink-job.png#center)
+
 #### SQL Traffic Aggregation
+
+I see the following error when I execute the SQL version of the pipeline with the *use_own* option. It seems that the Java SDK container for SQL transformation fails to download its expansion service and does not complete initialisation steps - see [Part 3](/blog/2024-04-18-beam-local-dev-3) for details about how multiple SDKs can be used in a single pipeline. Therefore, the Flink job fails to access the SDK container, and it keeps recreate a new container.
 
 ![](flink-job-sql.png#center)
 
+We can see lots of containers are stopped and get recreated.
 
-```
+```bash
 $ docker ps -a --format "table {{.ID}}\t{{.Image}}\t{{.Status}}" | grep apache/beam_java11_sdk
 46c51d89e966   apache/beam_java11_sdk:2.53.0   Up 7 seconds
 2ad755fc66df   apache/beam_java11_sdk:2.53.0   Up 7 seconds
@@ -410,12 +417,16 @@ a549729318e3   apache/beam_java11_sdk:2.53.0   Exited (1) 38 seconds ago
 3aee486b472f   apache/beam_java11_sdk:2.53.0   Exited (1) About a minute ago
 ```
 
+Instead, we can run the pipeline on an embedded Flink cluster without adding the *use_own* option. Note that we need to stop the existing clusters, start only a Kafka cluster with the *-k* option and re-generate data before executing this pipeline script.
+
 ```bash
-$ python section3/traffic_agg_sql.py --use_own
+$ python section3/traffic_agg_sql.py
 ```
+
+Similar to the earlier version, we can check the input and output topics on *localhost:8080* as well.
 
 ![](kafka-topics-sql.png#center)
 
 ## Summary
 
-As part of discussing local development of *Apache Beam* pipelines using Python, we developed Batch pipelines that aggregate website visit log by user and time in this post. The pipelines were developed with and without *Beam SQL*. Additionally, each pipeline was implemented on a Jupyter notebook for demonstration.
+In this post, we developed a streaming pipeline that aggregates website visits by user in a fixed time window of 20 seconds. Two versions of the pipeline were created with/without relying on Beam SQL. The first version that doesn't rely on SQL was deployed on a local Flink cluster, and how it is deployed as a Flink job is checked on the Flink web UI. The second version, however, had an issue to deploy on a local Flink cluster, and it was deployed on an embedded Flink cluster.

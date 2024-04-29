@@ -29,7 +29,7 @@ In this series, we discuss local development of [Apache Beam](https://beam.apach
 * [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1)
 * [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2)
 * [Part 3 Flink Runner](#) (this post)
-* Part 4 Streaming Pipelines
+* [Part 4 Streaming Pipelines](/blog/2024-05-02-beam-local-dev-4)
 * Part 5 Testing Pipelines
 
 ## Portability Layer
