@@ -55,6 +55,9 @@ The pipeline begins with reading data from a folder named *inputs* and parses th
 
 Note that custom types are created for the input and output elements using [element schema](https://beam.apache.org/documentation/programming-guide/#element-schema) (*EventLog* and *UserTraffic*), and transformations become more expressive using them. Also, the custom types are [registered to the coder registry](https://beam.apache.org/documentation/programming-guide/#specifying-coders) so that they are encoded/decoded appropriately - see the transformations that specify the output types via `with_output_types`.
 
+[**Update 2024-04-30**]
+Note the coders for the custom types are registered, but it is not required because we don't have a cross-language transformation that deals with them.
+
 ```python
 # section2/user_traffic.py
 import os
@@ -357,6 +360,9 @@ This pipeline aggregates the number of website visits in fixed time windows over
 ### Beam Pipeline
 
 As the user traffic pipeline, it begins with reading data from a folder named *inputs* and parses the Json lines. Then it adds timestamp to elements by parsing the *event_datetime* attribute, defines fixed time windows over 60 seconds, and counts the number of records within the windows. Finally, it writes the aggregated records into a folder named *outputs* after adding *window_start* and *window_end* timestamp attributes.
+
+[**Update 2024-04-30**]
+Note the coder for the custom type is registered, but it is not required because we don't have a cross-language transformation that deals with it.
 
 ```python
 # section2/minute_traffic.py
