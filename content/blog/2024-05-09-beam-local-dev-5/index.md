@@ -20,42 +20,25 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In this series, we discuss local development of Apache Beam pipelines using Python. A basic Beam pipeline was introduced in Part 1, followed by demonstrating how to utilise Jupyter notebooks, Beam SQL and Beam DataFrames. In this post, we discuss Batch pipelines that aggregate website visit log by user and time. The pipelines are developed with and without Beam SQL. Additionally, each pipeline is implemented on a Jupyter notebook for demonstration.
+description: We developed batch and streaming pipelines in Part 2 and Part 4. Often it is faster and simpler to identify and fix bugs on the pipeline code by performing local unit testing. Moreover, especially when it comes to creating a streaming pipeline, unit testing cases can facilitate development further by using TestStream as it allows us to advance watermarks or processing time according to different scenarios. In this post, we discuss how to perform unit testing of the batch and streaming pipelines that we developed earlier.
 ---
 
-In this series, we discuss local development of [Apache Beam](https://beam.apache.org/) pipelines using Python. A basic Beam pipeline was introduced in [Part 1](/blog/2024-03-28-beam-local-dev-1), followed by demonstrating how to utilise Jupyter notebooks, [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) and [Beam DataFrames](https://beam.apache.org/documentation/dsls/dataframes/overview/). In this post, we discuss Batch pipelines that aggregate website visit log by user and time. The pipelines are developed with and without *Beam SQL*. Additionally, each pipeline is implemented on a Jupyter notebook for demonstration.
+We developed batch and streaming pipelines in [Part 2](/blog/2024-04-04-beam-local-dev-2) and [Part 4](/blog/2024-05-02-beam-local-dev-4). Often it is faster and simpler to identify and fix bugs on the pipeline code by performing local unit testing. Moreover, especially when it comes to creating a streaming pipeline, unit testing cases can facilitate development further by using [TestStream](https://beam.apache.org/releases/pydoc/2.22.0/_modules/apache_beam/testing/test_stream.html) as it allows us to advance [watermarks](https://beam.apache.org/documentation/basics/#watermark) or processing time according to different scenarios. In this post, we discuss how to perform unit testing of the batch and streaming pipelines that we developed earlier.
 
 * [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1)
-* [Part 2 Batch Pipelines](#) (this post)
+* [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2)
 * [Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3)
-* Part 4 Streaming Pipelines
-* Part 5 Testing Pipelines
+* [Part 4 Streaming Pipelines](/blog/2024-05-02-beam-local-dev-4)
+* [Part 5 Testing Pipelines](#) (this post)
 
-## Data Generation
+## Batch Pipeline Testing
 
-We first need to generate website visit log data. As the second pipeline aggregates data by time, the max lag seconds (`--max_lag_seconds`) is set to 300 so that records are spread over 5 minutes period. See [Part 1](/blog/2024-03-28-beam-local-dev-1) for details about the data generation script and the source of this post can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-dev-env).
+### Pipeline Code
 
-```bash
-$ python datagen/generate_data.py --source batch --num_users 20 --num_events 10000 --max_lag_seconds 300
-...
-$ head -n 3 inputs/d919cc9e-dade-44be-872e-86598a4d0e47.out 
-{"ip": "81.112.193.168", "id": "-7450326752843155888", "lat": 41.8919, "lng": 12.5113, "user_agent": "Opera/8.29.(Windows CE; hi-IN) Presto/2.9.160 Version/10.00", "age_bracket": "18-25", "opted_into_marketing": false, "http_request": "GET eucharya.html HTTP/1.0", "http_response": 200, "file_size_bytes": 131, "event_datetime": "2024-04-02T04:30:18.999", "event_ts": 1711992618999}
-{"ip": "204.14.50.181", "id": "3385356383147784679", "lat": 47.7918, "lng": -122.2243, "user_agent": "Opera/9.77.(Windows NT 5.01; ber-DZ) Presto/2.9.166 Version/12.00", "age_bracket": "55+", "opted_into_marketing": true, "http_request": "GET coniferophyta.html HTTP/1.0", "http_response": 200, "file_size_bytes": 229, "event_datetime": "2024-04-02T04:28:13.144", "event_ts": 1711992493144}
-{"ip": "11.32.249.163", "id": "8764514706569354597", "lat": 37.2242, "lng": -95.7083, "user_agent": "Opera/8.45.(Windows NT 4.0; xh-ZA) Presto/2.9.177 Version/10.00", "age_bracket": "26-40", "opted_into_marketing": false, "http_request": "GET protozoa.html HTTP/1.0", "http_response": 200, "file_size_bytes": 373, "event_datetime": "2024-04-02T04:30:12.612", "event_ts": 1711992612612}
-```
-
-## User Traffic
-
-This pipeline basically calculates the number of website visits and distribution of traffic consumption by user. 
-
-### Beam Pipeline
-
-The pipeline begins with reading data from a folder named *inputs* and parses the Json lines. Then it creates a key value pair where the key is the user ID (`id`) and the value is the file size bytes (`file_size_bytes`). After that, the records are grouped by the key and aggregated to obtain website visit count and traffic consumption distribution per user using a [ParDo](https://beam.apache.org/documentation/transforms/python/elementwise/pardo/) transform. Finally, the output records are written to a folder named *outputs* after being converted into dictionary.
-
-Note that custom types are created for the input and output elements using [element schema](https://beam.apache.org/documentation/programming-guide/#element-schema) (*EventLog* and *UserTraffic*), and transformations become more expressive using them. Also, the custom types are [registered to the coder registry](https://beam.apache.org/documentation/programming-guide/#specifying-coders) so that they are encoded/decoded appropriately - see the transformations that specify the output types via `with_output_types`.
+The pipeline begins with reading data from a folder named *inputs* and parses the Json lines. Then it creates a key-value pair where the key is the user ID (`id`) and the value is the file size bytes (`file_size_bytes`). After that, the records are grouped by the key and aggregated to obtain website visit count and traffic consumption distribution using a [ParDo](https://beam.apache.org/documentation/transforms/python/elementwise/pardo/) transform. Finally, the output records are written to a folder named *outputs* after being converted into dictionary.
 
 ```python
-# section2/user_traffic.py
+# section4/user_traffic.py
 import os
 import datetime
 import argparse
@@ -89,10 +72,6 @@ class UserTraffic(typing.NamedTuple):
     total_bytes: int
     max_bytes: int
     min_bytes: int
-
-
-beam.coders.registry.register_coder(EventLog, beam.coders.RowCoder)
-beam.coders.registry.register_coder(UserTraffic, beam.coders.RowCoder)
 
 
 def parse_json(element: str):
@@ -164,201 +143,173 @@ if __name__ == "__main__":
     run()
 ```
 
-Once we execute the pipeline, we can check the output records by reading the output file. By default, the pipeline runs via the [Direct Runner](https://beam.apache.org/documentation/runners/direct/).
+### Test Pipeline
 
-```bash
-$ python section2/user_traffic.py
-...
-$ cat outputs/1712032400886-00000-of-00001.out 
-{'id': '-7450326752843155888', 'page_views': 466, 'total_bytes': 139811, 'max_bytes': 498, 'min_bytes': 100}
-{'id': '3385356383147784679', 'page_views': 471, 'total_bytes': 142846, 'max_bytes': 499, 'min_bytes': 103}
-{'id': '8764514706569354597', 'page_views': 498, 'total_bytes': 152005, 'max_bytes': 499, 'min_bytes': 101}
-{'id': '1097462159655745840', 'page_views': 483, 'total_bytes': 145655, 'max_bytes': 499, 'min_bytes': 101}
-{'id': '5107076440238203196', 'page_views': 520, 'total_bytes': 155475, 'max_bytes': 499, 'min_bytes': 100}
-{'id': '3817299155409964875', 'page_views': 515, 'total_bytes': 155516, 'max_bytes': 498, 'min_bytes': 100}
-{'id': '4396740364429657096', 'page_views': 534, 'total_bytes': 159351, 'max_bytes': 499, 'min_bytes': 101}
-{'id': '323358690592146285', 'page_views': 503, 'total_bytes': 150204, 'max_bytes': 497, 'min_bytes': 100}
-{'id': '-297761604717604766', 'page_views': 519, 'total_bytes': 157246, 'max_bytes': 499, 'min_bytes': 103}
-{'id': '-8832654768096800604', 'page_views': 489, 'total_bytes': 145166, 'max_bytes': 499, 'min_bytes': 100}
-{'id': '-7508437511513814045', 'page_views': 492, 'total_bytes': 146561, 'max_bytes': 499, 'min_bytes': 100}
-{'id': '-4225319382884577471', 'page_views': 518, 'total_bytes': 158242, 'max_bytes': 499, 'min_bytes': 101}
-{'id': '-6246779037351548961', 'page_views': 432, 'total_bytes': 127013, 'max_bytes': 499, 'min_bytes': 101}
-{'id': '7514213899672341122', 'page_views': 515, 'total_bytes': 154753, 'max_bytes': 498, 'min_bytes': 100}
-{'id': '8063196327933870504', 'page_views': 526, 'total_bytes': 159395, 'max_bytes': 499, 'min_bytes': 101}
-{'id': '4927182384805166657', 'page_views': 501, 'total_bytes': 151023, 'max_bytes': 498, 'min_bytes': 100}
-{'id': '134630243715938340', 'page_views': 506, 'total_bytes': 153509, 'max_bytes': 498, 'min_bytes': 101}
-{'id': '-5889211929143180249', 'page_views': 491, 'total_bytes': 146755, 'max_bytes': 499, 'min_bytes': 100}
-{'id': '3809491485105813594', 'page_views': 518, 'total_bytes': 155992, 'max_bytes': 499, 'min_bytes': 100}
-{'id': '4086706052291208999', 'page_views': 503, 'total_bytes': 154038, 'max_bytes': 499, 'min_bytes': 100}
-```
+As illustrated in the [Beam documentation](https://beam.apache.org/documentation/pipelines/test-your-pipeline/), we can use the following pattern to test a Beam pipeline.
 
-We can run the pipeline using a different runner e.g. by specifying the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) in the *runner* argument. Interestingly it completes the pipeline by multiple tasks.
+- Create a *TestPipeline*.
+- Create some static, known test input data.
+- Use the *Create* transform to create a *PCollection* of your input data.
+- Apply your transform to the input *PCollection* and save the resulting output *PCollection*.
+- Use *PAssert* and its subclasses (or testing functions in Python) to verify that the output *PCollection* contains the elements that you expect.
 
-```bash
-$ python section2/user_traffic.py --runner FlinkRunner
-...
-$ ls outputs/ | grep 1712032503940
-1712032503940-00000-of-00005.out
-1712032503940-00003-of-00005.out
-1712032503940-00002-of-00005.out
-1712032503940-00004-of-00005.out
-1712032503940-00001-of-00005.out
-```
-
-### Beam SQL
-
-The pipeline that calculates user statistic can also be developed using [*SqlTransform*](https://beam.apache.org/releases/pydoc/current/apache_beam.transforms.sql.html), which translates a SQL query into [PTransforms](https://beam.apache.org/documentation/basics/#ptransform). The following pipeline creates the same output to the previous pipeline.
+We have three unit testing cases for this batch pipeline. The first two cases checks whether the input elements are parsed into the custom *EventLog* type as expected while the last case is used to test if the pipeline aggregates the elements by user correctly. In all cases, pipeline outputs are compared to expected outputs for verification.
 
 ```python
-# section2/user_traffic_sql.py
-import os
-import datetime
-import argparse
-import json
-import logging
-import typing
+# section4/user_traffic_test.py
+import sys
+import unittest
 
 import apache_beam as beam
-from apache_beam.transforms.sql import SqlTransform
-from apache_beam.options.pipeline_options import PipelineOptions
-from apache_beam.options.pipeline_options import StandardOptions
+from apache_beam.testing.test_pipeline import TestPipeline
+from apache_beam.testing.util import assert_that, equal_to
+
+from user_traffic import EventLog, UserTraffic, parse_json, Aggregate
 
 
-class EventLog(typing.NamedTuple):
-    ip: str
-    id: str
-    lat: float
-    lng: float
-    user_agent: str
-    age_bracket: str
-    opted_into_marketing: bool
-    http_request: str
-    http_response: int
-    file_size_bytes: int
-    event_datetime: str
-    event_ts: int
+def main(out=sys.stderr, verbosity=2):
+    loader = unittest.TestLoader()
+
+    suite = loader.loadTestsFromModule(sys.modules[__name__])
+    unittest.TextTestRunner(out, verbosity=verbosity).run(suite)
 
 
-beam.coders.registry.register_coder(EventLog, beam.coders.RowCoder)
+class ParseJsonTest(unittest.TestCase):
+    def test_parse_json(self):
+        with TestPipeline() as p:
+            LINES = [
+                '{"ip": "138.201.212.70", "id": "462520009613048791", "lat": 50.4779, "lng": 12.3713, "user_agent": "Mozilla/5.0 (iPod; U; CPU iPhone OS 3_1 like Mac OS X; ks-IN) AppleWebKit/532.30.7 (KHTML, like Gecko) Version/3.0.5 Mobile/8B115 Safari/6532.30.7", "age_bracket": "18-25", "opted_into_marketing": false, "http_request": "GET eucharya.html HTTP/1.0", "http_response": 200, "file_size_bytes": 207, "event_datetime": "2024-03-01T05:51:22.083", "event_ts": 1709232682083}',
+                '{"ip": "105.100.237.193", "id": "5135574965990269004", "lat": 36.7323, "lng": 3.0875, "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_9 rv:2.0; wo-SN) AppleWebKit/531.18.2 (KHTML, like Gecko) Version/4.0.4 Safari/531.18.2", "age_bracket": "26-40", "opted_into_marketing": false, "http_request": "GET coniferophyta.html HTTP/1.0", "http_response": 200, "file_size_bytes": 427, "event_datetime": "2024-03-01T05:48:52.985", "event_ts": 1709232532985}',
+            ]
+
+            EXPECTED_OUTPUT = [
+                EventLog(
+                    ip="138.201.212.70",
+                    id="462520009613048791",
+                    lat=50.4779,
+                    lng=12.3713,
+                    user_agent="Mozilla/5.0 (iPod; U; CPU iPhone OS 3_1 like Mac OS X; ks-IN) AppleWebKit/532.30.7 (KHTML, like Gecko) Version/3.0.5 Mobile/8B115 Safari/6532.30.7",
+                    age_bracket="18-25",
+                    opted_into_marketing=False,
+                    http_request="GET eucharya.html HTTP/1.0",
+                    http_response=200,
+                    file_size_bytes=207,
+                    event_datetime="2024-03-01T05:51:22.083",
+                    event_ts=1709232682083,
+                ),
+                EventLog(
+                    ip="105.100.237.193",
+                    id="5135574965990269004",
+                    lat=36.7323,
+                    lng=3.0875,
+                    user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_9 rv:2.0; wo-SN) AppleWebKit/531.18.2 (KHTML, like Gecko) Version/4.0.4 Safari/531.18.2",
+                    age_bracket="26-40",
+                    opted_into_marketing=False,
+                    http_request="GET coniferophyta.html HTTP/1.0",
+                    http_response=200,
+                    file_size_bytes=427,
+                    event_datetime="2024-03-01T05:48:52.985",
+                    event_ts=1709232532985,
+                ),
+            ]
+
+            output = (
+                p
+                | beam.Create(LINES)
+                | beam.Map(parse_json).with_output_types(EventLog)
+            )
+
+            assert_that(output, equal_to(EXPECTED_OUTPUT))
+
+    def test_parse_null_lat_lng(self):
+        with TestPipeline() as p:
+            LINES = [
+                '{"ip": "138.201.212.70", "id": "462520009613048791", "lat": null, "lng": null, "user_agent": "Mozilla/5.0 (iPod; U; CPU iPhone OS 3_1 like Mac OS X; ks-IN) AppleWebKit/532.30.7 (KHTML, like Gecko) Version/3.0.5 Mobile/8B115 Safari/6532.30.7", "age_bracket": "18-25", "opted_into_marketing": false, "http_request": "GET eucharya.html HTTP/1.0", "http_response": 200, "file_size_bytes": 207, "event_datetime": "2024-03-01T05:51:22.083", "event_ts": 1709232682083}',
+            ]
+
+            EXPECTED_OUTPUT = [
+                EventLog(
+                    ip="138.201.212.70",
+                    id="462520009613048791",
+                    lat=-1,
+                    lng=-1,
+                    user_agent="Mozilla/5.0 (iPod; U; CPU iPhone OS 3_1 like Mac OS X; ks-IN) AppleWebKit/532.30.7 (KHTML, like Gecko) Version/3.0.5 Mobile/8B115 Safari/6532.30.7",
+                    age_bracket="18-25",
+                    opted_into_marketing=False,
+                    http_request="GET eucharya.html HTTP/1.0",
+                    http_response=200,
+                    file_size_bytes=207,
+                    event_datetime="2024-03-01T05:51:22.083",
+                    event_ts=1709232682083,
+                ),
+            ]
+
+            output = (
+                p
+                | beam.Create(LINES)
+                | beam.Map(parse_json).with_output_types(EventLog)
+            )
+
+            assert_that(output, equal_to(EXPECTED_OUTPUT))
 
 
-def parse_json(element: str):
-    row = json.loads(element)
-    # lat/lng sometimes empty string
-    if not row["lat"] or not row["lng"]:
-        row = {**row, **{"lat": -1, "lng": -1}}
-    return EventLog(**row)
+class AggregateTest(unittest.TestCase):
+    def test_aggregate(self):
+        with TestPipeline() as p:
+            LINES = [
+                '{"ip": "138.201.212.70", "id": "462520009613048791", "lat": 50.4779, "lng": 12.3713, "user_agent": "Mozilla/5.0 (iPod; U; CPU iPhone OS 3_1 like Mac OS X; ks-IN) AppleWebKit/532.30.7 (KHTML, like Gecko) Version/3.0.5 Mobile/8B115 Safari/6532.30.7", "age_bracket": "18-25", "opted_into_marketing": false, "http_request": "GET eucharya.html HTTP/1.0", "http_response": 200, "file_size_bytes": 207, "event_datetime": "2024-03-01T05:51:22.083", "event_ts": 1709232682083}',
+                '{"ip": "138.201.212.70", "id": "462520009613048791", "lat": 50.4779, "lng": 12.3713, "user_agent": "Mozilla/5.0 (iPod; U; CPU iPhone OS 3_1 like Mac OS X; ks-IN) AppleWebKit/532.30.7 (KHTML, like Gecko) Version/3.0.5 Mobile/8B115 Safari/6532.30.7", "age_bracket": "18-25", "opted_into_marketing": false, "http_request": "GET blastocladiomycota.html HTTP/1.0", "http_response": 200, "file_size_bytes": 446, "event_datetime": "2024-03-01T05:51:48.719", "event_ts": 1709232708719}',
+                '{"ip": "138.201.212.70", "id": "462520009613048791", "lat": 50.4779, "lng": 12.3713, "user_agent": "Mozilla/5.0 (iPod; U; CPU iPhone OS 3_1 like Mac OS X; ks-IN) AppleWebKit/532.30.7 (KHTML, like Gecko) Version/3.0.5 Mobile/8B115 Safari/6532.30.7", "age_bracket": "18-25", "opted_into_marketing": false, "http_request": "GET home.html HTTP/1.0", "http_response": 200, "file_size_bytes": 318, "event_datetime": "2024-03-01T05:51:35.181", "event_ts": 1709232695181}',
+            ]
 
+            EXPECTED_OUTPUT = [
+                UserTraffic(
+                    id="462520009613048791",
+                    page_views=3,
+                    total_bytes=971,
+                    max_bytes=446,
+                    min_bytes=207,
+                )
+            ]
 
-def run():
-    parser = argparse.ArgumentParser(description="Beam pipeline arguments")
-    parser.add_argument(
-        "--inputs",
-        default="inputs",
-        help="Specify folder name that event records are saved",
-    )
-    parser.add_argument(
-        "--runner", default="DirectRunner", help="Specify Apache Beam Runner"
-    )
-    opts = parser.parse_args()
-    PARENT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+            output = (
+                p
+                | beam.Create(LINES)
+                | beam.Map(parse_json).with_output_types(EventLog)
+                | beam.Map(lambda e: (e.id, e.file_size_bytes))
+                | beam.GroupByKey()
+                | beam.ParDo(Aggregate()).with_output_types(UserTraffic)
+            )
 
-    options = PipelineOptions()
-    options.view_as(StandardOptions).runner = opts.runner
-
-    query = """
-    SELECT
-        id,
-        COUNT(*) AS page_views,
-        SUM(file_size_bytes) AS total_bytes,
-        MAX(file_size_bytes) AS max_bytes,
-        MIN(file_size_bytes) AS min_bytes
-    FROM PCOLLECTION
-    GROUP BY id
-    """
-
-    p = beam.Pipeline(options=options)
-    (
-        p
-        | "Read from files"
-        >> beam.io.ReadFromText(
-            file_pattern=os.path.join(PARENT_DIR, opts.inputs, "*.out")
-        )
-        | "Parse elements" >> beam.Map(parse_json).with_output_types(EventLog)
-        | "Aggregate by user" >> SqlTransform(query)
-        | "To Dict" >> beam.Map(lambda e: e._asdict())
-        | "Write to file"
-        >> beam.io.WriteToText(
-            file_path_prefix=os.path.join(
-                PARENT_DIR,
-                "outputs",
-                f"{int(datetime.datetime.now().timestamp() * 1000)}",
-            ),
-            file_name_suffix=".out",
-        )
-    )
-
-    logging.getLogger().setLevel(logging.INFO)
-    logging.info("Building pipeline ...")
-
-    p.run().wait_until_finish()
+            assert_that(output, equal_to(EXPECTED_OUTPUT))
 
 
 if __name__ == "__main__":
-    run()
+    main(out=None)
 ```
 
-When we execute the pipeline script, we see that a Docker container is launched and actual transformations are performed within it via the Java SDK. The container exits when the pipeline completes.
+We can perform unit testing of the batch pipeline simply by executing the test script.
 
 ```bash
-$ python section2/user_traffic_sql.py
-...
+$ python section4/user_traffic_test.py 
+test_aggregate (__main__.AggregateTest) ... ok
+test_parse_json (__main__.ParseJsonTest) ... ok
+test_parse_null_lat_lng (__main__.ParseJsonTest) ... ok
 
-$ docker ps -a --format "table {{.ID}}\t{{.Image}}\t{{.Status}}"
-CONTAINER ID   IMAGE                           STATUS
-c7d7bad6b1e9   apache/beam_java11_sdk:2.53.0   Exited (137) 5 minutes ago
+----------------------------------------------------------------------
+Ran 3 tests in 1.278s
 
-$ cat outputs/1712032675637-00000-of-00001.out 
-{'id': '-297761604717604766', 'page_views': 519, 'total_bytes': 157246, 'max_bytes': 499, 'min_bytes': 103}
-{'id': '3817299155409964875', 'page_views': 515, 'total_bytes': 155516, 'max_bytes': 498, 'min_bytes': 100}
-{'id': '-8832654768096800604', 'page_views': 489, 'total_bytes': 145166, 'max_bytes': 499, 'min_bytes': 100}
-{'id': '4086706052291208999', 'page_views': 503, 'total_bytes': 154038, 'max_bytes': 499, 'min_bytes': 100}
-{'id': '3809491485105813594', 'page_views': 518, 'total_bytes': 155992, 'max_bytes': 499, 'min_bytes': 100}
-{'id': '323358690592146285', 'page_views': 503, 'total_bytes': 150204, 'max_bytes': 497, 'min_bytes': 100}
-{'id': '1097462159655745840', 'page_views': 483, 'total_bytes': 145655, 'max_bytes': 499, 'min_bytes': 101}
-{'id': '-7508437511513814045', 'page_views': 492, 'total_bytes': 146561, 'max_bytes': 499, 'min_bytes': 100}
-{'id': '7514213899672341122', 'page_views': 515, 'total_bytes': 154753, 'max_bytes': 498, 'min_bytes': 100}
-{'id': '8764514706569354597', 'page_views': 498, 'total_bytes': 152005, 'max_bytes': 499, 'min_bytes': 101}
-{'id': '5107076440238203196', 'page_views': 520, 'total_bytes': 155475, 'max_bytes': 499, 'min_bytes': 100}
-{'id': '134630243715938340', 'page_views': 506, 'total_bytes': 153509, 'max_bytes': 498, 'min_bytes': 101}
-{'id': '-6246779037351548961', 'page_views': 432, 'total_bytes': 127013, 'max_bytes': 499, 'min_bytes': 101}
-{'id': '-7450326752843155888', 'page_views': 466, 'total_bytes': 139811, 'max_bytes': 498, 'min_bytes': 100}
-{'id': '4927182384805166657', 'page_views': 501, 'total_bytes': 151023, 'max_bytes': 498, 'min_bytes': 100}
-{'id': '-5889211929143180249', 'page_views': 491, 'total_bytes': 146755, 'max_bytes': 499, 'min_bytes': 100}
-{'id': '8063196327933870504', 'page_views': 526, 'total_bytes': 159395, 'max_bytes': 499, 'min_bytes': 101}
-{'id': '3385356383147784679', 'page_views': 471, 'total_bytes': 142846, 'max_bytes': 499, 'min_bytes': 103}
-{'id': '4396740364429657096', 'page_views': 534, 'total_bytes': 159351, 'max_bytes': 499, 'min_bytes': 101}
-{'id': '-4225319382884577471', 'page_views': 518, 'total_bytes': 158242, 'max_bytes': 499, 'min_bytes': 101}
+OK
 ```
 
-When we develop a pipeline, [Interactive Beam](https://github.com/apache/beam/tree/master/sdks/python/apache_beam/runners/interactive) on a Jupyter notebook can be convenient. The user traffic pipelines are implemented using notebooks, and they can be found in [section2/user_traffic.ipynb](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section2/user_traffic.ipynb) and [section2/user_traffic_sql.ipynb](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section2/user_traffic_sql.ipynb) respectively. We can start a Jupyter server while enabling Jupyter Lab and ignoring authentication as shown below. Once started, it can be accessed on *http://localhost:8888*.
+## Streaming Pipeline Testing
 
-```bash
-$ JUPYTER_ENABLE_LAB=yes jupyter lab --ServerApp.token='' --ServerApp.password=''
-```
+### Pipeline Code
 
-![](user_traffic.png#center)
-
-## Minute Traffic
-
-This pipeline aggregates the number of website visits in fixed time windows over 60 seconds. 
-
-### Beam Pipeline
-
-As the user traffic pipeline, it begins with reading data from a folder named *inputs* and parses the Json lines. Then it adds timestamp to elements by parsing the *event_datetime* attribute, defines fixed time windows over 60 seconds, and counts the number of records within the windows. Finally, it writes the aggregated records into a folder named *outputs* after adding *window_start* and *window_end* timestamp attributes.
+It begins with reading and decoding messages from a Kafka topic named *website-visit*, followed by parsing the decoded Json string into a custom type named *EventLog*. After that, timestamp is re-assigned based on the *event_datetime* attribute and the element is converted into a key-value pair where user ID is taken as the key and 1 is given as the value. Finally, the tuple elements are aggregated in a fixed time window of 20 seconds and written to a Kafka topic named *traffic-agg*. Note that the output messages include two additional attributes (*window_start* and *window_end*) to clarify in which window they belong to.
 
 ```python
-# section2/minute_traffic.py
+# section4/traffic_agg.py
 import os
 import datetime
 import argparse
@@ -367,9 +318,9 @@ import logging
 import typing
 
 import apache_beam as beam
-from apache_beam.transforms.combiners import CountCombineFn
+from apache_beam.io import kafka
 from apache_beam.options.pipeline_options import PipelineOptions
-from apache_beam.options.pipeline_options import StandardOptions
+from apache_beam.options.pipeline_options import SetupOptions
 
 
 class EventLog(typing.NamedTuple):
@@ -387,7 +338,14 @@ class EventLog(typing.NamedTuple):
     event_ts: int
 
 
-beam.coders.registry.register_coder(EventLog, beam.coders.RowCoder)
+def decode_message(kafka_kv: tuple):
+    return kafka_kv[1].decode("utf-8")
+
+
+def create_message(element: dict):
+    key = {"event_id": element["id"], "window_start": element["window_start"]}
+    print(element)
+    return json.dumps(key).encode("utf-8"), json.dumps(element).encode("utf-8")
 
 
 def parse_json(element: str):
@@ -398,7 +356,7 @@ def parse_json(element: str):
     return EventLog(**row)
 
 
-def add_timestamp(element: EventLog):
+def assign_timestamp(element: EventLog):
     ts = datetime.datetime.strptime(
         element.event_datetime, "%Y-%m-%dT%H:%M:%S.%f"
     ).timestamp()
@@ -406,13 +364,14 @@ def add_timestamp(element: EventLog):
 
 
 class AddWindowTS(beam.DoFn):
-    def process(self, element: int, window=beam.DoFn.WindowParam):
+    def process(self, element: tuple, window=beam.DoFn.WindowParam):
         window_start = window.start.to_utc_datetime().isoformat(timespec="seconds")
         window_end = window.end.to_utc_datetime().isoformat(timespec="seconds")
         output = {
+            "id": element[0],
             "window_start": window_start,
             "window_end": window_end,
-            "page_views": element,
+            "page_views": element[1],
         }
         yield output
 
@@ -420,40 +379,67 @@ class AddWindowTS(beam.DoFn):
 def run():
     parser = argparse.ArgumentParser(description="Beam pipeline arguments")
     parser.add_argument(
-        "--inputs",
-        default="inputs",
-        help="Specify folder name that event records are saved",
+        "--runner", default="FlinkRunner", help="Specify Apache Beam Runner"
     )
     parser.add_argument(
-        "--runner", default="DirectRunner", help="Specify Apache Beam Runner"
+        "--use_own",
+        action="store_true",
+        default="Flag to indicate whether to use a own local cluster",
     )
     opts = parser.parse_args()
-    PARENT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
-    options = PipelineOptions()
-    options.view_as(StandardOptions).runner = opts.runner
+    pipeline_opts = {
+        "runner": opts.runner,
+        "job_name": "traffic-agg",
+        "environment_type": "LOOPBACK",
+        "streaming": True,
+        "parallelism": 3,
+        "experiments": [
+            "use_deprecated_read"
+        ],  ## https://github.com/apache/beam/issues/20979
+        "checkpointing_interval": "60000",
+    }
+    if opts.use_own is True:
+        pipeline_opts = {**pipeline_opts, **{"flink_master": "localhost:8081"}}
+    print(pipeline_opts)
+    options = PipelineOptions([], **pipeline_opts)
+    # Required, else it will complain that when importing worker functions
+    options.view_as(SetupOptions).save_main_session = True
 
     p = beam.Pipeline(options=options)
     (
         p
-        | "Read from files"
-        >> beam.io.ReadFromText(
-            file_pattern=os.path.join(os.path.join(PARENT_DIR, "inputs", "*.out"))
+        | "Read from Kafka"
+        >> kafka.ReadFromKafka(
+            consumer_config={
+                "bootstrap.servers": os.getenv(
+                    "BOOTSTRAP_SERVERS",
+                    "host.docker.internal:29092",
+                ),
+                "auto.offset.reset": "earliest",
+                # "enable.auto.commit": "true",
+                "group.id": "traffic-agg",
+            },
+            topics=["website-visit"],
         )
+        | "Decode messages" >> beam.Map(decode_message)
         | "Parse elements" >> beam.Map(parse_json).with_output_types(EventLog)
-        | "Add event timestamp" >> beam.Map(add_timestamp)
-        | "Tumble window per minute" >> beam.WindowInto(beam.window.FixedWindows(60))
-        | "Count per minute"
-        >> beam.CombineGlobally(CountCombineFn()).without_defaults()
+        | "Assign timestamp" >> beam.Map(assign_timestamp)
+        | "Form key value pair" >> beam.Map(lambda e: (e.id, 1))
+        | "Tumble window per minute" >> beam.WindowInto(beam.window.FixedWindows(20))
+        | "Sum by key" >> beam.CombinePerKey(sum)
         | "Add window timestamp" >> beam.ParDo(AddWindowTS())
-        | "Write to file"
-        >> beam.io.WriteToText(
-            file_path_prefix=os.path.join(
-                PARENT_DIR,
-                "outputs",
-                f"{int(datetime.datetime.now().timestamp() * 1000)}",
-            ),
-            file_name_suffix=".out",
+        | "Create messages"
+        >> beam.Map(create_message).with_output_types(typing.Tuple[bytes, bytes])
+        | "Write to Kafka"
+        >> kafka.WriteToKafka(
+            producer_config={
+                "bootstrap.servers": os.getenv(
+                    "BOOTSTRAP_SERVERS",
+                    "host.docker.internal:29092",
+                )
+            },
+            topic="traffic-agg",
         )
     )
 
@@ -467,197 +453,87 @@ if __name__ == "__main__":
     run()
 ```
 
-As mentioned earlier, we set the max lag seconds (`--max_lag_seconds`) to 300 so that records are spread over 5 minutes period. Therefore, we can see that website visit counts are found in multiple time windows.
+### Test Pipeline
 
-```bash
-$ python section2/minute_traffic.py
-...
-$ cat outputs/1712033031226-00000-of-00001.out 
-{'window_start': '2024-04-01T17:30:00', 'window_end': '2024-04-01T17:31:00', 'page_views': 1963}
-{'window_start': '2024-04-01T17:28:00', 'window_end': '2024-04-01T17:29:00', 'page_views': 2023}
-{'window_start': '2024-04-01T17:27:00', 'window_end': '2024-04-01T17:28:00', 'page_views': 1899}
-{'window_start': '2024-04-01T17:29:00', 'window_end': '2024-04-01T17:30:00', 'page_views': 2050}
-{'window_start': '2024-04-01T17:31:00', 'window_end': '2024-04-01T17:32:00', 'page_views': 1970}
-{'window_start': '2024-04-01T17:32:00', 'window_end': '2024-04-01T17:33:00', 'page_views': 95}
-```
+For testing the streaming pipeline, we use a [test stream](https://beam.apache.org/releases/pydoc/2.22.0/_modules/apache_beam/testing/test_stream.html), which is used to generate events on an unbounded *PCollection* of elements. The stream has three elements of a single user with the following timestamp values. 
 
-### Beam SQL
+- *2024-03-01T05:51:22.083*
+- *2024-03-01T05:51:32.083*
+- *2024-03-01T05:51:52.083*
 
-The traffic by fixed time window can also be obtained using *SqlTransform*. As mentioned in Part 1, *Beam SQL* supports two dialects - [Calcite SQL](https://calcite.apache.org/) and [ZetaSQL](https://github.com/google/zetasql). The following pipeline creates output files using both the dialects.
+Therefore, if we aggregate the elements in a fixed time window of 20 seconds, we can expect the first two elements are grouped together while the last element is grouped on its own. The expected output can be created accordingly and compared to the pipeline output for verification.
 
 ```python
-# section2/minute_traffic_sql.py
-import os
+# section4/traffic_agg_test.py
 import datetime
-import argparse
-import json
-import logging
-import typing
+import sys
+import unittest
 
 import apache_beam as beam
-from apache_beam.transforms.sql import SqlTransform
-from apache_beam.options.pipeline_options import PipelineOptions
-from apache_beam.options.pipeline_options import StandardOptions
+from apache_beam.testing.test_pipeline import TestPipeline
+from apache_beam.testing.util import assert_that, equal_to
+from apache_beam.testing.test_stream import TestStream
+from apache_beam.options.pipeline_options import PipelineOptions, StandardOptions
+
+from traffic_agg import EventLog, parse_json, assign_timestamp
 
 
-class EventLog(typing.NamedTuple):
-    ip: str
-    id: str
-    lat: float
-    lng: float
-    user_agent: str
-    age_bracket: str
-    opted_into_marketing: bool
-    http_request: str
-    http_response: int
-    file_size_bytes: int
-    event_datetime: str
-    event_ts: int
+def main(out=sys.stderr, verbosity=2):
+    loader = unittest.TestLoader()
+
+    suite = loader.loadTestsFromModule(sys.modules[__name__])
+    unittest.TextTestRunner(out, verbosity=verbosity).run(suite)
 
 
-beam.coders.registry.register_coder(EventLog, beam.coders.RowCoder)
+class TrafficWindowingTest(unittest.TestCase):
+    def test_windowing_behaviour(self):
+        options = PipelineOptions()
+        options.view_as(StandardOptions).streaming = True
+        with TestPipeline(options=options) as p:
+            EVENTS = [
+                '{"ip": "138.201.212.70", "id": "462520009613048791", "lat": 50.4779, "lng": 12.3713, "user_agent": "Mozilla/5.0 (iPod; U; CPU iPhone OS 3_1 like Mac OS X; ks-IN) AppleWebKit/532.30.7 (KHTML, like Gecko) Version/3.0.5 Mobile/8B115 Safari/6532.30.7", "age_bracket": "18-25", "opted_into_marketing": false, "http_request": "GET eucharya.html HTTP/1.0", "http_response": 200, "file_size_bytes": 207, "event_datetime": "2024-03-01T05:51:22.083", "event_ts": 1709232682083}',
+                '{"ip": "138.201.212.70", "id": "462520009613048791", "lat": 50.4779, "lng": 12.3713, "user_agent": "Mozilla/5.0 (iPod; U; CPU iPhone OS 3_1 like Mac OS X; ks-IN) AppleWebKit/532.30.7 (KHTML, like Gecko) Version/3.0.5 Mobile/8B115 Safari/6532.30.7", "age_bracket": "18-25", "opted_into_marketing": false, "http_request": "GET eucharya.html HTTP/1.0", "http_response": 200, "file_size_bytes": 207, "event_datetime": "2024-03-01T05:51:32.083", "event_ts": 1709232682083}',
+                '{"ip": "138.201.212.70", "id": "462520009613048791", "lat": 50.4779, "lng": 12.3713, "user_agent": "Mozilla/5.0 (iPod; U; CPU iPhone OS 3_1 like Mac OS X; ks-IN) AppleWebKit/532.30.7 (KHTML, like Gecko) Version/3.0.5 Mobile/8B115 Safari/6532.30.7", "age_bracket": "18-25", "opted_into_marketing": false, "http_request": "GET eucharya.html HTTP/1.0", "http_response": 200, "file_size_bytes": 207, "event_datetime": "2024-03-01T05:51:52.083", "event_ts": 1709232682083}',
+            ]
 
+            test_stream = (
+                TestStream()
+                .advance_watermark_to(0)
+                .add_elements([EVENTS[0], EVENTS[1], EVENTS[2]])
+                .advance_watermark_to_infinity()
+            )
 
-def parse_json(element: str):
-    row = json.loads(element)
-    # lat/lng sometimes empty string
-    if not row["lat"] or not row["lng"]:
-        row = {**row, **{"lat": -1, "lng": -1}}
-    return EventLog(**row)
+            output = (
+                p
+                | test_stream
+                | beam.Map(parse_json).with_output_types(EventLog)
+                | beam.Map(assign_timestamp)
+                | beam.Map(lambda e: (e.id, 1))
+                | beam.WindowInto(beam.window.FixedWindows(20))
+                | beam.CombinePerKey(sum)
+            )
 
+            EXPECTED_OUTPUT = [("462520009613048791", 2), ("462520009613048791", 1)]
 
-def format_timestamp(element: EventLog):
-    event_ts = datetime.datetime.fromisoformat(element.event_datetime)
-    temp_dict = element._asdict()
-    temp_dict["event_datetime"] = datetime.datetime.strftime(
-        event_ts, "%Y-%m-%d %H:%M:%S"
-    )
-    return EventLog(**temp_dict)
-
-
-def run():
-    parser = argparse.ArgumentParser(description="Beam pipeline arguments")
-    parser.add_argument(
-        "--inputs",
-        default="inputs",
-        help="Specify folder name that event records are saved",
-    )
-    parser.add_argument(
-        "--runner", default="DirectRunner", help="Specify Apache Beam Runner"
-    )
-    opts = parser.parse_args()
-    PARENT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-
-    options = PipelineOptions()
-    options.view_as(StandardOptions).runner = opts.runner
-
-    calcite_query = """
-    WITH cte AS (
-        SELECT CAST(event_datetime AS TIMESTAMP) AS ts
-        FROM PCOLLECTION
-    )
-    SELECT
-        CAST(TUMBLE_START(ts, INTERVAL '1' MINUTE) AS VARCHAR) AS window_start,
-        CAST(TUMBLE_END(ts, INTERVAL '1' MINUTE) AS VARCHAR) AS window_end,
-        COUNT(*) AS page_view
-    FROM cte
-    GROUP BY
-        TUMBLE(ts, INTERVAL '1' MINUTE)
-    """
-
-    zeta_query = """
-    SELECT
-        STRING(window_start) AS start_time,
-        STRING(window_end) AS end_time,
-        COUNT(*) AS page_views
-    FROM
-        TUMBLE(
-            (SELECT TIMESTAMP(event_datetime) AS ts FROM PCOLLECTION),
-            DESCRIPTOR(ts),
-            'INTERVAL 1 MINUTE')
-    GROUP BY
-        window_start, window_end
-    """
-
-    p = beam.Pipeline(options=options)
-    transformed = (
-        p
-        | "Read from files"
-        >> beam.io.ReadFromText(
-            file_pattern=os.path.join(os.path.join(PARENT_DIR, "inputs", "*.out"))
-        )
-        | "Parse elements" >> beam.Map(parse_json).with_output_types(EventLog)
-        | "Format timestamp" >> beam.Map(format_timestamp).with_output_types(EventLog)
-    )
-
-    ## calcite sql output
-    (
-        transformed
-        | "Count per minute via Caltice" >> SqlTransform(calcite_query)
-        | "To Dict via Caltice" >> beam.Map(lambda e: e._asdict())
-        | "Write to file via Caltice"
-        >> beam.io.WriteToText(
-            file_path_prefix=os.path.join(
-                PARENT_DIR,
-                "outputs",
-                f"{int(datetime.datetime.now().timestamp() * 1000)}-calcite",
-            ),
-            file_name_suffix=".out",
-        )
-    )
-
-    ## zeta sql output
-    (
-        transformed
-        | "Count per minute via Zeta" >> SqlTransform(zeta_query, dialect="zetasql")
-        | "To Dict via Zeta" >> beam.Map(lambda e: e._asdict())
-        | "Write to file via Zeta"
-        >> beam.io.WriteToText(
-            file_path_prefix=os.path.join(
-                PARENT_DIR,
-                "outputs",
-                f"{int(datetime.datetime.now().timestamp() * 1000)}-zeta",
-            ),
-            file_name_suffix=".out",
-        )
-    )
-
-    logging.getLogger().setLevel(logging.INFO)
-    logging.info("Building pipeline ...")
-
-    p.run().wait_until_finish()
+            assert_that(output, equal_to(EXPECTED_OUTPUT))
 
 
 if __name__ == "__main__":
-    run()
+    main(out=None)
 ```
 
-As expected, both the SQL dialects produce the same output.
+Similar to the previous testing, we can execute the test script for performing unit testing of the streaming pipeline.
 
 ```bash
-$ python section2/minute_traffic_sql.py
-...
-$ cat outputs/1712033090583-calcite-00000-of-00001.out 
-{'window_start': '2024-04-02 04:32:00', 'window_end': '2024-04-02 04:33:00', 'page_view': 95}
-{'window_start': '2024-04-02 04:28:00', 'window_end': '2024-04-02 04:29:00', 'page_view': 2023}
-{'window_start': '2024-04-02 04:30:00', 'window_end': '2024-04-02 04:31:00', 'page_view': 1963}
-{'window_start': '2024-04-02 04:29:00', 'window_end': '2024-04-02 04:30:00', 'page_view': 2050}
-{'window_start': '2024-04-02 04:27:00', 'window_end': '2024-04-02 04:28:00', 'page_view': 1899}
-{'window_start': '2024-04-02 04:31:00', 'window_end': '2024-04-02 04:32:00', 'page_view': 1970}
+$ python section4/traffic_agg_test.py 
+test_windowing_behaviour (__main__.TrafficWindowingTest) ... ok
 
-$ cat outputs/1712033101760-zeta-00000-of-00001.out 
-{'start_time': '2024-04-02 04:30:00+00', 'end_time': '2024-04-02 04:31:00+00', 'page_views': 1963}
-{'start_time': '2024-04-02 04:29:00+00', 'end_time': '2024-04-02 04:30:00+00', 'page_views': 2050}
-{'start_time': '2024-04-02 04:31:00+00', 'end_time': '2024-04-02 04:32:00+00', 'page_views': 1970}
-{'start_time': '2024-04-02 04:32:00+00', 'end_time': '2024-04-02 04:33:00+00', 'page_views': 95}
-{'start_time': '2024-04-02 04:28:00+00', 'end_time': '2024-04-02 04:29:00+00', 'page_views': 2023}
-{'start_time': '2024-04-02 04:27:00+00', 'end_time': '2024-04-02 04:28:00+00', 'page_views': 1899}
+----------------------------------------------------------------------
+Ran 1 test in 0.527s
+
+OK
 ```
-
-Jupyter notebooks are created for the minute traffic pipelines, and they can be found in [section2/minute_traffic.ipynb](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section2/minute_traffic.ipynb) and [section2/minute_traffic_sql.ipynb](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section2/minute_traffic_sql.ipynb) respectively.
-
-![](minute_traffic.png#center)
 
 ## Summary
 
-As part of discussing local development of *Apache Beam* pipelines using Python, we developed Batch pipelines that aggregate website visit log by user and time in this post. The pipelines were developed with and without *Beam SQL*. Additionally, each pipeline was implemented on a Jupyter notebook for demonstration.
+In this series of posts, we discussed local development of Apache Beam pipelines using Python. In *Part 1*, a basic Beam pipeline was introduced, followed by demonstrating how to utilise Jupyter notebooks for interactive development. Several notebook examples were covered including [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) and [Beam DataFrames](https://beam.apache.org/documentation/dsls/dataframes/overview/). Batch pipelines were developed in *Part 2*, and we used pipelines from [GCP Python DataFlow Quest](https://github.com/GoogleCloudPlatform/training-data-analyst/tree/master/quests/dataflow_python) while modifying them to access local resources only. Each batch pipeline has two versions with/without SQL. In *Part 3*, we discussed how to set up local Flink and Kafka clusters for deploying streaming pipelines on the [Flink Runner](https://beam.apache.org/documentation/runners/flink/). A streaming pipeline with/without Beam SQL was built in *Part 4*, and this series concludes with illustrating unit testing of existing pipelines in this post.

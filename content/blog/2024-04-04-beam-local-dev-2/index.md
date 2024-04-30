@@ -51,7 +51,7 @@ This pipeline basically calculates the number of website visits and distribution
 
 ### Beam Pipeline
 
-The pipeline begins with reading data from a folder named *inputs* and parses the Json lines. Then it creates a key value pair where the key is the user ID (`id`) and the value is the file size bytes (`file_size_bytes`). After that, the records are grouped by the key and aggregated to obtain website visit count and traffic consumption distribution per user using a [ParDo](https://beam.apache.org/documentation/transforms/python/elementwise/pardo/) transform. Finally, the output records are written to a folder named *outputs* after being converted into dictionary.
+The pipeline begins with reading data from a folder named *inputs* and parses the Json lines. Then it creates a key-value pair where the key is the user ID (`id`) and the value is the file size bytes (`file_size_bytes`). After that, the records are grouped by the key and aggregated to obtain website visit count and traffic consumption distribution using a [ParDo](https://beam.apache.org/documentation/transforms/python/elementwise/pardo/) transform. Finally, the output records are written to a folder named *outputs* after being converted into dictionary.
 
 Note that custom types are created for the input and output elements using [element schema](https://beam.apache.org/documentation/programming-guide/#element-schema) (*EventLog* and *UserTraffic*), and transformations become more expressive using them. Also, the custom types are [registered to the coder registry](https://beam.apache.org/documentation/programming-guide/#specifying-coders) so that they are encoded/decoded appropriately - see the transformations that specify the output types via `with_output_types`.
 
