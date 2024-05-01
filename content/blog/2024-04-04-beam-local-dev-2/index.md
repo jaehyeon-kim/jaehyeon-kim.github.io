@@ -29,7 +29,7 @@ In this series, we discuss local development of [Apache Beam](https://beam.apach
 * [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1)
 * [Part 2 Batch Pipelines](#) (this post)
 * [Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3)
-* Part 4 Streaming Pipelines
+* [Part 4 Streaming Pipelines](/blog/2024-05-02-beam-local-dev-4)
 * Part 5 Testing Pipelines
 
 ## Data Generation
@@ -51,9 +51,12 @@ This pipeline basically calculates the number of website visits and distribution
 
 ### Beam Pipeline
 
-The pipeline begins with reading data from a folder named *inputs* and parses the Json lines. Then it creates a key value pair where the key is the user ID (`id`) and the value is the file size bytes (`file_size_bytes`). After that, the records are grouped by the key and aggregated to obtain website visit count and traffic consumption distribution per user using a [ParDo](https://beam.apache.org/documentation/transforms/python/elementwise/pardo/) transform. Finally, the output records are written to a folder named *outputs* after being converted into dictionary.
+The pipeline begins with reading data from a folder named *inputs* and parses the Json lines. Then it creates a key-value pair where the key is the user ID (`id`) and the value is the file size bytes (`file_size_bytes`). After that, the records are grouped by the key and aggregated to obtain website visit count and traffic consumption distribution using a [ParDo](https://beam.apache.org/documentation/transforms/python/elementwise/pardo/) transform. Finally, the output records are written to a folder named *outputs* after being converted into dictionary.
 
 Note that custom types are created for the input and output elements using [element schema](https://beam.apache.org/documentation/programming-guide/#element-schema) (*EventLog* and *UserTraffic*), and transformations become more expressive using them. Also, the custom types are [registered to the coder registry](https://beam.apache.org/documentation/programming-guide/#specifying-coders) so that they are encoded/decoded appropriately - see the transformations that specify the output types via `with_output_types`.
+
+[**Update 2024-04-30**]
+Note the coders for the custom types are registered, but it is not required because we don't have a cross-language transformation that deals with them.
 
 ```python
 # section2/user_traffic.py
@@ -357,6 +360,9 @@ This pipeline aggregates the number of website visits in fixed time windows over
 ### Beam Pipeline
 
 As the user traffic pipeline, it begins with reading data from a folder named *inputs* and parses the Json lines. Then it adds timestamp to elements by parsing the *event_datetime* attribute, defines fixed time windows over 60 seconds, and counts the number of records within the windows. Finally, it writes the aggregated records into a folder named *outputs* after adding *window_start* and *window_end* timestamp attributes.
+
+[**Update 2024-04-30**]
+Note the coder for the custom type is registered, but it is not required because we don't have a cross-language transformation that deals with it.
 
 ```python
 # section2/minute_traffic.py
