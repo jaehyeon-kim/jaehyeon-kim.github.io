@@ -1,7 +1,7 @@
 ---
 title: Apache Beam Local Development with Python - Part 5 Testing Pipelines
 date: 2024-05-09
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -455,7 +455,7 @@ if __name__ == "__main__":
 
 ### Test Pipeline
 
-For testing the streaming pipeline, we use a [test stream](https://beam.apache.org/releases/pydoc/2.22.0/_modules/apache_beam/testing/test_stream.html), which is used to generate events on an unbounded *PCollection* of elements. The stream has three elements of a single user with the following timestamp values. 
+For testing the streaming pipeline, we use a [TestStream](https://beam.apache.org/releases/pydoc/2.22.0/_modules/apache_beam/testing/test_stream.html), which is used to generate events on an unbounded *PCollection* of elements. The stream has three elements of a single user with the following timestamp values. 
 
 - *2024-03-01T05:51:22.083*
 - *2024-03-01T05:51:32.083*
