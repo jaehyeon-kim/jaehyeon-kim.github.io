@@ -17,17 +17,18 @@ tags:
   - Apache Flink
   - Apache Kafka
   - Kubernetes
+  - Minikube
   - Python
   - Docker
 authors:
   - JaehyeonKim
 images: []
-description: Flink Kubernetes Operator acts as a control plane to manage the complete deployment lifecycle of Apache Flink applications. With the operator, we can simplify deployment and management of Python stream processing applications, and we discuss how to deploy a PyFlink application and Python Apache Beam pipeline on the Flink Runner on Kubernetes in this series. In Part 1, we first deploy a Kafka cluster on minikube as the source and sink of the PyFlink application are Kafka topics. Then, the application source is packaged in a custom Docker image and deployed on the minikube cluster using the Flink Kubernetes Operator. Finally, the output of the application is checked by sending messages to the input Kafka topic using a Python producer application.
+description: Flink Kubernetes Operator acts as a control plane to manage the complete deployment lifecycle of Apache Flink applications. With the operator, we can simplify deployment and management of Python stream processing applications. In this series, we discuss how to deploy a PyFlink application and Python Apache Beam pipeline on the Flink Runner on Kubernetes. In Part 1, we first deploy a Kafka cluster on a minikube cluster as the source and sink of the PyFlink application are Kafka topics. Then, the application source is packaged in a custom Docker image and deployed on the minikube cluster using the Flink Kubernetes Operator. Finally, the output of the application is checked by sending messages to the input Kafka topic using a Python producer application.
 ---
 
-[Flink Kubernetes Operator](https://nightlies.apache.org/flink/flink-kubernetes-operator-docs-main/docs/concepts/overview/) acts as a control plane to manage the complete deployment lifecycle of Apache Flink applications. With the operator, we can simplify deployment and management of Python stream processing applications, and we discuss how to deploy a PyFlink application and Python Apache Beam pipeline on the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) on Kubernetes in this series.
+[Flink Kubernetes Operator](https://nightlies.apache.org/flink/flink-kubernetes-operator-docs-main/docs/concepts/overview/) acts as a control plane to manage the complete deployment lifecycle of Apache Flink applications. With the operator, we can simplify deployment and management of Python stream processing applications. In this series, we discuss how to deploy a PyFlink application and Python Apache Beam pipeline on the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) on Kubernetes.
 
-In Part 1, we first deploy a Kafka cluster on [minikube](https://minikube.sigs.k8s.io/docs/) as the source and sink of the PyFlink application are Kafka topics. Then, the application source is packaged in a custom Docker image and deployed on the minikube cluster using the Flink Kubernetes Operator. Finally, the output of the application is checked by sending messages to the input Kafka topic using a Python producer application.
+In Part 1, we first deploy a Kafka cluster on a [minikube](https://minikube.sigs.k8s.io/docs/) cluster as the source and sink of the PyFlink application are Kafka topics. Then, the application source is packaged in a custom Docker image and deployed on the minikube cluster using the Flink Kubernetes Operator. Finally, the output of the application is checked by sending messages to the input Kafka topic using a Python producer application.
 
 * [Part 1 PyFlink Applicatin](#) (this post)
 * Part 2 Beam Pipeline on Flink Runner
@@ -42,7 +43,7 @@ minikube start --cpus='max' --memory=20480 --addons=metrics-server --kubernetes-
 
 ### Deploy Strimzi Operator
 
-The [**project repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-deploy) keeps manifest files that can be used to deploy the *Strimzi Operator*, Kafka cluster and Kafka management app. If you want to download a different version of the operator, you can download the relevant manifest file by specifying the desired version. By default, the manifest file assumes that the resources are deployed in the *myproject* namespace. As we deploy them in the *default* namespace, however, we need to change the resource namespace using [sed](https://www.gnu.org/software/sed/manual/sed.html) accordingly. The operator can be deployed using `kubectl create`.
+The [**project repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-deploy) keeps manifest files that can be used to deploy the *Strimzi Operator*, Kafka cluster and Kafka management app. If you want to download a different version of the operator, you can download the relevant manifest file by specifying the desired version. By default, the manifest file assumes that the resources are deployed in the *myproject* namespace. As we deploy them in the *default* namespace, however, we need to change the resource namespace using [sed](https://www.gnu.org/software/sed/manual/sed.html). The operator can be deployed using `kubectl create`.
 
 ```bash
 ## download and deploy strimzi oeprator
@@ -74,7 +75,7 @@ kubectl get deploy,rs,po
 
 ### Deploy Kafka Cluster
 
-We deploy a Kafka cluster with a single broker and Zookeeper node. It has both internal and external listeners on port 9092 and 29092 respectively. Note that the external listener will be used to access the Kafka cluster outside the minikube cluster. Also, the cluster is configured to allow automatic creation of topics (*auto.create.topics.enable: "true"*) and the default number of partition is set to 3 (*num.partitions: 3*).
+We deploy a Kafka cluster with a single broker and Zookeeper node. It has both internal and external listeners on port 9092 and 29092 respectively. Note that the external listener will be used to access the Kafka cluster outside the minikube cluster. Also, the cluster is configured to allow automatic creation of topics (*auto.create.topics.enable: "true"*) and the default number of partitions is set to 3 (*num.partitions: 3*).
 
 ```yaml
 # kafka/manifests/kafka-cluster.yaml
@@ -148,18 +149,22 @@ The Kafka and Zookeeper nodes are managed by the [*StrimziPodSet*](https://strim
   - *demo-cluster-kafka-external-bootstrap* - to access Kafka brokers from the producer app
 
 ```bash
-kubectl get all -l app.kubernetes.io/instance=demo-cluster
+kubectl get po,strimzipodsets.core.strimzi.io,svc -l app.kubernetes.io/instance=demo-cluster
 # NAME                           READY   STATUS    RESTARTS   AGE
-# pod/demo-cluster-kafka-0       1/1     Running   0          94s
-# pod/demo-cluster-zookeeper-0   1/1     Running   0          117s
+# pod/demo-cluster-kafka-0       1/1     Running   0          115s
+# pod/demo-cluster-zookeeper-0   1/1     Running   0          2m20s
+
+# NAME                                                   PODS   READY PODS   CURRENT PODS   AGE
+# strimzipodset.core.strimzi.io/demo-cluster-kafka       1      1            1              115s
+# strimzipodset.core.strimzi.io/demo-cluster-zookeeper   1      1            1              2m20s
 
 # NAME                                            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                               AGE
-# service/demo-cluster-kafka-bootstrap            ClusterIP   10.111.140.173   <none>        9091/TCP,9092/TCP                     94s
-# service/demo-cluster-kafka-brokers              ClusterIP   None             <none>        9090/TCP,9091/TCP,8443/TCP,9092/TCP   94s
-# service/demo-cluster-kafka-external-0           NodePort    10.104.111.213   <none>        29092:30663/TCP                       94s
-# service/demo-cluster-kafka-external-bootstrap   NodePort    10.104.149.213   <none>        29092:31966/TCP                       94s
-# service/demo-cluster-zookeeper-client           ClusterIP   10.98.115.75     <none>        2181/TCP                              118s
-# service/demo-cluster-zookeeper-nodes            ClusterIP   None             <none>        2181/TCP,2888/TCP,3888/TCP            118s
+# service/demo-cluster-kafka-bootstrap            ClusterIP   10.101.175.64    <none>        9091/TCP,9092/TCP                     115s
+# service/demo-cluster-kafka-brokers              ClusterIP   None             <none>        9090/TCP,9091/TCP,8443/TCP,9092/TCP   115s
+# service/demo-cluster-kafka-external-0           NodePort    10.106.155.20    <none>        29092:32475/TCP                       115s
+# service/demo-cluster-kafka-external-bootstrap   NodePort    10.111.244.128   <none>        29092:32674/TCP                       115s
+# service/demo-cluster-zookeeper-client           ClusterIP   10.100.215.29    <none>        2181/TCP                              2m20s
+# service/demo-cluster-zookeeper-nodes            ClusterIP   None             <none>        2181/TCP,2888/TCP,3888/TCP            2m20s
 ```
 
 ### Deploy Kafka UI
@@ -238,7 +243,7 @@ kubectl get all -l app=kafka-ui
 # replicaset.apps/kafka-ui-65dbbc98dc   1         1         1       35s
 ```
 
-We can use `kubectl port-forward` to connect to the *kafka-ui* server running in a Kubernetes cluster.
+We can use `kubectl port-forward` to connect to the *kafka-ui* server running in the minikube cluster.
 
 ```bash
 kubectl port-forward svc/kafka-ui 8080
@@ -252,7 +257,7 @@ A streaming processing application is developed using PyFlink and it is packaged
 
 ### PyFlink Code
 
-The application begins with reading text messages from a Kafka topic named *input-topic*, followed by extracting words by splitting the messages. Next, as we are going to calculate the average lengths of all words, all of them are added to a Tumbling window of 5 seconds - we use a processing time window for simplicity. After that, it calculates the average length of words in a window. Note that, as we are going to include the window start and end timestamps, the *ProcessAllWindowFunction* is used instead of the *AggregateFunction*. Finally, the output reocrds are sent into a Kafka topic named *output-topic-flink*.
+The application begins with reading text messages from a Kafka topic named *input-topic*, followed by extracting words by splitting the messages. Next, as we are going to calculate the average lengths of all words, all of them are added to a Tumbling window of 5 seconds - we use a processing time window for simplicity. After that, it calculates the average length of words within a window. Note that, as we are going to include the window start and end timestamps, the *ProcessAllWindowFunction* is used instead of the *AggregateFunction*. Finally, the output reocrds are sent to a Kafka topic named *output-topic-flink*.
 
 ```python
 # flink/word_len.py
@@ -411,7 +416,7 @@ docker build -t flink-python-example:1.17 flink/
 
 ## Deploy Stream Processing App
 
-The Pyflink application is be deployed as a single job of a Flink cluster using the Flink Kubernetes Operator. Then, we check the output of the application by sending text messages to the input Kafka topic.
+The Pyflink application is deployed as a single job of a Flink cluster using the Flink Kubernetes Operator. Then, we check the output of the application by sending text messages to the input Kafka topic.
 
 ### Deploy Flink Kubernetes Operator
 
@@ -435,7 +440,7 @@ helm list
 
 ### Deploy PyFlink App
 
-The PyFlink app is deployed as a single job of a Flink cluster using the *FlinkDeployment* custom resource. In the manifest file, we configure common properties such as the Docker image, Flink version, cluster configuration and pod template. These properties are applied to the Flink job manager and task manager where only the replica and resource are specified additionally. Finally, the PyFlink app is added as a job where the main *PythonDriver* entry class requires the paths of the Python executable and application source script. See this page for details about the [*FlinkDeployment*](https://nightlies.apache.org/flink/flink-kubernetes-operator-docs-release-1.8/docs/custom-resource/overview/) resource.
+The PyFlink app is deployed as a single job of a Flink cluster using the *FlinkDeployment* custom resource. In the manifest file, we configure common properties such as the Docker image, Flink version, cluster configuration and pod template. These properties are applied to the Flink job manager and task manager, and only the replica and resource are specified additionally to them. Finally, the PyFlink app is added as a job where the main *PythonDriver* entry class requires the paths of the Python executable and application source script. See this page for details about the [*FlinkDeployment*](https://nightlies.apache.org/flink/flink-kubernetes-operator-docs-release-1.8/docs/custom-resource/overview/) resource.
 
 ```yaml
 # flink/word_len.yml
@@ -500,11 +505,15 @@ Before we deploy the PyFlink app, make sure the input topic is created. We can c
 
 ![](topic-create.png#center)
 
-The app can be deployed using `kubectl create`, and it creates the Flink job manager, task manager and associated services.
+The app can be deployed using `kubectl create`, and it creates the *FlinkDeployment* custom resource, which manages the job manager deployment, task manager pod and associated services.
 
 ```bash
 kubectl create -f flink/word_len.yml
 # flinkdeployment.flink.apache.org/flink-word-len created
+
+kubectl get flinkdeployments.flink.apache.org
+# NAME             JOB STATUS   LIFECYCLE STATE
+# flink-word-len   RUNNING      STABLE
 
 kubectl get all -l app=flink-word-len
 # NAME                                  READY   STATUS    RESTARTS   AGE
@@ -601,7 +610,7 @@ We can see the output topic (*output-topic-flink*) is created on *kafka-ui*.
 
 ![](kafka-topics.png#center)
 
-Also, we can check the output messages are created as expected in the *Topics* tab. 
+Also, the output messages are created as expected in the *Topics* tab. 
 
 ![](output-topic-messages.png#center)
 
@@ -613,6 +622,7 @@ The Kubernetes resources and minikube cluster can be deleted as shown below.
 ## delete flink operator and related resoruces
 kubectl delete flinkdeployment/flink-word-len
 helm uninstall flink-kubernetes-operator
+helm repo remove flink-operator-repo
 kubectl delete -f https://github.com/jetstack/cert-manager/releases/download/v1.8.2/cert-manager.yaml
 
 ## delete kafka cluster and related resources
@@ -627,4 +637,4 @@ minikube delete
 
 ## Summary
 
-Flink Kubernetes Operator acts as a control plane to manage the complete deployment lifecycle of Apache Flink applications. With the operator, we can simplify deployment and management of Python stream processing applications on Kubernetes. In this post, we discussed how to deploy a PyFlink application on Kubernetes. We first deployed a Kafka cluster on minikube as the source and sink of the PyFlink application are Kafka topics. Then, the application source is packaged in a custom Docker image and deployed on the minikube cluster using the Flink Kubernetes Operator. Finally, the output of the application is checked by sending messages to the input Kafka topic using a Python producer application.
+Flink Kubernetes Operator acts as a control plane to manage the complete deployment lifecycle of Apache Flink applications. With the operator, we can simplify deployment and management of Python stream processing applications on Kubernetes. In this post, we discussed how to deploy a PyFlink application on Kubernetes. We first deployed a Kafka cluster on a minikube cluster as the source and sink of the PyFlink application are Kafka topics. Then, the application source is packaged in a custom Docker image and deployed on the minikube cluster using the Flink Kubernetes Operator. Finally, the output of the application is checked by sending messages to the input Kafka topic using a Python producer application.
