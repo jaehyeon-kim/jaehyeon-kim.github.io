@@ -31,7 +31,7 @@ The [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) is an eff
 * [Part 2 Glue](/blog/2022-10-09-dbt-on-aws-part-2-glue)
 * [Part 3 EMR on EC2](/blog/2022-10-19-dbt-on-aws-part-3-emr-ec2)
 * [Part 4 EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks)
-* [Part 5 Athena](/blog/2023-04-12-integrate-glue-schema-registry)
+* [Part 5 Athena](/blog/2022-12-06-dbt-on-aws-part-5-athena)
 
 
 ## Motivation
