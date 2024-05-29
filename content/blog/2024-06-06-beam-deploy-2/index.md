@@ -18,6 +18,7 @@ tags:
   - Apache Flink
   - Apache Kafka
   - Kubernetes
+  - Minikube
   - Python
   - Docker
 authors:
@@ -26,7 +27,7 @@ images: []
 description: to be updated 
 ---
 
-* [Part 1 PyFlink Applicatin](/blog/2024-06-06-beam-deploy-1)
+* [Part 1 PyFlink Applicatin](/blog/2024-05-30-beam-deploy-1)
 * [Part 2 Beam Pipeline on Flink Runner](#) (this post)
 
 ## Deploy Kafka Cluster
@@ -553,6 +554,7 @@ The Kubernetes resources and minikube cluster can be deleted as shown below.
 kubectl delete -f beam/word_len_cluster.yml
 kubectl delete -f beam/word_len_job.yml
 helm uninstall flink-kubernetes-operator
+helm repo remove flink-operator-repo
 kubectl delete -f https://github.com/jetstack/cert-manager/releases/download/v1.8.2/cert-manager.yaml
 
 ## delete kafka cluster and related resources
