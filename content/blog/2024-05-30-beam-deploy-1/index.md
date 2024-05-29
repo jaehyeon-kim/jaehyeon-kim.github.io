@@ -30,7 +30,7 @@ description: Flink Kubernetes Operator acts as a control plane to manage the com
 
 In Part 1, we first deploy a Kafka cluster on a [minikube](https://minikube.sigs.k8s.io/docs/) cluster as the source and sink of the PyFlink application are Kafka topics. Then, the application source is packaged in a custom Docker image and deployed on the minikube cluster using the Flink Kubernetes Operator. Finally, the output of the application is checked by sending messages to the input Kafka topic using a Python producer application.
 
-* [Part 1 PyFlink Applicatin](#) (this post)
+* [Part 1 PyFlink Application](#) (this post)
 * Part 2 Beam Pipeline on Flink Runner
 
 ## Setup Kafka Cluster

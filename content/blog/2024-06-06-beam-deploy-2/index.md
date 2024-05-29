@@ -27,7 +27,7 @@ images: []
 description: to be updated 
 ---
 
-* [Part 1 PyFlink Applicatin](/blog/2024-05-30-beam-deploy-1)
+* [Part 1 PyFlink Application](/blog/2024-05-30-beam-deploy-1)
 * [Part 2 Beam Pipeline on Flink Runner](#) (this post)
 
 ## Deploy Kafka Cluster
