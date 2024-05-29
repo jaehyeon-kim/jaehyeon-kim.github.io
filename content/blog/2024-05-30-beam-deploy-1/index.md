@@ -1,5 +1,5 @@
 ---
-title: Deploy Python Streaming Processing App on Kubernetes - Part 1 PyFlink Applicatin
+title: Deploy Python Streaming Processing App on Kubernetes - Part 1 PyFlink Application
 date: 2024-05-30
 draft: false
 featured: true
