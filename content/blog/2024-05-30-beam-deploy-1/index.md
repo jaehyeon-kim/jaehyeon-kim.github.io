@@ -1,5 +1,5 @@
 ---
-title: Deploy Python Streaming Processing App on Kubernetes - Part 1 PyFlink Application
+title: Deploy Python Stream Processing App on Kubernetes - Part 1 PyFlink Application
 date: 2024-05-30
 draft: false
 featured: true
@@ -10,7 +10,7 @@ pinned: false
 carousel: false
 featuredImage: false
 series:
-  - Deploy Python Streaming Processing App on Kubernetes
+  - Deploy Python Stream Processing App on Kubernetes
 categories:
   - Data Streaming
 tags: 
@@ -31,7 +31,7 @@ description: Flink Kubernetes Operator acts as a control plane to manage the com
 In Part 1, we first deploy a Kafka cluster on a [minikube](https://minikube.sigs.k8s.io/docs/) cluster as the source and sink of the PyFlink application are Kafka topics. Then, the application source is packaged in a custom Docker image and deployed on the minikube cluster using the Flink Kubernetes Operator. Finally, the output of the application is checked by sending messages to the input Kafka topic using a Python producer application.
 
 * [Part 1 PyFlink Application](#) (this post)
-* Part 2 Beam Pipeline on Flink Runner
+* [Part 2 Beam Pipeline on Flink Runner](/blog/2024-06-06-beam-deploy-2)
 
 ## Setup Kafka Cluster
 
@@ -243,7 +243,7 @@ kubectl get all -l app=kafka-ui
 # replicaset.apps/kafka-ui-65dbbc98dc   1         1         1       35s
 ```
 
-We can use `kubectl port-forward` to connect to the *kafka-ui* server running in the minikube cluster.
+We can use `kubectl port-forward` to connect to the *kafka-ui* server running in the minikube cluster on port 8080.
 
 ```bash
 kubectl port-forward svc/kafka-ui 8080
@@ -253,7 +253,7 @@ kubectl port-forward svc/kafka-ui 8080
 
 ## Develop Stream Processing App
 
-A streaming processing application is developed using PyFlink and it is packaged in a custom Docker image for deployment.
+A stream processing application is developed using PyFlink, and it is packaged in a custom Docker image for deployment.
 
 ### PyFlink Code
 
@@ -610,7 +610,7 @@ We can see the output topic (*output-topic-flink*) is created on *kafka-ui*.
 
 ![](kafka-topics.png#center)
 
-Also, the output messages are created as expected in the *Topics* tab. 
+Also, we can check the output messages are created as expected in the *Topics* tab. 
 
 ![](output-topic-messages.png#center)
 

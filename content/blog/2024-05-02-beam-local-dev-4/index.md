@@ -29,7 +29,7 @@ In [Part 3](/blog/2024-04-18-beam-local-dev-3), we discussed the portability lay
 * [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2)
 * [Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3)
 * [Part 4 Streaming Pipelines](#) (this post)
-* Part 5 Testing Pipelines
+* [Part 5 Testing Pipelines](/blog/2024-05-09-beam-local-dev-5)
 
 ## Streaming Pipeline
 
