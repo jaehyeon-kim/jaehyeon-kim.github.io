@@ -25,7 +25,7 @@ description: foo bar
 ---
 
 * [Part 1 - Calculate K Most Frequent Words and Max Word Length](#) (this post)
-* Part 2 - Calculate Average Word Length
+* Part 2 - Calculate Average Word Length with/without Fixed Lookback
 * Part 3 - Build Sport Activity Tracker
 * Part 4 - Call RPC Service for Data Augmentation
 * Part 5 - Call RPC Service in Batch using Stateless DoFn
