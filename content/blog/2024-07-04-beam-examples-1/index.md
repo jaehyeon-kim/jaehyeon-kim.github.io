@@ -134,7 +134,7 @@ volumes:
     name: kafka_0_data
 ```
 
-Note that the Kafka bootstrap server is accessible on port *29092* outside the Docker network, and it can be accessed via *localhost:29092* from the Docker host machine and *host.docker.internal:29092* from a Docker container that is launched with the host network. We use both types of the bootstrap server address - the former is used by a Kafka producer app that is discussed later and the latter by a Java IO expansion service, which is launched in a Docker container. Note further that, for the latter to work, we have to update the */etc/hosts* file by adding an entry for *host.docker.internal* as shown below. 
+Note that the Kafka bootstrap server is accessible on port *29092* outside the Docker network, and it can be accessed on *localhost:29092* from the Docker host machine and on *host.docker.internal:29092* from a Docker container that is launched with the host network. We use both types of the bootstrap server address - the former is used by a Kafka producer app that is discussed later and the latter by a Java IO expansion service, which is launched in a Docker container. Note further that, for the latter to work, we have to update the */etc/hosts* file by adding an entry for *host.docker.internal* as shown below. 
 
 ```bash
 cat /etc/hosts | grep host.docker.internal
@@ -426,7 +426,7 @@ if __name__ == "__main__":
 By default, the message creation timestamp is not shifted. We can do so by appending shift details (digit and scale) (e.g. `1 minute` or `10 sec`). Below shows some usage examples.
 
 ```bash
-# python utils/interactive_gen.py
+python utils/interactive_gen.py
 # ENTER TEXT: By default, message creation timestamp is not shifted!
 # >> text: By default, message creation timestamp is not shifted!
 # ENTER TEXT: -10 sec;Add time digit and scale to shift back. should be separated by semi-colon
@@ -699,7 +699,7 @@ As described in [this documentation](https://beam.apache.org/documentation/pipel
 4. Apply the transform to the input `PCollection` and save the resulting output `PCollection`.
 5. Use `PAssert` and its subclasses (or [testing utils](https://beam.apache.org/releases/pydoc/current/apache_beam.testing.util.html) in Python) to verify that the output `PCollection` contains the elements that you expect.
 
-We configure the first three lines to be delivered in 2 seconds and the remaining two lines after 10 seconds. Therefore, the whole elements are split into two fixed time windows, given the window length of 10 seconds. We can check the top 3 words are *line*, *first* and *the* in the first window while *line*, *in* and *window* are the top 3 words in the second window. Then, we can create the expected output as a list of tuples of the word and number of occurrences and compare it with the pipeline output.
+We configure the first three lines to be delivered in 2 seconds and the remaining two lines after 10 seconds. Therefore, the whole elements are split into two fixed time windows, given the window length of 10 seconds. We can check the top 3 words are `line`, `first` and `the` in the first window while `line`, `in` and `window` are the top 3 words in the second window. Then, we can create the expected output as a list of tuples of word and number of occurrences and compare it with the pipeline output.
 
 ```python
 # chapter3/top_k_words_test.py
@@ -797,7 +797,7 @@ python chapter2/top_k_words.py --job_name=top-k-words \
 	--checkpointing_interval=10000 --experiment=use_deprecated_read
 ```
 
-On Flink UI, we see the pipeline polls messages and performs the main transform in multiple tasks while keeping Kafka offset commit as a separate task. Note that, although I added a flag (`use_deprecated_read`) that uses the legacy read (`ReadFromKafkaViaUnbounded`), the splittable DoFn based read (`ReadFromKafkaViaSDF`) is used. It didn't happen when I used Flink 1.16.3, and I'm looking into it. It looks okay to go through the example pipelines, but check [this issue](https://github.com/apache/beam/issues/20979) before deciding which read to use in production.
+On Flink UI, we see the pipeline polls messages and performs the main transform in multiple tasks while keeping Kafka offset commit as a separate task. Note that, although I added a flag (`use_deprecated_read`) to use the legacy read (`ReadFromKafkaViaUnbounded`), the splittable DoFn based read (`ReadFromKafkaViaSDF`) is used. It didn't happen when I used Flink 1.16.3, and I'm looking into it. It looks okay to go through the example pipelines, but check [this issue](https://github.com/apache/beam/issues/20979) before deciding which read to use in production.
 
 ![](top-k-dag.png#center)
 
@@ -931,7 +931,7 @@ if __name__ == "__main__":
 
 #### Pipeline Test
 
-The lengths of words increase for the first three elements (*a*, *bb*, *ccc*), and the output changes each time. The length of the fourth element (*d*) is smaller than the previous one, and the output remains the same. The last output is emitted as the watermark is advanced into the end of the global window. We can create the expected output as a list of `TestWindowedValue`s and compare it with the pipeline output.
+The elements are configured so that the lengths of words increase for the first three elements (*a*, *bb*, *ccc*), and the output changes each time. The length of the fourth element (*d*) is smaller than the previous one, and the output remains the same. Note that the last output is emitted additionally because the watermark is advanced into the end of the global window, and it fires the after watermark trigger. We can create the expected output as a list of `TestWindowedValue`s and compare it with the pipeline output.
 
 ```python
 # chapter3/max_word_length_with_ts_test.py
@@ -1028,7 +1028,7 @@ python chapter2/max_word_length_with_ts.py --job_name=max-word-len \
 	--checkpointing_interval=10000 --experiment=use_deprecated_read
 ```
 
-Similar to the previous pipeline, on Flink UI, we see the pipeline polls messages and performs the main transform in multiple tasks while keeping Kafka offset commit as a separate task.
+On Flink UI, we see the pipeline polls messages and performs the main transform in multiple tasks while keeping Kafka offset commit as a separate task.
 
 ![](max-len-dag.png#center)
 
