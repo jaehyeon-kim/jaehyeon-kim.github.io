@@ -360,7 +360,7 @@ FROM flink:1.16
 COPY --from=apache/beam_java11_sdk:2.56.0 /opt/apache/beam/ /opt/apache/beam/
 ```
 
-We also build another custom Docker image (*beam-python-harness:2.56.0*) to run Python user code (*SDK Harness*). From the Python SDK Docker image, it first installs JDK Development Kit (JDK) and downloads the *Java IO Expansion Service* Jar file. Then, Beam pipeline packages are copied to the */app* folder, and it ends up adding the app folder into the *PYTHONPATH* environment variable, which makes the packages to be seachable.
+We also build another custom Docker image (*beam-python-harness:2.56.0*) to run Python user code (*SDK Harness*). From the Python SDK Docker image, it first installs JDK Development Kit (JDK) and downloads the *Java IO Expansion Service* Jar file. Then, Beam pipeline packages are copied to the */app* folder, and it ends up adding the app folder into the *PYTHONPATH* environment variable, which makes the packages to be searchable.
 
 ```Dockerfile
 # beam/Dockerfile-python-harness
