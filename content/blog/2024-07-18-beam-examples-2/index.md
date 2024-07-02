@@ -174,10 +174,11 @@ The main transform of this pipeline (`CalculateAverageWordLength`) performs
     - Keeps the previous elements that were already fired (`accumulation_mode=AccumulationMode.ACCUMULATING`) 
 2. `Tokenize`: tokenizes (or converts) text into words
 3. `GetAvgWordLength`: calculates the average word lengths by combining all words using a custom combine function (`AverageFn`)
+    - Using an accumulator, `AverageFn` obtains the average word length by dividing the sum of lengths with the number of words. 
 
-![](avg-word-len.png#center)
+Also, the output timestamp is added when creating output messages (`CreateMessags`). 
 
-```python
+```python                                       lu.ilunm
 # chapter2/average_word_length.py
 import os
 import json
@@ -236,13 +237,12 @@ class CalculateAverageWordLength(beam.PTransform):
                 allowed_lateness=0,
                 timestamp_combiner=TimestampCombiner.OUTPUT_AT_LATEST,
                 accumulation_mode=AccumulationMode.ACCUMULATING,
-                # closing behaviour - EMIT_ALWAYS, on_time_behavior - FIRE_ALWAYS
             )
             | "Tokenize" >> beam.FlatMap(tokenize)
             | "GetAvgWordLength"
             >> beam.CombineGlobally(
                 AverageFn()
-            ).without_defaults()  # DAG gets complicated if with_default()
+            ).without_defaults()
         )
 
 
@@ -366,6 +366,18 @@ class MaxWordLengthTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+```
+
+We can execute the pipeline test as shown below.
+
+```bash
+python chapter2/average_word_length_test.py -v
+test_windowing_behaviour (__main__.MaxWordLengthTest) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.343s
+
+OK
 ```
 
 #### Pipeline Execution
@@ -597,6 +609,18 @@ class SlidingWindowWordLengthTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+```
+
+The pipeline can be tested as shown below.
+
+```bash
+python chapter2/sliding_window_word_length_test.py -v
+test_windowing_behaviour (__main__.SlidingWindowWordLengthTest) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.358s
+
+OK
 ```
 
 #### Pipeline Execution
