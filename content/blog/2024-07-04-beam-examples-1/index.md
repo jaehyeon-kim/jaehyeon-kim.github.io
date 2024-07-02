@@ -38,7 +38,7 @@ In this series, we develop [Apache Beam](https://beam.apache.org/) Python pipeli
 * Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn
 * Part 10 Develop Streaming File Reader using Splittable DoFn
 
-## Setup Development Environment
+## Development Environment
 
 The development environment requires an Apache Flink cluster, Apache Kafka cluster and [gRPC](https://grpc.io/) Server. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
 
