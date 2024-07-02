@@ -797,7 +797,7 @@ python chapter2/top_k_words.py --job_name=top-k-words \
 	--checkpointing_interval=10000 --experiment=use_deprecated_read
 ```
 
-On Flink UI, we see the pipeline polls messages and performs the main transform in multiple tasks while keeping Kafka offset commit as a separate task.
+On Flink UI, we see the pipeline polls messages and performs the main transform in multiple tasks while keeping Kafka offset commit as a separate task. Note that, although I added a flag (`use_deprecated_read`) that uses the legacy read (`ReadFromKafkaViaUnbounded`), the splittable DoFn based read (`ReadFromKafkaViaSDF`) is used. It didn't happen when I used Flink 1.16.3, and I'm looking into it. It looks okay to go through the example pipelines, but check [this issue](https://github.com/apache/beam/issues/20979) before deciding which read to use in production.
 
 ![](top-k-dag.png#center)
 
