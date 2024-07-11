@@ -506,8 +506,8 @@ class ReadWordsFromKafka(beam.PTransform):
         bootstrap_servers: str,
         topics: typing.List[str],
         group_id: str,
+        deprecated_read: bool,
         verbose: bool = False,
-        expansion_service: typing.Any = None,
         label: str | None = None,
     ) -> None:
         super().__init__(label)
@@ -515,7 +515,11 @@ class ReadWordsFromKafka(beam.PTransform):
         self.topics = topics
         self.group_id = group_id
         self.verbose = verbose
-        self.expansion_service = expansion_service
+        self.expansion_service = None
+        if deprecated_read:
+            self.expansion_service = kafka.default_io_expansion_service(
+                ["--experiments=use_deprecated_read"]
+            )
 
     def expand(self, input: pvalue.PBegin):
         return (
@@ -542,13 +546,17 @@ class WriteProcessOutputsToKafka(beam.PTransform):
         self,
         bootstrap_servers: str,
         topic: str,
-        expansion_service: typing.Any = None,
+        deprecated_read: bool,
         label: str | None = None,
     ) -> None:
         super().__init__(label)
         self.boostrap_servers = bootstrap_servers
         self.topic = topic
-        self.expansion_service = expansion_service
+        self.expansion_service = None
+        if deprecated_read:
+            self.expansion_service = kafka.default_io_expansion_service(
+                ["--experiments=use_deprecated_read"]
+            )
 
     def expand(self, pcoll: pvalue.PCollection):
         return pcoll | "WriteToKafka" >> kafka.WriteToKafka(
@@ -649,15 +657,21 @@ def run(argv=None, save_main_session=True):
     )
     parser.add_argument("--window_length", default="10", type=int, help="Window length")
     parser.add_argument("--top_k", default="3", type=int, help="Top k")
+    parser.add_argument(
+        "--deprecated_read",
+        action="store_true",
+        default="Whether to use a deprecated read. See https://github.com/apache/beam/issues/20979",
+    )
+    parser.set_defaults(deprecated_read=False)
 
     known_args, pipeline_args = parser.parse_known_args(argv)
-    print(f"known args - {known_args}")
-    print(f"pipeline args - {pipeline_args}")
 
-    # We use the save_main_session option because one or more DoFn's in this
-    # workflow rely on global context (e.g., a module imported at module level).
+    # # We use the save_main_session option because one or more DoFn's in this
+    # # workflow rely on global context (e.g., a module imported at module level).
     pipeline_options = PipelineOptions(pipeline_args)
     pipeline_options.view_as(SetupOptions).save_main_session = save_main_session
+    print(f"known args - {known_args}")
+    print(f"pipeline options - {pipeline_options.display_data()}")
 
     with beam.Pipeline(options=pipeline_options) as p:
         (
@@ -667,6 +681,7 @@ def run(argv=None, save_main_session=True):
                 bootstrap_servers=known_args.bootstrap_servers,
                 topics=[known_args.input_topic],
                 group_id=f"{known_args.output_topic}-group",
+                deprecated_read=known_args.deprecated_read,
             )
             | "CalculateTopKWords"
             >> CalculateTopKWords(
@@ -678,6 +693,7 @@ def run(argv=None, save_main_session=True):
             >> WriteProcessOutputsToKafka(
                 bootstrap_servers=known_args.bootstrap_servers,
                 topic=known_args.output_topic,
+                deprecated_read=known_args.deprecated_read,
             )
         )
 
@@ -805,6 +821,28 @@ On Kafka UI, we can check the output messages include the frequent word details 
 
 ![](top-k-output.png#center)
 
+**Update on 2024-07-11**
+I made a mistake to add the `use_deprecated_read` option to the pipeline argument. For the Python SDK to work, it should be specified in the default IO expansion service directly - see below.
+
+```python
+kafka.default_io_expansion_service(
+    ["--experiments=use_deprecated_read"]
+)
+```
+
+I updated the source and the pipeline should be executed as follows.
+
+```bash
+## exclude --flink_master if using an embedded cluster
+python chapter2/top_k_words.py --deprecated_read \
+    --job_name=top-k-words --runner FlinkRunner --flink_master=localhost:8081 \
+	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
+```
+
+We can check the legacy read (`ReadFromKafkaViaUnbounded`) is used in the pipeline DAG.
+
+![](top-k-dag-d.png#center)
+
 ### Calculate the maximal word length
 
 The main transform of this pipeline (`CalculateMaxWordLength`) performs
@@ -893,15 +931,21 @@ def run(argv=None, save_main_session=True):
         default=re.sub("_", "-", re.sub(".py$", "", os.path.basename(__file__))),
         help="Output topic",
     )
+    parser.add_argument(
+        "--deprecated_read",
+        action="store_true",
+        default="Whether to use a deprecated read. See https://github.com/apache/beam/issues/20979",
+    )
+    parser.set_defaults(deprecated_read=False)
 
     known_args, pipeline_args = parser.parse_known_args(argv)
-    print(f"known args - {known_args}")
-    print(f"pipeline args - {pipeline_args}")
 
-    # We use the save_main_session option because one or more DoFn's in this
-    # workflow rely on global context (e.g., a module imported at module level).
+    # # We use the save_main_session option because one or more DoFn's in this
+    # # workflow rely on global context (e.g., a module imported at module level).
     pipeline_options = PipelineOptions(pipeline_args)
     pipeline_options.view_as(SetupOptions).save_main_session = save_main_session
+    print(f"known args - {known_args}")
+    print(f"pipeline options - {pipeline_options.display_data()}")
 
     with beam.Pipeline(options=pipeline_options) as p:
         (
@@ -911,6 +955,7 @@ def run(argv=None, save_main_session=True):
                 bootstrap_servers=known_args.bootstrap_servers,
                 topics=[known_args.input_topic],
                 group_id=f"{known_args.output_topic}-group",
+                deprecated_read=known_args.deprecated_read,
             )
             | "CalculateMaxWordLength" >> CalculateMaxWordLength()
             | "CreateMessags" >> CreateMessags()
@@ -918,6 +963,7 @@ def run(argv=None, save_main_session=True):
             >> WriteProcessOutputsToKafka(
                 bootstrap_servers=known_args.bootstrap_servers,
                 topic=known_args.output_topic,
+                deprecated_read=known_args.deprecated_read,
             )
         )
 
@@ -1035,3 +1081,16 @@ On Flink UI, we see the pipeline polls messages and performs the main transform 
 On Kafka UI, we can check the output messages include the longest word as well as its timestamp. Note that, as the input text message has multiple words, we can have multiple output messages that have the same timestamp - recall the accumulation mode is accumulating.
 
 ![](max-len-output.png#center)
+
+**Update on 2024-07-11**
+
+The pipeline can be executed to use the legacy read as shown below.
+
+```bash
+## exclude --flink_master if using an embedded cluster
+python chapter2/max_word_length_with_ts.py --deprecated_read \
+    --job_name=max-word-len --runner FlinkRunner --flink_master=localhost:8081 \
+	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
+```
+
+![](max-len-dag-d.png#center)
