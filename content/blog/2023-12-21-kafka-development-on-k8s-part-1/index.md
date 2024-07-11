@@ -41,7 +41,7 @@ minikube start --cpus='max' --memory=10240 --addons=metrics-server --kubernetes-
 
 ### Deploy Strimzi Operator
 
-The project repository keeps manifest files that can be used to deploy the Strimzi Operator and related resources. We can download the relevant manifest file by specifying the desired version. By default, the manifest file assumes the resources are deployed in the *myproject* namespace. As we deploy them in the *default* namespace, however, we need to change the resource namespace accordingly using [sed](https://www.gnu.org/software/sed/manual/sed.html). The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-on-k8s/part-01) of this post.
+The [**project repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-dev-on-k8s/part-01) keeps manifest files that can be used to deploy the Strimzi Operator and related resources. We can download the relevant manifest file by specifying the desired version. By default, the manifest file assumes the resources are deployed in the *myproject* namespace. As we deploy them in the *default* namespace, however, we need to change the resource namespace accordingly using [sed](https://www.gnu.org/software/sed/manual/sed.html).
 
 The resources that are associated with the Strimzi Operator can be deployed using the *kubectl create* command. Note that over 20 resources are deployed from the manifest file including Kafka-related [custom resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/). Among those, we use the *Kafka*, *KafkaConnect* and *KafkaConnector* custom resources in this series.
 
@@ -55,30 +55,6 @@ sed -i 's/namespace: .*/namespace: default/' manifests/strimzi-cluster-operator-
 
 ## deploy strimzi cluster operator
 kubectl create -f manifests/strimzi-cluster-operator-$STRIMZI_VERSION.yaml
-
-# rolebinding.rbac.authorization.k8s.io/strimzi-cluster-operator-entity-operator-delegation created
-# customresourcedefinition.apiextensions.k8s.io/strimzipodsets.core.strimzi.io created
-# clusterrole.rbac.authorization.k8s.io/strimzi-kafka-client created
-# deployment.apps/strimzi-cluster-operator created
-# customresourcedefinition.apiextensions.k8s.io/kafkarebalances.kafka.strimzi.io created
-# clusterrolebinding.rbac.authorization.k8s.io/strimzi-cluster-operator-kafka-broker-delegation created
-# configmap/strimzi-cluster-operator created
-# rolebinding.rbac.authorization.k8s.io/strimzi-cluster-operator created
-# customresourcedefinition.apiextensions.k8s.io/kafkamirrormakers.kafka.strimzi.io created
-# clusterrole.rbac.authorization.k8s.io/strimzi-entity-operator created
-# clusterrole.rbac.authorization.k8s.io/strimzi-kafka-broker created
-# customresourcedefinition.apiextensions.k8s.io/kafkaconnects.kafka.strimzi.io created
-# customresourcedefinition.apiextensions.k8s.io/kafkamirrormaker2s.kafka.strimzi.io created
-# customresourcedefinition.apiextensions.k8s.io/kafkausers.kafka.strimzi.io created
-# customresourcedefinition.apiextensions.k8s.io/kafkaconnectors.kafka.strimzi.io created
-# customresourcedefinition.apiextensions.k8s.io/kafkas.kafka.strimzi.io created
-# serviceaccount/strimzi-cluster-operator created
-# customresourcedefinition.apiextensions.k8s.io/kafkatopics.kafka.strimzi.io created
-# clusterrolebinding.rbac.authorization.k8s.io/strimzi-cluster-operator created
-# clusterrole.rbac.authorization.k8s.io/strimzi-cluster-operator-global created
-# clusterrolebinding.rbac.authorization.k8s.io/strimzi-cluster-operator-kafka-client-delegation created
-# customresourcedefinition.apiextensions.k8s.io/kafkabridges.kafka.strimzi.io created
-# clusterrole.rbac.authorization.k8s.io/strimzi-cluster-operator-namespaced created
 ```
 
 We can check the Strimzi Operator runs as a [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/).
@@ -176,6 +152,10 @@ kubectl get all -l app.kubernetes.io/instance=demo-cluster
 # statefulset.apps/demo-cluster-kafka       2/2     67s
 # statefulset.apps/demo-cluster-zookeeper   1/1     109s
 ```
+
+**Update 2024-07-11**
+
+In later versions of the Strimzi operator manage the Kafka and Zookeeper nodes using the [*StrimziPodSet*](https://strimzi.io/docs/operators/latest/configuring.html#type-StrimziPodSet-reference) custom resource. Check [this post](/blog/2024-05-30-beam-deploy-1) for details about how to deploy a Kafka cluster using Strimzi 0.39.0.
 
 ### Deploy Kafka UI
 
