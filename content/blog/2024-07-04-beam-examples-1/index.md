@@ -482,7 +482,7 @@ We develop two pipelines that obtain top K most frequent words and the word that
 Both the pipelines read text messages from an input Kafka topic and write outputs to an output topic. Therefore, the data source and sink transforms are refactored into a utility module as shown below.
 
 ```python
-# chapter3/word_process_utils.py
+# chapter2/word_process_utils.py
 import re
 import typing
 
@@ -579,7 +579,7 @@ The main transform of this pipeline (`CalculateTopKWords`) performs
 Also, it adds the window start and end timestamps when creating output messages (`CreateMessags`). 
 
 ```python
-# chapter3/top_k_words.py
+# chapter2/top_k_words.py
 import os
 import argparse
 import json
@@ -718,7 +718,7 @@ As described in [this documentation](https://beam.apache.org/documentation/pipel
 We configure the first three lines to be delivered in 2 seconds and the remaining two lines after 10 seconds. Therefore, the whole elements are split into two fixed time windows, given the window length of 10 seconds. We can check the top 3 words are `line`, `first` and `the` in the first window while `line`, `in` and `window` are the top 3 words in the second window. Then, we can create the expected output as a list of tuples of word and number of occurrences and compare it with the pipeline output.
 
 ```python
-# chapter3/top_k_words_test.py
+# chapter2/top_k_words_test.py
 import unittest
 
 from apache_beam.coders import coders
@@ -858,7 +858,7 @@ The main transform of this pipeline (`CalculateMaxWordLength`) performs
 Also, the output timestamp is added when creating output messages (`CreateMessags`). 
 
 ```python
-# chapter3/max_word_length_with_ts.py
+# chapter2/max_word_length_with_ts.py
 import os
 import argparse
 import json
@@ -980,7 +980,7 @@ if __name__ == "__main__":
 The elements are configured so that the lengths of words increase for the first three elements (*a*, *bb*, *ccc*), and the output changes each time. The length of the fourth element (*d*) is smaller than the previous one, and the output remains the same. Note that the last output is emitted additionally because the watermark is advanced into the end of the global window, and it fires the after watermark trigger. We can create the expected output as a list of `TestWindowedValue`s and compare it with the pipeline output.
 
 ```python
-# chapter3/max_word_length_with_ts_test.py
+# chapter2/max_word_length_with_ts_test.py
 import unittest
 
 from apache_beam.coders import coders
