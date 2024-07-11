@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="Sqb6T5c4-dPA9MeBLbvy" name="Page-1">
-        <mxGraphModel dx="673" dy="371" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+        <mxGraphModel dx="789" dy="455" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -8,10 +8,10 @@
                     <mxGeometry x="1273" y="130" width="473" height="107" as="geometry"/>
                 </mxCell>
                 <mxCell id="30" value="&lt;font color=&quot;#e58b05&quot;&gt;&lt;span style=&quot;font-size: 25px;&quot;&gt;Part 2 - Calculate Average Word Length with/without Fixed Look back&lt;/span&gt;&lt;/font&gt;" style="text;whiteSpace=wrap;html=1;fontSize=50;fontFamily=Comic Sans MS;fontColor=#0a3acd;align=center;verticalAlign=bottom;" parent="1" vertex="1">
-                    <mxGeometry x="753.5" y="313" width="454" height="97" as="geometry"/>
+                    <mxGeometry x="1295" y="299" width="454" height="97" as="geometry"/>
                 </mxCell>
                 <mxCell id="36" value="&lt;font color=&quot;#e58b05&quot;&gt;&lt;span style=&quot;font-size: 25px;&quot;&gt;Part 3 - Build Sport Activity Tracker with/without SQL&lt;/span&gt;&lt;/font&gt;" style="text;whiteSpace=wrap;html=1;fontSize=50;fontFamily=Comic Sans MS;fontColor=#0a3acd;align=center;verticalAlign=bottom;" parent="1" vertex="1">
-                    <mxGeometry x="33" y="343" width="515" height="98" as="geometry"/>
+                    <mxGeometry x="723" y="312" width="515" height="98" as="geometry"/>
                 </mxCell>
                 <mxCell id="42" value="&lt;font color=&quot;#e58b05&quot;&gt;&lt;span style=&quot;font-size: 25px;&quot;&gt;Part 4 - Call RPC Service for Data Augmentation&lt;/span&gt;&lt;/font&gt;" style="text;whiteSpace=wrap;html=1;fontSize=50;fontFamily=Comic Sans MS;fontColor=#0a3acd;align=center;verticalAlign=bottom;" parent="1" vertex="1">
                     <mxGeometry x="39" y="450" width="515" height="103" as="geometry"/>
