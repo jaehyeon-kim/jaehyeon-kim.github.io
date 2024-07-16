@@ -24,10 +24,12 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In this post, we develop an Apache Beam pipeline using the Python SDK and deploy it on an Apache Flink cluster via the Apache Flink Runner. Same as Part I, we deploy a Kafka cluster using the Strimzi Operator on a minikube cluster as the pipeline uses Apache Kafka topics for its data source and sink. Then, we develop the pipeline as a Python package and add the package to a custom Docker image so that Python user code can be executed externally. For deployment, we create a Flink session cluster via the Flink Kubernetes Operator, and deploy the pipeline using a Kubernetes job. Finally, we check the output of the application by sending messages to the input Kafka topic using a Python producer application.
+# description: In this post, we develop an Apache Beam pipeline using the Python SDK and deploy it on an Apache Flink cluster via the Apache Flink Runner. Same as Part I, we deploy a Kafka cluster using the Strimzi Operator on a minikube cluster as the pipeline uses Apache Kafka topics for its data source and sink. Then, we develop the pipeline as a Python package and add the package to a custom Docker image so that Python user code can be executed externally. For deployment, we create a Flink session cluster via the Flink Kubernetes Operator, and deploy the pipeline using a Kubernetes job. Finally, we check the output of the application by sending messages to the input Kafka topic using a Python producer application.
 ---
 
 In this post, we develop an [Apache Beam](https://beam.apache.org/) pipeline using the [Python SDK](https://beam.apache.org/documentation/sdks/python/) and deploy it on an [Apache Flink](https://flink.apache.org/) cluster via the [Apache Flink Runner](https://beam.apache.org/documentation/runners/flink/). Same as [Part I](/blog/2024-05-30-beam-deploy-1), we deploy a Kafka cluster using the [Strimzi Operator](https://strimzi.io/) on a [minikube](https://minikube.sigs.k8s.io/docs/) cluster as the pipeline uses [Apache Kafka](https://kafka.apache.org/) topics for its data source and sink. Then, we develop the pipeline as a Python package and add the package to a custom Docker image so that Python user code can be executed externally. For deployment, we create a Flink session cluster via the [Flink Kubernetes Operator](https://nightlies.apache.org/flink/flink-kubernetes-operator-docs-main/), and deploy the pipeline using a Kubernetes job. Finally, we check the output of the application by sending messages to the input Kafka topic using a Python producer application.
+
+<!--more-->
 
 * [Part 1 PyFlink Application](/blog/2024-05-30-beam-deploy-1)
 * [Part 2 Beam Pipeline on Flink Runner](#) (this post)
