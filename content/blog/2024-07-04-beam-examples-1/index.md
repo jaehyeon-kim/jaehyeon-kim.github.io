@@ -22,12 +22,10 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-# description: In this series, we develop Apache Beam Python pipelines. The majority of them are from Building Big Data Pipelines with Apache Beam by Jan Lukavský. Mainly relying on the Java SDK, the book teaches fundamentals of Apache Beam using hands-on tasks, and we convert those tasks using the Python SDK. We focus on streaming pipelines, and they are deployed on a local (or embedded) Apache Flink cluster using the Apache Flink Runner. Beginning with setting up the development environment, we build two pipelines that obtain top K most frequent words and the word that has the longest word length in this post.
+description: In this series, we develop Apache Beam Python pipelines. The majority of them are from Building Big Data Pipelines with Apache Beam by Jan Lukavský. Mainly relying on the Java SDK, the book teaches fundamentals of Apache Beam using hands-on tasks, and we convert those tasks using the Python SDK. We focus on streaming pipelines, and they are deployed on a local (or embedded) Apache Flink cluster using the Apache Flink Runner. Beginning with setting up the development environment, we build two pipelines that obtain top K most frequent words and the word that has the longest word length in this post.
 ---
 
 In this series, we develop [Apache Beam](https://beam.apache.org/) Python pipelines. The majority of them are from [Building Big Data Pipelines with Apache Beam by Jan Lukavský](https://www.packtpub.com/en-us/product/building-big-data-pipelines-with-apache-beam-9781800564930). Mainly relying on the Java SDK, the book teaches fundamentals of Apache Beam using hands-on tasks, and we convert those tasks using the Python SDK. We focus on streaming pipelines, and they are deployed on a local (or embedded) [Apache Flink](https://flink.apache.org/) cluster using the [Apache Flink Runner](https://beam.apache.org/documentation/runners/flink/). Beginning with setting up the development environment, we build two pipelines that obtain top K most frequent words and the word that has the longest word length in this post. 
-
-<!--more-->
 
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](#) (this post)
 * [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
@@ -175,7 +173,7 @@ networks:
 
 ### Manage Resources
 
-The Flink and Kafka clusters and gRPC server are managed by bash scripts. Those scripts accept four flags: `-f`, `-k` and `-g` to start/stop individual resources or `-a` to manage all of them. We can add multiple flags to start/stop multiple resources. Note that the scripts assume Flink 1.18.1 by default, and we can specify a specific Flink version if it is different from it e.g. `FLINK_VERSION=1.17.2 ./setup/start-flink-env.sh`.
+The Flink and Kafka clusters and gRPC server are managed by bash scripts. Those scripts accept four flags: `-f`, `-k` and `-g` to start/stop individual resources or `-a` to manage all of them. We can add multiple flags to start/stop relevant resources. Note that the scripts assume Flink 1.18.1 by default, and we can specify a specific Flink version if it is different from it e.g. `FLINK_VERSION=1.17.2 ./setup/start-flink-env.sh`.
 
 ```bash
 # setup/start-flink-env.sh
@@ -572,13 +570,13 @@ class WriteProcessOutputsToKafka(beam.PTransform):
 
 The main transform of this pipeline (`CalculateTopKWords`) performs
 
-1. `Windowing`: assigns input text messages into a [fixed time window](https://beam.apache.org/documentation/programming-guide/#windowing) of configurable length - 10 seconds by default
-2. `Tokenize`: tokenizes (or converts) text into words
-3. `CountPerWord`: counts occurrence of each word
-4. `TopKWords`: selects top k words - 3 by default
-5. `Flatten`: flattens a list of words into individual words
+1. `Windowing`: assigns input text messages into a [fixed time window](https://beam.apache.org/documentation/programming-guide/#windowing) of configurable length - 10 seconds by default.
+2. `Tokenize`: tokenizes (or converts) text into words.
+3. `CountPerWord`: counts occurrence of each word.
+4. `TopKWords`: selects top k words - 3 by default.
+5. `Flatten`: flattens a list of words into individual words.
 
-Also, it adds the window start and end timestamps when creating output messages (`CreateMessags`). 
+Also, it adds the window start and end timestamps when creating output messages (`CreateMessags`).
 
 ```python
 # chapter2/top_k_words.py
@@ -804,7 +802,7 @@ OK
 
 #### Pipeline Execution
 
-Below shows an example of executing the pipeline by specifying pipeline arguments only while accepting default values of the known arguments (*bootstrap_servers*, *input_topic* ...). Note that, by specifying the *flink_master* value to *localhost:8081*, it deployed the pipeline on a local Flink cluster. Alternatively, we can use an embedded Flink cluster if we exclude that argument.
+Below shows an example of executing the pipeline by specifying pipeline arguments only while accepting default values of the known arguments (`bootstrap_servers`, `input_topic`, ...). Note that, we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
 
 ```bash
 ## start the beam pipeline
@@ -849,13 +847,13 @@ We can check the legacy read (`ReadFromKafkaViaUnbounded`) is used in the pipeli
 
 The main transform of this pipeline (`CalculateMaxWordLength`) performs
 
-1. `Windowing`: assigns input text messages into a [global window](https://beam.apache.org/documentation/programming-guide/#windowing) and emits (or triggers) the result for every new input message with the following configuration
+1. `Windowing`: assigns input text messages into a [global window](https://beam.apache.org/documentation/programming-guide/#windowing) and emits (or triggers) the result for every new input message with the following configuration.
     - Disallows Late data (`allowed_lateness=0`)
     - Assigns the output timestamp from the latest input timestamp (`timestamp_combiner=TimestampCombiner.OUTPUT_AT_LATEST`)
     - Keeps the previous elements that were already fired (`accumulation_mode=AccumulationMode.ACCUMULATING`) 
-2. `Tokenize`: tokenizes (or converts) text into words
-3. `GetLongestWord`: selects top 1 word that has the longest length
-4. `Flatten`: flattens a list of words into a word
+2. `Tokenize`: tokenizes (or converts) text into words.
+3. `GetLongestWord`: selects top 1 word that has the longest length.
+4. `Flatten`: flattens a list of words into a word.
 
 Also, the output timestamp is added when creating output messages (`CreateMessags`). 
 
