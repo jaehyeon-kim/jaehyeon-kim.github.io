@@ -29,7 +29,7 @@ In this series, we develop [Apache Beam](https://beam.apache.org/) Python pipeli
 
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](#) (this post)
 * [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
-* Part 3 Build Sport Activity Tracker with/without SQL
+* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
 * Part 4 Call RPC Service for Data Augmentation
 * Part 5 Call RPC Service in Batch using Stateless DoFn
 * Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn
