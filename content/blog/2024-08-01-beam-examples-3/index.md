@@ -1,7 +1,7 @@
 ---
 title: Apache Beam Python Examples - Part 3 Build Sport Activity Tracker with/without SQL
 date: 2024-08-01
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -83,12 +83,12 @@ Below shows how to start resources using the start-up script. We need to launch 
 
 ## Kafka Sport Activity Producer
 
-A Kafka producer application is created to generates sport tracking activities of users. Those activities are tracked by user positions that have the following variables.
+A Kafka producer application is created to generate sport tracking activities of users. Those activities are tracked by user positions that have the following variables.
 
-* *spot* - An integer value that indicates where a user locates. (We may represent a user position using a geographic coordinate. For the sake of simplicity, however, we keep it as an integer.)
+* *spot* - An integer value that indicates where a user locates. Although we may represent a user position using a geographic coordinate, we keep it as an integer for the sake of simplicity in this post.
 * *timestamp* - A float value that shows the time in seconds since the Epoch when a user locates in the corresponding spot.
 
-A configurable number of user tracks (`--num_tracks`, default 5) can be generated every two seconds by default (`--delay_seconds`). The producer sends the activity tracking records after concatenating the user ID and position values with tab characters (`\t`).
+A configurable number of user tracks (`--num_tracks`, default 5) can be generated every two seconds by default (`--delay_seconds`). The producer sends the activity tracking records as a text by concatenating the user ID and position values with tab characters (`\t`).
 
 ```python
 # utils/sport_tracker_gen.py
@@ -236,7 +236,7 @@ user4   88      1722127107.1854854
 ...
 ```
 
-Also, we can check the input messages using *kafka-ui* on *localhost:8080*.
+Also, we can check the input messages using Kafka UI on *localhost:8080*.
 
 ![](input-messages.png#center)
 
@@ -255,7 +255,7 @@ Both the pipelines share the same sources, and they are refactored in a separate
 * `ReadPositionsFromKafka`
     - It reads messages from a Kafka topic, and returns tuple elements of user ID and position. We need to specify the output type hint for a portable runner to recognise the output type correctly. Note that, the Kafka read and write methods has an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979).
 * `WriteMetricsToKafka`
-    - It sends output messages to a Kafka topic. Each message is a tuple of user ID and speed. Note that the input type hint is necessary when the otuputs are piped from a transform by *Beam SQL*.
+    - It sends output messages to a Kafka topic. Each message is a tuple of user ID and speed. Note that the input type hint is necessary when the inputs are piped from a transform by *Beam SQL*.
 
 ```python
 # chapter2/sport_tracker_utils.py
@@ -410,12 +410,13 @@ class WriteMetricsToKafka(beam.PTransform):
 The main transforms of this pipeline perform
 
 1. `Windowing`: assigns input elements into a [global window](https://beam.apache.org/documentation/programming-guide/#windowing) with the following configuration.
-    - Emits (or triggers) the result every three seconds in processing time (`trigger=AfterWatermark(early=AfterProcessingTime(3))`)
+    - Emits (or triggers) a window after a certain amount of processing time has passed since data was received with a delay of 3 seconds. (`trigger=AfterWatermark(early=AfterProcessingTime(3))`)
     - Disallows Late data (`allowed_lateness=0`)
     - Assigns the output timestamp from the latest input timestamp (`timestamp_combiner=TimestampCombiner.OUTPUT_AT_LATEST`)
         - By default, the end of window timestamp is taken, but it is so distance future for the global window. Therefore, we take the latest timestamp of the input elements instead.
-    - Configures `ACCUMULATING` for calculating global average (`accumulation_mode=AccumulationMode.ACCUMULATING`) 
-2. `ComputeMetrics`: 
+    - Configures `ACCUMULATING` as the window's accumulation mode (`accumulation_mode=AccumulationMode.ACCUMULATING`).
+        - The trigger emits the results early but not multiple times. Therefore, which accumulation mode to choose doesn't give a different result in this transform. We can ignore this configuration.
+2. `ComputeMetrics`: (1) groups by the input elements by key (*user ID*), (2) obtains the total distance and duration by looping through individual elements, (3) calculates the speed of a user, which is the distance divided by the duration, and, finally, (4) returns a metrics record, which is a tuple of user ID and speed.
 
 
 ```python
@@ -529,6 +530,16 @@ if __name__ == "__main__":
 
 #### Pipeline Test
 
+As described in [this documentation](https://beam.apache.org/documentation/pipelines/test-your-pipeline/), we can test a Beam pipeline as following.
+
+1. Create a `TestPipeline`.
+2. Create some static, known test input data.
+3. Create a `PCollection` of input data using the `Create` transform (if bounded source) or a `TestStream` (if unbounded source)
+4. Apply the transform to the input `PCollection` and save the resulting output `PCollection`.
+5. Use `PAssert` and its subclasses (or [testing utils](https://beam.apache.org/releases/pydoc/current/apache_beam.testing.util.html) in Python) to verify that the output `PCollection` contains the elements that you expect.
+
+We use test sport activities of two users that are stored in a file (`input/test-tracker-data.txt`). Then, we add them into a test stream and apply the same preprocessing and windowing transforms. Finally, we apply the metric computation transform and compare the outputs with the expected outputs where the expected speed values are calculated using the same logic.
+
 ```txt
 # input/test-tracker-data.txt
 user0	109	1713939465.7636628
@@ -635,21 +646,44 @@ if __name__ == "__main__":
     unittest.main()
 ```
 
-#### Pipeline Execution
+We can execute the pipeline test as shown below.
 
 ```bash
+python chapter2/sport_tracker_test.py 
+.
+----------------------------------------------------------------------
+Ran 1 test in 1.492s
+
+OK
+```
+
+#### Pipeline Execution
+
+We specify only a single known argument that enables to use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments (`bootstrap_servers`, `input_topic` ...). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
+
+```bash
+## start the beam pipeline
+## exclude --flink_master if using an embedded cluster
 python chapter2/sport_tracker.py --deprecated_read \
-    --job_name=sport_tracker --runner FlinkRunner \
+    --job_name=sport_tracker --runner FlinkRunner --flink_master=localhost:8081 \
 	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
 ```
 
+On Flink UI, we see the pipeline has two tasks. The first task is performed until windowing the input elements while the second task performs up to sending the metric records into the output topic.
+
 ![](sport-tracker-dag.png#center)
+
+On Kafka UI, we can check the output message is a dictionary of user ID and speed.
 
 ![](sport-tracker-output.png#center)
 
 ### Sport Tracker SQL
 
-[BEAM-9198](https://issues.apache.org/jira/browse/BEAM-9198)
+The main transforms of this pipeline perform
+
+1. `Windowing`: assigns input elements into a [fixed time window](https://beam.apache.org/documentation/programming-guide/#windowing) of 5 seconds with the following configuration.
+    - Disallows Late data (`allowed_lateness=0`)
+2. `ComputeMetrics`: (1) groups by the input elements by key (*user ID*), (2) converts the input elements into a new custom type (`Track`) to use the key (user ID) for grouping, (3) calculates the speed of a user where the distance and duration are obtained based on their max/min values only (!), and, finally, (4) returns a metrics record, which is a tuple of user ID and speed.
 
 ```python
 # chapter2/sport_tracker_sql.py
@@ -662,8 +696,7 @@ import typing
 import apache_beam as beam
 from apache_beam import pvalue, coders
 from apache_beam.transforms.sql import SqlTransform
-from apache_beam.transforms.window import TimestampCombiner, FixedWindows
-from apache_beam.transforms.trigger import AccumulationMode
+from apache_beam.transforms.window import FixedWindows
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.options.pipeline_options import SetupOptions
 
@@ -753,13 +786,7 @@ def run(argv=None, save_main_session=True):
                 group_id=f"{known_args.output_topic}-group",
                 deprecated_read=known_args.deprecated_read,
             )
-            | "Windowing"
-            >> beam.WindowInto(
-                FixedWindows(5),
-                allowed_lateness=0,
-                timestamp_combiner=TimestampCombiner.OUTPUT_AT_LATEST,
-                accumulation_mode=AccumulationMode.ACCUMULATING,
-            )
+            | "Windowing" >> beam.WindowInto(FixedWindows(5), allowed_lateness=0)
             | "ComputeMetrics" >> ComputeMetrics()
             | "WriteNotifications"
             >> WriteMetricsToKafka(
@@ -779,9 +806,11 @@ if __name__ == "__main__":
 
 #### Pipeline Test
 
-Streaming Python direct runner does not support cross-language pipelines.
+We have 8 test activity records of two users. Below shows those records after sorting by user ID and timestamp. Using the sorted records, we can easily obtain the expected outputs, which can be found in the last column.
 
 ![](sport-tracker-sql-test.png#center)
+
+Note that the transform by Beam SQL cannot be tested by the streaming Python direct runner because it doesn't support cross-language pipelines. Therefore, we use the Flink runner for testing.
 
 ```python
 # chapter2/sport_tracker_sql_test.py
@@ -793,8 +822,7 @@ from apache_beam.coders import coders
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 from apache_beam.testing.test_stream import TestStream
-from apache_beam.transforms.window import TimestampCombiner, FixedWindows
-from apache_beam.transforms.trigger import AccumulationMode
+from apache_beam.transforms.window import FixedWindows
 from apache_beam.options.pipeline_options import PipelineOptions
 
 from sport_tracker_utils import PreProcessInput
@@ -832,13 +860,7 @@ class SportTrackerTest(unittest.TestCase):
                 p
                 | test_stream
                 | "PreProcessInput" >> PreProcessInput()
-                | "Windowing"
-                >> beam.WindowInto(
-                    FixedWindows(5),
-                    allowed_lateness=0,
-                    timestamp_combiner=TimestampCombiner.OUTPUT_AT_LATEST,
-                    accumulation_mode=AccumulationMode.ACCUMULATING,
-                )
+                | "Windowing" >> beam.WindowInto(FixedWindows(5), allowed_lateness=0)
                 | "ComputeMetrics" >> ComputeMetrics()
             )
 
@@ -854,13 +876,36 @@ if __name__ == "__main__":
     main(out=None)
 ```
 
-#### Pipeline Execution
+The pipeline can be tested as shown below.
 
 ```bash
+python chapter2/sport_tracker_sql_test.py 
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 34.487s
+
+OK
+```
+
+#### Pipeline Execution
+
+Similar to the previous example, we use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments. Note that the transform by Beam SQL fails to run on a local Flink cluster. Therefore, an embedded Flink cluster is used without specifying the flink master argument.
+
+```bash
+## start the beam pipeline with an embedded flink cluster
 python chapter2/sport_tracker_sql.py --deprecated_read \
     --job_name=sport_tracker_sql --runner FlinkRunner \
 	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
 ```
 
+On Kafka UI, we can check the output message is a dictionary of user ID and speed.
+
 ![](sport-tracker-sql-output.png#center)
 
+## Potential Improvements of Beam SQL for Python SDK
+
+As discussed earlier, the first pipeline uses native transforms, and it takes individual elements to calculate the distance and duration. On the other hand, the second pipeline approximates those values by their max/min values only. This kind of approximation is misleading and there are two options that we can overcome such a limitation.
+
+- User defined function: The Java SDK supports [user defined functions](https://beam.apache.org/documentation/dsls/sql/extensions/user-defined-functions/) that accept a custom Java scalar or aggregation function. We can use a user defined aggregation function to mimics the first pipeline using Beam SQL, but it is not supported in the Python SDK at the moment.
+- Beam SQL aggregation analytics functionality ([BEAM-9198](https://issues.apache.org/jira/browse/BEAM-9198)): This ticket aims to implement SQL window analytics functions, and we would be able to take individual elements by using the lead (or lag) function if supported.

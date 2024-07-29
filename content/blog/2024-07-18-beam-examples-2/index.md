@@ -418,7 +418,7 @@ OK
 
 #### Pipeline Execution
 
-We use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments (`bootstrap_servers` and `input_topic`). The pipeline arguments are followed and, note that, we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
+We specify only a single known argument that enables to use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments (`bootstrap_servers`, `input_topic` ...). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
 
 ```bash
 ## start the beam pipeline
@@ -432,7 +432,7 @@ On Flink UI, we see the pipeline has two tasks. The first task is performed unti
 
 ![](avg-word-len-dag.png#center)
 
-On Kafka UI, we can check the output messages include the average word length and record creation timestamp.
+On Kafka UI, we can check the output message includes an average word length and record creation timestamp.
 
 ![](avg-word-len-output.png#center)
 
@@ -535,7 +535,6 @@ class CreateMessags(beam.PTransform):
 
 
 def run(argv=None, save_main_session=True):
-    parser = argparse.ArgumentParser(description="Beam pipeline arguments")
     parser = argparse.ArgumentParser(description="Beam pipeline arguments")
     parser.add_argument(
         "--bootstrap_servers",
@@ -706,6 +705,6 @@ On Flink UI, we can see two tasks in the job graph as well.
 
 ![](avg-lookback-dag.png#center)
 
-On Kafka UI, we can check the output messages include the average word length as well as window start/end timestamps.
+On Kafka UI, we can check the output message includes an average word length as well as window start/end timestamps.
 
 ![](avg-lookback-output.png#center)

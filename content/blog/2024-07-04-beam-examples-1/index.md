@@ -817,7 +817,7 @@ On Flink UI, we see the pipeline polls messages and performs the main transform 
 
 ![](top-k-dag.png#center)
 
-On Kafka UI, we can check the output messages include the frequent word details as well as window start/end timestamps.
+On Kafka UI, we can check the output message includes frequent word details as well as window start/end timestamps.
 
 ![](top-k-output.png#center)
 
@@ -1078,7 +1078,7 @@ On Flink UI, we see the pipeline polls messages and performs the main transform 
 
 ![](max-len-dag.png#center)
 
-On Kafka UI, we can check the output messages include the longest word as well as its timestamp. Note that, as the input text message has multiple words, we can have multiple output messages that have the same timestamp - recall the accumulation mode is accumulating.
+On Kafka UI, we can check the output message includes a longest word as well as its timestamp. Note that, as the input text message has multiple words, we can have multiple output messages that have the same timestamp - recall the accumulation mode is accumulating.
 
 ![](max-len-output.png#center)
 
