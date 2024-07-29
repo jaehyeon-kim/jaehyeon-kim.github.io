@@ -22,10 +22,10 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In this post, we develop two Apache Beam pipelines that track sport activities of users and output their speed periodically. The first pipeline uses native transforms and Beam SQL is used for the latter. While Beam SQL can be useful in some situations, its features in the Python SDK are not complete compared to the Java SDK. Therefore, we are not able to build the required tracking pipeline using it. We end up discussing potential improvements of Beam SQL.
+description: In this post, we develop two Apache Beam pipelines that track sport activities of users and output their speed periodically. The first pipeline uses native transforms and Beam SQL is used for the latter. While Beam SQL can be useful in some situations, its features in the Python SDK are not complete compared to the Java SDK. Therefore, we are not able to build the required tracking pipeline using it. We end up discussing potential improvements of Beam SQL so that it can be used for building competitive applications with the Python SDK.
 ---
 
-In this post, we develop two Apache Beam pipelines that track sport activities of users and output their speed periodically. The first pipeline uses native transforms and [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) is used for the latter. While *Beam SQL* can be useful in some situations, its features in the Python SDK are not complete compared to the Java SDK. Therefore, we are not able to build the required tracking pipeline using it. We end up discussing potential improvements of *Beam SQL*.
+In this post, we develop two Apache Beam pipelines that track sport activities of users and output their speed periodically. The first pipeline uses native transforms and [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) is used for the latter. While *Beam SQL* can be useful in some situations, its features in the Python SDK are not complete compared to the Java SDK. Therefore, we are not able to build the required tracking pipeline using it. We end up discussing potential improvements of *Beam SQL* so that it can be used for building competitive applications with the Python SDK.
 
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1)
 * [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
@@ -83,9 +83,9 @@ Below shows how to start resources using the start-up script. We need to launch 
 
 ## Kafka Sport Activity Producer
 
-It generates sport tracking activities of users, and those activities are tracked by user positions that have the following variables.
+A Kafka producer application is created to generates sport tracking activities of users. Those activities are tracked by user positions that have the following variables.
 
-* *spot* - An integer value that indicates where a user locates. (We may represent a user position in two-dimensional space with his/her longitude and latitude. For the sake of simplicity, however, we keep it as an integer.)
+* *spot* - An integer value that indicates where a user locates. (We may represent a user position using a geographic coordinate. For the sake of simplicity, however, we keep it as an integer.)
 * *timestamp* - A float value that shows the time in seconds since the Epoch when a user locates in the corresponding spot.
 
 A configurable number of user tracks (`--num_tracks`, default 5) can be generated every two seconds by default (`--delay_seconds`). The producer sends the activity tracking records after concatenating the user ID and position values with tab characters (`\t`).
@@ -217,7 +217,7 @@ class TextProducer:
             raise RuntimeError("fails to send a message") from e
 ```
 
-Once executed, the activity tracking records are printed in the terminal.
+We can execute the producer app after starting the Kafka cluster. Once executed, the activity tracking records are printed in the terminal.
 
 ```bash
 python utils/sport_tracker_gen.py 
@@ -236,7 +236,7 @@ user4   88      1722127107.1854854
 ...
 ```
 
-Also, we can check the input messages on `kafka-ui` (*localhost:8080*).
+Also, we can check the input messages using *kafka-ui* on *localhost:8080*.
 
 ![](input-messages.png#center)
 
@@ -246,13 +246,16 @@ We develop two Beam pipelines that track sport activities of users. The first pi
 
 ### Shared Source
 
-Both the pipelines share the same sources, and they are refactored in a utility module.
+Both the pipelines share the same sources, and they are refactored in a separate module.
 
 * `Position` / `PositionCoder`
-    - The input text messages are converted into a custom type. Therefore, we need to create its type definition (`Position`) and register the instruction about how to encode/decode its value (`PositionCoder`). Note that the custom type is used in the output type hint of the `ReadPositionsFromKafka` transform. As the transform runs using the Java SDK, it fails to encode/decode the position values if we do  
+    - The input text messages are converted into a custom type (`Position`). Therefore, we need to create its type definition and register the instruction about how to encode/decode its value using a [coder](https://beam.apache.org/documentation/programming-guide/#data-encoding-and-type-safety) (`PositionCoder`). Note that, without registering the coder, the custom type cannot be processed by a portable runner. 
 * `PreProcessInput`
+    - This is a composite transform that converts an input text message into a tuple of user ID and position as well as assigns a timestamp value into an individual element.
 * `ReadPositionsFromKafka`
+    - It reads messages from a Kafka topic, and returns tuple elements of user ID and position. We need to specify the output type hint for a portable runner to recognise the output type correctly. Note that, the Kafka read and write methods has an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979).
 * `WriteMetricsToKafka`
+    - It sends output messages to a Kafka topic. Each message is a tuple of user ID and speed. Note that the input type hint is necessary when the otuputs are piped from a transform by *Beam SQL*.
 
 ```python
 # chapter2/sport_tracker_utils.py
@@ -404,6 +407,17 @@ class WriteMetricsToKafka(beam.PTransform):
 
 ### Sport Tracker
 
+The main transforms of this pipeline perform
+
+1. `Windowing`: assigns input elements into a [global window](https://beam.apache.org/documentation/programming-guide/#windowing) with the following configuration.
+    - Emits (or triggers) the result every three seconds in processing time (`trigger=AfterWatermark(early=AfterProcessingTime(3))`)
+    - Disallows Late data (`allowed_lateness=0`)
+    - Assigns the output timestamp from the latest input timestamp (`timestamp_combiner=TimestampCombiner.OUTPUT_AT_LATEST`)
+        - By default, the end of window timestamp is taken, but it is so distance future for the global window. Therefore, we take the latest timestamp of the input elements instead.
+    - Configures `ACCUMULATING` for calculating global average (`accumulation_mode=AccumulationMode.ACCUMULATING`) 
+2. `ComputeMetrics`: 
+
+
 ```python
 # chapter2/sport_tracker.py
 import os
@@ -492,8 +506,6 @@ def run(argv=None, save_main_session=True):
             >> beam.WindowInto(
                 GlobalWindows(),
                 trigger=AfterWatermark(early=AfterProcessingTime(3)),
-                # impossible to allow late data using default timestamp policies
-                # unless manually specifying timestamp by producer
                 allowed_lateness=0,
                 timestamp_combiner=TimestampCombiner.OUTPUT_AT_LATEST,
                 accumulation_mode=AccumulationMode.ACCUMULATING,
