@@ -683,7 +683,7 @@ The main transforms of this pipeline perform
 
 1. `Windowing`: assigns input elements into a [fixed time window](https://beam.apache.org/documentation/programming-guide/#windowing) of 5 seconds with the following configuration.
     - Disallows Late data (`allowed_lateness=0`)
-2. `ComputeMetrics`: (1) groups by the input elements by key (*user ID*), (2) converts the input elements into a new custom type (`Track`) to use the key (user ID) for grouping, (3) calculates the speed of a user where the distance and duration are obtained based on their max/min values only (!), and, finally, (4) returns a metrics record, which is a tuple of user ID and speed.
+2. `ComputeMetrics`: (1) converts the input elements into a new custom type (`Track`) so that the key (user ID) becomes present for grouping, (2) calculates the speed of a user where the distance and duration are obtained based on their max/min values only (!), and, finally, (3) returns a metrics record, which is a tuple of user ID and speed.
 
 ```python
 # chapter2/sport_tracker_sql.py
@@ -909,3 +909,5 @@ As discussed earlier, the first pipeline uses native transforms, and it takes in
 
 - User defined function: The Java SDK supports [user defined functions](https://beam.apache.org/documentation/dsls/sql/extensions/user-defined-functions/) that accept a custom Java scalar or aggregation function. We can use a user defined aggregation function to mimics the first pipeline using Beam SQL, but it is not supported in the Python SDK at the moment.
 - Beam SQL aggregation analytics functionality ([BEAM-9198](https://issues.apache.org/jira/browse/BEAM-9198)): This ticket aims to implement SQL window analytics functions, and we would be able to take individual elements by using the lead (or lag) function if supported.
+
+I consider the usage of Beam SQL would be limited unless one or all of those features are supported in the Python SDK, although it supports interesting features such as [External Table](https://beam.apache.org/documentation/dsls/sql/extensions/create-external-table/) and [JOIN](https://beam.apache.org/documentation/dsls/sql/extensions/joins/).
