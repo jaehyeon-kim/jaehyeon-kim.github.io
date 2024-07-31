@@ -29,7 +29,7 @@ In this series, we develop [Apache Beam](https://beam.apache.org/) Python pipeli
 
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](#) (this post)
 * [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
-* Part 3 Build Sport Activity Tracker with/without SQL
+* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
 * Part 4 Call RPC Service for Data Augmentation
 * Part 5 Call RPC Service in Batch using Stateless DoFn
 * Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn
@@ -817,7 +817,7 @@ On Flink UI, we see the pipeline polls messages and performs the main transform 
 
 ![](top-k-dag.png#center)
 
-On Kafka UI, we can check the output messages include the frequent word details as well as window start/end timestamps.
+On Kafka UI, we can check the output message includes frequent word details as well as window start/end timestamps.
 
 ![](top-k-output.png#center)
 
@@ -1078,7 +1078,7 @@ On Flink UI, we see the pipeline polls messages and performs the main transform 
 
 ![](max-len-dag.png#center)
 
-On Kafka UI, we can check the output messages include the longest word as well as its timestamp. Note that, as the input text message has multiple words, we can have multiple output messages that have the same timestamp - recall the accumulation mode is accumulating.
+On Kafka UI, we can check the output message includes a longest word as well as its timestamp. Note that, as the input text message has multiple words, we can have multiple output messages that have the same timestamp - recall the accumulation mode is accumulating.
 
 ![](max-len-output.png#center)
 
