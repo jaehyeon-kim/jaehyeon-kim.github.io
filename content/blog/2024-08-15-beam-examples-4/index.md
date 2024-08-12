@@ -1,7 +1,7 @@
 ---
-title: Apache Beam Python Examples - Part 3 Build Sport Activity Tracker with/without SQL
-date: 2024-08-01
-draft: false
+title: Apache Beam Python Examples - Part 4 Call RPC Service for Data Augmentation
+date: 2024-08-15
+draft: true
 featured: false
 comment: true
 toc: true
@@ -29,14 +29,48 @@ In this post, we develop two Apache Beam pipelines that track sport activities o
 
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1)
 * [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
-* [Part 3 Build Sport Activity Tracker with/without SQL](#) (this post)
-* [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4)
+* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
+* [Part 4 Call RPC Service for Data Augmentation](#) (this post)
 * Part 5 Call RPC Service in Batch using Stateless DoFn
 * Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn
 * Part 7 Separate Droppable Data into Side Output
 * Part 8 Enhance Sport Activity Tracker with Runner Motivation
 * Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn
 * Part 10 Develop Streaming File Reader using Splittable DoFn
+
+## Introduction to gRPC
+
+```proto
+syntax = "proto3";
+
+package chapter3;
+
+message Request {
+  string input = 1;
+}
+
+message Response {
+  int32 output = 1;
+}
+
+message RequestList {
+  repeated Request request = 1;
+}
+
+message ResponseList {
+  repeated Response response = 1;
+}
+
+service RcpService {
+  rpc resolve(Request) returns (Response);
+  rpc resolveBatch(RequestList) returns (ResponseList);
+}
+```
+
+
+```bash
+
+```
 
 ## Development Environment
 
@@ -55,7 +89,7 @@ Below shows how to start resources using the start-up script. We need to launch 
 
 ```bash
 ## start a local flink can kafka cluster
-./setup/start-flink-env.sh -f -k
+./setup/start-flink-env.sh -f -k -g
 # start kafka...
 # [+] Running 6/6
 #  ⠿ Network app-network      Created                                     0.0s
@@ -64,13 +98,17 @@ Below shows how to start resources using the start-up script. We need to launch 
 #  ⠿ Container zookeeper      Started                                     0.3s
 #  ⠿ Container kafka-0        Started                                     0.5s
 #  ⠿ Container kafka-ui       Started                                     0.8s
+# start grpc server...
+# [+] Running 2/2
+#  ⠿ Network grpc-network     Created                                     0.0s  
+#  ⠿ Container grpc-server    Started                                     0.4s
 # start flink 1.18.1...
 # Starting cluster.
 # Starting standalonesession daemon on host <hostname>.
 # Starting taskexecutor daemon on host <hostname>.
 
 ## start a local kafka cluster only
-./setup/start-flink-env.sh -k
+./setup/start-flink-env.sh -k -g
 # start kafka...
 # [+] Running 6/6
 #  ⠿ Network app-network      Created                                     0.0s
@@ -79,6 +117,10 @@ Below shows how to start resources using the start-up script. We need to launch 
 #  ⠿ Container zookeeper      Started                                     0.3s
 #  ⠿ Container kafka-0        Started                                     0.5s
 #  ⠿ Container kafka-ui       Started                                     0.8s
+# start grpc server...
+# [+] Running 2/2
+#  ⠿ Network grpc-network     Created                                     0.0s  
+#  ⠿ Container grpc-server    Started                                     0.6s
 ```
 
 ## Kafka Sport Activity Producer
