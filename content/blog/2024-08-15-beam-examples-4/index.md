@@ -38,7 +38,9 @@ In this post, we develop two Apache Beam pipelines that track sport activities o
 * Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn
 * Part 10 Develop Streaming File Reader using Splittable DoFn
 
-## Introduction to gRPC
+## Introduction to RPC Service
+
+Two services are defined in the `.proto` file - `resolve` and `resolveBatch`. The former requests with a string and returns an integer while the latter requests with a list of the string requests and returns a list of the integer responses.
 
 ```proto
 syntax = "proto3";
@@ -69,8 +71,40 @@ service RcpService {
 
 
 ```bash
-
+cd chapter3
+mkdir proto && touch proto/service.proto
+## copy proto contents
+## generate grpc client and server interfaces
+python -m grpc_tools.protoc -I proto --python_out=. --grpc_python_out=. proto/service.proto
 ```
+
+With the `.proto` service file, we can create 
+
+Note that as we've already provided a version of the generated code in the proto directory, running this command regenerates the appropriate file rather than creates a new one. The generated code files are called `service_pb2.py` and `service_pb2_grpc.py` and contain:
+
+- classes for the messages defined in `service.proto`
+- classes for the service defined in `service.proto`
+    - `RcpServiceStub`, which can be used by clients to invoke RcpService RPCs
+    - `RcpServiceServicer`, which defines the interface for implementations of the RcpService service
+- a function for the service defined in service.proto
+    - `add_RcpServiceServicer_to_server`, which adds a RcpServiceServicer to a `grpc.Server`
+
+```bash
+tree -P "serv*|proto" -I "*pycache*"
+.
+├── proto
+│   └── service.proto
+├── server.py
+├── server_client.py
+├── service_pb2.py
+├── service_pb2_grpc.py
+├── service_test_mock.py
+└── service_test_unit.py
+
+1 directory, 7 files
+```
+
+![](rpc-demo.png#center)
 
 ## Development Environment
 
@@ -90,18 +124,16 @@ Below shows how to start resources using the start-up script. We need to launch 
 ```bash
 ## start a local flink can kafka cluster
 ./setup/start-flink-env.sh -f -k -g
-# start kafka...
 # [+] Running 6/6
-#  ⠿ Network app-network      Created                                     0.0s
-#  ⠿ Volume "zookeeper_data"  Created                                     0.0s
-#  ⠿ Volume "kafka_0_data"    Created                                     0.0s
-#  ⠿ Container zookeeper      Started                                     0.3s
-#  ⠿ Container kafka-0        Started                                     0.5s
-#  ⠿ Container kafka-ui       Started                                     0.8s
-# start grpc server...
+#  ⠿ Network app-network      Created                                                        0.0s
+#  ⠿ Volume "kafka_0_data"    Created                                                        0.0s
+#  ⠿ Volume "zookeeper_data"  Created                                                        0.0s
+#  ⠿ Container zookeeper      Started                                                        0.5s
+#  ⠿ Container kafka-0        Started                                                        0.7s
+#  ⠿ Container kafka-ui       Started                                                        0.9s
 # [+] Running 2/2
-#  ⠿ Network grpc-network     Created                                     0.0s  
-#  ⠿ Container grpc-server    Started                                     0.4s
+#  ⠿ Network grpc-network   Created                                                          0.0s
+#  ⠿ Container grpc-server  Started                                                          0.4s
 # start flink 1.18.1...
 # Starting cluster.
 # Starting standalonesession daemon on host <hostname>.
@@ -109,178 +141,17 @@ Below shows how to start resources using the start-up script. We need to launch 
 
 ## start a local kafka cluster only
 ./setup/start-flink-env.sh -k -g
-# start kafka...
 # [+] Running 6/6
-#  ⠿ Network app-network      Created                                     0.0s
-#  ⠿ Volume "zookeeper_data"  Created                                     0.0s
-#  ⠿ Volume "kafka_0_data"    Created                                     0.0s
-#  ⠿ Container zookeeper      Started                                     0.3s
-#  ⠿ Container kafka-0        Started                                     0.5s
-#  ⠿ Container kafka-ui       Started                                     0.8s
-# start grpc server...
+#  ⠿ Network app-network      Created                                                        0.0s
+#  ⠿ Volume "kafka_0_data"    Created                                                        0.0s
+#  ⠿ Volume "zookeeper_data"  Created                                                        0.0s
+#  ⠿ Container zookeeper      Started                                                        0.5s
+#  ⠿ Container kafka-0        Started                                                        0.7s
+#  ⠿ Container kafka-ui       Started                                                        0.9s
 # [+] Running 2/2
-#  ⠿ Network grpc-network     Created                                     0.0s  
-#  ⠿ Container grpc-server    Started                                     0.6s
+#  ⠿ Network grpc-network   Created                                                          0.0s
+#  ⠿ Container grpc-server  Started                                                          0.4s
 ```
-
-## Kafka Sport Activity Producer
-
-A Kafka producer application is created to generate sport tracking activities of users. Those activities are tracked by user positions that have the following variables.
-
-* *spot* - An integer value that indicates where a user locates. Although we may represent a user position using a geographic coordinate, we keep it as an integer for the sake of simplicity in this post.
-* *timestamp* - A float value that shows the time in seconds since the Epoch when a user locates in the corresponding spot.
-
-A configurable number of user tracks (`--num_tracks`, default 5) can be generated every two seconds by default (`--delay_seconds`). The producer sends the activity tracking records as a text by concatenating the user ID and position values with tab characters (`\t`).
-
-```python
-# utils/sport_tracker_gen.py
-import time
-import argparse
-import random
-import typing
-
-from producer import TextProducer
-
-
-class Position(typing.NamedTuple):
-    spot: int
-    timestamp: float
-
-    @classmethod
-    def create(cls, spot: int = random.randint(0, 100), timestamp: float = time.time()):
-        return cls(spot=spot, timestamp=timestamp)
-
-
-class TrackGenerator:
-    def __init__(self, num_tracks: int, delay_seconds: int) -> None:
-        self.num_tracks = num_tracks
-        self.delay_seconds = delay_seconds
-        self.positions = [
-            Position.create(spot=random.randint(0, 110)) for _ in range(self.num_tracks)
-        ]
-
-    def update_positions(self):
-        for ind, position in enumerate(self.positions):
-            self.positions[ind] = self.move(
-                start=position,
-                delta=random.randint(-10, 10),
-                duration=time.time() - position.timestamp,
-            )
-
-    def move(self, start: Position, delta: int, duration: float):
-        spot, timestamp = tuple(start)
-        return Position(spot=spot + delta, timestamp=timestamp + duration)
-
-    def create_tracks(self):
-        tracks = []
-        for ind, position in enumerate(self.positions):
-            track = f"user{ind}\t{position.spot}\t{position.timestamp}"
-            print(track)
-            tracks.append(track)
-        return tracks
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(__file__, description="Sport Data Generator")
-    parser.add_argument(
-        "--bootstrap_servers",
-        "-b",
-        type=str,
-        default="localhost:29092",
-        help="Comma separated string of Kafka bootstrap addresses",
-    )
-    parser.add_argument(
-        "--topic_name",
-        "-t",
-        type=str,
-        default="input-topic",
-        help="Kafka topic name",
-    )
-    parser.add_argument(
-        "--num_tracks",
-        "-n",
-        type=int,
-        default=5,
-        help="Number of tracks",
-    )
-    parser.add_argument(
-        "--delay_seconds",
-        "-d",
-        type=float,
-        default=2,
-        help="The amount of time that a record should be delayed.",
-    )
-    args = parser.parse_args()
-
-    producer = TextProducer(args.bootstrap_servers, args.topic_name)
-    track_gen = TrackGenerator(args.num_tracks, args.delay_seconds)
-
-    while True:
-        tracks = track_gen.create_tracks()
-        for track in tracks:
-            producer.send_to_kafka(text=track)
-        track_gen.update_positions()
-        time.sleep(random.randint(0, args.delay_seconds))
-```
-
-The producer app sends the input messages using the following Kafka producer class.
-
-```python
-# utils/producer.py
-from kafka import KafkaProducer
-
-
-class TextProducer:
-    def __init__(self, bootstrap_servers: list, topic_name: str) -> None:
-        self.bootstrap_servers = bootstrap_servers
-        self.topic_name = topic_name
-        self.kafka_producer = self.create_producer()
-
-    def create_producer(self):
-        """
-        Returns a KafkaProducer instance
-        """
-        return KafkaProducer(
-            bootstrap_servers=self.bootstrap_servers,
-            value_serializer=lambda v: v.encode("utf-8"),
-        )
-
-    def send_to_kafka(self, text: str, timestamp_ms: int = None):
-        """
-        Sends text to a Kafka topic.
-        """
-        try:
-            args = {"topic": self.topic_name, "value": text}
-            if timestamp_ms is not None:
-                args = {**args, **{"timestamp_ms": timestamp_ms}}
-            self.kafka_producer.send(**args)
-            self.kafka_producer.flush()
-        except Exception as e:
-            raise RuntimeError("fails to send a message") from e
-```
-
-We can execute the producer app after starting the Kafka cluster. Once executed, the activity tracking records are printed in the terminal.
-
-```bash
-python utils/sport_tracker_gen.py 
-user0   97      1722127107.0654943
-user1   56      1722127107.0654943
-user2   55      1722127107.0654943
-user3   55      1722127107.0654943
-user4   95      1722127107.0654943
-===========================
-user0   88      1722127107.1854753
-user1   49      1722127107.1854813
-user2   55      1722127107.1854827
-user3   61      1722127107.185484
-user4   88      1722127107.1854854
-===========================
-...
-```
-
-Also, we can check the input messages using Kafka UI on *localhost:8080*.
-
-![](input-messages.png#center)
 
 ## Beam Pipelines
 
@@ -300,67 +171,13 @@ Both the pipelines share the same sources, and they are refactored in a separate
     - It sends output messages to a Kafka topic. Each message is a tuple of user ID and speed. Note that the input type hint is necessary when the inputs are piped from a transform by *Beam SQL*.
 
 ```python
-# chapter2/sport_tracker_utils.py
+# chapter3/io_utils.py
 import re
-import json
-import random
-import time
 import typing
 
 import apache_beam as beam
-from apache_beam.io import kafka
 from apache_beam import pvalue
-from apache_beam.transforms.window import TimestampedValue
-from apache_beam.utils.timestamp import Timestamp
-
-
-class Position(typing.NamedTuple):
-    spot: int
-    timestamp: float
-
-    def to_bytes(self):
-        return json.dumps(self._asdict()).encode("utf-8")
-
-    @classmethod
-    def from_bytes(cls, encoded: bytes):
-        d = json.loads(encoded.decode("utf-8"))
-        return cls(**d)
-
-    @classmethod
-    def create(cls, spot: int = random.randint(0, 100), timestamp: float = time.time()):
-        return cls(spot=spot, timestamp=timestamp)
-
-
-class PositionCoder(beam.coders.Coder):
-    def encode(self, value: Position):
-        return value.to_bytes()
-
-    def decode(self, encoded: bytes):
-        return Position.from_bytes(encoded)
-
-    def is_deterministic(self) -> bool:
-        return True
-
-
-beam.coders.registry.register_coder(Position, PositionCoder)
-
-
-def add_timestamp(element: typing.Tuple[str, Position]):
-    return TimestampedValue(element, Timestamp.of(element[1].timestamp))
-
-
-def to_positions(input: str):
-    workout, spot, timestamp = tuple(re.sub("\n", "", input).split("\t"))
-    return workout, Position(spot=int(spot), timestamp=float(timestamp))
-
-
-class PreProcessInput(beam.PTransform):
-    def expand(self, pcoll: pvalue.PCollection):
-        return (
-            pcoll
-            | "ToPositions" >> beam.Map(to_positions)
-            | "AddTS" >> beam.Map(add_timestamp)
-        )
+from apache_beam.io import kafka
 
 
 def decode_message(kafka_kv: tuple):
@@ -368,8 +185,11 @@ def decode_message(kafka_kv: tuple):
     return kafka_kv[1].decode("utf-8")
 
 
-@beam.typehints.with_output_types(typing.Tuple[str, Position])
-class ReadPositionsFromKafka(beam.PTransform):
+def tokenize(element: str):
+    return re.findall(r"[A-Za-z\']+", element)
+
+
+class ReadWordsFromKafka(beam.PTransform):
     def __init__(
         self,
         bootstrap_servers: str,
@@ -378,7 +198,7 @@ class ReadPositionsFromKafka(beam.PTransform):
         deprecated_read: bool,
         verbose: bool = False,
         label: str | None = None,
-    ):
+    ) -> None:
         super().__init__(label)
         self.boostrap_servers = bootstrap_servers
         self.topics = topics
@@ -397,28 +217,28 @@ class ReadPositionsFromKafka(beam.PTransform):
             >> kafka.ReadFromKafka(
                 consumer_config={
                     "bootstrap.servers": self.boostrap_servers,
-                    "auto.offset.reset": "earliest",
+                    "auto.offset.reset": "latest",
                     # "enable.auto.commit": "true",
                     "group.id": self.group_id,
                 },
                 topics=self.topics,
                 timestamp_policy=kafka.ReadFromKafka.create_time_policy,
+                commit_offset_in_finalize=True,
                 expansion_service=self.expansion_service,
             )
             | "DecodeMessage" >> beam.Map(decode_message)
-            | "PreProcessInput" >> PreProcessInput()
+            | "ExtractWords" >> beam.FlatMap(tokenize)
         )
 
 
-@beam.typehints.with_input_types(typing.Tuple[str, float])
-class WriteMetricsToKafka(beam.PTransform):
+class WriteOutputsToKafka(beam.PTransform):
     def __init__(
         self,
         bootstrap_servers: str,
         topic: str,
         deprecated_read: bool,
         label: str | None = None,
-    ):
+    ) -> None:
         super().__init__(label)
         self.boostrap_servers = bootstrap_servers
         self.topic = topic
@@ -429,25 +249,14 @@ class WriteMetricsToKafka(beam.PTransform):
             )
 
     def expand(self, pcoll: pvalue.PCollection):
-        def create_message(element: typing.Tuple[str, float]):
-            msg = json.dumps(dict(zip(["user", "speed"], element)))
-            print(msg)
-            return "".encode("utf-8"), msg.encode("utf-8")
-
-        return (
-            pcoll
-            | "CreateMessage"
-            >> beam.Map(create_message).with_output_types(typing.Tuple[bytes, bytes])
-            | "WriteToKafka"
-            >> kafka.WriteToKafka(
-                producer_config={"bootstrap.servers": self.boostrap_servers},
-                topic=self.topic,
-                expansion_service=self.expansion_service,
-            )
+        return pcoll | "WriteToKafka" >> kafka.WriteToKafka(
+            producer_config={"bootstrap.servers": self.boostrap_servers},
+            topic=self.topic,
+            expansion_service=self.expansion_service,
         )
 ```
 
-### Sport Tracker
+### Beam Pipeline
 
 The main transforms of this pipeline perform
 
@@ -462,48 +271,52 @@ The main transforms of this pipeline perform
 
 
 ```python
-# chapter2/sport_tracker.py
+# chapter3/rpc_pardo.py
 import os
 import argparse
+import json
 import re
-import logging
 import typing
+import logging
 
 import apache_beam as beam
-from apache_beam import pvalue
-from apache_beam.transforms.window import GlobalWindows, TimestampCombiner
-from apache_beam.transforms.trigger import (
-    AfterWatermark,
-    AccumulationMode,
-    AfterProcessingTime,
-)
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.options.pipeline_options import SetupOptions
 
-from sport_tracker_utils import (
-    Position,
-    ReadPositionsFromKafka,
-    WriteMetricsToKafka,
-)
+from io_utils import ReadWordsFromKafka, WriteOutputsToKafka
 
 
-def compute(element: typing.Tuple[str, typing.Iterable[Position]]):
-    last: Position = None
-    distance = 0
-    duration = 0
-    for p in sorted(element[1], key=lambda p: p.timestamp):
-        if last is not None:
-            distance += abs(p.spot - last.spot)
-            duration += p.timestamp - last.timestamp
-        last = p
-    return element[0], distance / duration if duration > 0 else 0
+def create_message(element: typing.Tuple[str, int]):
+    msg = json.dumps({"word": element[0], "length": element[1]})
+    print(msg)
+    return element[0].encode("utf-8"), msg.encode("utf-8")
 
 
-class ComputeMetrics(beam.PTransform):
-    def expand(self, pcoll: pvalue.PCollection):
-        return (
-            pcoll | "GroupByKey" >> beam.GroupByKey() | "Compute" >> beam.Map(compute)
+class RpcDoFn(beam.DoFn):
+    channel = None
+    stub = None
+    hostname = "localhost"
+    port = "50051"
+
+    def setup(self):
+        import grpc
+        import service_pb2_grpc
+
+        self.channel: grpc.Channel = grpc.insecure_channel(
+            f"{self.hostname}:{self.port}"
         )
+        self.stub = service_pb2_grpc.RcpServiceStub(self.channel)
+
+    def teardown(self):
+        if self.channel is not None:
+            self.channel.close()
+
+    def process(self, element: str) -> typing.Iterator[typing.Tuple[str, int]]:
+        import service_pb2
+
+        request = service_pb2.Request(input=element)
+        response = self.stub.resolve(request)
+        yield element, response.output
 
 
 def run(argv=None, save_main_session=True):
@@ -538,24 +351,18 @@ def run(argv=None, save_main_session=True):
     with beam.Pipeline(options=pipeline_options) as p:
         (
             p
-            | "ReadPositions"
-            >> ReadPositionsFromKafka(
+            | "ReadInputsFromKafka"
+            >> ReadWordsFromKafka(
                 bootstrap_servers=known_args.bootstrap_servers,
                 topics=[known_args.input_topic],
                 group_id=f"{known_args.output_topic}-group",
                 deprecated_read=known_args.deprecated_read,
             )
-            | "Windowing"
-            >> beam.WindowInto(
-                GlobalWindows(),
-                trigger=AfterWatermark(early=AfterProcessingTime(3)),
-                allowed_lateness=0,
-                timestamp_combiner=TimestampCombiner.OUTPUT_AT_LATEST,
-                accumulation_mode=AccumulationMode.ACCUMULATING,
-            )
-            | "ComputeMetrics" >> ComputeMetrics()
-            | "WriteNotifications"
-            >> WriteMetricsToKafka(
+            | "RequestRPC" >> beam.ParDo(RpcDoFn())
+            | "CreateMessags"
+            >> beam.Map(create_message).with_output_types(typing.Tuple[bytes, bytes])
+            | "WriteOutputsToKafka"
+            >> WriteOutputsToKafka(
                 bootstrap_servers=known_args.bootstrap_servers,
                 topic=known_args.output_topic,
                 deprecated_read=known_args.deprecated_read,
@@ -594,28 +401,24 @@ user1	58	1713939467.8904696
 ```
 
 ```python
-# chapter2/sport_tracker_test.py
+# chapter3/rpc_pardo_test.py
 import os
-import re
-import typing
 import unittest
+from concurrent import futures
 
 import apache_beam as beam
 from apache_beam.coders import coders
-
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 from apache_beam.testing.test_stream import TestStream
-from apache_beam.transforms.trigger import (
-    AfterWatermark,
-    AccumulationMode,
-    AfterProcessingTime,
-)
-from apache_beam.transforms.window import GlobalWindows, TimestampCombiner
 from apache_beam.options.pipeline_options import PipelineOptions, StandardOptions
 
-from sport_tracker_utils import Position, PreProcessInput
-from sport_tracker import ComputeMetrics
+import grpc
+import service_pb2_grpc
+import server
+
+from rpc_pardo import RpcDoFn
+from io_utils import tokenize
 
 
 def read_file(filename: str, inputpath: str):
@@ -623,42 +426,35 @@ def read_file(filename: str, inputpath: str):
         return f.readlines()
 
 
-def compute_matrics(key: str, positions: typing.List[Position]):
-    last: Position = None
-    distance = 0
-    duration = 0
-    for p in sorted(positions, key=lambda p: p.timestamp):
-        if last is not None:
-            distance += abs(int(p.spot) - int(last.spot))
-            duration += float(p.timestamp) - float(last.timestamp)
-        last = p
-    return key, distance / duration if duration > 0 else 0
-
-
-def compute_expected_metrics(lines: list):
-    ones, twos = [], []
+def compute_expected_output(lines: list):
+    output = []
     for line in lines:
-        workout, spot, timestamp = tuple(re.sub("\n", "", line).split("\t"))
-        position = Position(spot, timestamp)
-        if workout == "user0":
-            ones.append(position)
-        else:
-            twos.append(position)
-    return [
-        compute_matrics(key="user0", positions=ones),
-        compute_matrics(key="user1", positions=twos),
-    ]
+        words = [(w, len(w)) for w in tokenize(line)]
+        output = output + words
+    return output
 
 
-class SportTrackerTest(unittest.TestCase):
-    def test_windowing_behaviour(self):
+class RcpParDooTest(unittest.TestCase):
+    server_class = server.RcpServiceServicer
+    port = 50051
+
+    def setUp(self):
+        self.server = grpc.server(futures.ThreadPoolExecutor())
+        service_pb2_grpc.add_RcpServiceServicer_to_server(
+            self.server_class(), self.server
+        )
+        self.server.add_insecure_port(f"[::]:{self.port}")
+        self.server.start()
+
+    def tearDown(self):
+        self.server.stop(None)
+
+    def test_pipeline(self):
         options = PipelineOptions()
         options.view_as(StandardOptions).streaming = True
         with TestPipeline(options=options) as p:
             PARENT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-            lines = read_file(
-                "test-tracker-data.txt", os.path.join(PARENT_DIR, "inputs")
-            )
+            lines = read_file("lorem.txt", os.path.join(PARENT_DIR, "inputs"))
             test_stream = TestStream(coder=coders.StrUtf8Coder()).with_output_types(str)
             for line in lines:
                 test_stream.add_elements([line])
@@ -667,19 +463,11 @@ class SportTrackerTest(unittest.TestCase):
             output = (
                 p
                 | test_stream
-                | "PreProcessInput" >> PreProcessInput()
-                | "Windowing"
-                >> beam.WindowInto(
-                    GlobalWindows(),
-                    trigger=AfterWatermark(early=AfterProcessingTime(3)),
-                    allowed_lateness=0,
-                    timestamp_combiner=TimestampCombiner.OUTPUT_AT_LATEST,
-                    accumulation_mode=AccumulationMode.ACCUMULATING,
-                )
-                | "ComputeMetrics" >> ComputeMetrics()
+                | "ExtractWords" >> beam.FlatMap(tokenize)
+                | "RequestRPC" >> beam.ParDo(RpcDoFn())
             )
 
-            EXPECTED_OUTPUT = compute_expected_metrics(lines)
+            EXPECTED_OUTPUT = compute_expected_output(lines)
 
             assert_that(output, equal_to(EXPECTED_OUTPUT))
 
@@ -691,265 +479,32 @@ if __name__ == "__main__":
 We can execute the pipeline test as shown below.
 
 ```bash
-python chapter2/sport_tracker_test.py 
+python chapter3/rpc_pardo_test.py 
 .
 ----------------------------------------------------------------------
-Ran 1 test in 1.492s
+Ran 1 test in 0.373s
 
 OK
 ```
 
 #### Pipeline Execution
+
+![](input-messages.png#center)
 
 We specify only a single known argument that enables to use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments (`bootstrap_servers`, `input_topic` ...). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
 
 ```bash
 ## start the beam pipeline
 ## exclude --flink_master if using an embedded cluster
-python chapter2/sport_tracker.py --deprecated_read \
-    --job_name=sport_tracker --runner FlinkRunner --flink_master=localhost:8081 \
+python chapter3/rpc_pardo.py --deprecated_read \
+    --job_name=rpc-pardo --runner FlinkRunner --flink_master=localhost:8081 \
 	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
 ```
 
 On Flink UI, we see the pipeline has two tasks. The first task is performed until windowing the input elements while the second task performs up to sending the metric records into the output topic.
 
-![](sport-tracker-dag.png#center)
+![](pipeline-dag.png#center)
 
 On Kafka UI, we can check the output message is a dictionary of user ID and speed.
 
-![](sport-tracker-output.png#center)
-
-### Sport Tracker SQL
-
-The main transforms of this pipeline perform
-
-1. `Windowing`: assigns input elements into a [fixed time window](https://beam.apache.org/documentation/programming-guide/#windowing) of 5 seconds with the following configuration.
-    - Disallows Late data (`allowed_lateness=0`)
-2. `ComputeMetrics`: (1) converts the input elements into a new custom type (`Track`) so that the key (user ID) becomes present for grouping, (2) calculates the speed of a user where the distance and duration are obtained based on their max/min values only (!), and, finally, (3) returns a metrics record, which is a tuple of user ID and speed.
-
-```python
-# chapter2/sport_tracker_sql.py
-import os
-import argparse
-import re
-import logging
-import typing
-
-import apache_beam as beam
-from apache_beam import pvalue, coders
-from apache_beam.transforms.sql import SqlTransform
-from apache_beam.transforms.window import FixedWindows
-from apache_beam.options.pipeline_options import PipelineOptions
-from apache_beam.options.pipeline_options import SetupOptions
-
-from sport_tracker_utils import (
-    Position,
-    ReadPositionsFromKafka,
-    WriteMetricsToKafka,
-)
-
-
-class Track(typing.NamedTuple):
-    user: str
-    spot: int
-    timestamp: float
-
-
-coders.registry.register_coder(Track, coders.RowCoder)
-
-
-def to_track(element: typing.Tuple[str, Position]):
-    return Track(element[0], element[1].spot, element[1].timestamp)
-
-
-class ComputeMetrics(beam.PTransform):
-    def expand(self, pcoll: pvalue.PCollection):
-        return (
-            pcoll
-            | "ToTrack" >> beam.Map(to_track).with_output_types(Track)
-            | "Compute"
-            >> SqlTransform(
-                """
-                WITH cte AS (
-                    SELECT
-                        `user`,
-                        MIN(`spot`) - MAX(`spot`) AS distance,
-                        MIN(`timestamp`) - MAX(`timestamp`) AS duration
-                    FROM PCOLLECTION
-                    GROUP BY `user`
-                )
-                SELECT 
-                    `user`,
-                    CASE WHEN duration = 0 THEN 0 ELSE distance / duration END AS speed
-                FROM cte
-                """
-            )
-            | "ToTuple"
-            >> beam.Map(lambda e: tuple(e)).with_output_types(typing.Tuple[str, float])
-        )
-
-
-def run(argv=None, save_main_session=True):
-    parser = argparse.ArgumentParser(description="Beam pipeline arguments")
-    parser.add_argument(
-        "--bootstrap_servers",
-        default="host.docker.internal:29092",
-        help="Kafka bootstrap server addresses",
-    )
-    parser.add_argument("--input_topic", default="input-topic", help="Input topic")
-    parser.add_argument(
-        "--output_topic",
-        default=re.sub("_", "-", re.sub(".py$", "", os.path.basename(__file__))),
-        help="Output topic",
-    )
-    parser.add_argument(
-        "--deprecated_read",
-        action="store_true",
-        default="Whether to use a deprecated read. See https://github.com/apache/beam/issues/20979",
-    )
-    parser.set_defaults(deprecated_read=False)
-
-    known_args, pipeline_args = parser.parse_known_args(argv)
-
-    # # We use the save_main_session option because one or more DoFn's in this
-    # # workflow rely on global context (e.g., a module imported at module level).
-    pipeline_options = PipelineOptions(pipeline_args)
-    pipeline_options.view_as(SetupOptions).save_main_session = save_main_session
-    print(f"known args - {known_args}")
-    print(f"pipeline options - {pipeline_options.display_data()}")
-
-    with beam.Pipeline(options=pipeline_options) as p:
-        (
-            p
-            | "ReadPositions"
-            >> ReadPositionsFromKafka(
-                bootstrap_servers=known_args.bootstrap_servers,
-                topics=[known_args.input_topic],
-                group_id=f"{known_args.output_topic}-group",
-                deprecated_read=known_args.deprecated_read,
-            )
-            | "Windowing" >> beam.WindowInto(FixedWindows(5), allowed_lateness=0)
-            | "ComputeMetrics" >> ComputeMetrics()
-            | "WriteNotifications"
-            >> WriteMetricsToKafka(
-                bootstrap_servers=known_args.bootstrap_servers,
-                topic=known_args.output_topic,
-                deprecated_read=known_args.deprecated_read,
-            )
-        )
-
-        logging.getLogger().setLevel(logging.WARN)
-        logging.info("Building pipeline ...")
-
-
-if __name__ == "__main__":
-    run()
-```
-
-#### Pipeline Test
-
-We have 8 test activity records of two users. Below shows those records after sorting by user ID and timestamp. Using the sorted records, we can easily obtain the expected outputs, which can be found in the last column.
-
-![](sport-tracker-sql-test.png#center)
-
-Note that the transform by Beam SQL cannot be tested by the streaming Python direct runner because it doesn't support cross-language pipelines. Therefore, we use the Flink runner for testing.
-
-```python
-# chapter2/sport_tracker_sql_test.py
-import sys
-import unittest
-
-import apache_beam as beam
-from apache_beam.coders import coders
-from apache_beam.testing.test_pipeline import TestPipeline
-from apache_beam.testing.util import assert_that, equal_to
-from apache_beam.testing.test_stream import TestStream
-from apache_beam.transforms.window import FixedWindows
-from apache_beam.options.pipeline_options import PipelineOptions
-
-from sport_tracker_utils import PreProcessInput
-from sport_tracker_sql import ComputeMetrics
-
-
-def main(out=sys.stderr, verbosity=2):
-    loader = unittest.TestLoader()
-
-    suite = loader.loadTestsFromModule(sys.modules[__name__])
-    unittest.TextTestRunner(out, verbosity=verbosity).run(suite)
-
-
-class SportTrackerTest(unittest.TestCase):
-    def test_windowing_behaviour(self):
-        pipeline_opts = {"runner": "FlinkRunner", "parallelism": 1, "streaming": True}
-        options = PipelineOptions([], **pipeline_opts)
-        with TestPipeline(options=options) as p:
-            lines = [
-                "user0\t0\t0",
-                "user1\t10\t2",
-                "user0\t5\t4",
-                "user1\t3\t3",
-                "user0\t10\t6",
-                "user1\t2\t7",
-                "user0\t4\t9",
-                "user1\t10\t9",
-            ]
-            test_stream = TestStream(coder=coders.StrUtf8Coder()).with_output_types(str)
-            for line in lines:
-                test_stream.add_elements([line])
-            test_stream.advance_watermark_to_infinity()
-
-            output = (
-                p
-                | test_stream
-                | "PreProcessInput" >> PreProcessInput()
-                | "Windowing" >> beam.WindowInto(FixedWindows(5), allowed_lateness=0)
-                | "ComputeMetrics" >> ComputeMetrics()
-            )
-
-            assert_that(
-                output,
-                equal_to(
-                    [("user0", 1.25), ("user1", 7.0), ("user0", 2.0), ("user1", 4.0)]
-                ),
-            )
-
-
-if __name__ == "__main__":
-    main(out=None)
-```
-
-The pipeline can be tested as shown below.
-
-```bash
-python chapter2/sport_tracker_sql_test.py 
-ok
-
-----------------------------------------------------------------------
-Ran 1 test in 34.487s
-
-OK
-```
-
-#### Pipeline Execution
-
-Similar to the previous example, we use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments. Note that the transform by Beam SQL fails to run on a local Flink cluster. Therefore, an embedded Flink cluster is used without specifying the flink master argument.
-
-```bash
-## start the beam pipeline with an embedded flink cluster
-python chapter2/sport_tracker_sql.py --deprecated_read \
-    --job_name=sport_tracker_sql --runner FlinkRunner \
-	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
-```
-
-On Kafka UI, we can check the output message is a dictionary of user ID and speed.
-
-![](sport-tracker-sql-output.png#center)
-
-## Potential Improvements of Beam SQL for Python SDK
-
-As discussed earlier, the first pipeline uses native transforms, and it takes individual elements to calculate the distance and duration. On the other hand, the second pipeline approximates those values by their max/min values only. This kind of approximation is misleading and there are two options that we can overcome such a limitation.
-
-- User defined function: The Java SDK supports [user defined functions](https://beam.apache.org/documentation/dsls/sql/extensions/user-defined-functions/) that accept a custom Java scalar or aggregation function. We can use a user defined aggregation function to mimics the first pipeline using Beam SQL, but it is not supported in the Python SDK at the moment.
-- Beam SQL aggregation analytics functionality ([BEAM-9198](https://issues.apache.org/jira/browse/BEAM-9198)): This ticket aims to implement SQL window analytics functions, and we would be able to take individual elements by using the lead (or lag) function if supported.
-
-I consider the usage of Beam SQL would be limited unless one or all of those features are supported in the Python SDK, although it supports interesting features such as [External Table](https://beam.apache.org/documentation/dsls/sql/extensions/create-external-table/) and [JOIN](https://beam.apache.org/documentation/dsls/sql/extensions/joins/).
+![](output-messages.png#center)
