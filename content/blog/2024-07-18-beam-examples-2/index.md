@@ -30,7 +30,7 @@ In this post, we develop two Apache Beam pipelines that calculate average word l
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1)
 * [Part 2 Calculate Average Word Length with/without Fixed Look back](#) (this post)
 * [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
-* Part 4 Call RPC Service for Data Augmentation
+* [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4)
 * Part 5 Call RPC Service in Batch using Stateless DoFn
 * Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn
 * Part 7 Separate Droppable Data into Side Output
