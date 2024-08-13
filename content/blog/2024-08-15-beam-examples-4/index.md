@@ -26,7 +26,7 @@ images: []
 description: In this post, we develop an Apache Beam pipeline where the input data is augmented by an Remote Procedure Call (RPC). Each of the input elements performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one elements. In the subsequent two posts, we will discuss updated pipelines that make RPC calls more efficiently. We begin with illustrating how to manage development resources followed by demonstrating the RPC service that we use in this series. Finally, we develop a Beam pipeline that accesses the external service to augment the input elements.
 ---
 
-In this post, we develop an Apache Beam pipeline where the input data is augmented by an **Remote Procedure Call (RPC)**. Each of the input elements performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one elements. In the subsequent two posts, we will discuss updated pipelines that make RPC calls more efficiently. We begin with illustrating how to manage development resources followed by demonstrating the RPC service that we use in this series. Finally, we develop a Beam pipeline that accesses the external service to augment the input elements.
+In this post, we develop an Apache Beam pipeline where the input data is augmented by an **Remote Procedure Call (RPC)**. Each of the input elements performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element. In the subsequent two posts, we will discuss updated pipelines that make RPC calls more efficiently. We begin with illustrating how to manage development resources followed by demonstrating the RPC service that we use in this series. Finally, we develop a Beam pipeline that accesses the external service to augment the input elements.
 
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1)
 * [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
@@ -41,7 +41,7 @@ In this post, we develop an Apache Beam pipeline where the input data is augment
 
 ## Development Environment
 
-The development environment has an Apache Flink cluster and Apache Kafka cluster and [gRPC](https://grpc.io/) server. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
+The development environment has an Apache Flink cluster, Apache Kafka cluster and [gRPC](https://grpc.io/) server. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
 
 ### Manage Environment
 
@@ -90,10 +90,10 @@ Below shows how to start resources using the start-up script. We need to launch 
 
 ### Create client and server interfaces
 
-A service is defined in the `.proto` file and it supports two methods - `resolve` and `resolveBatch`. The former accepts a request with a string and returns an integer while the latter accepts a list of the string requests and returns a list of the integer responses.
+A service is defined in the `.proto` file, and it supports two methods - `resolve` and `resolveBatch`. The former accepts a request with a string and returns an integer while the latter accepts a list of the string requests and returns a list of the integer responses.
 
 ```proto
-# chapter3/proto/service.proto
+// chapter3/proto/service.proto
 syntax = "proto3";
 
 package chapter3;
@@ -143,7 +143,7 @@ Running the above command generates `service_pb2.py` and `service_pb2_grpc.py`, 
 
 ### Create client and server
 
-Using the gRPC interfaces generated earlier, we can create server and client applications. The server implements the two RPC methods (`resolve` and `resolveBatch`) where the response output is the length of the request input string. This server application is accessed by the Beam pipline and it gets started when we start the development resources while including the `-g` flag.
+Using the gRPC interfaces generated earlier, we can create server and client applications. The server implements the two RPC methods (`resolve` and `resolveBatch`) where the response output is the length of the request input string. This server application is accessed by the Beam pipline, and it gets started when we start the development resources while including the `-g` flag.
 
 ```python
 # chapter3/server.py
@@ -195,7 +195,7 @@ if __name__ == "__main__":
     serve()
 ```
 
-The client application is created for demonstration, and we use a similar logic to access the server application within a Beam pipeline. It requires a user input (1 or 2) to determine while method to call, and a user is expected to write an element (word or text) so that the client can make a request. See below for details about how the client and server applications work.
+The client application is created for demonstration, and we use the same logic to access the server application within a Beam pipeline. It requires a user input (1 or 2) to determine which method to call, and a user is expected to write an element (word or text) so that the client can make a request. See below for details about how the client and server applications work.
 
 ```python
 # chapter3/server_client.py
@@ -272,7 +272,7 @@ We develop an Apache Beam pipeline that accesses an external RPC service to augm
 
 ### Shared Source
 
-We have multiple pipelines that read text messages from an input Kafka topic and write outputs to an output topic. Therefore, the data source an d sink transforms are refactored into a utility module as shown below. Note that, the Kafka read and write methods has an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979).
+We have multiple pipelines that read text messages from an input Kafka topic and write outputs to an output topic. Therefore, the data source and sink transforms are refactored into a utility module as shown below. Note that, the Kafka read and write methods has an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979).
 
 ```python
 # chapter3/io_utils.py
@@ -362,7 +362,7 @@ class WriteOutputsToKafka(beam.PTransform):
 
 ### Beam Pipeline
 
-In `RpcDoFn`, connection to the RPC service is established in the `setUp` method, and the input element is augmented by a response from the service in the `process` method, returning a tuple of the element and output from the response. Finally, the connection (channel) is closed by the `teardown` method.
+In `RpcDoFn`, connection to the RPC service is established in the `setUp` method, and the input element is augmented by a response from the service in the `process` method. It returns a tuple of the element and response output, which is the length of the element. Finally, the connection (channel) is closed in the `teardown` method.
 
 ```python
 # chapter3/rpc_pardo.py
@@ -572,7 +572,7 @@ OK
 
 #### Pipeline Execution
 
-We need to send messages into the input Kafka topic before executing the pipeline. We can simply run the Kafka producer as `python utils/faker_gen.py`.
+We need to send messages into the input Kafka topic before executing the pipeline. Input text message can be sent by executing a Kafka text producer - `python utils/faker_gen.py`.
 
 ![](input-messages.png#center)
 
