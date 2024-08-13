@@ -16,6 +16,7 @@ categories:
 tags: 
   - Apache Beam
   - Apache Flink
+  - gRPC
   - Python
   - Docker
   - Docker Compose

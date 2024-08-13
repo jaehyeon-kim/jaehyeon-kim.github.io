@@ -1,7 +1,7 @@
 ---
 title: Apache Beam Python Examples - Part 4 Call RPC Service for Data Augmentation
 date: 2024-08-15
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -16,16 +16,17 @@ categories:
 tags: 
   - Apache Beam
   - Apache Flink
+  - gRPC
   - Python
   - Docker
   - Docker Compose
 authors:
   - JaehyeonKim
 images: []
-description: In this post, we develop two Apache Beam pipelines that track sport activities of users and output their speed periodically. The first pipeline uses native transforms and Beam SQL is used for the latter. While Beam SQL can be useful in some situations, its features in the Python SDK are not complete compared to the Java SDK. Therefore, we are not able to build the required tracking pipeline using it. We end up discussing potential improvements of Beam SQL so that it can be used for building competitive applications with the Python SDK.
+description: In this post, we develop an Apache Beam pipeline where the input data is augmented by an Remote Procedure Call (RPC). Each of the input elements performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one elements. In the subsequent two posts, we will discuss updated pipelines that make RPC calls more efficiently. We begin with illustrating how to manage development resources followed by demonstrating the RPC service that we use in this series. Finally, we develop a Beam pipeline that accesses the external service to augment the input elements.
 ---
 
-In this post, we develop two Apache Beam pipelines that track sport activities of users and output their speed periodically. The first pipeline uses native transforms and [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) is used for the latter. While *Beam SQL* can be useful in some situations, its features in the Python SDK are not complete compared to the Java SDK. Therefore, we are not able to build the required tracking pipeline using it. We end up discussing potential improvements of *Beam SQL* so that it can be used for building competitive applications with the Python SDK.
+In this post, we develop an Apache Beam pipeline where the input data is augmented by an **Remote Procedure Call (RPC)**. Each of the input elements performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one elements. In the subsequent two posts, we will discuss updated pipelines that make RPC calls more efficiently. We begin with illustrating how to manage development resources followed by demonstrating the RPC service that we use in this series. Finally, we develop a Beam pipeline that accesses the external service to augment the input elements.
 
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1)
 * [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
@@ -38,77 +39,9 @@ In this post, we develop two Apache Beam pipelines that track sport activities o
 * Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn
 * Part 10 Develop Streaming File Reader using Splittable DoFn
 
-## Introduction to RPC Service
-
-Two services are defined in the `.proto` file - `resolve` and `resolveBatch`. The former requests with a string and returns an integer while the latter requests with a list of the string requests and returns a list of the integer responses.
-
-```proto
-syntax = "proto3";
-
-package chapter3;
-
-message Request {
-  string input = 1;
-}
-
-message Response {
-  int32 output = 1;
-}
-
-message RequestList {
-  repeated Request request = 1;
-}
-
-message ResponseList {
-  repeated Response response = 1;
-}
-
-service RcpService {
-  rpc resolve(Request) returns (Response);
-  rpc resolveBatch(RequestList) returns (ResponseList);
-}
-```
-
-
-```bash
-cd chapter3
-mkdir proto && touch proto/service.proto
-## copy proto contents
-## generate grpc client and server interfaces
-python -m grpc_tools.protoc -I proto --python_out=. --grpc_python_out=. proto/service.proto
-```
-
-With the `.proto` service file, we can create 
-
-Note that as we've already provided a version of the generated code in the proto directory, running this command regenerates the appropriate file rather than creates a new one. The generated code files are called `service_pb2.py` and `service_pb2_grpc.py` and contain:
-
-- classes for the messages defined in `service.proto`
-- classes for the service defined in `service.proto`
-    - `RcpServiceStub`, which can be used by clients to invoke RcpService RPCs
-    - `RcpServiceServicer`, which defines the interface for implementations of the RcpService service
-- a function for the service defined in service.proto
-    - `add_RcpServiceServicer_to_server`, which adds a RcpServiceServicer to a `grpc.Server`
-
-```bash
-tree -P "serv*|proto" -I "*pycache*"
-.
-├── proto
-│   └── service.proto
-├── server.py
-├── server_client.py
-├── service_pb2.py
-├── service_pb2_grpc.py
-├── service_test_mock.py
-└── service_test_unit.py
-
-1 directory, 7 files
-```
-
-![](rpc-demo.png#center)
-
 ## Development Environment
 
-The development environment has an Apache Flink cluster and Apache Kafka cluster and [gRPC](https://grpc.io/) server - gRPC server will be used in later posts. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
+The development environment has an Apache Flink cluster and Apache Kafka cluster and [gRPC](https://grpc.io/) server. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
 
 ### Manage Environment
 
@@ -153,22 +86,193 @@ Below shows how to start resources using the start-up script. We need to launch 
 #  ⠿ Container grpc-server  Started                                                          0.4s
 ```
 
+## Introduction to RPC Service
+
+### Create client and server interfaces
+
+A service is defined in the `.proto` file and it supports two methods - `resolve` and `resolveBatch`. The former accepts a request with a string and returns an integer while the latter accepts a list of the string requests and returns a list of the integer responses.
+
+```proto
+# chapter3/proto/service.proto
+syntax = "proto3";
+
+package chapter3;
+
+message Request {
+  string input = 1;
+}
+
+message Response {
+  int32 output = 1;
+}
+
+message RequestList {
+  repeated Request request = 1;
+}
+
+message ResponseList {
+  repeated Response response = 1;
+}
+
+service RpcService {
+  rpc resolve(Request) returns (Response);
+  rpc resolveBatch(RequestList) returns (ResponseList);
+}
+```
+
+We can generate the gRPC client and server interfaces from the `.proto` service definition using the *grpcio-tools* package as shown below.
+
+```bash
+cd chapter3
+mkdir proto && touch proto/service.proto
+
+## << copy the proto service definition >>
+
+## generate grpc client and server interfaces
+python -m grpc_tools.protoc -I proto --python_out=. --grpc_python_out=. proto/service.proto
+```
+
+Running the above command generates `service_pb2.py` and `service_pb2_grpc.py`, and they contain:
+
+- classes for the messages defined in `service.proto`
+- classes for the service defined in `service.proto`
+    - `RpcServiceStub`, which can be used by clients to invoke RpcService RPCs
+    - `RpcServiceServicer`, which defines the interface for implementations of the RpcService service
+- a function for the service defined in service.proto
+    - `add_RpcServiceServicer_to_server`, which adds a RpcServiceServicer to a `grpc.Server`
+
+### Create client and server
+
+Using the gRPC interfaces generated earlier, we can create server and client applications. The server implements the two RPC methods (`resolve` and `resolveBatch`) where the response output is the length of the request input string. This server application is accessed by the Beam pipline and it gets started when we start the development resources while including the `-g` flag.
+
+```python
+# chapter3/server.py
+import os
+import argparse
+from concurrent import futures
+
+import grpc
+import service_pb2
+import service_pb2_grpc
+
+
+class RpcServiceServicer(service_pb2_grpc.RpcServiceServicer):
+    def resolve(self, request, context):
+        if os.getenv("VERBOSE", "False") == "True":
+            print(f"resolve Request Made: input - {request.input}")
+        response = service_pb2.Response(output=len(request.input))
+        return response
+
+    def resolveBatch(self, request, context):
+        if os.getenv("VERBOSE", "False") == "True":
+            print("resolveBatch Request Made:")
+            print(f"\tInputs - {', '.join([r.input for r in request.request])}")
+        response = service_pb2.ResponseList()
+        response.response.extend(
+            [service_pb2.Response(output=len(r.input)) for r in request.request]
+        )
+        return response
+
+
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor())
+    service_pb2_grpc.add_RpcServiceServicer_to_server(RpcServiceServicer(), server)
+    server.add_insecure_port(os.getenv("INSECURE_PORT", "0.0.0.0:50051"))
+    server.start()
+    server.wait_for_termination()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Beam pipeline arguments")
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        default="Whether to print messages for debugging.",
+    )
+    parser.set_defaults(verbose=False)
+    opts = parser.parse_args()
+    os.environ["VERBOSE"] = str(opts.verbose)
+    serve()
+```
+
+The client application is created for demonstration, and we use a similar logic to access the server application within a Beam pipeline. It requires a user input (1 or 2) to determine while method to call, and a user is expected to write an element (word or text) so that the client can make a request. See below for details about how the client and server applications work.
+
+```python
+# chapter3/server_client.py
+import time
+
+import grpc
+import service_pb2
+import service_pb2_grpc
+
+
+def get_client_stream_requests():
+    while True:
+        name = input("Please enter a name (or nothing to stop chatting):")
+        if name == "":
+            break
+        hello_request = service_pb2.HelloRequest(greeting="Hello", name=name)
+        yield hello_request
+        time.sleep(1)
+
+
+def run():
+    with grpc.insecure_channel("localhost:50051") as channel:
+        stub = service_pb2_grpc.RpcServiceStub(channel)
+        print("1. Resolve - Unary")
+        print("2. ResolveBatch - Unary")
+        rpc_call = input("Which rpc would you like to make: ")
+        if rpc_call == "1":
+            element = input("Please enter a word: ")
+            if not element:
+                element = "Hello"
+            request = service_pb2.Request(input=element)
+            resolved = stub.resolve(request)
+            print("Resolve response received: ")
+            print(f"({element}, {resolved.output})")
+        if rpc_call == "2":
+            element = input("Please enter a text: ")
+            if not element:
+                element = "Beautiful is better than ugly"
+            words = element.split(" ")
+            request_list = service_pb2.RequestList()
+            request_list.request.extend([service_pb2.Request(input=e) for e in words])
+            response = stub.resolveBatch(request_list)
+            resolved = [r.output for r in response.response]
+            print("ResolveBatch response received: ")
+            print(", ".join([f"({t[0]}, {t[1]})" for t in zip(words, resolved)]))
+
+
+if __name__ == "__main__":
+    run()
+```
+
+Overall, we end up having the following files for the gRPC server and client applications.
+
+```bash
+tree -P "serv*|proto" -I "*pycache*"
+.
+├── proto
+│   └── service.proto
+├── server.py
+├── server_client.py
+├── service_pb2.py
+└── service_pb2_grpc.py
+
+1 directory, 5 files
+```
+
+We can start the client and server applications as Python scripts. If we select 1, the next prompt indicates to enter a word. If a word is entered, it returns an output, which is a tuple of the word and its length. We can make an RPC request with a text if we select 2. Similar to the earlier call, it returns enriched outputs as multiple tuples.
+
+![](rpc-demo.png#center)
+
 ## Beam Pipelines
 
-We develop two Beam pipelines that track sport activities of users. The first pipeline uses native transforms and Beam SQL is used for the latter.
+We develop an Apache Beam pipeline that accesses an external RPC service to augment the input elements.
 
 ### Shared Source
 
-Both the pipelines share the same sources, and they are refactored in a separate module.
-
-* `Position` / `PositionCoder`
-    - The input text messages are converted into a custom type (`Position`). Therefore, we need to create its type definition and register the instruction about how to encode/decode its value using a [coder](https://beam.apache.org/documentation/programming-guide/#data-encoding-and-type-safety) (`PositionCoder`). Note that, without registering the coder, the custom type cannot be processed by a portable runner. 
-* `PreProcessInput`
-    - This is a composite transform that converts an input text message into a tuple of user ID and position as well as assigns a timestamp value into an individual element.
-* `ReadPositionsFromKafka`
-    - It reads messages from a Kafka topic, and returns tuple elements of user ID and position. We need to specify the output type hint for a portable runner to recognise the output type correctly. Note that, the Kafka read and write methods has an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979).
-* `WriteMetricsToKafka`
-    - It sends output messages to a Kafka topic. Each message is a tuple of user ID and speed. Note that the input type hint is necessary when the inputs are piped from a transform by *Beam SQL*.
+We have multiple pipelines that read text messages from an input Kafka topic and write outputs to an output topic. Therefore, the data source an d sink transforms are refactored into a utility module as shown below. Note that, the Kafka read and write methods has an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979).
 
 ```python
 # chapter3/io_utils.py
@@ -258,17 +362,7 @@ class WriteOutputsToKafka(beam.PTransform):
 
 ### Beam Pipeline
 
-The main transforms of this pipeline perform
-
-1. `Windowing`: assigns input elements into a [global window](https://beam.apache.org/documentation/programming-guide/#windowing) with the following configuration.
-    - Emits (or triggers) a window after a certain amount of processing time has passed since data was received with a delay of 3 seconds. (`trigger=AfterWatermark(early=AfterProcessingTime(3))`)
-    - Disallows Late data (`allowed_lateness=0`)
-    - Assigns the output timestamp from the latest input timestamp (`timestamp_combiner=TimestampCombiner.OUTPUT_AT_LATEST`)
-        - By default, the end of window timestamp is taken, but it is so distance future for the global window. Therefore, we take the latest timestamp of the input elements instead.
-    - Configures `ACCUMULATING` as the window's accumulation mode (`accumulation_mode=AccumulationMode.ACCUMULATING`).
-        - The trigger emits the results early but not multiple times. Therefore, which accumulation mode to choose doesn't give a different result in this transform. We can ignore this configuration.
-2. `ComputeMetrics`: (1) groups by the input elements by key (*user ID*), (2) obtains the total distance and duration by looping through individual elements, (3) calculates the speed of a user, which is the distance divided by the duration, and, finally, (4) returns a metrics record, which is a tuple of user ID and speed.
-
+In `RpcDoFn`, connection to the RPC service is established in the `setUp` method, and the input element is augmented by a response from the service in the `process` method, returning a tuple of the element and output from the response. Finally, the connection (channel) is closed by the `teardown` method.
 
 ```python
 # chapter3/rpc_pardo.py
@@ -305,7 +399,7 @@ class RpcDoFn(beam.DoFn):
         self.channel: grpc.Channel = grpc.insecure_channel(
             f"{self.hostname}:{self.port}"
         )
-        self.stub = service_pb2_grpc.RcpServiceStub(self.channel)
+        self.stub = service_pb2_grpc.RpcServiceStub(self.channel)
 
     def teardown(self):
         if self.channel is not None:
@@ -387,18 +481,7 @@ As described in [this documentation](https://beam.apache.org/documentation/pipel
 4. Apply the transform to the input `PCollection` and save the resulting output `PCollection`.
 5. Use `PAssert` and its subclasses (or [testing utils](https://beam.apache.org/releases/pydoc/current/apache_beam.testing.util.html) in Python) to verify that the output `PCollection` contains the elements that you expect.
 
-We use test sport activities of two users that are stored in a file (`input/test-tracker-data.txt`). Then, we add them into a test stream and apply the same preprocessing and windowing transforms. Finally, we apply the metric computation transform and compare the outputs with the expected outputs where the expected speed values are calculated using the same logic.
-
-```txt
-# input/test-tracker-data.txt
-user0	109	1713939465.7636628
-user1	40	1713939465.7636628
-user0	108	1713939465.8801599
-user1	50	1713939465.8801658
-user0	115	1713939467.8904564
-user1	58	1713939467.8904696
-...
-```
+We use a text file that keeps a random text (`input/lorem.txt`) for testing. Then, we add the lines into a test stream and apply the main transform. Finally, we compare the actual output with an expected output. The expected output is a list of tuples where each element is a word and its length.
 
 ```python
 # chapter3/rpc_pardo_test.py
@@ -434,13 +517,13 @@ def compute_expected_output(lines: list):
     return output
 
 
-class RcpParDooTest(unittest.TestCase):
-    server_class = server.RcpServiceServicer
+class RpcParDooTest(unittest.TestCase):
+    server_class = server.RpcServiceServicer
     port = 50051
 
     def setUp(self):
         self.server = grpc.server(futures.ThreadPoolExecutor())
-        service_pb2_grpc.add_RcpServiceServicer_to_server(
+        service_pb2_grpc.add_RpcServiceServicer_to_server(
             self.server_class(), self.server
         )
         self.server.add_insecure_port(f"[::]:{self.port}")
@@ -489,9 +572,11 @@ OK
 
 #### Pipeline Execution
 
+We need to send messages into the input Kafka topic before executing the pipeline. We can simply run the Kafka producer as `python utils/faker_gen.py`.
+
 ![](input-messages.png#center)
 
-We specify only a single known argument that enables to use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments (`bootstrap_servers`, `input_topic` ...). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
+When executing the pipeline, we specify only a single known argument that enables to use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments (`bootstrap_servers`, `input_topic` ...). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
 
 ```bash
 ## start the beam pipeline
@@ -501,10 +586,10 @@ python chapter3/rpc_pardo.py --deprecated_read \
 	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
 ```
 
-On Flink UI, we see the pipeline has two tasks. The first task is performed until windowing the input elements while the second task performs up to sending the metric records into the output topic.
+On Flink UI, we see the pipeline only has a single task.
 
 ![](pipeline-dag.png#center)
 
-On Kafka UI, we can check the output message is a dictionary of user ID and speed.
+On Kafka UI, we can check the output message is a dictionary of a word and its length.
 
 ![](output-messages.png#center)
