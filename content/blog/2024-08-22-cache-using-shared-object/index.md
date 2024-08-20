@@ -1,7 +1,7 @@
 ---
 title: Cache Data on Apache Beam Pipelines Using a Shared Object
 date: 2024-08-29
-draft: true
+draft: false
 featured: true
 comment: true
 toc: true
@@ -19,16 +19,16 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: A cache is a software component that stores data so that future requests for that data can be served faster. To access a cache, you can use side inputs, stateful DoFn, and calls to an external service. The Python SDK provides another option in the shared module. This option can be more memory-efficient than side inputs, simpler than a stateful DoFn, and more performant than calling an external service, because it does not have to access an external service for every element or bundle of elements. In this post, we discuss how to enrich PCollection elements using a shared object as a cache on both batch and streaming pipelines. For the latter, we refresh the shared object periodically to enrich PCollection elements with updated cache records.
+description:
 ---
 
-A cache is a software component that stores data so that future requests for that data can be served faster. To access a cache, you can use side inputs, stateful `DoFn`, and calls to an external service. The Python SDK provides another option in the shared module. This option can be more memory-efficient than side inputs, simpler than a stateful `DoFn`, and more performant than calling an external service, because it does not have to access an external service for every element or bundle of elements. For more details about strategies for caching data using Beam SDK, see the session [Strategies for caching data in Dataflow using Beam SDK](https://2022.beamsummit.org/sessions/strategies-for-caching-data-in-dataflow-using-beam-sdk/) from the 2022 Beam Summit.
+I recently contributed to Apache Beam by adding a common pipeline pattern - [*Cache data using a shared object*](https://beam.apache.org/documentation/patterns/shared-class/). Both batch and streaming pipelines are introduced, and they utilise the [`Shared` class](https://beam.apache.org/releases/pydoc/current/_modules/apache_beam/utils/shared.html#Shared) of the Python SDK to enrich `PCollection` elements. This pattern can be more memory-efficient than side inputs, simpler than a stateful `DoFn`, and more performant than calling an external service, because it does not have to access an external service for every element or bundle of elements. In this post, we discuss this pattern in more details with batch and streaming use cases. For the latter, we configure the cache gets refreshed periodically.
 
-The examples on this page demonstrate how to use the `Shared` class of the [`shared module`](https://beam.apache.org/releases/pydoc/current/apache_beam.utils.shared.html) to enrich elements in both bounded and unbounded `PCollection` objects. Two data sets are used in the samples: _order_ and _customer_. The order records include customer IDs that customer attributes are added to by mapping the customer records.
+<!--more-->
 
 ## Create a cache on a batch pipeline
 
-In this example, the customer cache is loaded as a dictionary in the `setup` method of the `EnrichOrderFn`. The cache is used to add customer attributes to the order records. Because the Python dictionary doesn't support weak references and a `Shared` object encapsulates a weak reference to a singleton instance of the shared resource, create a wrapper class.
+Two data sets are used in the pipelines: _order_ and _customer_. The order records include customer IDs that customer attributes are added to by mapping the customer records. In this batch example, the customer cache is loaded as a dictionary in the `setup` method of the `EnrichOrderFn`. The cache is used to add customer attributes to the order records. Note that we need to create a wrapper class (`WeakRefDict`) because the Python dictionary doesn't support weak references while a `Shared` object encapsulates a weak reference to a singleton instance of the shared resource.
 
 ```python
 import argparse
@@ -111,6 +111,8 @@ if __name__ == "__main__":
     run()
 ```
 
+When we execute the pipeline, we see that the customer attribute (`version`) is added to the order records.
+
 ```bash
 INFO:root:Building pipeline ...
 INFO:apache_beam.runners.worker.statecache:Creating state cache with size 104857600
@@ -123,52 +125,7 @@ INFO:apache_beam.runners.worker.statecache:Creating state cache with size 104857
 
 ## Create a cache and update it regularly on a streaming pipeline
 
-Because the customer cache is assumed to change over time, you need to refresh it periodically. To reload the shared object, change the `tag` argument of the `acquire` method. In this example, the refresh is implemented in the `start_bundle` method, where it compares the current tag value to the value that is associated with the existing shared object. The `set_tag` method returns a tag value that is the same within the maximum seconds of staleness. Therefore, if a tag value is greater than the existing tag value, it triggers a refresh of the customer cache.
-
-```python
-import argparse
-import time
-from datetime import datetime
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Tag bucketization demo")
-    parser.add_argument(
-        "--max_stale_sec",
-        "-m",
-        type=int,
-        default=5,
-        help="Maximum second of staleness.",
-    )
-    args = parser.parse_args()
-    max_stale_sec = args.max_stale_sec
-
-    while True:
-        current_ts = datetime.now().timestamp()
-        print(
-            f"current {int(current_ts)}, tag {current_ts - (current_ts % max_stale_sec)}, substraction {current_ts % max_stale_sec}"
-        )
-        time.sleep(1)
-```
-
-```text
-current 1724099032, tag 1724099030.0, substraction 2.151832103729248
-current 1724099033, tag 1724099030.0, substraction 3.152092933654785
-current 1724099034, tag 1724099030.0, substraction 4.152317047119141
-current 1724099035, tag 1724099035.0, substraction 0.1537001132965088
-current 1724099036, tag 1724099035.0, substraction 1.155073881149292
-current 1724099037, tag 1724099035.0, substraction 2.15644907951355
-current 1724099038, tag 1724099035.0, substraction 3.157841920852661
-current 1724099039, tag 1724099035.0, substraction 4.159423112869263
-current 1724099040, tag 1724099040.0, substraction 0.16069293022155762
-current 1724099041, tag 1724099040.0, substraction 1.162208080291748
-current 1724099042, tag 1724099040.0, substraction 2.1635289192199707
-current 1724099043, tag 1724099040.0, substraction 3.1647019386291504
-current 1724099044, tag 1724099040.0, substraction 4.166001081466675
-current 1724099045, tag 1724099045.0, substraction 0.1674060821533203
-current 1724099046, tag 1724099045.0, substraction 1.1687579154968262
-current 1724099047, tag 1724099045.0, substraction 2.1699440479278564
-current 1724099048, tag 1724099045.0, substraction 3.1711909770965576
-```
+Because the customer records are assumed to change over time, you need to refresh it periodically. To reload the shared object, change the `tag` argument of the `acquire` method. In this example, the refresh is implemented in the `start_bundle` method, where it compares the current tag value to the value that is associated with the existing shared object. The `set_tag` method returns a tag value that is the same within the maximum seconds of staleness. Therefore, if a tag value is greater than the existing tag value, it triggers a refresh of the customer cache.
 
 ```python
 import argparse
@@ -286,6 +243,8 @@ def run(argv=None):
 if __name__ == "__main__":
     run()
 ```
+
+The pipeline output shows the order records are enriched with updated customer attributes (`version`). By default, the pipeline creates 5 order records in every 2 seconds, and the maximum seconds of staleness is 5 seconds. Therefore, we have 2.5 sets of order records in a particular version on average, which causes 10 to 15 records are mapped to a single version.
 
 ```python
 INFO:root:Building pipeline ...
