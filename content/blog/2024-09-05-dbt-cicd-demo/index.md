@@ -1,7 +1,7 @@
 ---
 title: DBT CI/CD Demo with BigQuery and GitHub Actions
 date: 2024-09-05
-draft: true
+draft: false
 featured: true
 comment: true
 toc: true
