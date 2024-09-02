@@ -34,7 +34,7 @@ The CI/CD process has two workflows - `slim-ci` and `deploy`. When a pull reques
 
 ## DBT Project
 
-A *dbt* project is created using fictional pizza shop data. There are three staging data sets (*staging_orders*, *staging_products*, and *staging_users*), and they are loaded as *dbt* seeds. The project ends up building two *SCD Type 2* dimension tables (*dim_products* and *dim_users*) and one fact table (*fct_orders*) - see [this post](/blog/2024-02-08-dbt-pizza-shop-3) for more details about data modelling. The structure of the project is listed below, and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/dbt-cicd-demo) of this post.
+A *dbt* project is created using fictional pizza shop data. There are three staging data sets (*staging_orders*, *staging_products*, and *staging_users*), and they are loaded as *dbt* seeds. The project ends up building two *SCD Type 2* dimension tables (*dim_products* and *dim_users*) and one fact table (*fct_orders*) - see [this post](/blog/2024-02-08-dbt-pizza-shop-3) for more details about data modelling of those tables. The structure of the project is listed below, and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/dbt-cicd-demo) of this post.
 
 ```text
 pizza_shop
@@ -159,7 +159,7 @@ We can check the models are created in the *pizza_shop* dataset.
 
 ## CI/CD Process
 
-The CI/CD process has two workflows - `slim-ci` and `deploy`. When a pull request is created to the main branch, the `slim-ci` workflow is triggered, and it aims to perform tests after building only modified models and its first-order children in a *ci* dataset. When a pull request is merged to the main branch, the `deploy` workflow is triggered, and it begins with performing *unit tests*. Upon successful testing, two jobs are triggered subsequently, which builds/pushes the *dbt* project as a Docker container and publishes the project documentation.
+The CI/CD process has two workflows - `slim-ci` and `deploy`. When a pull request is created to the main branch, the `slim-ci` workflow is triggered, and it aims to perform tests after building only modified models and its first-order children in a *ci* dataset. When a pull request is merged to the main branch, the `deploy` workflow is triggered, and it begins with performing *unit tests*. Upon successful testing, two jobs are triggered subsequently, which builds/pushes the *dbt* project in a Docker container and publishes the project documentation.
 
 ### Prerequisites
 
@@ -201,7 +201,16 @@ Enabling GitHub Pages creates an environment with protection rules. By default, 
 
 ### DBT Slim CI
 
-As mentioned, the `slim-ci` workflow builds/tests only modified models and its first-order children. To see an example, we create a simple change to the fact table by adding a new column.
+The `slim-ci` workflow is triggered when a pull request is created to the main branch. It begins with performing prerequisite steps, which covers creating a Python environment, authenticating to GCP, and downloading a *dbt* manifest file from a GCS bucket. Then, it builds/tests only modified models and its first-order children (`--select state:modified+`) in a *ci* dataset without building their upstream parents (`--defer`). After that, the *ci* dataset is deleted regardless of whether the build/test step is succeeded or not. 
+
+Below shows the main *dbt* command that is used in the workflow.
+
+```bash
+dbt build --profiles-dir=${{ env.DBT_PROFILES_DIR }} --project-dir=pizza_shop --target ci \
+  --select state:modified+ --defer --state ${{github.workspace}}
+```
+
+To show an example outcome, we create a simple change to the fact table by adding a new column before making a pull request, 
 
 ```sql
 -- pizza_shot/models/fct/fct_orders.sql
@@ -210,13 +219,6 @@ SELECT
   o.order_id,
   'foo' AS bar -- add new column
 ...
-```
-
-The workflow is triggered when a pull request is created to the main branch. It begings with performing prerequisite steps, which covers creating a Python environment, authenticating to GCP, and downloading a *dbt* manifest file from a GCS bucket. Then, it builds/tests only modified models and its first-order children in a *ci* dataset by executing the following command. After that, the *ci* dataset is deleted regardless of whether the build/test step is succeeded or not.
-
-```bash
-dbt build --profiles-dir=${{ env.DBT_PROFILES_DIR }} --project-dir=pizza_shop --target ci \
-  --select state:modified+ --state ${{github.workspace}}
 ```
 
 Below shows the details of the `slim-ci` workflow configuration.
@@ -308,7 +310,7 @@ jobs:
           done
 ```
 
-In the workflow log, we see only the modified model (*fct_orders*) is created in a *ci* dataset - the dataset name is prefixed by *ci* and suffixed by the commit hash.
+In the workflow log, we see only the modified model (*fct_orders*) is created in a *ci* dataset - the dataset name is prefixed and suffixed by *ci* and the commit hash respectively.
 
 ![](slim-ci-log.png#center)
 
@@ -318,11 +320,11 @@ We can see the new column is created in the *fct_orders* table in the *ci* datas
 
 ### DBT Deployment
 
-The `deploy` workflow is triggered when a pull request is merged to the main branch, and it begins with performing *unit tests*. Upon successful testing, two jobs are triggered subsequently, which builds/pushes the *dbt* project as a Docker container and publishes the project documentation.
+The `deploy` workflow is triggered when a pull request is merged to the main branch, and it begins with performing *unit tests*. Upon successful testing, two jobs are triggered subsequently, which builds/pushes the *dbt* project in a Docker container and publishes the project documentation.
 
 #### DBT Unit Tests
 
-The main purpose of performing *unit tests* is validating key SQL modelling logic on a small set of static inputs. When developing the *users* dimension table, we use custom logic to assign values of the *valid_from* and *valid_to* columns. We can define a unit testing case of the logic in a YAML file by specifying the name, model, input and expected output.
+The `dbt-unit-tests` job performs *unit tests* is validating key SQL modelling logic on a small set of static inputs. When developing the *users* dimension table, we use custom logic to assign values of the *valid_from* and *valid_to* columns. We can define a unit testing case of that logic in a YAML file by specifying the *name*, *model*, *input* and *expected output*.
 
 ```sql
 -- pizza_shot/models/dim/dim_users.sql
@@ -363,7 +365,7 @@ unit_tests:
           }
 ```
 
-Essentially the unit testing job builds models (*schema-only* with `--empty`) in a *ci* dataset by selecting those that have associate unit testing cases (`--select +test_type:unit`). Then, the actual output from the static input is compared with the expected output.
+Essentially the unit testing job builds the models that have associating unit testing cases (`--select +test_type:unit`) without populating data (`--empty`) in a *ci* dataset. Then, the actual output from the static input is compared with the expected output.
 
 ```bash
 # build all the models that the unit tests need to run, but empty
@@ -474,7 +476,7 @@ In the workflow log, we see it creates two models in a *ci* dataset and performs
 
 #### DBT Image Build and Push
 
-This deploy job packages the *dbt* project in a Docker container and pushes into an *Artifact Registry* repository. We use the latest Docker image from [*dbt labs*](https://github.com/dbt-labs/dbt-bigquery/pkgs/container/dbt-bigquery), installs the Google Cloud CLI, and copies the dbt project and profile files.
+The `dbt-deploy` job packages the *dbt* project in a Docker container and pushes into an *Artifact Registry* repository. We use the latest Docker image from [*dbt labs*](https://github.com/dbt-labs/dbt-bigquery/pkgs/container/dbt-bigquery), installs the Google Cloud CLI, and copies the dbt project and profile files.
 
 ```dockerfile
 FROM ghcr.io/dbt-labs/dbt-bigquery:1.8.2
@@ -506,7 +508,7 @@ RUN dbt deps --project-dir=pizza_shop
 ENTRYPOINT ["./entrypoint.sh"]
 ```
 
-The entrypoint file runs a *dbt* command and uploads the *dbt* manifest file into the GCS bucket. The last step allows the `slim-ci` workflow to access the latest *dbt* manifest file for state comparison.
+The *entrypoint* file runs a *dbt* command and uploads the resulting *dbt* manifest file into the GCS bucket. The last step allows the `slim-ci` workflow to access the latest *dbt* manifest file for state comparison.
 
 ```bash
 #!/bin/bash
@@ -530,13 +532,13 @@ fi
 We can verify the Docker image by running the `dbt test` command. As expected, it runs all data tests followed by uploading the *dbt* manifest file into a GCS bucket.
 
 ```bash
-docker build \
+# build a docker image
+$ docker build \
   --build-arg GCP_PROJECT_ID=$GCP_PROJECT_ID \
   --build-arg GCS_TARGET_PATH=gs://dbt-cicd-demo/artifact \
   -t dbt:test .
-```
 
-```bash
+# executes data tests
 $ docker run --rm -it dbt:test \
     test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target dev
 Activated service account credentials for: [dbt-cicd@GCP_PROJECT_ID.iam.gserviceaccount.com]
@@ -727,6 +729,6 @@ jobs:
           artifact_name: dbt-docs
 ```
 
-We can check the documentation on GitHub Pages - [LINK](https://jaehyeon.me/dbt-cicd-demo/).
+We can check the documentation on [this link](https://jaehyeon.me/dbt-cicd-demo/).
 
 ![](gh-pages-output.png#center)
