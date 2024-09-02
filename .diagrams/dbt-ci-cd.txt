@@ -1,0 +1,21 @@
+dbt CI/CD Workflows Using GitHub Actions
+
+I recently have a chance to look into dbt CI/CD pipeline using GitHub Actions where BigQuery is used as the data warehouse.
+
+One of the key workflows is to perform dbt slim CI where the updated dbt models are executed/tested using the dbt state method where it selects nodes by comparing them against a previous version of the same project.
+
+The whole workflows would be
+
+0. Upload an initial manifest.json into a cloud storage bucket.
+1. Perform dbt slim CI.
+▪ Download the latest manifest.json from the cloud storage bucket.
+▪ Copy the main BigQuery datasets into CI datasets.
+▪ Execute dbt run/test with the state method against the CI datasets.
+▪ Delete the CI datasets.
+▪▪ Use always() or succeeded() || failed() condition to ensure deletion.
+2. Deploy the dbt model and docs only if the dbt slim ci is succeeded.
+▪ Deploy the new dbt model into an artifact registry.
+▪▪ Upload the manifest.json into the cloud storage bucket.
+▪ Deploy the dbt docs into GitHub Pages.
+
+#dbt #dataengineering #cicd #gcp #bigquery
