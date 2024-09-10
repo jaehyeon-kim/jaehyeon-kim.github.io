@@ -1,0 +1,582 @@
+---
+title: Guide to Running DBT in Production
+date: 2024-09-18
+draft: true
+featured: true
+comment: true
+toc: true
+reward: false
+pinned: false
+carousel: false
+featuredImage: false
+# series:
+#   - Apache Beam Python Examples
+categories:
+  - Data Engineering
+tags: 
+  - Data Build Tool (DBT)
+  - GCP
+  - BigQuery
+  - Continuous Integration
+  - Continuous Delivery
+  - GitHub Actions
+authors:
+  - JaehyeonKim
+images: []
+description:
+---
+
+foo bar
+
+<!--more-->
+
+baz
+
+## Initial Deployment
+
+```yaml
+# dbt_profiles/profiles.yml
+pizza_shop:
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: pizza_shop_dev
+      threads: 4
+      keyfile: "{{ env_var('SA_KEYFILE') }}"
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      priority: interactive
+      location: australia-southeast1
+    ci:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: "{{ env_var('CI_DATASET') }}"
+      threads: 4
+      keyfile: "{{ env_var('SA_KEYFILE') }}"
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      priority: interactive
+      location: australia-southeast1
+    prod:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: pizza_shop_prod
+      threads: 4
+      keyfile: "{{ env_var('SA_KEYFILE') }}"
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      priority: interactive
+      location: australia-southeast1
+    clone:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: pizza_shop_clone
+      threads: 4
+      keyfile: "{{ env_var('SA_KEYFILE') }}"
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      priority: interactive
+      location: australia-southeast1
+  target: dev
+```
+
+```text
+pizza_shop
+├── analyses
+├── dbt_project.yml
+├── macros
+├── models
+│   ├── dim
+│   │   ├── dim_products.sql
+│   │   └── dim_users.sql
+│   ├── fct
+│   │   └── fct_orders.sql
+│   ├── schema.yml
+│   ├── sources.yml
+│   ├── src
+│   │   ├── src_orders.sql
+│   │   ├── src_products.sql
+│   │   └── src_users.sql
+│   └── unit_tests.yml
+├── seeds
+│   ├── properties.yml
+│   ├── staging_orders.csv
+│   ├── staging_products.csv
+│   └── staging_users.csv
+├── snapshots
+└── tests
+```
+
+```bash
+## deploy and test in dev
+TARGET=dev
+dbt seed --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+
+## upload manifest.json for slim ci
+gsutil --quiet cp pizza_shop/target/manifest.json gs://dbt-cicd-demo/artifact/$TARGET/manifest.json \
+  && rm -r pizza_shop/target
+```
+
+```bash
+## deploy and test in dev
+TARGET=dev
+dbt seed --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+
+## upload manifest.json for clone and incremental build
+gsutil --quiet cp pizza_shop/target/manifest.json gs://dbt-cicd-demo/artifact/$TARGET/manifest.json \
+  && rm -r pizza_shop/target
+```
+
+```bash
+bq ls --project_id=$GCP_PROJECT_ID
+#      datasetId     
+#  ----------------- 
+#   pizza_shop_dev   
+#   pizza_shop_prod
+
+gsutil ls -r gs://dbt-cicd-demo/artifact
+# gs://dbt-cicd-demo/artifact/:
+
+# gs://dbt-cicd-demo/artifact/dev/:
+# gs://dbt-cicd-demo/artifact/dev/manifest.json
+
+# gs://dbt-cicd-demo/artifact/prod/:
+# gs://dbt-cicd-demo/artifact/prod/manifest.json
+```
+
+## (Optional) CI
+
+```sql
+{{
+  config(
+    materialized = 'incremental'
+  )
+}}
+WITH cte_items_expanced AS (
+  SELECT 
+    user.id AS user_id,
+    user.first_name,
+    user.last_name,
+    p.quantity AS quantity,
+    p.price AS price
+  FROM {{ ref('fct_orders') }} AS o 
+  CROSS JOIN UNNEST(product) AS p
+  WHERE _PARTITIONTIME = (SELECT max(_PARTITIONTIME) FROM {{ ref('fct_orders') }})
+)
+SELECT
+  user_id,
+  first_name,
+  last_name,
+  sum(quantity) AS total_quantity,
+  sum(price) AS total_price
+FROM cte_items_expanced
+GROUP BY user_id, first_name, last_name
+ORDER BY sum(price) DESC
+LIMIT 10
+```
+
+```yaml
+version: 2
+
+models:
+  - name: fct_top_customers
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "total_quantity >= 0"
+      - dbt_utils.expression_is_true:
+          expression: "total_price >= 0"
+    columns:
+      - name: user_id
+        description: Natural key of users
+      - name: first_name
+        description: First name
+      - name: last_name
+        description: Last name
+      - name: total_quantity
+        description: Total quantity purchased by user
+      - name: total_price
+        description: Total price spent by user
+```
+
+```bash
+cp -r extra_models/fct_top* pizza_shop/models/fct
+
+tree pizza_shop/models/fct/
+# pizza_shop/models/fct/
+# ├── fct_orders.sql
+# ├── fct_top_customers.sql
+# └── fct_top_customers.yml
+
+# 1 directory, 3 files
+```
+
+### Slim CI
+
+```bash
+TARGET=ci
+export CI_DATASET=ci_$(date +'%y%m%d')
+
+gsutil --quiet cp gs://dbt-cicd-demo/artifact/dev/manifest.json manifest.json
+
+dbt build --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
+  --select state:modified+ --defer --state $PWD --vars 'ds_suffix: dev'
+
+# 05:30:50  Running with dbt=1.8.6
+# 05:30:50  Registered adapter: bigquery=1.8.2
+# 05:30:50  Unable to do partial parsing because saved manifest not found. Starting full parse.
+# 05:30:52  [WARNING]: Deprecated functionality
+# The `tests` config has been renamed to `data_tests`. Please see
+# https://docs.getdbt.com/docs/build/data-tests#new-data_tests-syntax for more
+# information.
+# 05:30:52  Found 7 models, 3 seeds, 6 data tests, 3 sources, 587 macros, 1 unit test
+# 05:30:52  Found a seed (pizza_shop.staging_orders) >1MB in size at the same path, dbt cannot tell if it has changed: assuming they are the same
+# 05:30:52  Found a seed (pizza_shop.staging_users) >1MB in size at the same path, dbt cannot tell if it has changed: assuming they are the same
+# 05:30:52  Found a seed (pizza_shop.staging_orders) >1MB in size at the same path, dbt cannot tell if it has changed: assuming they are the same
+# 05:30:52  Found a seed (pizza_shop.staging_users) >1MB in size at the same path, dbt cannot tell if it has changed: assuming they are the same
+# 05:30:52  Found a seed (pizza_shop.staging_orders) >1MB in size at the same path, dbt cannot tell if it has changed: assuming they are the same
+# 05:30:52  Found a seed (pizza_shop.staging_users) >1MB in size at the same path, dbt cannot tell if it has changed: assuming they are the same
+# 05:30:52  
+# 05:30:57  Concurrency: 4 threads (target='ci')
+# 05:30:57  
+# 05:30:57  1 of 3 START sql incremental model ci_240910.fct_top_customers ................. [RUN]
+# 05:31:00  1 of 3 OK created sql incremental model ci_240910.fct_top_customers ............ [CREATE TABLE (10.0 rows, 2.1 MiB processed) in 2.78s]
+# 05:31:00  2 of 3 START test dbt_utils_expression_is_true_fct_top_customers_total_price_0 . [RUN]
+# 05:31:00  3 of 3 START test dbt_utils_expression_is_true_fct_top_customers_total_quantity_0  [RUN]
+# 05:31:01  3 of 3 PASS dbt_utils_expression_is_true_fct_top_customers_total_quantity_0 .... [PASS in 1.24s]
+# 05:31:01  2 of 3 PASS dbt_utils_expression_is_true_fct_top_customers_total_price_0 ....... [PASS in 1.62s]
+# 05:31:01  
+# 05:31:01  Finished running 1 incremental model, 2 data tests in 0 hours 0 minutes and 8.94 seconds (8.94s).
+# 05:31:01  
+# 05:31:01  Completed successfully
+# 05:31:01  
+# 05:31:01  Done. PASS=3 WARN=0 ERROR=0 SKIP=0 TOTAL=3
+```
+
+![](slim-ci.png#center)
+
+```bash
+bq rm -r -f $CI_DATASET
+```
+
+### Unit Tests
+
+```bash
+TARGET=ci
+export CI_DATASET=ut_$(date +'%y%m%d')
+
+# build all the models that the unit tests need to run, but empty
+dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
+  --select +test_type:unit --empty
+
+# 05:34:21  Running with dbt=1.8.6
+# 05:34:21  Registered adapter: bigquery=1.8.2
+# 05:34:22  Unable to do partial parsing because config vars, config profile, or config target have changed
+# 05:34:22  Unable to do partial parsing because profile has changed
+# 05:34:23  [WARNING]: Deprecated functionality
+# The `tests` config has been renamed to `data_tests`. Please see
+# https://docs.getdbt.com/docs/build/data-tests#new-data_tests-syntax for more
+# information.
+# 05:34:23  Found 7 models, 3 seeds, 6 data tests, 3 sources, 587 macros, 1 unit test
+# 05:34:23  
+# 05:34:28  Concurrency: 4 threads (target='ci')
+# 05:34:28  
+# 05:34:28  1 of 2 START sql view model ut_240910.src_users ................................ [RUN]
+# 05:34:29  1 of 2 OK created sql view model ut_240910.src_users ........................... [CREATE VIEW (0 processed) in 1.19s]
+# 05:34:29  2 of 2 START sql table model ut_240910.dim_users ............................... [RUN]
+# 05:34:32  2 of 2 OK created sql table model ut_240910.dim_users .......................... [CREATE TABLE (0.0 rows, 0 processed) in 3.12s]
+# 05:34:32  
+# 05:34:32  Finished running 1 view model, 1 table model in 0 hours 0 minutes and 8.67 seconds (8.67s).
+# 05:34:32  
+# 05:34:32  Completed successfully
+# 05:34:32  
+# 05:34:32  Done. PASS=2 WARN=0 ERROR=0 SKIP=0 TOTAL=2
+```
+
+```bash
+# do the actual unit tests
+dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
+  --select test_type:unit
+
+# 05:04:48  Running with dbt=1.8.6
+# 05:04:49  Registered adapter: bigquery=1.8.2
+# 05:04:49  Found 7 models, 3 seeds, 4 data tests, 3 sources, 587 macros, 1 unit test
+# 05:04:49  
+# 05:04:50  Concurrency: 4 threads (target='ci')
+# 05:04:50  
+# 05:04:50  1 of 1 START unit_test dim_users::test_is_valid_date_ranges .................... [RUN]
+# 05:04:56  1 of 1 PASS dim_users::test_is_valid_date_ranges ............................... [PASS in 5.15s]
+# 05:04:56  
+# 05:04:56  Finished running 1 unit test in 0 hours 0 minutes and 6.07 seconds (6.07s).
+# 05:04:56  
+# 05:04:56  Completed successfully
+# 05:04:56  
+# 05:04:56  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
+```
+
+![](unit-test.png#center)
+
+```bash
+bq rm -r -f $CI_DATASET
+```
+
+## Automatic Deployment
+
+```bash
+TARGET=dev
+dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+
+# 05:37:34  Running with dbt=1.8.6
+# 05:37:34  Registered adapter: bigquery=1.8.2
+# 05:37:34  Unable to do partial parsing because config vars, config profile, or config target have changed
+# 05:37:34  Unable to do partial parsing because profile has changed
+# 05:37:36  [WARNING]: Deprecated functionality
+# The `tests` config has been renamed to `data_tests`. Please see
+# https://docs.getdbt.com/docs/build/data-tests#new-data_tests-syntax for more
+# information.
+# 05:37:36  Found 7 models, 3 seeds, 6 data tests, 3 sources, 587 macros, 1 unit test
+# 05:37:36  
+# 05:37:38  Concurrency: 4 threads (target='dev')
+# 05:37:38  
+# 05:37:38  1 of 7 START sql view model pizza_shop_dev.src_orders .......................... [RUN]
+# 05:37:38  2 of 7 START sql view model pizza_shop_dev.src_products ........................ [RUN]
+# 05:37:38  3 of 7 START sql view model pizza_shop_dev.src_users ........................... [RUN]
+# 05:37:39  2 of 7 OK created sql view model pizza_shop_dev.src_products ................... [CREATE VIEW (0 processed) in 1.08s]
+# 05:37:39  4 of 7 START sql table model pizza_shop_dev.dim_products ....................... [RUN]
+# 05:37:39  3 of 7 OK created sql view model pizza_shop_dev.src_users ...................... [CREATE VIEW (0 processed) in 1.14s]
+# 05:37:39  5 of 7 START sql table model pizza_shop_dev.dim_users .......................... [RUN]
+# 05:37:39  1 of 7 OK created sql view model pizza_shop_dev.src_orders ..................... [CREATE VIEW (0 processed) in 1.64s]
+# 05:37:42  4 of 7 OK created sql table model pizza_shop_dev.dim_products .................. [CREATE TABLE (81.0 rows, 13.7 KiB processed) in 2.83s]
+# 05:37:42  5 of 7 OK created sql table model pizza_shop_dev.dim_users ..................... [CREATE TABLE (10.0k rows, 880.9 KiB processed) in 2.88s]
+# 05:37:42  6 of 7 START sql incremental model pizza_shop_dev.fct_orders ................... [RUN]
+# 05:37:46  6 of 7 OK created sql incremental model pizza_shop_dev.fct_orders .............. [MERGE (20.0k rows, 5.1 MiB processed) in 4.60s]
+# 05:37:46  7 of 7 START sql incremental model pizza_shop_dev.fct_top_customers ............ [RUN]
+# 05:37:48  7 of 7 OK created sql incremental model pizza_shop_dev.fct_top_customers ....... [CREATE TABLE (10.0 rows, 4.1 MiB processed) in 2.23s]
+# 05:37:48  
+# 05:37:48  Finished running 3 view models, 2 table models, 2 incremental models in 0 hours 0 minutes and 12.21 seconds (12.21s).
+# 05:37:49  
+# 05:37:49  Completed successfully
+# 05:37:49  
+# 05:37:49  Done. PASS=7 WARN=0 ERROR=0 SKIP=0 TOTAL=7
+```
+
+```bash
+dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+
+# 05:38:23  Running with dbt=1.8.6
+# 05:38:23  Registered adapter: bigquery=1.8.2
+# 05:38:24  Found 7 models, 3 seeds, 6 data tests, 3 sources, 587 macros, 1 unit test
+# 05:38:24  
+# 05:38:24  Concurrency: 4 threads (target='dev')
+# 05:38:24  
+# 05:38:24  1 of 7 START test dbt_utils_expression_is_true_fct_top_customers_total_price_0 . [RUN]
+# 05:38:24  2 of 7 START test dbt_utils_expression_is_true_fct_top_customers_total_quantity_0  [RUN]
+# 05:38:24  3 of 7 START test not_null_dim_products_product_key ............................ [RUN]
+# 05:38:24  4 of 7 START test not_null_dim_users_user_key .................................. [RUN]
+# 05:38:26  4 of 7 PASS not_null_dim_users_user_key ........................................ [PASS in 1.20s]
+# 05:38:26  5 of 7 START test unique_dim_products_product_key .............................. [RUN]
+# 05:38:26  1 of 7 PASS dbt_utils_expression_is_true_fct_top_customers_total_price_0 ....... [PASS in 1.20s]
+# 05:38:26  3 of 7 PASS not_null_dim_products_product_key .................................. [PASS in 1.22s]
+# 05:38:26  6 of 7 START test unique_dim_users_user_key .................................... [RUN]
+# 05:38:26  7 of 7 START unit_test dim_users::test_is_valid_date_ranges .................... [RUN]
+# 05:38:26  2 of 7 PASS dbt_utils_expression_is_true_fct_top_customers_total_quantity_0 .... [PASS in 1.27s]
+# 05:38:27  5 of 7 PASS unique_dim_products_product_key .................................... [PASS in 1.24s]
+# 05:38:27  6 of 7 PASS unique_dim_users_user_key .......................................... [PASS in 1.30s]
+# 05:38:30  7 of 7 PASS dim_users::test_is_valid_date_ranges ............................... [PASS in 4.16s]
+# 05:38:30  
+# 05:38:30  Finished running 6 data tests, 1 unit test in 0 hours 0 minutes and 5.99 seconds (5.99s).
+# 05:38:30  
+# 05:38:30  Completed successfully
+# 05:38:30  
+# 05:38:30  Done. PASS=7 WARN=0 ERROR=0 SKIP=0 TOTAL=7
+```
+
+```bash
+gsutil --quiet cp pizza_shop/target/manifest.json gs://dbt-cicd-demo/artifact/$TARGET/manifest.json \
+  && rm -r pizza_shop/target
+```
+
+## Deployment by Write-Audit-Publish Pattern
+
+### Clone and audit
+
+```bash
+gsutil --quiet cp gs://dbt-cicd-demo/artifact/prod/manifest.json manifest.json
+```
+
+```bash
+dbt clone --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
+  --full-refresh --state $PWD  --vars "ds_suffix: $TARGET"
+
+# 05:40:16  Running with dbt=1.8.6
+# 05:40:16  Registered adapter: bigquery=1.8.2
+# 05:40:16  Unable to do partial parsing because saved manifest not found. Starting full parse.
+# 05:40:18  [WARNING]: Deprecated functionality
+# The `tests` config has been renamed to `data_tests`. Please see
+# https://docs.getdbt.com/docs/build/data-tests#new-data_tests-syntax for more
+# information.
+# 05:40:18  Found 7 models, 3 seeds, 6 data tests, 3 sources, 587 macros, 1 unit test
+# 05:40:18  
+# 05:40:22  Concurrency: 4 threads (target='clone')
+# 05:40:22  
+# 05:40:28  No relation found in state manifest for model.pizza_shop.fct_top_customers
+# 05:40:28  
+# 05:40:28  Completed successfully
+# 05:40:28  
+# 05:40:28  Done. PASS=10 WARN=0 ERROR=0 SKIP=0 TOTAL=10
+```
+
+```bash
+dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
+  --select state:modified --state $PWD --vars 'ds_suffix: prod'
+
+# 05:40:52  Running with dbt=1.8.6
+# 05:40:53  Registered adapter: bigquery=1.8.2
+# 05:40:53  Unable to do partial parsing because config vars, config profile, or config target have changed
+# 05:40:54  [WARNING]: Deprecated functionality
+# The `tests` config has been renamed to `data_tests`. Please see
+# https://docs.getdbt.com/docs/build/data-tests#new-data_tests-syntax for more
+# information.
+# 05:40:55  Found 7 models, 3 seeds, 6 data tests, 3 sources, 587 macros, 1 unit test
+# 05:40:55  Found a seed (pizza_shop.staging_orders) >1MB in size at the same path, dbt cannot tell if it has changed: assuming they are the same
+# 05:40:55  Found a seed (pizza_shop.staging_users) >1MB in size at the same path, dbt cannot tell if it has changed: assuming they are the same
+# 05:40:55  
+# 05:40:56  Concurrency: 4 threads (target='clone')
+# 05:40:56  
+# 05:40:56  1 of 1 START sql incremental model pizza_shop_clone.fct_top_customers .......... [RUN]
+# 05:40:59  1 of 1 OK created sql incremental model pizza_shop_clone.fct_top_customers ..... [CREATE TABLE (10.0 rows, 2.1 MiB processed) in 2.55s]
+# 05:40:59  
+# 05:40:59  Finished running 1 incremental model in 0 hours 0 minutes and 3.92 seconds (3.92s).
+# 05:40:59  
+# 05:40:59  Completed successfully
+# 05:40:59  
+# 05:40:59  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
+```
+
+```bash
+dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+
+# 05:41:23  Running with dbt=1.8.6
+# 05:41:23  Registered adapter: bigquery=1.8.2
+# 05:41:23  Unable to do partial parsing because config vars, config profile, or config target have changed
+# 05:41:25  [WARNING]: Deprecated functionality
+# The `tests` config has been renamed to `data_tests`. Please see
+# https://docs.getdbt.com/docs/build/data-tests#new-data_tests-syntax for more
+# information.
+# 05:41:25  Found 7 models, 3 seeds, 6 data tests, 3 sources, 587 macros, 1 unit test
+# 05:41:25  
+# 05:41:26  Concurrency: 4 threads (target='clone')
+# 05:41:26  
+# 05:41:26  1 of 7 START test dbt_utils_expression_is_true_fct_top_customers_total_price_0 . [RUN]
+# 05:41:26  2 of 7 START test dbt_utils_expression_is_true_fct_top_customers_total_quantity_0  [RUN]
+# 05:41:26  3 of 7 START test not_null_dim_products_product_key ............................ [RUN]
+# 05:41:26  4 of 7 START test not_null_dim_users_user_key .................................. [RUN]
+# 05:41:27  3 of 7 PASS not_null_dim_products_product_key .................................. [PASS in 1.22s]
+# 05:41:27  2 of 7 PASS dbt_utils_expression_is_true_fct_top_customers_total_quantity_0 .... [PASS in 1.22s]
+# 05:41:27  5 of 7 START test unique_dim_products_product_key .............................. [RUN]
+# 05:41:27  1 of 7 PASS dbt_utils_expression_is_true_fct_top_customers_total_price_0 ....... [PASS in 1.23s]
+# 05:41:27  6 of 7 START test unique_dim_users_user_key .................................... [RUN]
+# 05:41:27  7 of 7 START unit_test dim_users::test_is_valid_date_ranges .................... [RUN]
+# 05:41:27  4 of 7 PASS not_null_dim_users_user_key ........................................ [PASS in 1.25s]
+# 05:41:28  6 of 7 PASS unique_dim_users_user_key .......................................... [PASS in 1.18s]
+# 05:41:28  5 of 7 PASS unique_dim_products_product_key .................................... [PASS in 1.23s]
+# 05:41:31  7 of 7 PASS dim_users::test_is_valid_date_ranges ............................... [PASS in 3.54s]
+# 05:41:31  
+# 05:41:31  Finished running 6 data tests, 1 unit test in 0 hours 0 minutes and 5.35 seconds (5.35s).
+# 05:41:31  
+# 05:41:31  Completed successfully
+# 05:41:31  
+# 05:41:31  Done. PASS=7 WARN=0 ERROR=0 SKIP=0 TOTAL=7
+```
+
+![](audit.png#center)
+
+```bash
+bq rm -r -f "pizza_shop_$TARGET"
+```
+
+### Deployment
+
+```bash
+TARGET=prod
+dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+
+# 05:44:22  Running with dbt=1.8.6
+# 05:44:22  Registered adapter: bigquery=1.8.2
+# 05:44:23  Unable to do partial parsing because config vars, config profile, or config target have changed
+# 05:44:23  Unable to do partial parsing because profile has changed
+# 05:44:24  [WARNING]: Deprecated functionality
+# The `tests` config has been renamed to `data_tests`. Please see
+# https://docs.getdbt.com/docs/build/data-tests#new-data_tests-syntax for more
+# information.
+# 05:44:25  Found 7 models, 3 seeds, 6 data tests, 3 sources, 587 macros, 1 unit test
+# 05:44:25  
+# 05:44:26  Concurrency: 4 threads (target='prod')
+# 05:44:26  
+# 05:44:26  1 of 7 START sql view model pizza_shop_prod.src_orders ......................... [RUN]
+# 05:44:26  2 of 7 START sql view model pizza_shop_prod.src_products ....................... [RUN]
+# 05:44:26  3 of 7 START sql view model pizza_shop_prod.src_users .......................... [RUN]
+# 05:44:27  1 of 7 OK created sql view model pizza_shop_prod.src_orders .................... [CREATE VIEW (0 processed) in 1.17s]
+# 05:44:27  3 of 7 OK created sql view model pizza_shop_prod.src_users ..................... [CREATE VIEW (0 processed) in 1.17s]
+# 05:44:27  4 of 7 START sql table model pizza_shop_prod.dim_users ......................... [RUN]
+# 05:44:27  2 of 7 OK created sql view model pizza_shop_prod.src_products .................. [CREATE VIEW (0 processed) in 1.19s]
+# 05:44:27  5 of 7 START sql table model pizza_shop_prod.dim_products ...................... [RUN]
+# 05:44:30  5 of 7 OK created sql table model pizza_shop_prod.dim_products ................. [CREATE TABLE (81.0 rows, 13.7 KiB processed) in 2.66s]
+# 05:44:30  4 of 7 OK created sql table model pizza_shop_prod.dim_users .................... [CREATE TABLE (10.0k rows, 880.9 KiB processed) in 3.23s]
+# 05:44:30  6 of 7 START sql incremental model pizza_shop_prod.fct_orders .................. [RUN]
+# 05:44:35  6 of 7 OK created sql incremental model pizza_shop_prod.fct_orders ............. [MERGE (20.0k rows, 5.1 MiB processed) in 4.78s]
+# 05:44:35  7 of 7 START sql incremental model pizza_shop_prod.fct_top_customers ........... [RUN]
+# 05:44:37  7 of 7 OK created sql incremental model pizza_shop_prod.fct_top_customers ...... [CREATE TABLE (10.0 rows, 4.1 MiB processed) in 2.43s]
+# 05:44:38  
+# 05:44:38  Finished running 3 view models, 2 table models, 2 incremental models in 0 hours 0 minutes and 12.90 seconds (12.90s).
+# 05:44:38  
+# 05:44:38  Completed successfully
+# 05:44:38  
+# 05:44:38  Done. PASS=7 WARN=0 ERROR=0 SKIP=0 TOTAL=7
+```
+
+```bash
+dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+
+# 05:45:08  Running with dbt=1.8.6
+# 05:45:08  Registered adapter: bigquery=1.8.2
+# 05:45:09  Found 7 models, 3 seeds, 6 data tests, 3 sources, 587 macros, 1 unit test
+# 05:45:09  
+# 05:45:09  Concurrency: 4 threads (target='prod')
+# 05:45:09  
+# 05:45:09  1 of 7 START test dbt_utils_expression_is_true_fct_top_customers_total_price_0 . [RUN]
+# 05:45:09  2 of 7 START test dbt_utils_expression_is_true_fct_top_customers_total_quantity_0  [RUN]
+# 05:45:09  3 of 7 START test not_null_dim_products_product_key ............................ [RUN]
+# 05:45:09  4 of 7 START test not_null_dim_users_user_key .................................. [RUN]
+# 05:45:10  3 of 7 PASS not_null_dim_products_product_key .................................. [PASS in 1.18s]
+# 05:45:10  5 of 7 START test unique_dim_products_product_key .............................. [RUN]
+# 05:45:10  4 of 7 PASS not_null_dim_users_user_key ........................................ [PASS in 1.29s]
+# 05:45:10  6 of 7 START test unique_dim_users_user_key .................................... [RUN]
+# 05:45:10  2 of 7 PASS dbt_utils_expression_is_true_fct_top_customers_total_quantity_0 .... [PASS in 1.31s]
+# 05:45:10  1 of 7 PASS dbt_utils_expression_is_true_fct_top_customers_total_price_0 ....... [PASS in 1.34s]
+# 05:45:11  7 of 7 START unit_test dim_users::test_is_valid_date_ranges .................... [RUN]
+# 05:45:12  5 of 7 PASS unique_dim_products_product_key .................................... [PASS in 1.23s]
+# 05:45:12  6 of 7 PASS unique_dim_users_user_key .......................................... [PASS in 1.37s]
+# 05:45:14  7 of 7 PASS dim_users::test_is_valid_date_ranges ............................... [PASS in 3.38s]
+# 05:45:14  
+# 05:45:14  Finished running 6 data tests, 1 unit test in 0 hours 0 minutes and 5.23 seconds (5.23s).
+# 05:45:14  
+# 05:45:14  Completed successfully
+# 05:45:14  
+# 05:45:14  Done. PASS=7 WARN=0 ERROR=0 SKIP=0 TOTAL=7
+```
+
+![](deploy.png#center)
+
+```bash
+gsutil --quiet cp pizza_shop/target/manifest.json gs://dbt-cicd-demo/artifact/$TARGET/manifest.json \
+  && rm -rf pizza_shop/target
+```
