@@ -9,8 +9,8 @@ reward: false
 pinned: false
 carousel: false
 featuredImage: false
-# series:
-#   - Apache Beam Python Examples
+series:
+  - DBT Guide for Production
 categories:
   - Data Engineering
 tags: 
@@ -26,13 +26,47 @@ images: []
 description:
 ---
 
-foo bar
+In the [previous post](/blog/2024-09-05-dbt-cicd-demo), we started discussing a *continuous integration/continuous delivery (CI/CD)* process of a *dbt* project by introducing two GitHub Actions workflows - `slim-ci` and `deploy`. The former is triggered when a pull request is created to the main branch, and it builds only modified models and its first-order children in a *ci* dataset, followed by performing tests on them. The second workflow gets triggered once a pull request is merged. Beginning with running unit tests, it packages the *dbt* project as a Docker container and publishes to *Artifact Registry*. In this post, we focus on how to deploy a *dbt* project in multiple environments while walking through the entire CI/CD process step-by-step.
 
 <!--more-->
 
-baz
+As the CI process executes tests in multiple phases, it is advised to deploy a new relese automatically in lower environments, and it supports fast iteration. In higher environments, however, the testing scope is normally beyond what a development team can control. Often we involve business teams to perform extensive testing using BI tools and a new release can be deployed only if it is signed-off by them. Besides, changes in a new release must not be executed in main datasets until it is approved. To meet those requirements, either [blue/green deployment](https://discourse.getdbt.com/t/performing-a-blue-green-deploy-of-your-dbt-project-on-snowflake/1349) or the [Write-Audit-Publish (WAP)](https://lakefs.io/blog/data-engineering-patterns-write-audit-publish/) pattern can be considered. In this post, we employ the WAP pattern because BigQuery does not support renaming datasets by default.
 
-## Initial Deployment
+* [DBT CI/CD Demo with BigQuery and GitHub Actions](/blog/2024-09-05-dbt-cicd-demo)
+* [Guide to Running DBT in Production](#) (this post)
+
+## DBT Project
+
+We continue using the *dbt* project for a fictional pizza shop. There are three staging data sets (*staging_orders*, *staging_products*, and *staging_users*), and they are loaded as *dbt* seeds. Initially the project ends up building two *SCD Type 2* dimension tables (*dim_products* and *dim_users*) and one fact table (*fct_orders*) - see [this post](/blog/2024-02-08-dbt-pizza-shop-3) for more details about data modelling of those tables. The structure of the project is listed below, and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/dbt-cicd-demo/tree/release-lifecycle) (*release-lifecycle* branch) of this post.
+
+```text
+pizza_shop
+├── analyses
+├── dbt_project.yml
+├── macros
+├── models
+│   ├── dim
+│   │   ├── dim_products.sql
+│   │   └── dim_users.sql
+│   ├── fct
+│   │   └── fct_orders.sql
+│   ├── schema.yml
+│   ├── sources.yml
+│   ├── src
+│   │   ├── src_orders.sql
+│   │   ├── src_products.sql
+│   │   └── src_users.sql
+│   └── unit_tests.yml
+├── seeds
+│   ├── properties.yml
+│   ├── staging_orders.csv
+│   ├── staging_products.csv
+│   └── staging_users.csv
+├── snapshots
+└── tests
+```
+
+We use four *dbt* profiles. The *dev* and *prod* targets are used to manage the *dbt* models in the development (dev) and production (prod) environments respectively. As the name suggested, the *ci* target is used for the CI process. Finally, the target named *clone* is used to clone the main dataset in the production environment as part of implementing the WAP pattern.
 
 ```yaml
 # dbt_profiles/profiles.yml
@@ -85,56 +119,63 @@ pizza_shop:
   target: dev
 ```
 
-```text
-pizza_shop
-├── analyses
-├── dbt_project.yml
-├── macros
-├── models
-│   ├── dim
-│   │   ├── dim_products.sql
-│   │   └── dim_users.sql
-│   ├── fct
-│   │   └── fct_orders.sql
-│   ├── schema.yml
-│   ├── sources.yml
-│   ├── src
-│   │   ├── src_orders.sql
-│   │   ├── src_products.sql
-│   │   └── src_users.sql
-│   └── unit_tests.yml
-├── seeds
-│   ├── properties.yml
-│   ├── staging_orders.csv
-│   ├── staging_products.csv
-│   └── staging_users.csv
-├── snapshots
-└── tests
+## Initial Deployment
+
+We assume that the *dbt* project is deployed to the dev and prod environments initially. Note that, because each environment associates with its own dataset, the source data (*seeds*) should be deployed to the own dataset as well. It is achieved by adding a dataset suffix (*ds_suffix*) to the source schema. In this way, the source data is deployed to *pizza_shop_dev* and *pizza_shop_prod* for the dev and prod environments respectively.
+
+```yaml
+# pizza_shop/models/sources.yml
+version: 2
+
+sources:
+  - name: raw
+    schema: pizza_shop_{{ var ('ds_suffix') }}
+    tables:
+      - name: users
+        identifier: staging_users
+      - name: products
+        identifier: staging_products
+      - name: orders
+        identifier: staging_orders
 ```
+
+Initial deployment is identical in each environment. After specifying the desired *dbt* profile target, we can execute the *dbt* `seed`, `run` and `test` commands successively. After that, the *dbt* artifact (*manifest.json*) is uploaded to the corresponding location in a GCS bucket. Below shows commands that are related to deploying to the dev environment. Note that the artifact is used to perform *dbt slim ci* as discussed in the [previous post](/blog/2024-09-05-dbt-cicd-demo).
 
 ```bash
 ## deploy and test in dev
 TARGET=dev
-dbt seed --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
-dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
-dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+dbt seed --profiles-dir=dbt_profiles --project-dir=pizza_shop \
+  --target $TARGET --vars "ds_suffix: $TARGET"
+dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop \
+  --target $TARGET --vars "ds_suffix: $TARGET"
+dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop \
+  --target $TARGET --vars "ds_suffix: $TARGET"
 
 ## upload manifest.json for slim ci
-gsutil --quiet cp pizza_shop/target/manifest.json gs://dbt-cicd-demo/artifact/$TARGET/manifest.json \
-  && rm -r pizza_shop/target
+gsutil --quiet cp pizza_shop/target/manifest.json \
+  gs://dbt-cicd-demo/artifact/$TARGET/manifest.json \
+    && rm -r pizza_shop/target
 ```
+
+We can execute the same commands to deploy to the production environment. Unlike the dev environment, the artifact of the prod environment is used to clone data from the main dataset and build changes incrementally. The usage of this artifact is illustrated further below.
 
 ```bash
-## deploy and test in dev
-TARGET=dev
-dbt seed --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
-dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
-dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+## deploy and test in prod
+TARGET=prod
+dbt seed --profiles-dir=dbt_profiles --project-dir=pizza_shop \
+  --target $TARGET --vars "ds_suffix: $TARGET"
+dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop \
+  --target $TARGET --vars "ds_suffix: $TARGET"
+dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop \
+  --target $TARGET --vars "ds_suffix: $TARGET"
 
 ## upload manifest.json for clone and incremental build
-gsutil --quiet cp pizza_shop/target/manifest.json gs://dbt-cicd-demo/artifact/$TARGET/manifest.json \
-  && rm -r pizza_shop/target
+gsutil --quiet cp pizza_shop/target/manifest.json \
+  gs://dbt-cicd-demo/artifact/$TARGET/manifest.json \
+    && rm -r pizza_shop/target
 ```
+
+We can check the project is deployed successfully to both the environments by the following commands.
 
 ```bash
 bq ls --project_id=$GCP_PROJECT_ID
@@ -153,7 +194,9 @@ gsutil ls -r gs://dbt-cicd-demo/artifact
 # gs://dbt-cicd-demo/artifact/prod/manifest.json
 ```
 
-## (Optional) CI
+## Continuous Integration
+
+To illustrate a feature release scenario, we add a new incremental model named *fct_top_customers*, and it collects top 10 customers who spend the most in a day.
 
 ```sql
 {{
@@ -184,6 +227,8 @@ ORDER BY sum(price) DESC
 LIMIT 10
 ```
 
+The model has an associated schema. Among the schema attributes, we are particularly interested in the two test cases, which determines if the new model is good to be deployed. In reality, we would have more tests but we assume those are sufficient.
+
 ```yaml
 version: 2
 
@@ -207,6 +252,8 @@ models:
         description: Total price spent by user
 ```
 
+We can add the new model as shown below.
+
 ```bash
 cp -r extra_models/fct_top* pizza_shop/models/fct
 
@@ -219,7 +266,9 @@ tree pizza_shop/models/fct/
 # 1 directory, 3 files
 ```
 
-### Slim CI
+### DBT Slim CI
+
+Assuming a pull request is made to the main branch, we can go through *dbt slim ci*, which is the first step of the CI process. Thanks to the [defer feature](https://docs.getdbt.com/reference/node-selection/defer) and [state method](https://docs.getdbt.com/reference/node-selection/methods#the-state-method), it saves time and computational resources for testing only relevant models in a *dbt* project. As expected, the *dbt* execution log shows the new model is built in the *ci* dataset and the associated two test cases are executed successfully.
 
 ```bash
 TARGET=ci
@@ -261,13 +310,19 @@ dbt build --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET 
 # 09:31:01  Done. PASS=3 WARN=0 ERROR=0 SKIP=0 TOTAL=3
 ```
 
+We can see a table named *fct_top_customers* is created in the *ci* dataset on BigQuery Console.
+
 ![](slim-ci.png#center)
+
+To complete *dbt slim ci*, the *ci* dataset can be deleted as shown below.
 
 ```bash
 bq rm -r -f $CI_DATASET
 ```
 
-### Unit Tests
+### DBT Unit Tests
+
+Now we assume the pull request is merged. In the earlier step, *dbt slim ci* tests only those that are associated with modified models, and nothing is tested on existing models. Therefore, it is important to validate key SQL modelling logic across all models, and it is achieved by performing [unit tests](https://docs.getdbt.com/docs/build/unit-tests). To do so, we first need to create relevant models in a *ci* dataset. In the current project, we have a single unit testing case on the *dim_users* model and the *src_users* model is used as an input. This results in those models are created in a *ci* dataset if we set the selector value to `+test_type:unit`.
 
 ```bash
 TARGET=ci
@@ -301,6 +356,8 @@ dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
 # 09:34:32  Done. PASS=2 WARN=0 ERROR=0 SKIP=0 TOTAL=2
 ```
 
+We can use the `dbt test` command with the same selector value to perform unit testing. As expected, only the single unit testing case is executed successfully.
+
 ```bash
 # do the actual unit tests
 dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
@@ -322,7 +379,11 @@ dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
 # 09:04:56  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 ```
 
+We can see the tables that are created by the two models on BigQuery Console. Note that, as we executed the `dbt run` command with the `--empty` flag, the tables do not have records.
+
 ![](unit-test.png#center)
+
+Same to *dbt slim ci*, the *ci* dataset can be deleted as shown below.
 
 ```bash
 bq rm -r -f $CI_DATASET
@@ -330,9 +391,12 @@ bq rm -r -f $CI_DATASET
 
 ## Automatic Deployment
 
+As the CI process executes tests in multiple phases, we assume the release is deployed to the dev environment automatically, and it can done so by executing the following command.
+
 ```bash
 TARGET=dev
-dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
+  --vars "ds_suffix: $TARGET"
 
 # 09:37:34  Running with dbt=1.8.6
 # 09:37:34  Registered adapter: bigquery=1.8.2
@@ -368,8 +432,11 @@ dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --
 # 09:37:49  Done. PASS=7 WARN=0 ERROR=0 SKIP=0 TOTAL=7
 ```
 
+Nonetheless, it is recommended to perform tests and potentially send the output to where the development team can access.
+
 ```bash
-dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
+  --vars "ds_suffix: $TARGET"
 
 # 09:38:23  Running with dbt=1.8.6
 # 09:38:23  Registered adapter: bigquery=1.8.2
@@ -399,22 +466,30 @@ dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET -
 # 09:38:30  Done. PASS=7 WARN=0 ERROR=0 SKIP=0 TOTAL=7
 ```
 
+Finally, do not forget to upload the latest *dbt* artifact because it is used for *dbt slim ci*.
+
 ```bash
 gsutil --quiet cp pizza_shop/target/manifest.json gs://dbt-cicd-demo/artifact/$TARGET/manifest.json \
   && rm -r pizza_shop/target
 ```
 
-## Deployment by Write-Audit-Publish Pattern
+## Write-Audit-Publish
 
-### Clone and audit
+As mentioned, there are two key requirements for deploying to higher environments (eg prod). First, we invove business teams to perform extensive tests using BI tools, and it requires a copy of main datasets including changes in a new release. Secondly, those changes must not be executed in main datasets until it is approved. To meet those requirements, either *blue/green deployment* or the *Write-Audit-Publish (WAP)* pattern can be considered. Basically, both of them utilise the [dbt clone](https://docs.getdbt.com/reference/commands/clone) feature, which clones selected nodes of main datasets from a specified state to audit datasets. Specifically, we can use the latest *dbt* artifact for cloning main datasets as well as build incrementally for all new models and any changes to existing models on audit datasets. Then, testing can be performed on audit datasets, which meets both the requirements. Note that, as BigQuery supports [zero-copy table clones](https://cloud.google.com/bigquery/docs/table-clones-intro), it is a lightweight and cost-effective way of testing.
+
+When it comes to selecting a deployment strategy, the WAP pattern is more applicable on BigQuery because, while blue/green deployment requires to change dataset (or schema) names at the end, BigQuery does not support renaming datasets by default. Note that, instead of publishing *audited* datasets to main datasets as the WAP pattern proposes, we follow typical dbt deployment steps (i.e. `dbt run` and `dbt test`) once a new release gets signed-off. This is because it is not straightforward to publish only those that are associated with changes in a new release.
+
+### Test on Cloned Dataset
+
+We first download the latest *dbt* artifact of the prod environment. Then, we clone the main dataset into the audit (clone) dataset using the artifact as a state. By specifying `--full-refresh`, all existing models from the latest state are cloned into the audit dataset as well as all pre-existing relations are recreated there. Note that, as the new model (*fct_top_customers*) is not included in the latest state, the audit dataset misses the table for it.
 
 ```bash
+TARGET=clone
+
 gsutil --quiet cp gs://dbt-cicd-demo/artifact/prod/manifest.json manifest.json
-```
 
-```bash
-dbt clone --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
-  --full-refresh --state $PWD  --vars "ds_suffix: $TARGET"
+dbt clone --profiles-dir=dbt_profiles --project-dir=pizza_shop \
+  --target $TARGET --full-refresh --state $PWD  --vars "ds_suffix: $TARGET"
 
 # 09:40:16  Running with dbt=1.8.6
 # 09:40:16  Registered adapter: bigquery=1.8.2
@@ -434,9 +509,11 @@ dbt clone --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET 
 # 09:40:28  Done. PASS=10 WARN=0 ERROR=0 SKIP=0 TOTAL=10
 ```
 
+To include the table for the new model, we execute the `dbt run` command to build incrementally by specifying `--select state:modified`. We see the new table is created in the audit dataset as expected.
+
 ```bash
 dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
-  --select state:modified --state $PWD --vars 'ds_suffix: prod'
+  --select state:modified --state $PWD --vars "ds_suffix: $TARGET"
 
 # 09:40:52  Running with dbt=1.8.6
 # 09:40:53  Registered adapter: bigquery=1.8.2
@@ -461,8 +538,11 @@ dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
 # 09:40:59  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 ```
 
+Once the audit dataset includes all existing and new models, we can perform tests on it. A total of seven test cases are executed successfully and two of them are associated with the new model.
+
 ```bash
-dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
+dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
+  --vars "ds_suffix: $TARGET"
 
 # 09:41:23  Running with dbt=1.8.6
 # 09:41:23  Registered adapter: bigquery=1.8.2
@@ -497,13 +577,19 @@ dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET -
 # 09:41:31  Done. PASS=7 WARN=0 ERROR=0 SKIP=0 TOTAL=7
 ```
 
+On BigQuery Console, we see the audit dataset includes the table for the new model while the prod datasets misses it.
+
 ![](audit.png#center)
+
+To complete testing, we can delete the audit dataset as shown below.
 
 ```bash
 bq rm -r -f "pizza_shop_$TARGET"
 ```
 
-### Deployment
+### Deploy to Main Dataset
+
+As mentioned, we deploy the release to the prod environment by following typical *dbt* deployment steps. We first execute the `dbt run` command, and we see the new model is created.
 
 ```bash
 TARGET=prod
@@ -543,6 +629,8 @@ dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --
 # 09:44:38  Done. PASS=7 WARN=0 ERROR=0 SKIP=0 TOTAL=7
 ```
 
+By executing the `dbt test` command, we see all the seven testing cases are executed successfully.
+
 ```bash
 dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET --vars "ds_suffix: $TARGET"
 
@@ -574,7 +662,11 @@ dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET -
 # 09:45:14  Done. PASS=7 WARN=0 ERROR=0 SKIP=0 TOTAL=7
 ```
 
+Now we can see the table for the new model is created on BigQuery Console.
+
 ![](deploy.png#center)
+
+Finally, do not forget to upload the latest artifacts to be used for subsequent deployment.
 
 ```bash
 gsutil --quiet cp pizza_shop/target/manifest.json gs://dbt-cicd-demo/artifact/$TARGET/manifest.json \
