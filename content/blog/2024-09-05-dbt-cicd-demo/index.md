@@ -9,8 +9,8 @@ reward: false
 pinned: false
 carousel: false
 featuredImage: false
-# series:
-#   - Apache Beam Python Examples
+series:
+  - DBT Guide for Production
 categories:
   - Data Engineering
 tags: 
@@ -30,7 +30,10 @@ Continuous integration (CI) is the process of ensuring new code integrates with 
 
 <!--more-->
 
-The CI/CD process has two workflows - `slim-ci` and `deploy`. When a pull request is created to the main branch, the `slim-ci` workflow is triggered, and it aims to perform tests after building only modified models and its first-order children in a *ci* dataset. Thanks to the [defer feature](https://docs.getdbt.com/reference/node-selection/defer) and [state method](https://docs.getdbt.com/reference/node-selection/methods#the-state-method), it saves time and computational resources for testing a few models in a *dbt* project. When a pull request is merged to the main branch, the `deploy` workflow is triggered. It begins with performing [unit tests](https://docs.getdbt.com/docs/build/unit-tests) to validate key SQL modelling logic on a small set of static inputs. Once the tests are complete successfully, two jobs are triggered concurrently. The first job builds a Docker container that packages the *dbt* model and pushes into *Artifact Registry* while the second one publishes the project documentation into *GitHub Pages*.
+The CI/CD process has two workflows - `slim-ci` and `deploy`. When a pull request is created to the main branch, the `slim-ci` workflow is triggered, and it aims to perform tests after building only modified models and its first-order children in a *ci* dataset. Thanks to the [defer feature](https://docs.getdbt.com/reference/node-selection/defer) and [state method](https://docs.getdbt.com/reference/node-selection/methods#the-state-method), it saves time and computational resources for testing a few models in a *dbt* project. When a pull request is merged to the main branch, the `deploy` workflow is triggered. It begins with performing [unit tests](https://docs.getdbt.com/docs/build/unit-tests) to validate key SQL modelling logic on a small set of static inputs. Once the tests are complete successfully, two jobs are triggered concurrently. The first job builds a Docker container that packages the *dbt* project and pushes into *Artifact Registry* while the second one publishes the project documentation into *GitHub Pages*.
+
+* [DBT CI/CD Demo with BigQuery and GitHub Actions](#) (this post)
+* [Guide to Running DBT in Production](/blog/2024-09-13-dbt-guide)
 
 ## DBT Project
 
