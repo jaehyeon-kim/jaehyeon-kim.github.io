@@ -389,7 +389,11 @@ Same to *dbt slim ci*, the *ci* dataset can be deleted as shown below.
 bq rm -r -f $CI_DATASET
 ```
 
-## Automatic Deployment
+## Continuous Delivery
+
+For CD, deployment of a new release is made automatically in lower environments while the Write-Audit-Publish pattern is applied in higher environments.
+
+### Automatic Deployment
 
 As the CI process executes tests in multiple phases, we assume the release is deployed to the dev environment automatically, and it can be done so by executing the following command.
 
@@ -473,13 +477,13 @@ gsutil --quiet cp pizza_shop/target/manifest.json gs://dbt-cicd-demo/artifact/$T
   && rm -r pizza_shop/target
 ```
 
-## Write-Audit-Publish
+### Write-Audit-Publish
 
 As mentioned, there are two key requirements for deploying to higher environments (e.g. prod). First, we include business teams to perform extensive tests using BI tools, and it requires a copy of main datasets including changes in a new release. Secondly, those changes must not be executed in main datasets until it is approved. To meet those requirements, either *blue/green deployment* or the *Write-Audit-Publish (WAP)* pattern can be considered. Basically, both of them utilise the [dbt clone](https://docs.getdbt.com/reference/commands/clone) feature, which clones selected nodes of main datasets from a specified state to audit datasets. Specifically, we can use the latest *dbt* artifact for cloning main datasets as well as build incrementally for all new models and any changes to existing models on audit datasets. Then, testing can be performed on audit datasets, which meets both the requirements. Note that, as BigQuery supports [zero-copy table clones](https://cloud.google.com/bigquery/docs/table-clones-intro), it is a lightweight and cost-effective way of testing.
 
 When it comes to selecting a deployment strategy, the WAP pattern is more applicable on BigQuery because, while blue/green deployment requires changing dataset (or schema) names at the end, BigQuery does not support renaming datasets by default. Note that, instead of publishing *audited* datasets to main datasets as the WAP pattern proposes, we follow typical dbt deployment steps (i.e. `dbt run` and `dbt test`) once a new release gets signed-off. This is because it is not straightforward to publish only those that are associated with changes in a new release.
 
-### Test on Cloned Dataset
+#### Test on Cloned Dataset
 
 We first download the latest *dbt* artifact of the prod environment. Then, we clone the main dataset into the audit (clone) dataset using the artifact as a state. By specifying `--full-refresh`, all existing models from the latest state are cloned into the audit dataset as well as all pre-existing relations are recreated there. Note that, as the new model (*fct_top_customers*) is not included in the latest state, the audit dataset misses the table for it.
 
@@ -587,7 +591,7 @@ To complete testing, we can delete the audit dataset as shown below.
 bq rm -r -f "pizza_shop_$TARGET"
 ```
 
-### Deploy to Main Dataset
+#### Deploy to Main Dataset
 
 Assuming the release is approved, we deploy it to the prod environment by following typical *dbt* deployment steps. We first execute the `dbt run` command, and the execution log shows the new model is created.
 
