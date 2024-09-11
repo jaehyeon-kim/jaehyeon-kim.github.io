@@ -30,7 +30,7 @@ In the [previous post](/blog/2024-09-05-dbt-cicd-demo), we started discussing a 
 
 <!--more-->
 
-As the CI process executes tests in multiple phases, it is advised to deploy a new relese automatically in lower environments, and it supports fast iteration. In higher environments, however, the testing scope is normally beyond what a development team can control. Often we involve business teams to perform extensive testing using BI tools and a new release can be deployed only if it is signed-off by them. Besides, changes in a new release must not be executed in main datasets until it is approved. To meet those requirements, either [blue/green deployment](https://discourse.getdbt.com/t/performing-a-blue-green-deploy-of-your-dbt-project-on-snowflake/1349) or the [Write-Audit-Publish (WAP)](https://lakefs.io/blog/data-engineering-patterns-write-audit-publish/) pattern can be considered. In this post, we employ the WAP pattern because BigQuery does not support renaming datasets by default.
+As the CI process executes tests in multiple phases, it is advised to deploy a new release automatically in lower environments, and it supports fast iteration. In higher environments, however, the testing scope is normally beyond what a development team can control. Often we involve business teams to perform extensive testing using BI tools and a new release can be deployed only if it is signed-off by them. Besides, changes in a new release must not be executed in main datasets until it is approved. To meet those requirements, either [blue/green deployment](https://discourse.getdbt.com/t/performing-a-blue-green-deploy-of-your-dbt-project-on-snowflake/1349) or the [Write-Audit-Publish (WAP)](https://lakefs.io/blog/data-engineering-patterns-write-audit-publish/) pattern can be considered. In this post, we employ the WAP pattern because BigQuery does not support renaming datasets by default.
 
 * [DBT CI/CD Demo with BigQuery and GitHub Actions](/blog/2024-09-05-dbt-cicd-demo)
 * [Guide to Running DBT in Production](#) (this post)
@@ -227,7 +227,7 @@ ORDER BY sum(price) DESC
 LIMIT 10
 ```
 
-The model has an associated schema. Among the schema attributes, we are particularly interested in the two test cases, which determines if the new model is good to be deployed. In reality, we would have more tests but we assume those are sufficient.
+The model has an associated schema. Among the schema attributes, we are particularly interested in the two test cases, which determines if the new model is good to be deployed. In reality, we would have more tests, but we assume those are sufficient.
 
 ```yaml
 version: 2
@@ -391,7 +391,7 @@ bq rm -r -f $CI_DATASET
 
 ## Automatic Deployment
 
-As the CI process executes tests in multiple phases, we assume the release is deployed to the dev environment automatically, and it can done so by executing the following command.
+As the CI process executes tests in multiple phases, we assume the release is deployed to the dev environment automatically, and it can be done so by executing the following command.
 
 ```bash
 TARGET=dev
@@ -475,9 +475,9 @@ gsutil --quiet cp pizza_shop/target/manifest.json gs://dbt-cicd-demo/artifact/$T
 
 ## Write-Audit-Publish
 
-As mentioned, there are two key requirements for deploying to higher environments (eg prod). First, we invove business teams to perform extensive tests using BI tools, and it requires a copy of main datasets including changes in a new release. Secondly, those changes must not be executed in main datasets until it is approved. To meet those requirements, either *blue/green deployment* or the *Write-Audit-Publish (WAP)* pattern can be considered. Basically, both of them utilise the [dbt clone](https://docs.getdbt.com/reference/commands/clone) feature, which clones selected nodes of main datasets from a specified state to audit datasets. Specifically, we can use the latest *dbt* artifact for cloning main datasets as well as build incrementally for all new models and any changes to existing models on audit datasets. Then, testing can be performed on audit datasets, which meets both the requirements. Note that, as BigQuery supports [zero-copy table clones](https://cloud.google.com/bigquery/docs/table-clones-intro), it is a lightweight and cost-effective way of testing.
+As mentioned, there are two key requirements for deploying to higher environments (e.g. prod). First, we includes business teams to perform extensive tests using BI tools, and it requires a copy of main datasets including changes in a new release. Secondly, those changes must not be executed in main datasets until it is approved. To meet those requirements, either *blue/green deployment* or the *Write-Audit-Publish (WAP)* pattern can be considered. Basically, both of them utilise the [dbt clone](https://docs.getdbt.com/reference/commands/clone) feature, which clones selected nodes of main datasets from a specified state to audit datasets. Specifically, we can use the latest *dbt* artifact for cloning main datasets as well as build incrementally for all new models and any changes to existing models on audit datasets. Then, testing can be performed on audit datasets, which meets both the requirements. Note that, as BigQuery supports [zero-copy table clones](https://cloud.google.com/bigquery/docs/table-clones-intro), it is a lightweight and cost-effective way of testing.
 
-When it comes to selecting a deployment strategy, the WAP pattern is more applicable on BigQuery because, while blue/green deployment requires to change dataset (or schema) names at the end, BigQuery does not support renaming datasets by default. Note that, instead of publishing *audited* datasets to main datasets as the WAP pattern proposes, we follow typical dbt deployment steps (i.e. `dbt run` and `dbt test`) once a new release gets signed-off. This is because it is not straightforward to publish only those that are associated with changes in a new release.
+When it comes to selecting a deployment strategy, the WAP pattern is more applicable on BigQuery because, while blue/green deployment requires changing dataset (or schema) names at the end, BigQuery does not support renaming datasets by default. Note that, instead of publishing *audited* datasets to main datasets as the WAP pattern proposes, we follow typical dbt deployment steps (i.e. `dbt run` and `dbt test`) once a new release gets signed-off. This is because it is not straightforward to publish only those that are associated with changes in a new release.
 
 ### Test on Cloned Dataset
 
