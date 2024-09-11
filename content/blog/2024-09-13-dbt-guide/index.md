@@ -30,7 +30,7 @@ In the [previous post](/blog/2024-09-05-dbt-cicd-demo), we started discussing a 
 
 <!--more-->
 
-As the CI process executes tests in multiple phases, it is advised to deploy a new release automatically in lower environments, and it supports fast iteration. In higher environments, however, the testing scope is normally beyond what a development team can control. Often we involve business teams to perform extensive testing using BI tools and a new release can be deployed only if it is signed-off by them. Besides, changes in a new release must not be executed in main datasets until it is approved. To meet those requirements, either [blue/green deployment](https://discourse.getdbt.com/t/performing-a-blue-green-deploy-of-your-dbt-project-on-snowflake/1349) or the [Write-Audit-Publish (WAP)](https://lakefs.io/blog/data-engineering-patterns-write-audit-publish/) pattern can be considered. In this post, we employ the WAP pattern because BigQuery does not support renaming datasets by default.
+As the CI process executes tests in multiple phases, it is advised to deploy a new release automatically in lower environments, which supports fast iteration. In higher environments, however, the testing scope is normally beyond what a development team can control. We involve business teams to perform extensive testing using BI tools and a new release can be deployed only if it is signed-off by them. Often it requires a copy of main datasets including changes in a new release. Also, those changes must not be executed in main datasets until it is approved. To meet those requirements, either [blue/green deployment](https://discourse.getdbt.com/t/performing-a-blue-green-deploy-of-your-dbt-project-on-snowflake/1349) or the [Write-Audit-Publish (WAP)](https://lakefs.io/blog/data-engineering-patterns-write-audit-publish/) pattern can be considered. In this post, we employ the WAP pattern because, while blue/green deployment requires changing dataset (or schema) names at the end, BigQuery does not support renaming datasets by default.
 
 * [DBT CI/CD Demo with BigQuery and GitHub Actions](/blog/2024-09-05-dbt-cicd-demo)
 * [Guide to Running DBT in Production](#) (this post)
@@ -157,7 +157,7 @@ gsutil --quiet cp pizza_shop/target/manifest.json \
     && rm -r pizza_shop/target
 ```
 
-We can execute the same commands to deploy to the production environment. Unlike the dev environment, the artifact of the prod environment is used to clone data from the main dataset and build changes incrementally. The usage of this artifact is illustrated further below.
+We can execute the same commands to deploy to the production environment by specifying the prod target. Unlike the dev environment, the artifact of the prod environment is used to clone data from the main dataset and build changes incrementally. The usage of this artifact is illustrated further below.
 
 ```bash
 ## deploy and test in prod
@@ -314,7 +314,7 @@ We can see a table named *fct_top_customers* is created in the *ci* dataset on B
 
 ![](slim-ci.png#center)
 
-To complete *dbt slim ci*, the *ci* dataset can be deleted as shown below.
+To complete *dbt slim ci*, the *ci* dataset can be deleted by executing the `bq rm` command.
 
 ```bash
 bq rm -r -f $CI_DATASET
@@ -379,7 +379,7 @@ dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
 # 09:04:56  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 ```
 
-We can see the tables that are created by the two models on BigQuery Console. Note that, as we executed the `dbt run` command with the `--empty` flag, the tables do not have records.
+We can see the tables for the two models are created on BigQuery Console. Note that, as we executed the `dbt run` command with the `--empty` flag, the tables do not have records.
 
 ![](unit-test.png#center)
 
@@ -466,7 +466,7 @@ dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
 # 09:38:30  Done. PASS=7 WARN=0 ERROR=0 SKIP=0 TOTAL=7
 ```
 
-Finally, do not forget to upload the latest *dbt* artifact because it is used for *dbt slim ci*.
+Finally, do not forget to upload the latest *dbt* artifact because it is used by *dbt slim ci*.
 
 ```bash
 gsutil --quiet cp pizza_shop/target/manifest.json gs://dbt-cicd-demo/artifact/$TARGET/manifest.json \
@@ -475,7 +475,7 @@ gsutil --quiet cp pizza_shop/target/manifest.json gs://dbt-cicd-demo/artifact/$T
 
 ## Write-Audit-Publish
 
-As mentioned, there are two key requirements for deploying to higher environments (e.g. prod). First, we includes business teams to perform extensive tests using BI tools, and it requires a copy of main datasets including changes in a new release. Secondly, those changes must not be executed in main datasets until it is approved. To meet those requirements, either *blue/green deployment* or the *Write-Audit-Publish (WAP)* pattern can be considered. Basically, both of them utilise the [dbt clone](https://docs.getdbt.com/reference/commands/clone) feature, which clones selected nodes of main datasets from a specified state to audit datasets. Specifically, we can use the latest *dbt* artifact for cloning main datasets as well as build incrementally for all new models and any changes to existing models on audit datasets. Then, testing can be performed on audit datasets, which meets both the requirements. Note that, as BigQuery supports [zero-copy table clones](https://cloud.google.com/bigquery/docs/table-clones-intro), it is a lightweight and cost-effective way of testing.
+As mentioned, there are two key requirements for deploying to higher environments (e.g. prod). First, we include business teams to perform extensive tests using BI tools, and it requires a copy of main datasets including changes in a new release. Secondly, those changes must not be executed in main datasets until it is approved. To meet those requirements, either *blue/green deployment* or the *Write-Audit-Publish (WAP)* pattern can be considered. Basically, both of them utilise the [dbt clone](https://docs.getdbt.com/reference/commands/clone) feature, which clones selected nodes of main datasets from a specified state to audit datasets. Specifically, we can use the latest *dbt* artifact for cloning main datasets as well as build incrementally for all new models and any changes to existing models on audit datasets. Then, testing can be performed on audit datasets, which meets both the requirements. Note that, as BigQuery supports [zero-copy table clones](https://cloud.google.com/bigquery/docs/table-clones-intro), it is a lightweight and cost-effective way of testing.
 
 When it comes to selecting a deployment strategy, the WAP pattern is more applicable on BigQuery because, while blue/green deployment requires changing dataset (or schema) names at the end, BigQuery does not support renaming datasets by default. Note that, instead of publishing *audited* datasets to main datasets as the WAP pattern proposes, we follow typical dbt deployment steps (i.e. `dbt run` and `dbt test`) once a new release gets signed-off. This is because it is not straightforward to publish only those that are associated with changes in a new release.
 
@@ -538,7 +538,7 @@ dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
 # 09:40:59  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 ```
 
-Once the audit dataset includes all existing and new models, we can perform tests on it. A total of seven test cases are executed successfully and two of them are associated with the new model.
+Once the audit dataset includes all required models and relations, we can perform tests on it. A total of seven test cases are executed successfully and two of them are associated with the new model. In practice, business teams perform further tests using BI tools on this dataset, and determine whether the release can be signed-off or not.
 
 ```bash
 dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
@@ -589,7 +589,7 @@ bq rm -r -f "pizza_shop_$TARGET"
 
 ### Deploy to Main Dataset
 
-As mentioned, we deploy the release to the prod environment by following typical *dbt* deployment steps. We first execute the `dbt run` command, and we see the new model is created.
+Assuming the release is approved, we deploy it to the prod environment by following typical *dbt* deployment steps. We first execute the `dbt run` command, and the execution log shows the new model is created.
 
 ```bash
 TARGET=prod
