@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="8IJkE5wXEIwwiDYIljkx" name="Page-1">
-        <mxGraphModel dx="3460" dy="3850" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2339" pageHeight="3300" math="0" shadow="0">
+        <mxGraphModel dx="3965" dy="4097" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2339" pageHeight="3300" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -307,7 +307,7 @@
                 <mxCell id="190" value="&lt;b&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;Continuous Integration&lt;/font&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
                     <mxGeometry x="284" y="1424" width="440" height="29" as="geometry"/>
                 </mxCell>
-                <mxCell id="191" value="&lt;b&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;Continuous Deployment&lt;/font&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                <mxCell id="191" value="&lt;b&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;Continuous Delivery&lt;/font&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
                     <mxGeometry x="724" y="1424" width="581" height="29" as="geometry"/>
                 </mxCell>
                 <mxCell id="192" value="&lt;font style=&quot;font-size: 11px;&quot;&gt;Dev Environment&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fillColor=none;fontColor=#333333;strokeColor=default;" parent="1" vertex="1">
