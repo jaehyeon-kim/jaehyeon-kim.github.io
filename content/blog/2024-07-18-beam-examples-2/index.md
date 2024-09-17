@@ -22,16 +22,18 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In this post, we develop two Apache Beam pipelines that calculate average word lengths from input texts that are ingested by a Kafka topic. They obtain the statistics in different angles. The first pipeline emits the global average lengths whenever a new input text arrives while the latter triggers those values in a sliding time window.
+description: 
 ---
 
 In this post, we develop two Apache Beam pipelines that calculate average word lengths from input texts that are ingested by a Kafka topic. They obtain the statistics in different angles. The first pipeline emits the global average lengths whenever a new input text arrives while the latter triggers those values in a sliding time window.
+
+<!--more-->
 
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1)
 * [Part 2 Calculate Average Word Length with/without Fixed Look back](#) (this post)
 * [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
 * [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4)
-* Part 5 Call RPC Service in Batch using Stateless DoFn
+* [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5)
 * Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn
 * Part 7 Separate Droppable Data into Side Output
 * Part 8 Enhance Sport Activity Tracker with Runner Motivation
@@ -418,6 +420,13 @@ OK
 
 #### Pipeline Execution
 
+Note that the Kafka bootstrap server is accessible on port *29092* outside the Docker network, and it can be accessed on *localhost:29092* from the Docker host machine and on *host.docker.internal:29092* from a Docker container that is launched with the host network. We use both types of the bootstrap server address - the former is used by a Kafka producer app that is discussed later and the latter by a Java IO expansion service, which is launched in a Docker container. Note further that, for the latter to work, we have to update the */etc/hosts* file by adding an entry for *host.docker.internal* as shown below. 
+
+```bash
+cat /etc/hosts | grep host.docker.internal
+# 127.0.0.1       host.docker.internal
+```
+
 We specify only a single known argument that enables to use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments (`bootstrap_servers`, `input_topic` ...). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
 
 ```bash
@@ -690,7 +699,7 @@ OK
 
 #### Pipeline Execution
 
-Similar to the previous example, we use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments. Also, the pipeline is deployed on a local Flink cluster (`--flink_master=localhost:8081`).
+Similar to the previous example, we use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments. Also, the pipeline is deployed on a local Flink cluster (`--flink_master=localhost:8081`). Do not forget to update the */etc/hosts* file by adding an entry for *host.docker.internal* as mentioned earlier.
 
 ```bash
 ## start the beam pipeline

@@ -1,7 +1,7 @@
 ---
-title: Apache Beam Python Examples - Part 4 Call RPC Service for Data Augmentation
-date: 2024-08-15
-draft: false
+title: Apache Beam Python Examples - Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn
+date: 2024-10-02
+draft: true
 featured: false
 comment: true
 toc: true
@@ -26,16 +26,16 @@ images: []
 description: 
 ---
 
-In this post, we develop an Apache Beam pipeline where the input data is augmented by an **Remote Procedure Call (RPC)** service. Each input element performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element. In the subsequent two posts, we will discuss updated pipelines that make RPC calls more efficiently. We begin with illustrating how to manage development resources followed by demonstrating the RPC service that we use in this series. Finally, we develop a Beam pipeline that accesses the external service to augment the input elements.
+In the [previous post](/blog/2024-09-25-beam-examples-5), we developed an Apache Beam pipeline where the input data is augmented by an **Remote Procedure Call (RPC)** service. It is developed so that a single RPC call is made for a bundle of elements. The bundle size, however, is determined by the runner, we may encounter an issue e.g. if an RPC service becomes quite slower if a large number of elements are included in a single request. We can improve the pipeline using stateful `DoFn` where the number elements to process and maximum wait seconds can be controlled. Note that, although the stateful `DoFn` used in this post solves the data aumentation task well, in practice, we should use the built-in transforms such as [BatchElements](https://beam.apache.org/documentation/transforms/python/aggregation/batchelements/) and [GroupIntoBatches](https://beam.apache.org/documentation/transforms/python/aggregation/groupintobatches/) whenever possible. 
 
 <!--more-->
 
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1)
 * [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
 * [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
-* [Part 4 Call RPC Service for Data Augmentation](#) (this post)
+* [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4)
 * [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5)
-* Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn
+* [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](#) (this post)
 * Part 7 Separate Droppable Data into Side Output
 * Part 8 Enhance Sport Activity Tracker with Runner Motivation
 * Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn
@@ -88,166 +88,9 @@ Below shows how to start resources using the start-up script. We need to launch 
 #  ⠿ Container grpc-server  Started                                                          0.4s
 ```
 
-## Introduction to Remote Procedure Call (RPC) Service
+## Remote Procedure Call (RPC) Service
 
-### Create client and server interfaces
-
-A service is defined in the `.proto` file, and it supports two methods - `resolve` and `resolveBatch`. The former accepts a request with a string and returns an integer while the latter accepts a list of string requests and returns a list of integer responses.
-
-```proto
-// chapter3/proto/service.proto
-syntax = "proto3";
-
-package chapter3;
-
-message Request {
-  string input = 1;
-}
-
-message Response {
-  int32 output = 1;
-}
-
-message RequestList {
-  repeated Request request = 1;
-}
-
-message ResponseList {
-  repeated Response response = 1;
-}
-
-service RpcService {
-  rpc resolve(Request) returns (Response);
-  rpc resolveBatch(RequestList) returns (ResponseList);
-}
-```
-
-We can generate the gRPC client and server interfaces from the `.proto` service definition using the *grpcio-tools* package as shown below.
-
-```bash
-cd chapter3
-mkdir proto && touch proto/service.proto
-
-## << copy the proto service definition >>
-
-## generate grpc client and server interfaces
-python -m grpc_tools.protoc -I proto --python_out=. --grpc_python_out=. proto/service.proto
-```
-
-Running the above command generates `service_pb2.py` and `service_pb2_grpc.py`, and they contain:
-
-- classes for the messages defined in `service.proto`
-- classes for the service defined in `service.proto`
-    - `RpcServiceStub`, which can be used by clients to invoke RpcService RPCs
-    - `RpcServiceServicer`, which defines the interface for implementations of the RpcService service
-- a function for the service defined in service.proto
-    - `add_RpcServiceServicer_to_server`, which adds a RpcServiceServicer to a `grpc.Server`
-
-### Create client and server
-
-Using the gRPC interfaces generated earlier, we can create server and client applications. The server implements the two RPC methods (`resolve` and `resolveBatch`) where the response output is the length of the request input string. This server application is accessed by the Beam pipline, and it gets started when we start the development resources while including the `-g` flag.
-
-```python
-# chapter3/server.py
-import os
-import argparse
-from concurrent import futures
-
-import grpc
-import service_pb2
-import service_pb2_grpc
-
-
-class RpcServiceServicer(service_pb2_grpc.RpcServiceServicer):
-    def resolve(self, request, context):
-        if os.getenv("VERBOSE", "False") == "True":
-            print(f"resolve Request Made: input - {request.input}")
-        response = service_pb2.Response(output=len(request.input))
-        return response
-
-    def resolveBatch(self, request, context):
-        if os.getenv("VERBOSE", "False") == "True":
-            print("resolveBatch Request Made:")
-            print(f"\tInputs - {', '.join([r.input for r in request.request])}")
-        response = service_pb2.ResponseList()
-        response.response.extend(
-            [service_pb2.Response(output=len(r.input)) for r in request.request]
-        )
-        return response
-
-
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor())
-    service_pb2_grpc.add_RpcServiceServicer_to_server(RpcServiceServicer(), server)
-    server.add_insecure_port(os.getenv("INSECURE_PORT", "0.0.0.0:50051"))
-    server.start()
-    server.wait_for_termination()
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Beam pipeline arguments")
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        default="Whether to print messages for debugging.",
-    )
-    parser.set_defaults(verbose=False)
-    opts = parser.parse_args()
-    os.environ["VERBOSE"] = str(opts.verbose)
-    serve()
-```
-
-The client application is created for demonstration, and we use the same logic to access the server application within a Beam pipeline. It requires a user input (1 or 2) to determine which method to call, and a user is expected to write an element (word or text) so that the client can make a request. See below for details about how the client and server applications work.
-
-```python
-# chapter3/server_client.py
-import time
-
-import grpc
-import service_pb2
-import service_pb2_grpc
-
-
-def get_client_stream_requests():
-    while True:
-        name = input("Please enter a name (or nothing to stop chatting):")
-        if name == "":
-            break
-        hello_request = service_pb2.HelloRequest(greeting="Hello", name=name)
-        yield hello_request
-        time.sleep(1)
-
-
-def run():
-    with grpc.insecure_channel("localhost:50051") as channel:
-        stub = service_pb2_grpc.RpcServiceStub(channel)
-        print("1. Resolve - Unary")
-        print("2. ResolveBatch - Unary")
-        rpc_call = input("Which rpc would you like to make: ")
-        if rpc_call == "1":
-            element = input("Please enter a word: ")
-            if not element:
-                element = "Hello"
-            request = service_pb2.Request(input=element)
-            resolved = stub.resolve(request)
-            print("Resolve response received: ")
-            print(f"({element}, {resolved.output})")
-        if rpc_call == "2":
-            element = input("Please enter a text: ")
-            if not element:
-                element = "Beautiful is better than ugly"
-            words = element.split(" ")
-            request_list = service_pb2.RequestList()
-            request_list.request.extend([service_pb2.Request(input=e) for e in words])
-            response = stub.resolveBatch(request_list)
-            resolved = [r.output for r in response.response]
-            print("ResolveBatch response received: ")
-            print(", ".join([f"({t[0]}, {t[1]})" for t in zip(words, resolved)]))
-
-
-if __name__ == "__main__":
-    run()
-```
+The RPC service have two methods - `resolve` and `resolveBatch`. The former accepts a request with a string and returns an integer while the latter accepts a list of string requests and returns a list of integer responses. See [Part 4](/blog/2024-08-15-beam-examples-4) for details about how the RPC service is developed.
 
 Overall, we have the following files for the gRPC server and client applications, and the `server.py` gets started when we execute the start-up script with the `-g` flag.
 
@@ -270,7 +113,7 @@ We can check the client and server applications as Python scripts. If we select 
 
 ## Beam Pipeline
 
-We develop an Apache Beam pipeline that accesses an external RPC service to augment input elements. In this version, it is configured so that each element calls the RPC service.
+We develop an Apache Beam pipeline that accesses an external RPC service to augment input elements. In this version, it is configured so that a single RPC call is made for multiple elements in batch. Using state and timers, it controls how many elements to process in a batch and how long to keep elements before flushing them.
 
 ### Shared Source
 
@@ -364,10 +207,26 @@ class WriteOutputsToKafka(beam.PTransform):
 
 ### Pipeline Source
 
-In `RpcDoFn`, connection to the RPC service is established in the `setUp` method, and the input element is augmented by a response from the service in the `process` method. It returns a tuple of the element and response output, which is the length of the element. Finally, the connection (channel) is closed in the `teardown` method.
+In `BatchRpcDoFnStateful`, we use state and timers to control how many elements to process in a batch and how long to keep elements before flushing them.
+
+**State**
+- `BATCH_SIZE`
+    - A varying integer value is kept in this state, and its value increases by one when a new element is added to a *batch*. It is used to determine whether to flush the elements in the batch for processing.
+- `BATCH`
+    - Input elements are kept in this state until being flushed.
+
+**Timers**
+- `FLUSH_TIMER`
+    - This timer is triggered when it exceeds the maximum wait seconds. Without this timer, input elements may be held forever if the number of elements is less than the defined batch size. 
+- `EOW_TIMER`
+    - This timer is set up to ensure any existing elements are flushed at the end of the window.
+
+In the `process` method, we set the flush and end of window timers if there is no element is a batch. Then, we add a new element to the batch and increase the batch size by one. Finally, the elements are flushed if the current batch size is greater than or equal to the defined batch size. In the `flush` method, it begins with collecting elements in the batch, followed by clearing up all state and timers. Then, a single RPC call is made to the `resolveBatch` method after unique input elements are converted into a `RequestList` object. Once a response is made, output elements are constructed by augmenting input elements with the response, and the output elements are returned as a list.
+
+Note that a stateful `DoFn` requires a key-value pair as the input because state access is within the content of the key and window. Therefore, we apply a transform called `ToBuckets` before the main transform. That transform converts a word into a key-value pair where the key is obtained by taking the Unicode code point for the first character of the word and the value is the word itself.
 
 ```python
-# chapter3/rpc_pardo.py
+# chapter3/rpc_pardo_stateful.py
 import os
 import argparse
 import json
@@ -376,10 +235,37 @@ import typing
 import logging
 
 import apache_beam as beam
+from apache_beam.transforms.timeutil import TimeDomain
+from apache_beam.transforms.userstate import (
+    ReadModifyWriteStateSpec,
+    BagStateSpec,
+    TimerSpec,
+    on_timer,
+)
+from apache_beam.transforms.window import GlobalWindow
+from apache_beam.utils.windowed_value import WindowedValue
+from apache_beam.utils.timestamp import Timestamp, Duration
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.options.pipeline_options import SetupOptions
 
 from io_utils import ReadWordsFromKafka, WriteOutputsToKafka
+
+
+class ValueCoder(beam.coders.Coder):
+    def encode(self, e: typing.Tuple[int, str]):
+        """Encode to bytes with a trace that coder was used."""
+        return f"x:{e[0]}:{e[1]}".encode("utf-8")
+
+    def decode(self, b: bytes):
+        s = b.decode("utf-8")
+        assert s[0:2] == "x:"
+        return tuple(s.split(":")[1:])
+
+    def is_deterministic(self):
+        return True
+
+
+beam.coders.registry.register_coder(typing.Tuple[int, str], ValueCoder)
 
 
 def create_message(element: typing.Tuple[str, int]):
@@ -388,11 +274,27 @@ def create_message(element: typing.Tuple[str, int]):
     return element[0].encode("utf-8"), msg.encode("utf-8")
 
 
-class RpcDoFn(beam.DoFn):
+def to_buckets(e: str):
+    return (ord(e[0]) % 10, e)
+
+
+class BatchRpcDoFnStateful(beam.DoFn):
     channel = None
     stub = None
     hostname = "localhost"
     port = "50051"
+
+    BATCH_SIZE = ReadModifyWriteStateSpec("batch_size", beam.coders.VarIntCoder())
+    BATCH = BagStateSpec(
+        "batch",
+        beam.coders.WindowedValueCoder(wrapped_value_coder=ValueCoder()),
+    )
+    FLUSH_TIMER = TimerSpec("flush_timer", TimeDomain.REAL_TIME)
+    EOW_TIMER = TimerSpec("end_of_time", TimeDomain.WATERMARK)
+
+    def __init__(self, batch_size: int, max_wait_secs: int):
+        self.batch_size = batch_size
+        self.max_wait_secs = max_wait_secs
 
     def setup(self):
         import grpc
@@ -407,12 +309,84 @@ class RpcDoFn(beam.DoFn):
         if self.channel is not None:
             self.channel.close()
 
-    def process(self, element: str) -> typing.Iterator[typing.Tuple[str, int]]:
+    def process(
+        self,
+        element: typing.Tuple[int, str],
+        batch=beam.DoFn.StateParam(BATCH),
+        batch_size=beam.DoFn.StateParam(BATCH_SIZE),
+        flush_timer=beam.DoFn.TimerParam(FLUSH_TIMER),
+        eow_timer=beam.DoFn.TimerParam(EOW_TIMER),
+        timestamp=beam.DoFn.TimestampParam,
+        win_param=beam.DoFn.WindowParam,
+    ):
+        current_size = batch_size.read() or 0
+        if current_size == 0:
+            flush_timer.set(Timestamp.now() + Duration(seconds=self.max_wait_secs))
+            eow_timer.set(GlobalWindow().max_timestamp())
+        current_size += 1
+        batch_size.write(current_size)
+        batch.add(
+            WindowedValue(value=element, timestamp=timestamp, windows=(win_param,))
+        )
+        if current_size >= self.batch_size:
+            return self.flush(batch, batch_size, flush_timer, eow_timer)
+
+    @on_timer(FLUSH_TIMER)
+    def on_flush_timer(
+        self,
+        batch=beam.DoFn.StateParam(BATCH),
+        batch_size=beam.DoFn.StateParam(BATCH_SIZE),
+        flush_timer=beam.DoFn.TimerParam(FLUSH_TIMER),
+        eow_timer=beam.DoFn.TimerParam(EOW_TIMER),
+    ):
+        return self.flush(batch, batch_size, flush_timer, eow_timer)
+
+    @on_timer(EOW_TIMER)
+    def on_eow_timer(
+        self,
+        batch=beam.DoFn.StateParam(BATCH),
+        batch_size=beam.DoFn.StateParam(BATCH_SIZE),
+        flush_timer=beam.DoFn.TimerParam(FLUSH_TIMER),
+        eow_timer=beam.DoFn.TimerParam(EOW_TIMER),
+    ):
+        return self.flush(batch, batch_size, flush_timer, eow_timer)
+
+    def flush(
+        self,
+        batch=beam.DoFn.StateParam(BATCH),
+        batch_size=beam.DoFn.StateParam(BATCH_SIZE),
+        flush_timer=beam.DoFn.TimerParam(FLUSH_TIMER),
+        eow_timer=beam.DoFn.TimerParam(EOW_TIMER),
+    ):
         import service_pb2
 
-        request = service_pb2.Request(input=element)
-        response = self.stub.resolve(request)
-        yield element, response.output
+        elements = list(batch.read())
+
+        batch.clear()
+        batch_size.clear()
+        if flush_timer:
+            flush_timer.clear()
+        if eow_timer:
+            eow_timer.clear()
+
+        unqiue_values = set([e.value for e in elements])
+        request_list = service_pb2.RequestList()
+        request_list.request.extend(
+            [service_pb2.Request(input=e[1]) for e in unqiue_values]
+        )
+        response = self.stub.resolveBatch(request_list)
+        resolved = dict(
+            zip([e[1] for e in unqiue_values], [r.output for r in response.response])
+        )
+
+        return [
+            WindowedValue(
+                value=(e.value[1], resolved[e.value[1]]),
+                timestamp=e.timestamp,
+                windows=e.windows,
+            )
+            for e in elements
+        ]
 
 
 def run(argv=None, save_main_session=True):
@@ -427,6 +401,15 @@ def run(argv=None, save_main_session=True):
         "--output_topic",
         default=re.sub("_", "-", re.sub(".py$", "", os.path.basename(__file__))),
         help="Output topic",
+    )
+    parser.add_argument(
+        "--batch_size", type=int, default=10, help="Batch size to process"
+    )
+    parser.add_argument(
+        "--max_wait_secs",
+        type=int,
+        default=4,
+        help="Maximum wait seconds before processing",
     )
     parser.add_argument(
         "--deprecated_read",
@@ -454,7 +437,15 @@ def run(argv=None, save_main_session=True):
                 group_id=f"{known_args.output_topic}-group",
                 deprecated_read=known_args.deprecated_read,
             )
-            | "RequestRPC" >> beam.ParDo(RpcDoFn())
+            | "ToBuckets"
+            >> beam.Map(to_buckets).with_output_types(typing.Tuple[int, str])
+            | "RequestRPC"
+            >> beam.ParDo(
+                BatchRpcDoFnStateful(
+                    batch_size=known_args.batch_size,
+                    max_wait_secs=known_args.max_wait_secs,
+                )
+            )
             | "CreateMessags"
             >> beam.Map(create_message).with_output_types(typing.Tuple[bytes, bytes])
             | "WriteOutputsToKafka"
@@ -483,12 +474,13 @@ As described in [this documentation](https://beam.apache.org/documentation/pipel
 4. Apply the transform to the input `PCollection` and save the resulting output `PCollection`.
 5. Use `PAssert` and its subclasses (or [testing utils](https://beam.apache.org/releases/pydoc/current/apache_beam.testing.util.html) in Python) to verify that the output `PCollection` contains the elements that you expect.
 
-We use a text file that keeps a random text (`input/lorem.txt`) for testing. Then, we add the lines into a test stream and apply the main transform. Finally, we compare the actual output with an expected output. The expected output is a list of tuples where each element is a word and its length.
+We use a text file that keeps a random text (`input/lorem.txt`) for testing. Then, we add the lines into a test stream and apply the main transform. Finally, we compare the actual output with an expected output. The expected output is a list of tuples where each element is a word and its length. Note that, I had an issue to run this test using the Python *DirectRunner*. Therefore, the *FlinkRunner* is used instead.
 
 ```python
-# chapter3/rpc_pardo_test.py
+# chapter3/rpc_pardo_stateful_test.py
 import os
 import unittest
+import typing
 from concurrent import futures
 
 import apache_beam as beam
@@ -496,14 +488,22 @@ from apache_beam.coders import coders
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 from apache_beam.testing.test_stream import TestStream
-from apache_beam.options.pipeline_options import PipelineOptions, StandardOptions
+from apache_beam.options.pipeline_options import PipelineOptions
 
 import grpc
 import service_pb2_grpc
 import server
 
-from rpc_pardo import RpcDoFn
+from rpc_pardo_stateful import to_buckets, BatchRpcDoFnStateful
 from io_utils import tokenize
+
+
+class MyItem(typing.NamedTuple):
+    word: str
+    length: int
+
+
+beam.coders.registry.register_coder(MyItem, beam.coders.RowCoder)
 
 
 def read_file(filename: str, inputpath: str):
@@ -519,7 +519,7 @@ def compute_expected_output(lines: list):
     return output
 
 
-class RpcParDooTest(unittest.TestCase):
+class RpcParDooStatefulTest(unittest.TestCase):
     server_class = server.RpcServiceServicer
     port = 50051
 
@@ -535,8 +535,8 @@ class RpcParDooTest(unittest.TestCase):
         self.server.stop(None)
 
     def test_pipeline(self):
-        options = PipelineOptions()
-        options.view_as(StandardOptions).streaming = True
+        pipeline_opts = {"runner": "FlinkRunner", "parallelism": 1, "streaming": True}
+        options = PipelineOptions([], **pipeline_opts)
         with TestPipeline(options=options) as p:
             PARENT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
             lines = read_file("lorem.txt", os.path.join(PARENT_DIR, "inputs"))
@@ -549,7 +549,10 @@ class RpcParDooTest(unittest.TestCase):
                 p
                 | test_stream
                 | "ExtractWords" >> beam.FlatMap(tokenize)
-                | "RequestRPC" >> beam.ParDo(RpcDoFn())
+                | "ToBuckets"
+                >> beam.Map(to_buckets).with_output_types(typing.Tuple[int, str])
+                | "RequestRPC"
+                >> beam.ParDo(BatchRpcDoFnStateful(batch_size=10, max_wait_secs=5))
             )
 
             EXPECTED_OUTPUT = compute_expected_output(lines)
@@ -564,10 +567,13 @@ if __name__ == "__main__":
 We can execute the pipeline test as shown below.
 
 ```bash
-python chapter3/rpc_pardo_test.py 
+python chapter3/rpc_pardo_stateful_test.py 
+WARNING:root:Waiting for grpc channel to be ready at localhost:46459.
+WARNING:root:Waiting for grpc channel to be ready at localhost:46459.
+WARNING:root:Waiting for grpc channel to be ready at localhost:46459.
 .
 ----------------------------------------------------------------------
-Ran 1 test in 0.373s
+Ran 1 test in 19.801s
 
 OK
 ```
@@ -590,12 +596,12 @@ When executing the pipeline, we specify only a single known argument that enable
 ```bash
 ## start the beam pipeline
 ## exclude --flink_master if using an embedded cluster
-python chapter3/rpc_pardo.py --deprecated_read \
-    --job_name=rpc-pardo --runner FlinkRunner --flink_master=localhost:8081 \
-	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
+python chapter3/rpc_pardo_stateful.py --deprecated_read \
+    --job_name=rpc-pardo-stateful --runner FlinkRunner --flink_master=localhost:8081 \
+  --streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
 ```
 
-On Flink UI, we see the pipeline only has a single task.
+On Flink UI, we see the pipeline has two tasks. The first task is until converting words into key-value pairs while the latter executes the main transform and sends output messages to the Kafka topic.
 
 ![](pipeline-dag.png#center)
 

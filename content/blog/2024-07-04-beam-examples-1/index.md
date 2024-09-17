@@ -22,16 +22,18 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In this series, we develop Apache Beam Python pipelines. The majority of them are from Building Big Data Pipelines with Apache Beam by Jan Lukavský. Mainly relying on the Java SDK, the book teaches fundamentals of Apache Beam using hands-on tasks, and we convert those tasks using the Python SDK. We focus on streaming pipelines, and they are deployed on a local (or embedded) Apache Flink cluster using the Apache Flink Runner. Beginning with setting up the development environment, we build two pipelines that obtain top K most frequent words and the word that has the longest word length in this post.
+description: 
 ---
 
 In this series, we develop [Apache Beam](https://beam.apache.org/) Python pipelines. The majority of them are from [Building Big Data Pipelines with Apache Beam by Jan Lukavský](https://www.packtpub.com/en-us/product/building-big-data-pipelines-with-apache-beam-9781800564930). Mainly relying on the Java SDK, the book teaches fundamentals of Apache Beam using hands-on tasks, and we convert those tasks using the Python SDK. We focus on streaming pipelines, and they are deployed on a local (or embedded) [Apache Flink](https://flink.apache.org/) cluster using the [Apache Flink Runner](https://beam.apache.org/documentation/runners/flink/). Beginning with setting up the development environment, we build two pipelines that obtain top K most frequent words and the word that has the longest word length in this post. 
+
+<!--more-->
 
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](#) (this post)
 * [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
 * [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
 * [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4)
-* Part 5 Call RPC Service in Batch using Stateless DoFn
+* [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5)
 * Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn
 * Part 7 Separate Droppable Data into Side Output
 * Part 8 Enhance Sport Activity Tracker with Runner Motivation
@@ -802,7 +804,7 @@ OK
 
 #### Pipeline Execution
 
-Below shows an example of executing the pipeline by specifying pipeline arguments only while accepting default values of the known arguments (`bootstrap_servers`, `input_topic`, ...). Note that, we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
+Below shows an example of executing the pipeline by specifying pipeline arguments only while accepting default values of the known arguments (`bootstrap_servers`, `input_topic`, ...). Note that, we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument. Do not forget to update the */etc/hosts* file by adding an entry for *host.docker.internal* as mentioned earlier.
 
 ```bash
 ## start the beam pipeline
@@ -1063,7 +1065,7 @@ OK
 
 #### Pipeline Execution
 
-Similar to the previous example, we can execute the pipeline by specifying pipeline arguments only while accepting default values of the known arguments (*bootstrap_servers*, *input_topic* ...).
+Similar to the previous example, we can execute the pipeline by specifying pipeline arguments only while accepting default values of the known arguments (*bootstrap_servers*, *input_topic* ...). Do not forget to update the */etc/hosts* file by adding an entry for *host.docker.internal* as mentioned earlier.
 
 ```bash
 ## start the beam pipeline

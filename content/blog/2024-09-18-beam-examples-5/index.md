@@ -1,6 +1,6 @@
 ---
-title: Apache Beam Python Examples - Part 4 Call RPC Service for Data Augmentation
-date: 2024-08-15
+title: Apache Beam Python Examples - Part 5 Call RPC Service in Batch using Stateless DoFn
+date: 2024-09-18
 draft: false
 featured: false
 comment: true
@@ -26,15 +26,15 @@ images: []
 description: 
 ---
 
-In this post, we develop an Apache Beam pipeline where the input data is augmented by an **Remote Procedure Call (RPC)** service. Each input element performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element. In the subsequent two posts, we will discuss updated pipelines that make RPC calls more efficiently. We begin with illustrating how to manage development resources followed by demonstrating the RPC service that we use in this series. Finally, we develop a Beam pipeline that accesses the external service to augment the input elements.
+In the [previous post](/blog/2024-08-15-beam-examples-4), we developed an Apache Beam pipeline where the input data is augmented by an **Remote Procedure Call (RPC)** service. Each input element performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element. In this post, we discuss how to enhance the pipeline so that a single RPC call is made for a bundle of elements, which can save a significant amount time compared to making a call for each element.
 
 <!--more-->
 
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1)
 * [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
 * [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
-* [Part 4 Call RPC Service for Data Augmentation](#) (this post)
-* [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5)
+* [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4)
+* [Part 5 Call RPC Service in Batch using Stateless DoFn](#) (this post)
 * Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn
 * Part 7 Separate Droppable Data into Side Output
 * Part 8 Enhance Sport Activity Tracker with Runner Motivation
@@ -88,166 +88,9 @@ Below shows how to start resources using the start-up script. We need to launch 
 #  ⠿ Container grpc-server  Started                                                          0.4s
 ```
 
-## Introduction to Remote Procedure Call (RPC) Service
+## Remote Procedure Call (RPC) Service
 
-### Create client and server interfaces
-
-A service is defined in the `.proto` file, and it supports two methods - `resolve` and `resolveBatch`. The former accepts a request with a string and returns an integer while the latter accepts a list of string requests and returns a list of integer responses.
-
-```proto
-// chapter3/proto/service.proto
-syntax = "proto3";
-
-package chapter3;
-
-message Request {
-  string input = 1;
-}
-
-message Response {
-  int32 output = 1;
-}
-
-message RequestList {
-  repeated Request request = 1;
-}
-
-message ResponseList {
-  repeated Response response = 1;
-}
-
-service RpcService {
-  rpc resolve(Request) returns (Response);
-  rpc resolveBatch(RequestList) returns (ResponseList);
-}
-```
-
-We can generate the gRPC client and server interfaces from the `.proto` service definition using the *grpcio-tools* package as shown below.
-
-```bash
-cd chapter3
-mkdir proto && touch proto/service.proto
-
-## << copy the proto service definition >>
-
-## generate grpc client and server interfaces
-python -m grpc_tools.protoc -I proto --python_out=. --grpc_python_out=. proto/service.proto
-```
-
-Running the above command generates `service_pb2.py` and `service_pb2_grpc.py`, and they contain:
-
-- classes for the messages defined in `service.proto`
-- classes for the service defined in `service.proto`
-    - `RpcServiceStub`, which can be used by clients to invoke RpcService RPCs
-    - `RpcServiceServicer`, which defines the interface for implementations of the RpcService service
-- a function for the service defined in service.proto
-    - `add_RpcServiceServicer_to_server`, which adds a RpcServiceServicer to a `grpc.Server`
-
-### Create client and server
-
-Using the gRPC interfaces generated earlier, we can create server and client applications. The server implements the two RPC methods (`resolve` and `resolveBatch`) where the response output is the length of the request input string. This server application is accessed by the Beam pipline, and it gets started when we start the development resources while including the `-g` flag.
-
-```python
-# chapter3/server.py
-import os
-import argparse
-from concurrent import futures
-
-import grpc
-import service_pb2
-import service_pb2_grpc
-
-
-class RpcServiceServicer(service_pb2_grpc.RpcServiceServicer):
-    def resolve(self, request, context):
-        if os.getenv("VERBOSE", "False") == "True":
-            print(f"resolve Request Made: input - {request.input}")
-        response = service_pb2.Response(output=len(request.input))
-        return response
-
-    def resolveBatch(self, request, context):
-        if os.getenv("VERBOSE", "False") == "True":
-            print("resolveBatch Request Made:")
-            print(f"\tInputs - {', '.join([r.input for r in request.request])}")
-        response = service_pb2.ResponseList()
-        response.response.extend(
-            [service_pb2.Response(output=len(r.input)) for r in request.request]
-        )
-        return response
-
-
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor())
-    service_pb2_grpc.add_RpcServiceServicer_to_server(RpcServiceServicer(), server)
-    server.add_insecure_port(os.getenv("INSECURE_PORT", "0.0.0.0:50051"))
-    server.start()
-    server.wait_for_termination()
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Beam pipeline arguments")
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        default="Whether to print messages for debugging.",
-    )
-    parser.set_defaults(verbose=False)
-    opts = parser.parse_args()
-    os.environ["VERBOSE"] = str(opts.verbose)
-    serve()
-```
-
-The client application is created for demonstration, and we use the same logic to access the server application within a Beam pipeline. It requires a user input (1 or 2) to determine which method to call, and a user is expected to write an element (word or text) so that the client can make a request. See below for details about how the client and server applications work.
-
-```python
-# chapter3/server_client.py
-import time
-
-import grpc
-import service_pb2
-import service_pb2_grpc
-
-
-def get_client_stream_requests():
-    while True:
-        name = input("Please enter a name (or nothing to stop chatting):")
-        if name == "":
-            break
-        hello_request = service_pb2.HelloRequest(greeting="Hello", name=name)
-        yield hello_request
-        time.sleep(1)
-
-
-def run():
-    with grpc.insecure_channel("localhost:50051") as channel:
-        stub = service_pb2_grpc.RpcServiceStub(channel)
-        print("1. Resolve - Unary")
-        print("2. ResolveBatch - Unary")
-        rpc_call = input("Which rpc would you like to make: ")
-        if rpc_call == "1":
-            element = input("Please enter a word: ")
-            if not element:
-                element = "Hello"
-            request = service_pb2.Request(input=element)
-            resolved = stub.resolve(request)
-            print("Resolve response received: ")
-            print(f"({element}, {resolved.output})")
-        if rpc_call == "2":
-            element = input("Please enter a text: ")
-            if not element:
-                element = "Beautiful is better than ugly"
-            words = element.split(" ")
-            request_list = service_pb2.RequestList()
-            request_list.request.extend([service_pb2.Request(input=e) for e in words])
-            response = stub.resolveBatch(request_list)
-            resolved = [r.output for r in response.response]
-            print("ResolveBatch response received: ")
-            print(", ".join([f"({t[0]}, {t[1]})" for t in zip(words, resolved)]))
-
-
-if __name__ == "__main__":
-    run()
-```
+The RPC service have two methods - `resolve` and `resolveBatch`. The former accepts a request with a string and returns an integer while the latter accepts a list of string requests and returns a list of integer responses. See [Part 4](/blog/2024-08-15-beam-examples-4) for details about how the RPC service is developed.
 
 Overall, we have the following files for the gRPC server and client applications, and the `server.py` gets started when we execute the start-up script with the `-g` flag.
 
@@ -270,7 +113,7 @@ We can check the client and server applications as Python scripts. If we select 
 
 ## Beam Pipeline
 
-We develop an Apache Beam pipeline that accesses an external RPC service to augment input elements. In this version, it is configured so that each element calls the RPC service.
+We develop an Apache Beam pipeline that accesses an external RPC service to augment input elements. In this version, it is configured so that a single RPC call is made for a bundle of elements.
 
 ### Shared Source
 
@@ -364,10 +207,15 @@ class WriteOutputsToKafka(beam.PTransform):
 
 ### Pipeline Source
 
-In `RpcDoFn`, connection to the RPC service is established in the `setUp` method, and the input element is augmented by a response from the service in the `process` method. It returns a tuple of the element and response output, which is the length of the element. Finally, the connection (channel) is closed in the `teardown` method.
+According to the life cycle of a `DoFn` object, the `BatchRpcDoFn` is configured as follows.
+- `setUp` - The RPC service is established because this method is commonly used to initialize transient resources that are needed during the processing.
+- `start_bundle` - In a `DoFn` object, input elements are split into chunks called bundles, and this method is invoked when a new bundle arrives. We initialise an empty list to keep input elements in a bundle.
+- `process` - Each input element in a bundle is appended into the elements list after being converted into a `WindowedValue` object.
+- `finish_bundle` - A single RPC call is made to the `resolveBatch` method after unique input elements are converted into a `RequestList` object. It has two advantages. First, as requests with the same input tend to return the same output, making a call with unique elements can reduce request time. Secondly, calling to the `resolveBatch` method with multiple elements can save a significant amount of time compared to making a call for each element. Once a response is made, output elements are constructed by augmenting input elements with the response, and the output elements are returned as a list.
+- `teardown` - The connection (channel) to the RPC service is closed.
 
 ```python
-# chapter3/rpc_pardo.py
+# chapter3/rpc_pardo_batch.py
 import os
 import argparse
 import json
@@ -376,6 +224,7 @@ import typing
 import logging
 
 import apache_beam as beam
+from apache_beam.utils.windowed_value import WindowedValue
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.options.pipeline_options import SetupOptions
 
@@ -388,9 +237,10 @@ def create_message(element: typing.Tuple[str, int]):
     return element[0].encode("utf-8"), msg.encode("utf-8")
 
 
-class RpcDoFn(beam.DoFn):
+class BatchRpcDoFn(beam.DoFn):
     channel = None
     stub = None
+    elements: typing.List[WindowedValue] = None
     hostname = "localhost"
     port = "50051"
 
@@ -407,12 +257,38 @@ class RpcDoFn(beam.DoFn):
         if self.channel is not None:
             self.channel.close()
 
-    def process(self, element: str) -> typing.Iterator[typing.Tuple[str, int]]:
+    def start_bundle(self):
+        self.elements = []
+
+    def finish_bundle(self):
         import service_pb2
 
-        request = service_pb2.Request(input=element)
-        response = self.stub.resolve(request)
-        yield element, response.output
+        unqiue_values = set([e.value for e in self.elements])
+        request_list = service_pb2.RequestList()
+        request_list.request.extend(
+            [service_pb2.Request(input=e) for e in unqiue_values]
+        )
+        response = self.stub.resolveBatch(request_list)
+        resolved = dict(zip(unqiue_values, [r.output for r in response.response]))
+
+        return [
+            WindowedValue(
+                value=(e.value, resolved[e.value]),
+                timestamp=e.timestamp,
+                windows=e.windows,
+            )
+            for e in self.elements
+        ]
+
+    def process(
+        self,
+        element: str,
+        timestamp=beam.DoFn.TimestampParam,
+        win_param=beam.DoFn.WindowParam,
+    ):
+        self.elements.append(
+            WindowedValue(value=element, timestamp=timestamp, windows=(win_param,))
+        )
 
 
 def run(argv=None, save_main_session=True):
@@ -454,7 +330,7 @@ def run(argv=None, save_main_session=True):
                 group_id=f"{known_args.output_topic}-group",
                 deprecated_read=known_args.deprecated_read,
             )
-            | "RequestRPC" >> beam.ParDo(RpcDoFn())
+            | "RequestRPC" >> beam.ParDo(BatchRpcDoFn())
             | "CreateMessags"
             >> beam.Map(create_message).with_output_types(typing.Tuple[bytes, bytes])
             | "WriteOutputsToKafka"
@@ -486,7 +362,7 @@ As described in [this documentation](https://beam.apache.org/documentation/pipel
 We use a text file that keeps a random text (`input/lorem.txt`) for testing. Then, we add the lines into a test stream and apply the main transform. Finally, we compare the actual output with an expected output. The expected output is a list of tuples where each element is a word and its length.
 
 ```python
-# chapter3/rpc_pardo_test.py
+# chapter3/rpc_pardo_batch_test.py
 import os
 import unittest
 from concurrent import futures
@@ -502,7 +378,7 @@ import grpc
 import service_pb2_grpc
 import server
 
-from rpc_pardo import RpcDoFn
+from rpc_pardo_batch import BatchRpcDoFn
 from io_utils import tokenize
 
 
@@ -519,7 +395,7 @@ def compute_expected_output(lines: list):
     return output
 
 
-class RpcParDooTest(unittest.TestCase):
+class RpcParDooBatchTest(unittest.TestCase):
     server_class = server.RpcServiceServicer
     port = 50051
 
@@ -549,7 +425,7 @@ class RpcParDooTest(unittest.TestCase):
                 p
                 | test_stream
                 | "ExtractWords" >> beam.FlatMap(tokenize)
-                | "RequestRPC" >> beam.ParDo(RpcDoFn())
+                | "RequestRPC" >> beam.ParDo(BatchRpcDoFn())
             )
 
             EXPECTED_OUTPUT = compute_expected_output(lines)
@@ -564,10 +440,10 @@ if __name__ == "__main__":
 We can execute the pipeline test as shown below.
 
 ```bash
-python chapter3/rpc_pardo_test.py 
+python chapter3/rpc_pardo_batch_test.py 
 .
 ----------------------------------------------------------------------
-Ran 1 test in 0.373s
+Ran 1 test in 0.285s
 
 OK
 ```
@@ -590,9 +466,9 @@ When executing the pipeline, we specify only a single known argument that enable
 ```bash
 ## start the beam pipeline
 ## exclude --flink_master if using an embedded cluster
-python chapter3/rpc_pardo.py --deprecated_read \
-    --job_name=rpc-pardo --runner FlinkRunner --flink_master=localhost:8081 \
-	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
+python chapter3/rpc_pardo_batch.py --deprecated_read \
+    --job_name=rpc-pardo-batch --runner FlinkRunner --flink_master=localhost:8081 \
+  --streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
 ```
 
 On Flink UI, we see the pipeline only has a single task.
