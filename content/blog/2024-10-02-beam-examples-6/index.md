@@ -1,7 +1,7 @@
 ---
 title: Apache Beam Python Examples - Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn
 date: 2024-10-02
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -26,7 +26,7 @@ images: []
 description: 
 ---
 
-In the [previous post](/blog/2024-09-25-beam-examples-5), we developed an Apache Beam pipeline where the input data is augmented by an **Remote Procedure Call (RPC)** service. It is developed so that a single RPC call is made for a bundle of elements. The bundle size, however, is determined by the runner, we may encounter an issue e.g. if an RPC service becomes quite slower if a large number of elements are included in a single request. We can improve the pipeline using stateful `DoFn` where the number elements to process and maximum wait seconds can be controlled. Note that, although the stateful `DoFn` used in this post solves the data aumentation task well, in practice, we should use the built-in transforms such as [BatchElements](https://beam.apache.org/documentation/transforms/python/aggregation/batchelements/) and [GroupIntoBatches](https://beam.apache.org/documentation/transforms/python/aggregation/groupintobatches/) whenever possible. 
+In the [previous post](/blog/2024-09-25-beam-examples-5), we continued discussing an Apache Beam pipeline that arguments input data by calling a **Remote Procedure Call (RPC)** service. A pipeline was developed that makes a single RPC call for a bundle of elements. The bundle size is determined by the runner, however, we may encounter an issue e.g. if an RPC service becomes quite slower if many elements are included in a single request. We can improve the pipeline using stateful `DoFn` where the number elements to process and maximum wait seconds can be controlled by *state* and *timers*. Note that, although the stateful `DoFn` used in this post solves the data augmentation task well, in practice, we should use the built-in transforms such as [BatchElements](https://beam.apache.org/documentation/transforms/python/aggregation/batchelements/) and [GroupIntoBatches](https://beam.apache.org/documentation/transforms/python/aggregation/groupintobatches/) whenever possible. 
 
 <!--more-->
 
@@ -113,7 +113,7 @@ We can check the client and server applications as Python scripts. If we select 
 
 ## Beam Pipeline
 
-We develop an Apache Beam pipeline that accesses an external RPC service to augment input elements. In this version, it is configured so that a single RPC call is made for multiple elements in batch. Using state and timers, it controls how many elements to process in a batch and how long to keep elements before flushing them.
+We develop an Apache Beam pipeline that accesses an external RPC service to augment input elements. In this version, it is configured so that a single RPC call is made for multiple elements in batch. Moreover, using *state* and *timers*, it controls how many elements to process in a batch and how long to keep elements before flushing them.
 
 ### Shared Source
 
@@ -211,7 +211,7 @@ In `BatchRpcDoFnStateful`, we use state and timers to control how many elements 
 
 **State**
 - `BATCH_SIZE`
-    - A varying integer value is kept in this state, and its value increases by one when a new element is added to a *batch*. It is used to determine whether to flush the elements in the batch for processing.
+    - A varying integer value is kept in this state, and its value increases by one when a new element is added to a *batch*. It is used to determine whether to flush the elements in a batch for processing.
 - `BATCH`
     - Input elements are kept in this state until being flushed.
 
@@ -221,9 +221,11 @@ In `BatchRpcDoFnStateful`, we use state and timers to control how many elements 
 - `EOW_TIMER`
     - This timer is set up to ensure any existing elements are flushed at the end of the window.
 
-In the `process` method, we set the flush and end of window timers if there is no element is a batch. Then, we add a new element to the batch and increase the batch size by one. Finally, the elements are flushed if the current batch size is greater than or equal to the defined batch size. In the `flush` method, it begins with collecting elements in the batch, followed by clearing up all state and timers. Then, a single RPC call is made to the `resolveBatch` method after unique input elements are converted into a `RequestList` object. Once a response is made, output elements are constructed by augmenting input elements with the response, and the output elements are returned as a list.
+In the `process` method, we set the flush and end of window timers. These timers ensure that elements are flushed even if there is no element or fewer elements than the batch size in a batch. Then, we add a new element to the batch and increase the batch size by one. Finally, the elements are flushed if the current batch size is greater than or equal to the defined batch size.
 
-Note that a stateful `DoFn` requires a key-value pair as the input because state access is within the content of the key and window. Therefore, we apply a transform called `ToBuckets` before the main transform. That transform converts a word into a key-value pair where the key is obtained by taking the Unicode code point for the first character of the word and the value is the word itself.
+In the `flush` method, it begins with collecting elements in the batch, followed by clearing up all *state* and *timers*. Then, a single RPC call is made to the `resolveBatch` method after unique input elements are converted into a `RequestList` object. Once a response is made, output elements are constructed by augmenting input elements with the response, and the output elements are returned as a list.
+
+Note that stateful `DoFn` requires a key-value pair as its input because state access is within the content of the key and window. Therefore, we apply a transform called `ToBuckets` before the main transform. That transform converts a word into a key-value pair where the key is obtained by taking the Unicode code point for the first character of the word and the value is the word itself.
 
 ```python
 # chapter3/rpc_pardo_stateful.py
@@ -474,7 +476,7 @@ As described in [this documentation](https://beam.apache.org/documentation/pipel
 4. Apply the transform to the input `PCollection` and save the resulting output `PCollection`.
 5. Use `PAssert` and its subclasses (or [testing utils](https://beam.apache.org/releases/pydoc/current/apache_beam.testing.util.html) in Python) to verify that the output `PCollection` contains the elements that you expect.
 
-We use a text file that keeps a random text (`input/lorem.txt`) for testing. Then, we add the lines into a test stream and apply the main transform. Finally, we compare the actual output with an expected output. The expected output is a list of tuples where each element is a word and its length. Note that, I had an issue to run this test using the Python *DirectRunner*. Therefore, the *FlinkRunner* is used instead.
+We use a text file that keeps a random text (`input/lorem.txt`) for testing. Then, we add the lines into a test stream and apply the main transform. Finally, we compare the actual output with an expected output. The expected output is a list of tuples where each element is a word and its length. Note that the *FlinkRunner* is used for testing because output collection failed by the Python *DirectRunner*, resulting in testing failure.
 
 ```python
 # chapter3/rpc_pardo_stateful_test.py

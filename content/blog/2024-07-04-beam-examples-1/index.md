@@ -34,7 +34,7 @@ In this series, we develop [Apache Beam](https://beam.apache.org/) Python pipeli
 * [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
 * [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4)
 * [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5)
-* Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn
+* [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6)
 * Part 7 Separate Droppable Data into Side Output
 * Part 8 Enhance Sport Activity Tracker with Runner Motivation
 * Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn
