@@ -589,7 +589,7 @@ cat /etc/hosts | grep host.docker.internal
 # 127.0.0.1       host.docker.internal
 ```
 
-We need to send messages into the input Kafka topic before executing the pipeline. Input text message can be sent by executing a Kafka text producer - `python utils/faker_gen.py`.
+We need to send messages into the input Kafka topic before executing the pipeline. Input text message can be sent by executing a Kafka text producer - `python utils/faker_shifted_gen.py`.
 
 ![](input-messages.png#center)
 
