@@ -26,7 +26,7 @@ images: []
 description: 
 ---
 
-In the [previous post](/blog/2024-09-25-beam-examples-5), we developed an Apache Beam pipeline where the input data is augmented by an **Remote Procedure Call (RPC)** service. It is developed so that a single RPC call is made for a bundle of elements. The bundle size, however, is determined by the runner, we may encounter an issue e.g. if an RPC service becomes quite slower if a large number of elements are included in a single request. We can improve the pipeline using stateful `DoFn` where the number elements to process and maximum wait seconds can be controlled. Note that, although the stateful `DoFn` used in this post solves the data aumentation task well, in practice, we should use the built-in transforms such as [BatchElements](https://beam.apache.org/documentation/transforms/python/aggregation/batchelements/) and [GroupIntoBatches](https://beam.apache.org/documentation/transforms/python/aggregation/groupintobatches/) whenever possible. 
+We develop an Apache Beam pipeline that separates droppable elements from the rest of the data. Droppable elements are those that come later when the watermark passes the window max timestamp plus allowed lateness. Using a timer in a *Stateful* DoFn, droppable data is separated from normal data and dispatched into a side output rather than being discarded silently, which is the default behaviour. Note that the pipeline works in a situation where droppable elements do not appear often, and thus the chance that a droppable element is delivered as the first element in a particular window is low.
 
 <!--more-->
 
@@ -54,7 +54,7 @@ The Flink and Kafka clusters and gRPC server are managed by the following bash s
 
 Those scripts accept four flags: `-f`, `-k` and `-g` to start/stop individual resources or `-a` to manage all of them. We can add multiple flags to start/stop relevant resources. Note that the scripts assume Flink 1.18.1 by default, and we can specify a specific Flink version if it is different from it e.g. `FLINK_VERSION=1.17.2 ./setup/start-flink-env.sh`.
 
-Below shows how to start resources using the start-up script. We need to launch both the Flink/Kafka clusters and gRPC server if we deploy a Beam pipeline on a local Flink cluster. Otherwise, we can start the Kafka cluster and gRPC server only.
+Below shows how to start resources using the start-up script. We need to launch both the Flink and Kafka clusters if we deploy a Beam pipeline on a local Flink cluster. Otherwise, we can start the Kafka cluster only.
 
 ```bash
 ## start a local flink can kafka cluster
@@ -85,6 +85,8 @@ Below shows how to start resources using the start-up script. We need to launch 
 ```
 
 ## Kafka Producer
+
+We create a Kafka producer using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package. It generates text messages with the [Faker](https://faker.readthedocs.io/en/master/) package and sends them to an input topic. Note that we randomly shift back message creation timestamps to simulate late data, and about 20 percent of messages are affected - see below for details about how Beam's `KafkaIO` utilises Kafka message timestamp instead of processing timestamp. We can run the producer simply by executing the producer script.
 
 ```python
 # utils/faker_shifted_gen.py
@@ -130,12 +132,12 @@ if __name__ == "__main__":
     fake = Faker()
     Faker.seed(1237)
 
-    num_events = 0
     while True:
-        num_events += 1
         text = fake.text(max_nb_chars=10)
         current = int(time.time())
-        shift = fake.random_element(range(args.max_shift_seconds))
+        shift = 0
+        if fake.random_int(min=0, max=9) < 2:
+            shift = fake.random_element(range(args.max_shift_seconds))
         shifted = current - shift
         producer.send_to_kafka(text=text, timestamp_ms=shifted * 1000)
         print(
@@ -180,39 +182,56 @@ class TextProducer:
             raise RuntimeError("fails to send a message") from e
 ```
 
+When we run the Kafka producer, it prints messags and associating timestamps. As mentioned, the *shifted* timestamp values are recorded as message timestamps.
+
 ```bash
 python utils/faker_shifted_gen.py 
-text - Church., ts - 1729223414, shift - 6 secs - shifted ts 1729223408
-text - For., ts - 1729223415, shift - 3 secs - shifted ts 1729223412
-text - Have., ts - 1729223416, shift - 9 secs - shifted ts 1729223407
-text - Health., ts - 1729223417, shift - 6 secs - shifted ts 1729223411
-text - Join., ts - 1729223418, shift - 2 secs - shifted ts 1729223416
-text - Nice., ts - 1729223419, shift - 11 secs - shifted ts 1729223408
-text - Us., ts - 1729223420, shift - 8 secs - shifted ts 1729223412
-text - Friend., ts - 1729223421, shift - 4 secs - shifted ts 1729223417
-text - Executive., ts - 1729223422, shift - 2 secs - shifted ts 1729223420
-text - Memory., ts - 1729223423, shift - 6 secs - shifted ts 1729223417
-text - Charge., ts - 1729223424, shift - 0 secs - shifted ts 1729223424
-text - Season., ts - 1729223425, shift - 3 secs - shifted ts 1729223422
-text - Several., ts - 1729223426, shift - 14 secs - shifted ts 1729223412
-text - Not say., ts - 1729223427, shift - 2 secs - shifted ts 1729223425
-text - City eat., ts - 1729223428, shift - 3 secs - shifted ts 1729223425
-text - Character., ts - 1729223429, shift - 8 secs - shifted ts 1729223421
-text - Finally., ts - 1729223430, shift - 4 secs - shifted ts 1729223426
-text - Letter., ts - 1729223431, shift - 1 secs - shifted ts 1729223430
-text - Case., ts - 1729223432, shift - 8 secs - shifted ts 1729223424
-text - Word., ts - 1729223433, shift - 6 secs - shifted ts 1729223427
+text - Church., ts - 1729476924, shift - 0 secs - shifted ts 1729476924
+text - For., ts - 1729476925, shift - 0 secs - shifted ts 1729476925
+text - Have., ts - 1729476926, shift - 0 secs - shifted ts 1729476926
+text - Health., ts - 1729476927, shift - 0 secs - shifted ts 1729476927
+text - Join., ts - 1729476928, shift - 0 secs - shifted ts 1729476928
+text - Nice., ts - 1729476929, shift - 0 secs - shifted ts 1729476929
+text - New., ts - 1729476930, shift - 0 secs - shifted ts 1729476930
+text - Executive., ts - 1729476931, shift - 0 secs - shifted ts 1729476931
+text - Memory., ts - 1729476932, shift - 0 secs - shifted ts 1729476932
+text - Charge., ts - 1729476933, shift - 11 secs - shifted ts 1729476922
+text - Indeed., ts - 1729476934, shift - 0 secs - shifted ts 1729476934
+text - Say then., ts - 1729476935, shift - 0 secs - shifted ts 1729476935
+text - Eat nice., ts - 1729476936, shift - 0 secs - shifted ts 1729476936
+text - Possible., ts - 1729476937, shift - 0 secs - shifted ts 1729476937
+text - Protect., ts - 1729476938, shift - 0 secs - shifted ts 1729476938
+text - Shake., ts - 1729476939, shift - 0 secs - shifted ts 1729476939
+text - Newspaper., ts - 1729476940, shift - 0 secs - shifted ts 1729476940
+text - Language., ts - 1729476941, shift - 0 secs - shifted ts 1729476941
+text - Forward., ts - 1729476942, shift - 0 secs - shifted ts 1729476942
+text - Order., ts - 1729476943, shift - 0 secs - shifted ts 1729476943
+text - Thank., ts - 1729476944, shift - 0 secs - shifted ts 1729476944
+text - Growth., ts - 1729476945, shift - 0 secs - shifted ts 1729476945
+text - Structure., ts - 1729476946, shift - 0 secs - shifted ts 1729476946
+text - Those us., ts - 1729476947, shift - 0 secs - shifted ts 1729476947
+text - Decade., ts - 1729476948, shift - 0 secs - shifted ts 1729476948
+text - College., ts - 1729476949, shift - 0 secs - shifted ts 1729476949
+text - Along., ts - 1729476950, shift - 0 secs - shifted ts 1729476950
+text - Sense., ts - 1729476951, shift - 9 secs - shifted ts 1729476942
+text - Land skin., ts - 1729476952, shift - 0 secs - shifted ts 1729476952
+text - Service., ts - 1729476953, shift - 0 secs - shifted ts 1729476953
+text - While., ts - 1729476954, shift - 10 secs - shifted ts 1729476944
+text - Method., ts - 1729476955, shift - 0 secs - shifted ts 1729476955
+text - Spend., ts - 1729476956, shift - 14 secs - shifted ts 1729476942
+text - Drive., ts - 1729476957, shift - 0 secs - shifted ts 1729476957
 ```
 
 ## Beam Pipeline
 
-to be updated
+We develop an Apache Beam pipeline that separates droppable elements from the rest of the data. Droppable elements are those that come later when the watermark passes the window max timestamp plus allowed lateness. Using a timer in a *Stateful* DoFn, droppable data is separated from normal data and dispatched into a side output rather than being discarded silently, which is the default behaviour. Note that the pipeline works in a situation where droppable elements do not appear often, and thus the chance that a droppable element is delivered as the first element in a particular window is low.
+
+![](droppable.png#center)
 
 ### Shared Source
 
-We have multiple pipelines that read text messages from an input Kafka topic and write outputs to an output topic. Therefore, the data source and sink transforms are refactored into a utility module as shown below. Note that, the Kafka read and write methods has an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979).
+We have multiple pipelines that read text messages from an input Kafka topic and write outputs to an output topic. Therefore, the data source and sink transforms are refactored into a utility module as shown below. Note that, the Kafka read and write transforms have an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979). Note further that, by default, *timestamp policy* of the Kafak read transform is configured to use processing timestamp (wall clock), and it is not possible to simulate late data. We change it to use message creation time (`create_time_policy`) so that both the timestamp of elements and watermark propagation are based on Kafka message (creation) timestamp.
 
-`timestamp_policy=kafka.ReadFromKafka.create_time_policy`
 
 ```python
 # chapter3/io_utils.py
@@ -302,7 +321,15 @@ class WriteOutputsToKafka(beam.PTransform):
 
 ### Pipeline Source
 
-to be updated!
+Once messages are read from Kafka and assigned into a fixed window, the main transform (`SplitDroppable`) is applies to elements, which dispatches (droppable) late data into a side output. Specifically it performs
+* `Reify.Window()` - It converts an element in a PCollection into a tuple of (element, timestamp, window).
+* `beam.Map(to_kv) | beam.WindowInto(GlobalWindows()) ` - An element is changed into a key-value pair where the window is used as the key, followed by re-windowing into the *Global* window. Note that we should use the *Global* window to prevent from (late) elements being discarded silently when the watermark passes the window GC time (or the watermark passes the window max timestamp plus allowed lateness if you like).
+* `beam.ParDo(SplitDroppableDataFn(windowing=windowing))` - Elements are classified as (droppable) late or normal using the window GC timer and split into the main and side output accordningly.
+* `Rewindow(windowing=windowing)` - Elements in the main output is re-windowed according to its original window function while those in the droppable output are returned as they are.
+
+Below shows the sequence of transforms of the main transform.
+
+![](pipeline.png#center)
 
 ```python
 # chapter3/droppable_data_filter.py
@@ -555,7 +582,16 @@ As described in [this documentation](https://beam.apache.org/documentation/pipel
 4. Apply the transform to the input `PCollection` and save the resulting output `PCollection`.
 5. Use `PAssert` and its subclasses (or [testing utils](https://beam.apache.org/releases/pydoc/current/apache_beam.testing.util.html) in Python) to verify that the output `PCollection` contains the elements that you expect.
 
-to be updated
+There are two test cases. The first case has a pipeline that processes elements as follows, and it returns a single droppable element.
+
+* Watermark propagates to 0
+* First element arrives - value: *a*, timestamp 3 (normal)
+* Watermark propagates to 6.999
+* Second element arrives - value: *b*, timesteamp 4 (normal)
+* Watermark propagages to 7 (Any elements less then 7 will be considered as late!)
+* Third elements arrives - value: *c*, timestamp 0 (*late*)
+
+The second case shows a drawback of the pipeline logic where it treats a late element as normal if it comes as the first element. This is because, when such an element is delivered for the first time, the state is empty and timer is not set up properly. [Building Big Data Pipelines with Apache Beam](https://www.packtpub.com/en-us/product/building-big-data-pipelines-with-apache-beam-9781800564930) that this example is based on has a solution to fix this issue, and you may check the book if interested.
 
 ```python
 # chapter3/droppable_data_filter_test.py
@@ -688,14 +724,14 @@ OK (expected failures=1)
 
 #### Pipeline Execution
 
-Note that the Kafka bootstrap server is accessible on port *29092* outside the Docker network, and it can be accessed on *localhost:29092* from the Docker host machine and on *host.docker.internal:29092* from a Docker container that is launched with the host network. We use both types of the bootstrap server address - the former is used by a Kafka producer app that is discussed later and the latter by a Java IO expansion service, which is launched in a Docker container. Note further that, for the latter to work, we have to update the */etc/hosts* file by adding an entry for *host.docker.internal* as shown below. 
+Note that the Kafka bootstrap server is accessible on port *29092* outside the Docker network, and it can be accessed on *localhost:29092* from the Docker host machine and on *host.docker.internal:29092* from a Docker container that is launched with the host network. We use both types of the bootstrap server address - the former is used by the Kafka producer app and the latter by a Java IO expansion service, which is launched in a Docker container. Note further that, for the latter to work, we have to update the */etc/hosts* file by adding an entry for *host.docker.internal* as shown below. 
 
 ```bash
 cat /etc/hosts | grep host.docker.internal
 # 127.0.0.1       host.docker.internal
 ```
 
-We need to send messages into the input Kafka topic before executing the pipeline. Input text message can be sent by executing a Kafka text producer - `python utils/faker_shifted_gen.py`.
+We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - `python utils/faker_shifted_gen.py`.
 
 ![](input-messages.png#center)
 
@@ -709,10 +745,10 @@ python chapter3/droppable_data_filter.py --deprecated_read \
 	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
 ```
 
-to be updated
+On Flink UI, we see the pipeline has two tasks. The first task is until windowing elements in a fixed window while the latter executes the main transform and sends the normal and droppable elements into output topics respectively.
 
 ![](pipeline-dag.png#center)
 
-On Kafka UI, we can check the output message is a dictionary of a word and its length.
+On Kafka UI, we can check messages are sent to the normal and droppable output topics.
 
 ![](all-topics.png#center)

@@ -136,7 +136,7 @@ volumes:
     name: kafka_0_data
 ```
 
-Note that the Kafka bootstrap server is accessible on port *29092* outside the Docker network, and it can be accessed on *localhost:29092* from the Docker host machine and on *host.docker.internal:29092* from a Docker container that is launched with the host network. We use both types of the bootstrap server address - the former is used by a Kafka producer app that is discussed later and the latter by a Java IO expansion service, which is launched in a Docker container. Note further that, for the latter to work, we have to update the */etc/hosts* file by adding an entry for *host.docker.internal* as shown below. 
+Note that the Kafka bootstrap server is accessible on port *29092* outside the Docker network, and it can be accessed on *localhost:29092* from the Docker host machine and on *host.docker.internal:29092* from a Docker container that is launched with the host network. We use both types of the bootstrap server address - the former is used by the Kafka producer app and the latter by a Java IO expansion service, which is launched in a Docker container. Note further that, for the latter to work, we have to update the */etc/hosts* file by adding an entry for *host.docker.internal* as shown below. 
 
 ```bash
 cat /etc/hosts | grep host.docker.internal
@@ -300,7 +300,7 @@ Below shows how to start resources using the start-up script. We need to launch 
 
 ## Kafka Text Producer
 
-We create a Kafka producer using the [`kafka-python`](https://kafka-python.readthedocs.io/en/master/index.html) package. It generates text messages with the [Faker](https://faker.readthedocs.io/en/master/) package and sends them to an input topic. Note that message creation timestamp is shifted back randomly to simulate late messages. We can run the producer simply by executing the producer script.
+We create a Kafka producer using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package. It generates text messages with the [Faker](https://faker.readthedocs.io/en/master/) package and sends them to an input topic. Note that message creation timestamp is shifted back randomly to simulate late messages. We can run the producer simply by executing the producer script.
 
 ```python
 # utils/faker_gen.py
