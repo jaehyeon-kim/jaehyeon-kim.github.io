@@ -1,7 +1,7 @@
 ---
 title: Apache Beam Python Examples - Part 7 Separate Droppable Data into Side Output
 date: 2024-10-24
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -26,7 +26,7 @@ images: []
 description: 
 ---
 
-We develop an Apache Beam pipeline that separates droppable elements from the rest of the data. Droppable elements are those that come later when the watermark passes the window max timestamp plus allowed lateness. Using a timer in a *Stateful* DoFn, droppable data is separated from normal data and dispatched into a side output rather than being discarded silently, which is the default behaviour. Note that this pipeline works in a situation where droppable elements do not appear often, and thus the chance that a droppable element is delivered as the first element in a particular window is low.
+We develop an Apache Beam pipeline that separates *droppable *elements from the rest of the data. *Droppable* elements are those that come later when the watermark passes the window max timestamp plus allowed lateness. Using a timer in a *Stateful* DoFn, *droppable* data is separated from normal data and dispatched into a side output rather than being discarded silently, which is the default behaviour. Note that this pipeline works in a situation where *droppable* elements do not appear often, and thus the chance that a *droppable* element is delivered as the first element in a particular window is low.
 
 <!--more-->
 
@@ -182,7 +182,7 @@ class TextProducer:
             raise RuntimeError("fails to send a message") from e
 ```
 
-When we run the Kafka producer, it prints messags and associating timestamps. As mentioned, the *shifted* timestamp values are recorded as message timestamps.
+When we run the Kafka producer, it prints messages and associating timestamps. As mentioned, the *shifted* timestamp values are recorded as message timestamps.
 
 ```bash
 python utils/faker_shifted_gen.py 
@@ -224,13 +224,13 @@ text - Drive., ts - 1729476957, shift - 0 secs - shifted ts 1729476957
 
 ## Beam Pipeline
 
-We develop an Apache Beam pipeline that separates droppable elements from the rest of the data. Droppable elements are those that come later when the watermark passes the window max timestamp plus allowed lateness. Using a timer in a *Stateful* DoFn, droppable data is separated from normal data and dispatched into a side output rather than being discarded silently, which is the default behaviour. Note that this pipeline works in a situation where droppable elements do not appear often, and thus the chance that a droppable element is delivered as the first element in a particular window is low.
+We develop an Apache Beam pipeline that separates *droppable *elements from the rest of the data. *Droppable* elements are those that come later when the watermark passes the window max timestamp plus allowed lateness. Using a timer in a *Stateful* DoFn, *droppable* data is separated from normal data and dispatched into a side output rather than being discarded silently, which is the default behaviour. Note that this pipeline works in a situation where *droppable* elements do not appear often, and thus the chance that a *droppable* element is delivered as the first element in a particular window is low.
 
 ![](droppable.png#center)
 
 ### Shared Source
 
-We have multiple pipelines that read text messages from an input Kafka topic and write outputs to an output topic. Therefore, the data source and sink transforms are refactored into a utility module as shown below. Note that, the Kafka read and write transforms have an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979). Note further that, by default, *timestamp policy* of the Kafak read transform is configured to use processing timestamp (wall clock), and it is not possible to simulate late data. We change it to use message creation time (`create_time_policy`) instead so that both the timestamp of elements and watermark propagation are based on Kafka message (creation) timestamp.
+We have multiple pipelines that read text messages from an input Kafka topic and write outputs to an output topic. Therefore, the data source and sink transforms are refactored into a utility module as shown below. Note that, the Kafka read and write transforms have an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979). Note further that, by default, *timestamp policy* of the Kafka read transform is configured to use processing timestamp (wall clock), and it is not possible to simulate late data. We change it to use message creation time (`create_time_policy`) instead so that both the timestamp of elements and watermark propagation are based on Kafka message (creation) timestamp.
 
 
 ```python
@@ -321,11 +321,11 @@ class WriteOutputsToKafka(beam.PTransform):
 
 ### Pipeline Source
 
-Once messages are read from Kafka and assigned into a fixed window, the main transform (`SplitDroppable`) is applies to elements, which dispatches (droppable) late data into a side output. Specifically it performs
+Once messages are read from Kafka and assigned into a fixed window, the main transform (`SplitDroppable`) is applied to elements, which dispatches (*droppable*) late data into a side output. Specifically it performs
 * `Reify.Window()` - It converts an element in a PCollection into a tuple of *element*, *timestamp*, and *window*.
 * `beam.Map(to_kv) | beam.WindowInto(GlobalWindows())` - The tuple element is changed into a key-value pair by taking the *window* as the key, followed by re-windowing the key-value pair into the *Global* window. Note that we should use the *Global* window to prevent from (late) elements being discarded silently when the watermark passes the window GC time (or the watermark passes the window max timestamp plus allowed lateness if you like).
-* `beam.ParDo(SplitDroppableDataFn(windowing=windowing))` - Elements are classified as (droppable) late or normal using the window GC timer and split into the main and side output accordningly.
-* `Rewindow(windowing=windowing)` - Elements in the main output is re-windowed according to its original window function while those in the droppable output are returned as they are.
+* `beam.ParDo(SplitDroppableDataFn(windowing=windowing))` - Elements are classified as (*droppable*) late or normal using the window GC timer and split into the main and side output accordingly.
+* `Rewindow(windowing=windowing)` - Elements in the main output is re-windowed according to its original window function while those in the *droppable* output are returned as they are.
 
 Below shows the sequence of transforms of the main transform.
 
@@ -582,14 +582,14 @@ As described in [this documentation](https://beam.apache.org/documentation/pipel
 4. Apply the transform to the input `PCollection` and save the resulting output `PCollection`.
 5. Use `PAssert` and its subclasses (or [testing utils](https://beam.apache.org/releases/pydoc/current/apache_beam.testing.util.html) in Python) to verify that the output `PCollection` contains the elements that you expect.
 
-There are two test cases. The first case has a pipeline that processes elements as described in the following schedule. Therefore, it is expected to return a single droppable element.
+There are two test cases. The first case has a pipeline that processes elements as described in the following schedule. Therefore, it is expected to return a single *droppable* element.
 
 * Watermark propagates to 0
 * First element arrives - value: *a*, timestamp 3 (normal)
 * Watermark propagates to 6.999
-* Second element arrives - value: *b*, timesteamp 4 (normal)
-* Watermark propagages to 7 (Any elements less then 7 will be considered as late!)
-* Third elements arrives - value: *c*, timestamp 0 (*late*)
+* Second element arrives - value: *b*, timestamp 4 (normal)
+* Watermark propagates to 7 (Any elements less than 7 will be considered as late!)
+* Third element arrives - value: *c*, timestamp 0 (*late*)
 
 The second case shows a drawback of the pipeline logic where it treats a late element as normal if it comes as the first element. This is because, when such an element is delivered for the first time, the state is empty and timer is not set up properly. [Building Big Data Pipelines with Apache Beam](https://www.packtpub.com/en-us/product/building-big-data-pipelines-with-apache-beam-9781800564930) that this example is based on has a solution to fix this issue, and you may check the book if interested.
 
@@ -745,10 +745,10 @@ python chapter3/droppable_data_filter.py --deprecated_read \
 	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
 ```
 
-On Flink UI, we see the pipeline has two tasks. The first task is until windowing elements in a fixed window while the latter executes the main transform and sends the normal and droppable elements into output topics respectively.
+On Flink UI, we see the pipeline has two tasks. The first task is until windowing elements in a fixed window while the latter executes the main transform and sends the normal and *droppable* elements into output topics respectively.
 
 ![](pipeline-dag.png#center)
 
-On Kafka UI, we can check messages are sent to the normal and droppable output topics.
+On Kafka UI, we can check messages are sent to the normal and *droppable* output topics.
 
 ![](all-topics.png#center)
