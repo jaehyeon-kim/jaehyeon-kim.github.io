@@ -36,7 +36,7 @@ In the [previous post](/blog/2024-09-25-beam-examples-5), we continued discussin
 * [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4)
 * [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5)
 * [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](#) (this post)
-* Part 7 Separate Droppable Data into Side Output
+* [Part 7 Separate Droppable Data into Side Output](/blog/2024-10-24-beam-examples-7)
 * Part 8 Enhance Sport Activity Tracker with Runner Motivation
 * Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn
 * Part 10 Develop Streaming File Reader using Splittable DoFn
@@ -117,7 +117,7 @@ We develop an Apache Beam pipeline that accesses an external RPC service to augm
 
 ### Shared Source
 
-We have multiple pipelines that read text messages from an input Kafka topic and write outputs to an output topic. Therefore, the data source and sink transforms are refactored into a utility module as shown below. Note that, the Kafka read and write methods has an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979).
+We have multiple pipelines that read text messages from an input Kafka topic and write outputs to an output topic. Therefore, the data source and sink transforms are refactored into a utility module as shown below. Note that, the Kafka read and write transforms have an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979).
 
 ```python
 # chapter3/io_utils.py
@@ -582,14 +582,14 @@ OK
 
 #### Pipeline Execution
 
-Note that the Kafka bootstrap server is accessible on port *29092* outside the Docker network, and it can be accessed on *localhost:29092* from the Docker host machine and on *host.docker.internal:29092* from a Docker container that is launched with the host network. We use both types of the bootstrap server address - the former is used by a Kafka producer app that is discussed later and the latter by a Java IO expansion service, which is launched in a Docker container. Note further that, for the latter to work, we have to update the */etc/hosts* file by adding an entry for *host.docker.internal* as shown below. 
+Note that the Kafka bootstrap server is accessible on port *29092* outside the Docker network, and it can be accessed on *localhost:29092* from the Docker host machine and on *host.docker.internal:29092* from a Docker container that is launched with the host network. We use both types of the bootstrap server address - the former is used by the Kafka producer app and the latter by a Java IO expansion service, which is launched in a Docker container. Note further that, for the latter to work, we have to update the */etc/hosts* file by adding an entry for *host.docker.internal* as shown below. 
 
 ```bash
 cat /etc/hosts | grep host.docker.internal
 # 127.0.0.1       host.docker.internal
 ```
 
-We need to send messages into the input Kafka topic before executing the pipeline. Input text message can be sent by executing a Kafka text producer - `python utils/faker_gen.py`.
+We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - `python utils/faker_shifted_gen.py`.
 
 ![](input-messages.png#center)
 
@@ -600,7 +600,7 @@ When executing the pipeline, we specify only a single known argument that enable
 ## exclude --flink_master if using an embedded cluster
 python chapter3/rpc_pardo_stateful.py --deprecated_read \
     --job_name=rpc-pardo-stateful --runner FlinkRunner --flink_master=localhost:8081 \
-  --streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
+    --streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
 ```
 
 On Flink UI, we see the pipeline has two tasks. The first task is until converting words into key-value pairs while the latter executes the main transform and sends output messages to the Kafka topic.
