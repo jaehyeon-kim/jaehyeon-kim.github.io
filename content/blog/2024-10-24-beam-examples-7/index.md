@@ -26,7 +26,7 @@ images: []
 description: 
 ---
 
-We develop an Apache Beam pipeline that separates *droppable *elements from the rest of the data. *Droppable* elements are those that come later when the watermark passes the window max timestamp plus allowed lateness. Using a timer in a *Stateful* DoFn, *droppable* data is separated from normal data and dispatched into a side output rather than being discarded silently, which is the default behaviour. Note that this pipeline works in a situation where *droppable* elements do not appear often, and thus the chance that a *droppable* element is delivered as the first element in a particular window is low.
+We develop an Apache Beam pipeline that separates *droppable* elements from the rest of the data. *Droppable* elements are those that come later when the watermark passes the window max timestamp plus allowed lateness. Using a timer in a *Stateful* DoFn, *droppable* data is separated from normal data and dispatched into a side output rather than being discarded silently, which is the default behaviour. Note that this pipeline works in a situation where *droppable* elements do not appear often, and thus the chance that a *droppable* element is delivered as the first element in a particular window is low.
 
 <!--more-->
 
