@@ -63,7 +63,7 @@ volumes:
     name: postgres_data
 ```
 
-The bootstrap script creates a dedicated schema named *ecommerce*, and sets the schema as the default search path. It ends up creating a custom [publication](https://www.postgresql.org/docs/current/logical-replication-publication.html) for all tables in the *ecommerce* table.
+The bootstrap script creates a dedicated schema named *ecommerce* and sets the schema as the default search path. It ends up creating a custom [publication](https://www.postgresql.org/docs/current/logical-replication-publication.html) for all tables in the *ecommerce* schema.
 
 ```sql
 -- config/postgres/bootstrap.sql
@@ -82,7 +82,7 @@ CREATE PUBLICATION cdc_publication FOR TABLES IN SCHEMA ecommerce;
 
 ### Debezium Server
 
-The Debezium server configuration is fairly simple.
+The Debezium server configuration is fairly simple, and the application properties are supplied by volume mapping.
 
 ```yaml
 # docker-compose.yml
@@ -100,13 +100,13 @@ services:
 ...
 ```
 
-The application properties are split into four sections.
+The application properties can be grouped into four sections.
 - Sink configuration
     - The sink type is set up as *pubsub*, and the address of the Pub/Sub emulator is specified as an extra.
 - Source configuration
     - The PostgreSQL source connector class is specified, followed by adding the database details.
-    - Only two tables in the *ecommerce* schema are indicated, and the output plugin and replication names are configuring as required.
-    - Note that the topic prefix (*debezium.source.topic.prefix*) is mandatory, and the Debezium server expects corresponding Pub/Sub topics named `<prefix>.<schema>.<table-name>` exist. Therefore, we need to create topics for the two tables before we start the server (if there are records already) or before we send records to the database (if there is no record).
+    - Only two tables in the *ecommerce* schema are included, and the output plugin and replication names are configuring as required.
+    - Note that the topic prefix (*debezium.source.topic.prefix*) is mandatory, and the Debezium server expects the corresponding Pub/Sub topic exists where its name is in the `<prefix>.<schema>.<table-name>` format. Therefore, we need to create topics for the two tables before we start the server (if there are records already) or before we send records to the database (if there is no record).
 - Message transform
     - The change messages are simplified using a [single message transform](https://debezium.io/documentation/reference/stable/transformations/event-flattening.html). With this transform, the message includes only a single payload that keeps record attributes and additional message metadata as specified in `debezium.transforms.unwrap.add.fields`.
 - Log configuration
@@ -189,7 +189,7 @@ services:
 
 ## Solution Deployment
 
-### Data Generator
+We can start the docker-compose services by `docker-compose up -d`. Then, we should create the topics into which the change messages are ingested. The topics and subscriptions to them can be created by the following Python script.
 
 ```python
 # ps_setup.py
@@ -230,6 +230,8 @@ if __name__ == "__main__":
     ps_utils.show_resources("subscriptions", args.emulator_host, args.project_id)
 ```
 
+Once executed, the topics and subscriptions are created as shown below.
+
 ```bash
 python ps_setup.py 
 projects/test-project/topics/demo.ecommerce.order_items
@@ -237,6 +239,10 @@ projects/test-project/topics/demo.ecommerce.orders
 projects/test-project/subscriptions/demo.ecommerce.order_items.sub
 projects/test-project/subscriptions/demo.ecommerce.orders.sub
 ```
+
+### Data Generator
+
+The *theLook eCommerce* dataset has seven entities and five of them are generated dynamically. In each iteration, a *user* record is created, and it has zero or more orders. An *order* record creates zero or more order items in turn. Finally, an *order item* record creates zero or more *event* and *inventory item* objects. Once all records are generated, they are ingested into the relevant tables using pandas' `to_sql` method.
 
 ```python
 # data_gen.py
@@ -374,6 +380,8 @@ if __name__ == "__main__":
     main(args.wait_for, args.max_iter, if_exists=args.if_exists)
 ```
 
+In the following example, we see data is generated in every two seconds (`-w 2`).
+
 ```bash
 python data_gen.py -w 2
 INFO:root:Generate theLook eCommerce data...
@@ -406,9 +414,13 @@ INFO:root:append records, table - inventory_items, # records - 9
 INFO:root:append records, table - events, # records - 19
 ```
 
+When the data is ingested into the database, we see the following tables are created in the *ecommerce* schema.
+
 ![](diagram.png#center)
 
 ### Data Subscriber
+
+The subscriber expects a topic name as an argument (default *demo.ecommerce.orders*) and assumes a subscription of the topic is named in the `<topic-name>.sub` format. While it subscribes a topic, it prints the payload attribute of each message, followed by acknowledging it.
 
 ```python
 # ps_sub.py
@@ -456,6 +468,8 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             future.cancel()
 ```
+
+Below shows an example of subscribing the topic that keeps the change messages of the orders table.
 
 ```bash
 python ps_sub.py -t demo.ecommerce.orders
