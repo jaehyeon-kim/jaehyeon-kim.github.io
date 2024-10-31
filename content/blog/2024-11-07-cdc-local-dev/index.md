@@ -25,11 +25,17 @@ images: []
 description:
 ---
 
-To be updated
+*Change data capture* (CDC) is a data integration pattern to track changes in a database so that actions can be taken using the changed data. [*Debezium*](https://debezium.io/) is probably the most popular open source platform for CDC. Originally providing Kafka source connectors, it also supports a ready-to-use application called [Debezium server](https://debezium.io/documentation/reference/stable/operations/debezium-server.html). The standalone application can be used to stream change events to other messaging infrastructure such as Google Cloud Pub/Sub, Amazon Kinesis and Apache Pulsar. In this post, we develop a CDC solution locally using Docker. The source of the [theLook eCommerce](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) is modified to generate data continuously, and the data is inserted into multiple tables of a PostgreSQL database. Among those tables, two of them are tracked by the Debezium server, and it pushes row-level changes of those tables into Pub/Sub topics on the [Pub/Sub emulator](https://cloud.google.com/pubsub/docs/emulator). Finally, messages of the topics are read by a Python application.
 
 <!--more-->
 
-## PostgreSQL
+## Docker Compose Services
+
+We have three docker-compose services, and each service is illustrated separately. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/cdc-local).
+
+### PostgreSQL
+
+A PostgreSQL database server is configured so that it enables logical replication (`wal_level=logical`) at startup. It is necessary because we will be using the standard logical decoding output plug-in in PostgreSQL 10+ - see [this page](https://debezium.io/documentation/reference/stable/connectors/postgresql.html#postgresql-overview) for details.
 
 ```yaml
 # docker-compose.yml
@@ -57,6 +63,8 @@ volumes:
     name: postgres_data
 ```
 
+The bootstrap script creates a dedicated schema named *ecommerce*, and sets the schema as the default search path. It ends up creating a custom [publication](https://www.postgresql.org/docs/current/logical-replication-publication.html) for all tables in the *ecommerce* table.
+
 ```sql
 -- config/postgres/bootstrap.sql
 CREATE SCHEMA ecommerce;
@@ -72,7 +80,9 @@ ALTER database "develop" SET search_path TO ecommerce;
 CREATE PUBLICATION cdc_publication FOR TABLES IN SCHEMA ecommerce;
 ```
 
-## Debezium Server
+### Debezium Server
+
+The Debezium server configuration is fairly simple.
 
 ```yaml
 # docker-compose.yml
@@ -82,11 +92,6 @@ services:
   debezium:
     image: debezium/server:3.0
     container_name: debezium
-    environment:
-      - PUBSUB_EMULATOR_HOST=pubsub:8085
-      - PUBSUB_EMULATOR_NO_AUTH=true
-    ports:
-      - "8080:8080"
     volumes:
       - ./config/debezium:/debezium/config
     depends_on:
@@ -94,6 +99,18 @@ services:
     restart: always
 ...
 ```
+
+The application properties are split into four sections.
+- Sink configuration
+    - The sink type is set up as *pubsub*, and the address of the Pub/Sub emulator is specified as an extra.
+- Source configuration
+    - The PostgreSQL source connector class is specified, followed by adding the database details.
+    - Only two tables in the *ecommerce* schema are indicated, and the output plugin and replication names are configuring as required.
+    - Note that the topic prefix (*debezium.source.topic.prefix*) is mandatory, and the Debezium server expects corresponding Pub/Sub topics named `<prefix>.<schema>.<table-name>` exist. Therefore, we need to create topics for the two tables before we start the server (if there are records already) or before we send records to the database (if there is no record).
+- Message transform
+    - The change messages are simplified using a [single message transform](https://debezium.io/documentation/reference/stable/transformations/event-flattening.html). With this transform, the message includes only a single payload that keeps record attributes and additional message metadata as specified in `debezium.transforms.unwrap.add.fields`.
+- Log configuration
+    - The default log format is JSON, and it is disabled to produce log messages as console outputs for ease of troubleshooting.
 
 ```properties
 # config/debezium/application.properties
@@ -129,6 +146,8 @@ quarkus.log.file.enable=false
 quarkus.log.level=INFO
 ```
 
+Below shows an output payload of one of the tables. Those that are prefixed by double underscore (`__`) are message metadata.
+
 ```json
 {
   "order_id": "5db78495-2d65-4ebf-871f-cdc66eb1ed61",
@@ -150,7 +169,9 @@ quarkus.log.level=INFO
 }
 ```
 
-## Pub/Sub Emulator
+### Pub/Sub Emulator
+
+The Pub/Sub emulator is started as a gcloud component on port 8085.
 
 ```yaml
 # docker-compose.yml
@@ -166,7 +187,56 @@ services:
 ...
 ```
 
-## Data Generator
+## Solution Deployment
+
+### Data Generator
+
+```python
+# ps_setup.py
+import os
+import argparse
+
+from src import ps_utils
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Create PubSub resources")
+    parser.add_argument(
+        "--emulator-host",
+        "-e",
+        default="localhost:8085",
+        help="PubSub emulator host address",
+    )
+    parser.add_argument(
+        "--project-id", "-p", default="test-project", help="GCP project id"
+    )
+    parser.add_argument(
+        "--topics",
+        "-t",
+        action="append",
+        default=["demo.ecommerce.orders", "demo.ecommerce.order_items"],
+        help="PubSub topic names",
+    )
+    args = parser.parse_args()
+    os.environ["PUBSUB_EMULATOR_HOST"] = args.emulator_host
+    os.environ["PUBSUB_PROJECT_ID"] = args.project_id
+
+    for name in set(args.topics):
+        ps_utils.create_topic(project_id=args.project_id, topic_name=name)
+        ps_utils.create_subscription(
+            project_id=args.project_id, sub_name=f"{name}.sub", topic_name=name
+        )
+    ps_utils.show_resources("topics", args.emulator_host, args.project_id)
+    ps_utils.show_resources("subscriptions", args.emulator_host, args.project_id)
+```
+
+```bash
+python ps_setup.py 
+projects/test-project/topics/demo.ecommerce.order_items
+projects/test-project/topics/demo.ecommerce.orders
+projects/test-project/subscriptions/demo.ecommerce.order_items.sub
+projects/test-project/subscriptions/demo.ecommerce.orders.sub
+```
 
 ```python
 # data_gen.py
@@ -338,54 +408,7 @@ INFO:root:append records, table - events, # records - 19
 
 ![](diagram.png#center)
 
-## Data Subscriber
-
-```python
-# ps_setup.py
-import os
-import argparse
-
-from src import ps_utils
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Create PubSub resources")
-    parser.add_argument(
-        "--emulator-host",
-        "-e",
-        default="localhost:8085",
-        help="PubSub emulator host address",
-    )
-    parser.add_argument(
-        "--project-id", "-p", default="test-project", help="GCP project id"
-    )
-    parser.add_argument(
-        "--topics",
-        "-t",
-        action="append",
-        default=["demo.ecommerce.orders", "demo.ecommerce.order_items"],
-        help="PubSub topic names",
-    )
-    args = parser.parse_args()
-    os.environ["PUBSUB_EMULATOR_HOST"] = args.emulator_host
-    os.environ["PUBSUB_PROJECT_ID"] = args.project_id
-
-    for name in set(args.topics):
-        ps_utils.create_topic(project_id=args.project_id, topic_name=name)
-        ps_utils.create_subscription(
-            project_id=args.project_id, sub_name=f"{name}.sub", topic_name=name
-        )
-    ps_utils.show_resources("topics", args.emulator_host, args.project_id)
-    ps_utils.show_resources("subscriptions", args.emulator_host, args.project_id)
-```
-
-```bash
-python ps_setup.py 
-projects/test-project/topics/demo.ecommerce.order_items
-projects/test-project/topics/demo.ecommerce.orders
-projects/test-project/subscriptions/demo.ecommerce.order_items.sub
-projects/test-project/subscriptions/demo.ecommerce.orders.sub
-```
+### Data Subscriber
 
 ```python
 # ps_sub.py
@@ -417,7 +440,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--topic",
         "-t",
-        required=True,
         default="demo.ecommerce.orders",
         help="PubSub topic name",
     )
