@@ -42,3 +42,4 @@ deserializers
 lakehouse
 dbt
 utilise
+gcloud
