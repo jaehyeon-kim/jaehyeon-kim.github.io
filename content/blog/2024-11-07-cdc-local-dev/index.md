@@ -90,7 +90,7 @@ version: "3"
 services:
 ...
   debezium:
-    image: debezium/server:3.0
+    image: debezium/server:3.0.0.Final
     container_name: debezium
     volumes:
       - ./config/debezium:/debezium/config
