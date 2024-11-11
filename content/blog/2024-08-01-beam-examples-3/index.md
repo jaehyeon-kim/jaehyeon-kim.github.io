@@ -42,7 +42,7 @@ In this post, we develop two Apache Beam pipelines that track sport activities o
 
 ## Development Environment
 
-The development environment has an Apache Flink cluster and Apache Kafka cluster and [gRPC](https://grpc.io/) server - gRPC server will be used in later posts. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
+The development environment has an Apache Flink cluster and Apache Kafka cluster and [gRPC](https://grpc.io/) server. The gRPC server will be used in Part 4 to 6. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
 
 ### Manage Environment
 

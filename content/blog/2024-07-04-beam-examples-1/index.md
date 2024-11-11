@@ -42,7 +42,7 @@ In this series, we develop [Apache Beam](https://beam.apache.org/) Python pipeli
 
 ## Development Environment
 
-The development environment has an Apache Flink cluster, Apache Kafka cluster and [gRPC](https://grpc.io/) Server. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
+The development environment has an Apache Flink cluster, Apache Kafka cluster and [gRPC](https://grpc.io/) Server. The gRPC server will be used in Part 4 to 6. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
 
 ### Flink Cluster
 
