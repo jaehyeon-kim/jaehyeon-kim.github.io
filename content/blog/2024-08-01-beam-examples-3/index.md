@@ -376,13 +376,14 @@ class WriteMetricsToKafka(beam.PTransform):
         self,
         bootstrap_servers: str,
         topic: str,
-        deprecated_read: bool,
+        deprecated_read: bool, # TO DO: remove as it applies only to ReadFromKafka
         label: str | None = None,
     ):
         super().__init__(label)
         self.boostrap_servers = bootstrap_servers
         self.topic = topic
-        self.expansion_service = None
+        # TO DO: remove as it applies only to ReadFromKafka
+        self.expansion_service = None        
         if deprecated_read:
             self.expansion_service = kafka.default_io_expansion_service(
                 ["--experiments=use_deprecated_read"]
