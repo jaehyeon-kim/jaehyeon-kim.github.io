@@ -26,7 +26,7 @@ images: []
 description: 
 ---
 
-to be updated!!!!!!!!!!!!!!!!
+In [Part 3](/blog/2024-08-01-beam-examples-3), we developed a Beam pipeline that tracks sport activities of users and outputs their speeds periodically. While reporting such values is useful for users on its own, we can provide more engaging information to users if we have a pipeline that reports pacing of their activities over periods. For example, if a user has a performance goal and he/she is underperforming for multiple periods, we can send a message to encourage him/her to work harder. In this post, we develop a new pipeline that tracks user activities and reports pacing info by comparing short term metrics to long term counterparts.
 
 <!--more-->
 
@@ -224,41 +224,41 @@ We can execute the producer app after starting the Kafka cluster. Once executed,
 
 ```bash
 python utils/sport_tracker_gen.py 
-user0   97      1722127107.0654943
-user1   56      1722127107.0654943
-user2   55      1722127107.0654943
-user3   55      1722127107.0654943
-user4   95      1722127107.0654943
+user0   78      1731565423.0311885
+user1   13      1731565423.0311885
+user2   108     1731565423.0311885
+user3   64      1731565423.0311885
+user4   92      1731565423.0311885
 ===========================
-user0   88      1722127107.1854753
-user1   49      1722127107.1854813
-user2   55      1722127107.1854827
-user3   61      1722127107.185484
-user4   88      1722127107.1854854
+user0   87      1731565423.1549027
+user1   22      1731565423.154912
+user2   116     1731565423.1549146
+user3   67      1731565423.1549163
+user4   99      1731565423.1549182
 ===========================
 ...
 ```
 
-Also, we can check the input messages using Kafka UI on *localhost:8080*.
+Also, we can check the input messages using Kafka UI on *localhost:8080*. to be updated!
 
 ![](input-messages.png#center)
 
 ## Beam Pipeline
 
-to be updated...
+We develop a Beam pipeline that tracks sport activities of users and reports pacing details by comparing short term and long term metrics.
 
 ### Shared Source
 
 * `Position` / `PositionCoder`
     - The input text messages are converted into a custom type (`Position`). Therefore, we need to create its type definition and register the instruction about how to encode/decode its value using a [coder](https://beam.apache.org/documentation/programming-guide/#data-encoding-and-type-safety) (`PositionCoder`). Note that, without registering the coder, the custom type cannot be processed by a portable runner. 
 * `ComputeBoxedMetrics`
-    - to be updated
+    - This composite transform begins with placing activity tracking elements into a global window and pushes them into the `ToMetricFn` *DoFn*.
 * `ToMetricFn`
-    - to be updated
+    - This is a stateful *DoFn* that buffers the tracking elements and flushes them periodically. Once flushed, it computes a metric record recursively and returns a tuple of the key (user ID) and metric together with the associating timestamp. Note that the timestamp of the output tuple is taken from the first element's timestamp.
 * `Metric`
-    - to be updated
+    - A custom data type that keeps user activity metrics.
 * `MeanPaceCombineFn`
-    - to be updated
+    - A *CombineFn* that accumulates user activity metrics.
 * `ReadPositionsFromKafka`
     - It reads messages from a Kafka topic, and returns tuple elements of user ID and position. We need to specify the output type hint for a portable runner to recognise the output type correctly. Note that, the Kafka read and write transforms have an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979).
 * `PreProcessInput`
@@ -279,7 +279,7 @@ import apache_beam as beam
 from apache_beam.io import kafka
 from apache_beam import pvalue
 from apache_beam.transforms.util import Reify
-from apache_beam.transforms.window import GlobalWindows, TimestampedValue, BoundedWindow
+from apache_beam.transforms.window import GlobalWindows, TimestampedValue
 from apache_beam.transforms.timeutil import TimeDomain
 from apache_beam.transforms.userstate import (
     ReadModifyWriteStateSpec,
@@ -524,8 +524,18 @@ class WriteNotificationsToKafka(beam.PTransform):
 
 ### Pipeline Source
 
-* `SportTrackerMotivation`
-    - to be updated
+The main transform is performed by `SportTrackerMotivation`. It begins with producing metrics using the `ComputeBoxedMetrics` transform. Then, those metrics are averaged *within* a short period (default to 20 seconds) as well as *across* a long period (default to 100 seconds). A fixed window is applied to obtain short averages while computing long averages involves more steps.
+
+1. A sliding window is applied where the size and period are the long and short periods respectively. 
+2. The average in each of the sliding windows is computed. 
+3. The long averages are re-windowed to a fixed window that has the same size to the short averages.
+    - It makes the long averages are placed in comparable periods to the short averages.
+
+After both the short and long averages are obtained, they are joined by the `CoGroupByKey` transform followed by generating pacing details of user activities. Note that we can also join the short/long averages using a side input - see [this link](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-pipelines/chapter4/sport_tracker_motivation_side_inputs.py) for details.
+
+The pipeline can be better illustrated with an example. Let say we have three positions of a user, and two metrics can be obtained recursively by comparing a position and its previous one. The short averages are computed with the metrics that belong to `[20, 40)` and `[60, 80)` windows. The long averages are obtained across multiple periods. Basically the metrics that belong to `[Long Avg Window Start, Window End)` are included in computing the long averages. Note that, as the long averages are re-windowed, joining is based on `[Window Start, Window End)`.
+
+![](breakdown.png#center)
 
 ```python
 # chapter4/sport_tracker_motivation_co_gbk.py
@@ -583,7 +593,7 @@ class SportTrackerMotivation(beam.PTransform):
                     status = "outperforming"
             if self.verbose and element[0] == "user0":
                 logging.info(
-                    f"SportTrackerMotivation track {element[0]}, short average {round(short_avg, 2)}, long average {round(long_avg, 2)}, status - {status}"
+                    f"SportTrackerMotivation track {element[0]}, short average {short_avg}, long average {long_avg}, status - {status}"
                 )
             if status is None:
                 return []
@@ -685,7 +695,7 @@ As described in [this documentation](https://beam.apache.org/documentation/pipel
 4. Apply the transform to the input `PCollection` and save the resulting output `PCollection`.
 5. Use `PAssert` and its subclasses (or [testing utils](https://beam.apache.org/releases/pydoc/current/apache_beam.testing.util.html) in Python) to verify that the output `PCollection` contains the elements that you expect.
 
-![](breakdown.png#center)
+We have two test cases assuming bounded and unbounded scenarios. Each includes sport activities of two users, and we can obtain the expected outputs with the reasoning illustrated earlier.
 
 ```python
 # chapter4/sport_tracker_motivation_co_gbk_test.py
@@ -810,16 +820,14 @@ cat /etc/hosts | grep host.docker.internal
 
 We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - `python utils/sport_tracker_gen.py`.
 
-![](input-messages.png#center)
-
 When executing the pipeline, we specify only a single known argument that enables to use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments (`bootstrap_servers`, `input_topic` ...). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
 
 ```bash
 ## start the beam pipeline
 ## exclude --flink_master if using an embedded cluster
-## add --verbose to check log messages
+## add --verbose to check detailed log messages
 python chapter4/sport_tracker_motivation_co_gbk.py --deprecated_read \
-	--job_name=droppable-data-filter --runner FlinkRunner --flink_master=localhost:8081 \
+	--job_name=sport-tracker-motivation --runner FlinkRunner --flink_master=localhost:8081 \
 	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
 ```
 
@@ -827,6 +835,6 @@ On Flink UI, we see the pipeline has two tasks. The first task is until windowin
 
 ![](pipeline-dag.png#center)
 
-On Kafka UI, we can check messages are sent to the normal and *droppable* output topics.
+On Kafka UI, we can check the output message is a dictionary of user ID and speed.
 
-![](all-topics.png#center)
+![](output-messages.png#center)
