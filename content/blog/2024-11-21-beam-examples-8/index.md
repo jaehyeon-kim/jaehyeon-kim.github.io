@@ -26,7 +26,7 @@ images: []
 description: 
 ---
 
-In [Part 3](/blog/2024-08-01-beam-examples-3), we developed a Beam pipeline that tracks sport activities of users and outputs their speeds periodically. While reporting such values is useful for users on its own, we can provide more engaging information to users if we have a pipeline that reports pacing of their activities over periods. For example, if a user has a performance goal and he/she is underperforming for multiple periods, we can send a message to encourage him/her to work harder. In this post, we develop a new pipeline that tracks user activities and reports pacing info by comparing short term metrics to long term counterparts.
+In [Part 3](/blog/2024-08-01-beam-examples-3), we developed a Beam pipeline that tracks sport activities of users and outputs their speeds periodically. While reporting such values is useful for users on its own, we can provide more engaging information to users if we have a pipeline that reports pacing of their activities over periods. For example, we can send a message to encourage a user to work harder if he/she has a performance goal and is underperforming for some periods. In this post, we develop a new pipeline that tracks user activities and reports pacing details by comparing short term metrics to their long term counterparts.
 
 <!--more-->
 
@@ -239,13 +239,13 @@ user4   99      1731565423.1549182
 ...
 ```
 
-Also, we can check the input messages using Kafka UI on *localhost:8080*. to be updated!
+Also, we can check the input messages using Kafka UI on *localhost:8080*.
 
 ![](input-messages.png#center)
 
 ## Beam Pipeline
 
-We develop a Beam pipeline that tracks sport activities of users and reports pacing details by comparing short term and long term metrics.
+We develop a new pipeline that tracks user activities and reports pacing details by comparing short term metrics to their long term counterparts.
 
 ### Shared Source
 
@@ -254,17 +254,17 @@ We develop a Beam pipeline that tracks sport activities of users and reports pac
 * `ComputeBoxedMetrics`
     - This composite transform begins with placing activity tracking elements into a global window and pushes them into the `ToMetricFn` *DoFn*.
 * `ToMetricFn`
-    - This is a stateful *DoFn* that buffers the tracking elements and flushes them periodically. Once flushed, it computes a metric record recursively and returns a tuple of the key (user ID) and metric together with the associating timestamp. Note that the timestamp of the output tuple is taken from the first element's timestamp.
+    - This is a stateful *DoFn* that buffers the tracking elements and flushes them periodically. Once flushed, it computes a metric record recursively and returns a tuple of the key (user ID) and metric together with the associating timestamp. The timestamp of the output tuple is taken from the first element's timestamp.
 * `Metric`
-    - A custom data type that keeps user activity metrics.
+    - This is a custom data type that keeps user activity metrics.
 * `MeanPaceCombineFn`
-    - A *CombineFn* that accumulates user activity metrics.
+    - This *CombineFn* accumulates user activity metrics and computes an average speed.
 * `ReadPositionsFromKafka`
     - It reads messages from a Kafka topic, and returns tuple elements of user ID and position. We need to specify the output type hint for a portable runner to recognise the output type correctly. Note that, the Kafka read and write transforms have an argument called `deprecated_read`, which forces to use the legacy read when it is set to *True*. We will use the legacy read in this post to prevent a problem that is described in this [GitHub issue](https://github.com/apache/beam/issues/20979).
 * `PreProcessInput`
     - This is a composite transform that converts an input text message into a tuple of user ID and position as well as assigns a timestamp value into an individual element.
-* `WriteMetricsToKafka`
-    - It sends output messages to a Kafka topic. Each message is a tuple of user ID and speed. Note that the input type hint is necessary when the inputs are piped from a transform by *Beam SQL*.
+* `WriteNotificationsToKafka`
+    - It sends output messages to a Kafka topic. Each message is a tuple of track (user ID) and notification.
 
 ```python
 # chapter4/sport_tracker_utils.py
@@ -524,16 +524,16 @@ class WriteNotificationsToKafka(beam.PTransform):
 
 ### Pipeline Source
 
-The main transform is performed by `SportTrackerMotivation`. It begins with producing metrics using the `ComputeBoxedMetrics` transform. Then, those metrics are averaged *within* a short period (default to 20 seconds) as well as *across* a long period (default to 100 seconds). A fixed window is applied to obtain short averages while computing long averages involves more steps.
+The main transform is performed by `SportTrackerMotivation`. It begins with producing metrics using the `ComputeBoxedMetrics` transform. Then, those metrics are averaged *within* a short period (default to 20 seconds) as well as *across* a long period (default to 100 seconds). A fixed window is applied to obtain short averages while computing long averages involves more steps as illustrated below.
 
 1. A sliding window is applied where the size and period are the long and short periods respectively. 
 2. The average in each of the sliding windows is computed. 
 3. The long averages are re-windowed to a fixed window that has the same size to the short averages.
-    - It makes the long averages are placed in comparable periods to the short averages.
+    - It makes the long averages are placed in comparable windows to the short averages.
 
 After both the short and long averages are obtained, they are joined by the `CoGroupByKey` transform followed by generating pacing details of user activities. Note that we can also join the short/long averages using a side input - see [this link](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-pipelines/chapter4/sport_tracker_motivation_side_inputs.py) for details.
 
-The pipeline can be better illustrated with an example. Let say we have three positions of a user, and two metrics can be obtained recursively by comparing a position and its previous one. The short averages are computed with the metrics that belong to `[20, 40)` and `[60, 80)` windows. The long averages are obtained across multiple periods. Basically the metrics that belong to `[Long Avg Window Start, Window End)` are included in computing the long averages. Note that, as the long averages are re-windowed, joining is based on `[Window Start, Window End)`.
+The pipeline can be better illustrated with an example. Let say we have three positions of a user, and two metric records can be obtained recursively by comparing a position and its previous one. The short averages are computed with the metrics that belong to `[20, 40)` and `[60, 80)` windows. On the other hand, the long averages are obtained across multiple windows by including all metrics that fall in `[Long Avg Window Start, Window End)`. Note that, as the long averages are re-windowed, joining is based on `[Window Start, Window End)`. We end up having two matching windows and the notification values are obtained by comparing the short and long averages.
 
 ![](breakdown.png#center)
 
@@ -831,10 +831,10 @@ python chapter4/sport_tracker_motivation_co_gbk.py --deprecated_read \
 	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
 ```
 
-On Flink UI, we see the pipeline has two tasks. The first task is until windowing elements in a fixed window while the latter executes the main transform and sends the normal and *droppable* elements into output topics respectively.
+On Flink UI, we see the pipeline has multiple tasks. Notably the tasks that compute the short and long averages are split and executed in parallel, and the outcomes are combined subsequently. 
 
 ![](pipeline-dag.png#center)
 
-On Kafka UI, we can check the output message is a dictionary of user ID and speed.
+On Kafka UI, we can check the output message is a dictionary of track (user ID) and notification.
 
 ![](output-messages.png#center)
