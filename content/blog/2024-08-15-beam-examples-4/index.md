@@ -37,7 +37,7 @@ In this post, we develop an Apache Beam pipeline where the input data is augment
 * [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5)
 * [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6)
 * [Part 7 Separate Droppable Data into Side Output](/blog/2024-10-24-beam-examples-7)
-* Part 8 Enhance Sport Activity Tracker with Runner Motivation
+* [Part 8 Enhance Sport Activity Tracker with Runner Motivation](/blog/2024-11-21-beam-examples-8)
 * Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn
 * Part 10 Develop Streaming File Reader using Splittable DoFn
 
@@ -342,12 +342,13 @@ class WriteOutputsToKafka(beam.PTransform):
         self,
         bootstrap_servers: str,
         topic: str,
-        deprecated_read: bool,
+        deprecated_read: bool, # TO DO: remove as it applies only to ReadFromKafka
         label: str | None = None,
     ) -> None:
         super().__init__(label)
         self.boostrap_servers = bootstrap_servers
         self.topic = topic
+        # TO DO: remove as it applies only to ReadFromKafka
         self.expansion_service = None
         if deprecated_read:
             self.expansion_service = kafka.default_io_expansion_service(

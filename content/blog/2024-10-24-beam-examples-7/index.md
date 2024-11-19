@@ -37,13 +37,13 @@ We develop an Apache Beam pipeline that separates *droppable* elements from the 
 * [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5)
 * [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6)
 * [Part 7 Separate Droppable Data into Side Output](#) (this post)
-* Part 8 Enhance Sport Activity Tracker with Runner Motivation
+* [Part 8 Enhance Sport Activity Tracker with Runner Motivation](/blog/2024-11-21-beam-examples-8)
 * Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn
 * Part 10 Develop Streaming File Reader using Splittable DoFn
 
 ## Development Environment
 
-The development environment has an Apache Flink cluster, Apache Kafka cluster and [gRPC](https://grpc.io/) server. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
+The development environment has an Apache Flink cluster, Apache Kafka cluster and [gRPC](https://grpc.io/) server. The gRPC server was used in Part 4 to 6. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
 
 ### Manage Environment
 
@@ -299,12 +299,13 @@ class WriteOutputsToKafka(beam.PTransform):
         self,
         bootstrap_servers: str,
         topic: str,
-        deprecated_read: bool,
+        deprecated_read: bool, # TO DO: remove as it applies only to ReadFromKafka
         label: str | None = None,
     ) -> None:
         super().__init__(label)
         self.boostrap_servers = bootstrap_servers
         self.topic = topic
+        # TO DO: remove as it applies only to ReadFromKafka
         self.expansion_service = None
         if deprecated_read:
             self.expansion_service = kafka.default_io_expansion_service(
