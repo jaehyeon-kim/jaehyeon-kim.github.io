@@ -26,7 +26,7 @@ images: []
 description: 
 ---
 
-A [*Splittable DoFn (SDF)*](https://beam.apache.org/documentation/programming-guide/#splittable-dofns) is a generalization of a *DoFn* that enables Apache Beam developers to create modular and composable I/O components. Also, it can be applied in advanced non-I/O scenarios such as Monte Carlo simulation. In this post, we develop two Apache Beam pipelines. The first pipeline is an example I/O connector, and it reads a list of files in a folder followed by processing each of the file objects in parallel. The second pipeline estimates the value of $\pi$ by performing Monte Carlo simulation.
+to be updated
 
 <!--more-->
 
@@ -68,9 +68,9 @@ A basic SDF is composed of three parts: a restriction, a restriction provider, a
     - It tracks for which parts of the restriction processing has been completed.
     - It extends from the `RestrictionTracker` base class.
 
-The Python SDK has a built-in restriction (`OffsetRange`) and restriction tracker (`OffsetRangeTracker`), and we will use them in this post.
+The Python SDK has a built-in restriction (`OffsetRange`) and restriction tracker (`OffsetRangeTracker`). We will use both the built-in and custom components in this post.
 
-An advanced SDF has the following components for watermark estimation, and we will use them in the next post.
+An advanced SDF has the following components for watermark estimation, and we will use them in this post.
 
 - watermark state
     - It is a user-defined object. In its simplest form it could just be a timestamp.
@@ -83,9 +83,11 @@ An advanced SDF has the following components for watermark estimation, and we wi
 
 For more details, visit [Splittable DoFns in Python: a hands-on workshop](https://2022.beamsummit.org/sessions/splittable-dofns-in-python/).
 
-## Batch File Reader
+## Streaming File Reader
 
-This Beam pipeline reads a list of files in a folder followed by processing each of the file objects in parallel. This pipeline is slightly modified from the pipeline that was introduced in a [workshop](https://2022.beamsummit.org/sessions/splittable-dofns-in-python/) at Beam Summit 2022. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
+to be updated
+
+The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
 
 ### File Generator
 
@@ -191,14 +193,186 @@ fake_files/
 1 directory, 10 files
 ```
 
+### SDF for Directory Watch
+
+```python
+# chapter7/directory_watch.py
+import os
+import json
+import typing
+
+import apache_beam as beam
+from apache_beam import RestrictionProvider
+from apache_beam.utils.timestamp import Duration
+from apache_beam.io.iobase import RestrictionTracker
+from apache_beam.io.watermark_estimators import ManualWatermarkEstimator
+from apache_beam.transforms.core import WatermarkEstimatorProvider
+from apache_beam.runners.sdf_utils import RestrictionTrackerView
+from apache_beam.utils.timestamp import Timestamp, MIN_TIMESTAMP, MAX_TIMESTAMP
+
+from file_read import MyFile
+
+
+class DirectoryWatchRestriction:
+    def __init__(self, already_processed: typing.Set[str], finished: bool):
+        self.already_processed = already_processed
+        self.finished = finished
+
+    def as_primary(self):
+        self.finished = True
+        return self
+
+    def as_residual(self):
+        return DirectoryWatchRestriction(self.already_processed, False)
+
+    def add_new(self, file: str):
+        self.already_processed.add(file)
+
+    def size(self) -> int:
+        return 1
+
+    @classmethod
+    def from_json(cls, value: str):
+        d = json.loads(value)
+        return cls(
+            already_processed=set(d["already_processed"]), finished=d["finished"]
+        )
+
+    def to_json(self):
+        return json.dumps(
+            {
+                "already_processed": list(self.already_processed),
+                "finished": self.finished,
+            }
+        )
+
+
+class DirectoryWatchRestrictionCoder(beam.coders.Coder):
+    def encode(self, value: DirectoryWatchRestriction) -> bytes:
+        return value.to_json().encode("utf-8")
+
+    def decode(self, encoded: bytes) -> DirectoryWatchRestriction:
+        return DirectoryWatchRestriction.from_json(encoded.decode("utf-8"))
+
+    def is_deterministic(self) -> bool:
+        return True
+
+
+class DirectoryWatchRestrictionTracker(RestrictionTracker):
+    def __init__(self, restriction: DirectoryWatchRestriction):
+        self.restriction = restriction
+
+    def current_restriction(self):
+        return self.restriction
+
+    def try_claim(self, new_file: str):
+        if self.restriction.finished:
+            return False
+        self.restriction.add_new(new_file)
+        return True
+
+    def check_done(self):
+        return
+
+    def is_bounded(self):
+        return True if self.restriction.finished else False
+
+    def try_split(self, fraction_of_remainder):
+        return self.restriction.as_primary(), self.restriction.as_residual()
+
+
+class DirectoryWatchRestrictionProvider(RestrictionProvider):
+    def initial_restriction(self, element: str) -> DirectoryWatchRestriction:
+        return DirectoryWatchRestriction(set(), False)
+
+    def create_tracker(
+        self, restriction: DirectoryWatchRestriction
+    ) -> DirectoryWatchRestrictionTracker:
+        return DirectoryWatchRestrictionTracker(restriction)
+
+    def restriction_size(self, element: str, restriction: DirectoryWatchRestriction):
+        return restriction.size()
+
+    def restriction_coder(self):
+        return DirectoryWatchRestrictionCoder()
+
+
+class DirectoryWatchWatermarkEstimatorProvider(WatermarkEstimatorProvider):
+    def initial_estimator_state(self, element, restriction):
+        return MIN_TIMESTAMP
+
+    def create_watermark_estimator(self, watermark: Timestamp):
+        return ManualWatermarkEstimator(watermark)
+
+    def estimator_state_coder(self):
+        return beam.coders.TimestampCoder()
+
+
+class DirectoryWatchFn(beam.DoFn):
+    # TODO: add watermark_fn to completes the process function by advancing watermark to max timestamp
+    #       without such a funcition, the pipeline never completes and we cannot perform unit testing
+    POLL_TIMEOUT = 1
+
+    @beam.DoFn.unbounded_per_element()
+    def process(
+        self,
+        element: str,
+        tracker: RestrictionTrackerView = beam.DoFn.RestrictionParam(
+            DirectoryWatchRestrictionProvider()
+        ),
+        watermark_estimater: WatermarkEstimatorProvider = beam.DoFn.WatermarkEstimatorParam(
+            DirectoryWatchWatermarkEstimatorProvider()
+        ),
+    ) -> typing.Iterable[MyFile]:
+        new_files = self._get_new_files_if_any(element, tracker)
+        if self._process_new_files(tracker, watermark_estimater, new_files):
+            # return [new_file[0] for new_file in new_files]
+            for new_file in new_files:
+                yield new_file[0]
+        else:
+            return
+        tracker.defer_remainder(Duration.of(self.POLL_TIMEOUT))
+
+    def _get_new_files_if_any(
+        self, element: str, tracker: DirectoryWatchRestrictionTracker
+    ) -> typing.List[typing.Tuple[MyFile, Timestamp]]:
+        new_files = []
+        for file in os.listdir(element):
+            if (
+                os.path.isfile(os.path.join(element, file))
+                and file not in tracker.current_restriction().already_processed
+            ):
+                num_lines = sum(1 for _ in open(os.path.join(element, file)))
+                new_file = MyFile(file, 0, num_lines)
+                print(new_file)
+                new_files.append(
+                    (
+                        new_file,
+                        Timestamp.of(os.path.getmtime(os.path.join(element, file))),
+                    )
+                )
+        return new_files
+
+    def _process_new_files(
+        self,
+        tracker: DirectoryWatchRestrictionTracker,
+        watermark_estimater: ManualWatermarkEstimator,
+        new_files: typing.List[typing.Tuple[MyFile, Timestamp]],
+    ):
+        max_instance = watermark_estimater.current_watermark()
+        for new_file in new_files:
+            if tracker.try_claim(new_file[0].name) is False:
+                watermark_estimater.set_watermark(max_instance)
+                return False
+            if max_instance < new_file[1]:
+                max_instance = new_file[1]
+        watermark_estimater.set_watermark(max_instance)
+        return max_instance < MAX_TIMESTAMP
+```
+
 ### SDF for File Processing
 
-The pipeline has two *DoFn* objects.
-
-- `GenerateFilesFn`
-    - It reads each of the files in the input folder (*element*) followed by yielding a custom object (`MyFile`). The custom object keeps details of a file object that include the file name and start/end positions. As mentioned, we are going to use the default `OffsetRestrictionTracker` in the subsequent *DoFn*. Therefore, it is necessary to keep the start and end positions because those are used to set up the initial offset range.
-- `ProcessFilesFn`
-    - It begins with recovering the current restriction using the parameter of type `RestrictionParam`, which is passed as argument. Then, it tries to claim/lock the position. Once claimed, it proceeds to processing the associated element and restriction pair, which is just yielding a text that keeps the file name and current position.
+The `ProcessFilesFn` *DoFn* begins with recovering the current restriction using the parameter of type `RestrictionParam`, which is passed as argument. Then, it tries to claim/lock the position. Once claimed, it proceeds to processing the associated element and restriction pair, which is just yielding a text that keeps the file name and current position.
 
 ```python
 # chapter7/file_read.py
@@ -210,21 +384,7 @@ import apache_beam as beam
 from apache_beam import RestrictionProvider
 from apache_beam.io.restriction_trackers import OffsetRange, OffsetRestrictionTracker
 
-
-class MyFile(typing.NamedTuple):
-    name: str
-    start: int
-    end: int
-
-
-class GenerateFilesFn(beam.DoFn):
-    def process(self, element: str) -> typing.Iterable[MyFile]:
-        for file in os.listdir(element):
-            if os.path.isfile(os.path.join(element, file)):
-                num_lines = sum(1 for _ in open(os.path.join(element, file)))
-                new_file = MyFile(file, 0, num_lines)
-                yield new_file
-
+# ...
 
 class ProcessFilesFn(beam.DoFn, RestrictionProvider):
     def process(
@@ -253,10 +413,10 @@ class ProcessFilesFn(beam.DoFn, RestrictionProvider):
 
 ### Beam Pipeline
 
-The pipeline begins with passing the input folder to the `GenerateFilesFn` *DoFn*. Then, the *DoFn* yields the custom `MyFile` objects while reading the whole list of files in the input folder. Finally, the custom objects are processed by the`ProcessFilesFn` *DoFn*. 
+to be updated
 
 ```python
-# chapter7/batch_file_read.py
+# chapter7/streaming_file_read.py
 import os
 import logging
 import argparse
@@ -265,7 +425,8 @@ import apache_beam as beam
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.options.pipeline_options import SetupOptions
 
-from file_read import GenerateFilesFn, ProcessFilesFn
+from directory_watch import DirectoryWatchFn
+from file_read import ProcessFilesFn
 
 
 def run(argv=None, save_main_session=True):
@@ -292,7 +453,7 @@ def run(argv=None, save_main_session=True):
         (
             p
             | beam.Create([known_args.file_path])
-            | beam.ParDo(GenerateFilesFn())
+            | beam.ParDo(DirectoryWatchFn())
             | beam.ParDo(ProcessFilesFn())
         )
 
@@ -305,5 +466,13 @@ if __name__ == "__main__":
 ```
 
 We can create input files and run the pipeline using the *Direct Runner* as shown below.
+
+```bash
+python utils/faker_file_gen.py --max_files -1 --delay_seconds 0.5
+
+python chapter7/streaming_file_read.py \
+    --runner FlinkRunner --streaming --environment_type=LOOPBACK \
+    --parallelism=3 --checkpointing_interval=10000
+```
 
 ![](streaming-reader-demo.gif#center)

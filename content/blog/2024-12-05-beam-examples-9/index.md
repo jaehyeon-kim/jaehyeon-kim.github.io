@@ -306,6 +306,12 @@ if __name__ == "__main__":
 
 We can create input files and run the pipeline using the *Direct Runner* as shown below.
 
+```bash
+python utils/faker_file_gen.py -m 1000 -d 0
+python chapter7/batch_file_read.py \
+    --direct_num_workers=3 --direct_running_mode=multi_threading
+```
+
 ![](batch-reader-demo.gif#center)
 
 ## PI Sampler
@@ -422,5 +428,10 @@ if __name__ == "__main__":
 ```
 
 In the following example, the value of $\pi$ is estimated by 6,000,000 simulations (*parallelism*: 200, *num_samples*: 30,000). We see that the pipeline estimates $\pi$ correctly to three decimal places.
+
+```bash
+python chapter7/pi_sampler.py -p 200 -n 30000 \
+    --direct_num_workers=3 --direct_running_mode=multi_threading
+```
 
 ![](pi-sampler-demo.gif#center)
