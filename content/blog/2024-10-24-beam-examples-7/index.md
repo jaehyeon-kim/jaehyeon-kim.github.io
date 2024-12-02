@@ -38,7 +38,7 @@ We develop an Apache Beam pipeline that separates *droppable* elements from the 
 * [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6)
 * [Part 7 Separate Droppable Data into Side Output](#) (this post)
 * [Part 8 Enhance Sport Activity Tracker with Runner Motivation](/blog/2024-11-21-beam-examples-8)
-* Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn
+* [Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn](/blog/2024-12-05-beam-examples-9)
 * Part 10 Develop Streaming File Reader using Splittable DoFn
 
 ## Development Environment
