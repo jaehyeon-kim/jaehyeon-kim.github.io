@@ -26,7 +26,7 @@ images: []
 description: 
 ---
 
-In [Part 9](/blog/2024-12-05-beam-examples-9), we developed two Apache Beam pipelines using [*Splittable DoFn (SDF)*](https://beam.apache.org/documentation/programming-guide/#splittable-dofns). One of them is a batch file reader, which reads a list of files in an input folder followed by processing them in parallel. We can extend the I/O connector so that, instead of listing files once at the beginning, it scans an input folder periodically for new files and processes files whenever new files are created in the folder. The techniques used in this post can be quite useful because they can be applied to developing I/O connectors that target other streaming data sources (eg Kafka) using the Python SDK.
+In [Part 9](/blog/2024-12-05-beam-examples-9), we developed two Apache Beam pipelines using [*Splittable DoFn (SDF)*](https://beam.apache.org/documentation/programming-guide/#splittable-dofns). One of them is a batch file reader, which reads a list of files in an input folder followed by processing them in parallel. We can extend the I/O connector so that, instead of listing files once at the beginning, it scans an input folder periodically for new files and processes whenever new files are created in the folder. The techniques used in this post can be quite useful as they can be applied to developing I/O connectors that target other unbounded (or streaming) data sources (eg Kafka) using the Python SDK.
 
 <!--more-->
 
@@ -85,7 +85,7 @@ For more details, visit [Splittable DoFns in Python: a hands-on workshop](https:
 
 ## Streaming File Reader
 
-The pipeline scans an input folder periodically for new files and processes files whenever new files are created in the folder. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
+The pipeline scans an input folder periodically for new files and processes whenever new files are created in the folder. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
 
 ### File Generator
 
@@ -195,7 +195,7 @@ fake_files/
 
 ### SDF for Directory Watch
 
-We use a custom restriction (`DirectoryWatchRestriction`) for the `DirectoryWatchFn` *DoFn* object. The details about the restriction and related objects can be found below.
+We use a custom restriction (`DirectoryWatchRestriction`) for the `DirectoryWatchFn` *DoFn* object. The details about the restriction and related components can be found below.
 
 - `DirectoryWatchRestriction`
     - It has two fields (*already_processed* and *finished*) where the former is used to hold the file names that have processed (i.e. *claimed*) already.
