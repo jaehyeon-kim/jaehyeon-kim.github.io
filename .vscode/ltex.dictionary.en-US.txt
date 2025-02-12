@@ -43,3 +43,4 @@ lakehouse
 dbt
 utilise
 gcloud
+Streamlit
