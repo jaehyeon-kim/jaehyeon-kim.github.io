@@ -1,5 +1,5 @@
 ---
-title: Realtime Dashboard with Streamlit and Next.js - Part 2 Streamlit Frontend
+title: Realtime Dashboard with Streamlit and Next.js - Part 2 Streamlit Dashboard
 date: 2025-02-25
 draft: true
 featured: false
@@ -16,28 +16,55 @@ tags:
   - Python
   - Streamlit
   - Apache ECharts
-  - Websocket
+  - WebSocket
 authors:
   - JaehyeonKim
 images: []
 description:
 ---
 
-to be updated!!!!!!!!
+In this post, we develop a real-time monitoring dashboard using [Streamlit](https://streamlit.io/), an open-source Python framework that allows data scientists and AI/ML engineers to create interactive data apps. The app connects to the WebSocket server we developed in [Part 1](/blog/2025-02-18-realtime-dashboard-1) and continuously fetches data to visualize key metrics such as **order counts**, **sales data**, and **revenue by traffic source and country**. With interactive bar charts and dynamic metrics, users can monitor sales trends and other important business KPIs in real-time.
 
 <!--more-->
 
 * [Part 1 Data Producer](/blog/2025-02-18-realtime-dashboard-1)
-* [Part 2 Streamlit Frontend](#) (this post)
-* Part 3 Next.js Frontend
+* [Part 2 Streamlit Dashboard](#) (this post)
+* Part 3 Next.js Dashboard
 
-## Start Data Producer
+## Deploy Data Producer
+
+The data generator and WebSocket server can be deployed using Docker Compose with the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) using the command `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`. The source code for this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos).
+
+![](backend.gif#center)
 
 ## Streamlit Frontend
 
+This Streamlit dashboard is designed to process and display real-time *theLook eCommerce data* using *pandas* for data manipulation, Streamlit's built-in *metric* component for KPIs, and *Apache ECharts* for visualizations.
+
 ### Components
 
+The dashboard components and data processing logic are managed by functions in `utils.py`. Below are the details of those functions.
+
+1. Loading Records:
+   - The `load_records()` function accepts a list of records, converts them into a **pandas DataFrame**, and ensures that the necessary columns are present.
+   - It then processes data by converting the **age** column to integers and the **cost** and **sale_price** columns to floating-point values, rounding the sale price to one decimal place.
+   - Key metrics like the **number of orders**, **number of order items**, and **total sales** are calculated from the DataFrame and returned for display.
+
+2. Generating Metrics:
+   - The `create_metric_items()` function creates a list of dictionaries containing metrics and their respective changes (`delta`), comparing the current and previous values of **orders**, **order items**, and **total sales**.
+   - The `generate_metrics()` function takes the calculated metrics and displays them in Streamlit’s **metric components** within the `placeholder` container. It uses a column layout to show the metrics side-by-side.
+
+3. Creating Chart Options:
+   - The `create_options_items()` function generates configuration data for bar charts that display **revenue by country** and **revenue by traffic source**. 
+   - It groups the data by **country** and **traffic source**, sums the **sale_price** for each, and sorts it in descending order. 
+   - **ECharts options** are defined for each chart with custom colors, titles, and axis settings. The charts are configured to show **tooltips** when hovering over the bars.
+
+4. Displaying Charts:
+   - The `generate_charts()` function takes the **ECharts options** and renders each chart within a container using the `st_echarts` component of the [streamlit-echarts](https://pypi.org/project/streamlit-echarts/) package.
+   - Each chart is placed in its own column, with dynamic layout adjustments based on the number of charts being displayed. The charts are rendered with a fixed height of **500px**.
+
 ```python
+## producer/streamlit/utils.py
 from uuid import uuid4
 
 import pandas as pd
@@ -175,7 +202,32 @@ def generate_charts(placeholder: DeltaGenerator, option_items: list):
 
 ### Application
 
+The dashboard connects to the **WebSocket server** to fetch and display real-time *theLook eCommerce* data. Here's a detailed breakdown of its functionality:
+
+1. WebSocket Connection:
+   - The `generate()` function is an **asynchronous** task that establishes a connection to a WebSocket server (`ws://localhost:8000/ws`) using an asynchronous HTTP client by the [aiohttp](https://pypi.org/project/aiohttp/) package. It listens for incoming messages from the server, which contain the eCommerce data.
+   - As each message is received, the function loads the data using the `load_records()` function, which processes the data into **pandas DataFrame** format and computes key metrics.
+
+2. Generating and Displaying Metrics:
+   - The `create_metric_items()` function calculates and prepares key metrics (such as **number of orders**, **order items**, and **total sales**) along with the delta (changes) from the previous values.
+   - The `generate_metrics()` function updates the Streamlit dashboard by displaying these metrics in the `metric_placeholder`.
+
+3. Creating and Displaying Charts:
+   - The `create_options_items()` function processes the data and generates configuration options for bar charts, displaying **revenue by country** and **traffic source**.
+   - The `generate_charts()` function renders the charts in the `chart_placeholder` container, using **ECharts** for interactive data visualizations.
+
+4. Real-time Updates:
+   - The loop continuously listens for new data from the WebSocket server. As data is received, it updates both the metrics and charts in real-time.
+
+5. User Interface:
+   - The app sets a wide layout with the title **"theLook eCommerce Dashboard"**. 
+   - A checkbox (`Connect to WS Server`) lets the user choose whether to connect to the WebSocket server. When checked, the dashboard fetches data live and updates metrics and charts accordingly.
+   - If the checkbox is unchecked, only the static metrics are displayed.
+
+This setup provides a **dynamic dashboard** that pulls and visualizes real-time eCommerce data, making it interactive and responsive for monitoring sales and performance metrics.
+
 ```python
+## producer/streamlit/app.py
 import json
 import asyncio
 
@@ -230,3 +282,7 @@ else:
 ```
 
 ## Start Dashboard
+
+The dashboard can be started by running the Streamlit app with the command `streamlit run streamlit/app.py`. Once started, it can be accessed in a browser at *http://localhost:8501*.
+
+![](featured.gif#center)
