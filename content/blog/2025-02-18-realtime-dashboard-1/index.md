@@ -1,7 +1,7 @@
 ---
 title: Realtime Dashboard with Streamlit and Next.js - Part 1 Data Producer
 date: 2025-02-18
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -15,7 +15,7 @@ categories:
 tags: 
   - Python
   - FastAPI
-  - Websocket
+  - WebSocket
   - PostgreSQL
   - Docker
   - Docker Compose
@@ -25,23 +25,23 @@ images: []
 description:
 ---
 
-to be updated!!!!!!!!
+In this series, we develop real-time monitoring dashboard applications. The [theLook eCommerce](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) data is continuously ingested into a PostgreSQL database, and a WebSocket server, built by [FastAPI](https://fastapi.tiangolo.com/), periodically queries the data to serve its clients. The monitoring dashboards will be developed using [Streamlit](https://streamlit.io/) and [Next.js](https://nextjs.org/), with [Apache ECharts](https://echarts.apache.org/en/index.html) for visualization. In this post, we walk through the data generation app and backend API, while the frontend dashboards will be discussed in later posts.
 
 <!--more-->
 
 * [Part 1 Data Producer](#) (this post)
-* Part 2 Streamlit Frontend
-* Part 3 Next.js Frontend
+* Part 2 Streamlit Dashboard
+* Part 3 Next.js Dashboard
 
 <!--more-->
 
 ## Docker Compose Services
 
-We have three docker-compose services, and each service is illustrated separately. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos).
+We have three docker-compose services, and they are illustrated separately below. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos).
 
 ### PostgreSQL
 
-A PostgreSQL database server is configured so that it enables logical replication (`wal_level=logical`) at startup. It is necessary because we will be using the standard logical decoding output plug-in in PostgreSQL 10+ - see [this page](https://debezium.io/documentation/reference/stable/connectors/postgresql.html#postgresql-overview) for details.
+A PostgreSQL database server is configured with persistent storage, automatic initialization, and a health check. The health check is set up so that the remaining services wait until the database is ready.
 
 ```yaml
 # producer/docker-compose.yml
@@ -50,11 +50,10 @@ services:
   postgres:
     image: postgres:16
     container_name: postgres
-    command: ["postgres", "-c", "wal_level=logical"]
     ports:
       - 5432:5432
     volumes:
-      - ./config/postgres:/docker-entrypoint-initdb.d
+      - ./config/:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: develop
@@ -62,6 +61,11 @@ services:
       POSTGRES_PASSWORD: password
       PGUSER: develop
       TZ: Australia/Sydney
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U develop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 ...
 volumes:
   postgres_data:
@@ -69,7 +73,7 @@ volumes:
     name: postgres_data
 ```
 
-The bootstrap script creates a dedicated schema named *ecommerce* and sets the schema as the default search path. It ends up creating a custom [publication](https://www.postgresql.org/docs/current/logical-replication-publication.html) for all tables in the *ecommerce* schema.
+The bootstrap script creates a dedicated schema named *ecommerce* and sets the schema as the default search path.
 
 ```sql
 -- producer/config/postgres/bootstrap.sql
@@ -84,6 +88,27 @@ ALTER database "develop" SET search_path TO ecommerce;
 ```
 
 ### Data Generator
+
+The following Dockerfile is created for the data generation app and WebSocket server. It sets up a lightweight Python 3.10 environment for an application. It copies and installs dependencies from `requirements.txt`, then creates a dedicated **user** (`app`) with a home directory (`/home/app`) for security. The container runs as the `app` user instead of root, with `/home/app` set as the working directory.
+
+```dockerfile
+# producer/Dockerfile
+FROM python:3.10-slim
+
+## install dependent packages
+COPY requirements.txt requirements.txt
+
+RUN pip install -r requirements.txt
+
+## create a user
+RUN useradd app && mkdir /home/app \
+    && chown app:app /home/app
+
+USER app
+WORKDIR /home/app
+```
+
+The data generation app builds from the local Dockerfile, runs as `datagen`, and connects to the PostgreSQL database using environment variables for credentials. The container executes `generator.py` with a 0.5-second delay between iterations and runs indefinitely (`--max_iter -1`). It mounts the current directory to `/home/app` for access to scripts and dependencies. The service starts only after the database is healthy, ensuring proper database availability.
 
 ```yaml
 # producer/docker-compose.yml
@@ -116,7 +141,7 @@ services:
 
 #### Data Generator Source
 
-The *theLook eCommerce* dataset has seven entities and five of them are generated dynamically. In each iteration, a *user* record is created, and it has zero or more orders. An *order* record creates zero or more order items in turn. Finally, an *order item* record creates zero or more *event* and *inventory item* objects. Once all records are generated, they are ingested into the relevant tables using pandas' `to_sql` method.
+The *theLook eCommerce* dataset consists of seven entities, five of which are dynamically generated. In each iteration, a *user* record is created, associated with zero or more orders. Each *order*, in turn, generates zero or more order items. Finally, each *order item* produces zero or more *event* and *inventory item* records. Once all records are generated, they are ingested into the corresponding database tables using pandas' `to_sql` method.
 
 ```python
 # producer/generator.py
@@ -257,7 +282,7 @@ if __name__ == "__main__":
 In the following example, we see data is generated in every two seconds (`-w 2`).
 
 ```bash
-python data_gen.py -w 2
+$ python data_gen.py -w 2
 INFO:root:Generate theLook eCommerce data...
 INFO:root:Namespace(if_exists='append', wait_for=2.0, max_iter=-1)
 INFO:root:replace records, table - products, # records - 29120
@@ -288,11 +313,13 @@ INFO:root:append records, table - inventory_items, # records - 9
 INFO:root:append records, table - events, # records - 19
 ```
 
-When the data is ingested into the database, we see the following tables are created in the *ecommerce* schema.
+When the data gets ingested into the database, we see the following tables are created in the *ecommerce* schema.
 
 ![](diagram.png#center)
 
-### Backend API
+### WebSocket Server
+
+This WebSocket server runs a FastAPI-based API using `uvicorn`. It builds from the local Dockerfile, exposing port 8000, and connects to the PostgreSQL database with credentials and configuration variables. The service processes data with a 5-minute lookback window and refreshes every 5 seconds. The working directory is mounted for access to code, and the service starts only after PostgreSQL is healthy, ensuring database readiness. 
 
 ```yaml
 # producer/docker-compose.yml
@@ -327,7 +354,9 @@ services:
 ...
 ```
 
-#### Backend API Source
+#### WebSocket Server Source
+
+This FastAPI WebSocket server streams real-time data from a PostgreSQL database. It connects using *SQLAlchemy*, fetches order-related data with a configurable *lookback window*, and sends updates every few seconds as defined by *refresh seconds*. A WebSocket manager handles multiple connections, converting database results into JSON before streaming them. The app continuously queries the database, sending fresh data to connected clients until they disconnect. Logging ensures visibility into connections, queries, and errors.
 
 ```python
 # producer/api.py
@@ -335,12 +364,11 @@ import os
 import logging
 import asyncio
 
-import sqlalchemy
-from sqlalchemy import Engine, Connection
+from sqlalchemy import create_engine, Engine, Connection
 import pandas as pd
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
-logging.getLogger().setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 try:
     LOOKBACK_MINUTES = int(os.getenv("LOOKBACK_MINUTES", "5"))
@@ -350,19 +378,24 @@ except ValueError:
     REFRESH_SECONDS = 5
 
 
-def create_engine(
-    user: str = os.getenv("DB_USER", "develop"),
-    password: str = os.getenv("DB_PASS", "password"),
-    host: str = os.getenv("DB_HOST", "localhost"),
-    db_name: str = os.getenv("DB_NAME", "develop"),
-    echo: bool = True,
-) -> Engine:
-    return sqlalchemy.create_engine(
-        f"postgresql+psycopg2://{user}:{password}@{host}/{db_name}", echo=echo
-    )
+def get_db_engine() -> Engine:
+    """Creates and returns a SQLAlchemy engine."""
+    user = os.getenv("DB_USER", "develop")
+    password = os.getenv("DB_PASS", "password")
+    host = os.getenv("DB_HOST", "localhost")
+    db_name = os.getenv("DB_NAME", "develop")
+
+    try:
+        return create_engine(
+            f"postgresql+psycopg2://{user}:{password}@{host}/{db_name}", echo=True
+        )
+    except Exception as e:
+        logging.error(f"Database connection error: {e}")
+        raise
 
 
-def read_from_db(conn: Connection, minutes: int = 0):
+def fetch_data(conn: Connection, minutes: int = 0):
+    """Fetches data from the database with an optional lookback filter."""
     sql = """
     SELECT
         u.id AS user_id
@@ -385,26 +418,36 @@ def read_from_db(conn: Connection, minutes: int = 0):
         sql = f"{sql} WHERE o.created_at >= current_timestamp - interval '{minutes} minute'"
     else:
         sql = f"{sql} LIMIT 1"
-    return pd.read_sql(sql=sql, con=conn)
+    try:
+        return pd.read_sql(sql=sql, con=conn)
+    except Exception as e:
+        logging.error(f"Error reading from database: {e}")
+        return pd.DataFrame()
 
 
 app = FastAPI()
 
 
 class ConnectionManager:
+    """Manages WebSocket connections."""
+
     def __init__(self):
         self.active_connections: list[WebSocket] = []
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
+        logging.info(f"New WebSocket connection: {websocket.client}")
 
     def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+            logging.info(f"WebSocket disconnected: {websocket.client}")
 
-    async def send_records(self, df: pd.DataFrame, websocket: WebSocket):
-        records = df.to_json(orient="records")
-        await websocket.send_json(records)
+    async def send_data(self, df: pd.DataFrame, websocket: WebSocket):
+        """Converts DataFrame to JSON and sends it via WebSocket."""
+        if not df.empty:
+            await websocket.send_json(df.to_json(orient="records"))
 
 
 manager = ConnectionManager()
@@ -412,20 +455,28 @@ manager = ConnectionManager()
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    """Handles WebSocket connections and continuously streams data."""
     await manager.connect(websocket)
-    engine = create_engine()
-    conn = engine.connect()
+
+    engine = get_db_engine()
+
     try:
-        while True:
-            df = read_from_db(conn=conn, minutes=LOOKBACK_MINUTES)
-            logging.info(f"{df.shape[0]} records are fetched...")
-            await manager.send_records(df, websocket)
-            await asyncio.sleep(REFRESH_SECONDS)
+        with engine.connect() as conn:
+            while True:
+                df = fetch_data(conn, LOOKBACK_MINUTES)
+                logging.info(f"Fetched {df.shape[0]} records from database")
+                await manager.send_data(df, websocket)
+                await asyncio.sleep(REFRESH_SECONDS)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+    except Exception as e:
+        logging.error(f"WebSocket error: {e}")
     finally:
-        conn.close()
         engine.dispose()
 ```
 
-## Start Services
+## Deploy Services
+
+The docker compose services can be deployed using Docker Compose with the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) using the command `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`.
+
+![](featured.gif#center)
