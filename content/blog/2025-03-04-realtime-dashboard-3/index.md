@@ -1,5 +1,5 @@
 ---
-title: Realtime Dashboard with Streamlit and Next.js - Part 3 Next.js Dashboard
+title: Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 3 Next.js Dashboard
 date: 2025-03-04
 draft: true
 featured: false

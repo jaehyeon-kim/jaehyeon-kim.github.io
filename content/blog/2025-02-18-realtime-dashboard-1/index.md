@@ -1,5 +1,5 @@
 ---
-title: Realtime Dashboard with Streamlit and Next.js - Part 1 Data Producer
+title: Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1 Data Producer
 date: 2025-02-18
 draft: false
 featured: false
