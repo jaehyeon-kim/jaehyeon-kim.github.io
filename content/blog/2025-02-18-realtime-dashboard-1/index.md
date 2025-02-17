@@ -477,6 +477,6 @@ async def websocket_endpoint(websocket: WebSocket):
 
 ## Deploy Services
 
-The docker compose services can be deployed using Docker Compose with the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) using the command `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`.
+The Docker Compose services can be deployed using the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) by executing `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`.  
 
 ![](featured.gif#center)
