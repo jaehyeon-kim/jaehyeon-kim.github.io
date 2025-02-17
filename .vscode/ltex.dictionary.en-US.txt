@@ -43,3 +43,5 @@ lakehouse
 dbt
 utilise
 gcloud
+Streamlit
+WebSocket
