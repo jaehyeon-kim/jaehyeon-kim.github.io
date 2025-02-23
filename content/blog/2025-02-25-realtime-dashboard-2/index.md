@@ -31,19 +31,13 @@ In this post, we develop a real-time monitoring dashboard using [Streamlit](http
 * [Part 2 Streamlit Dashboard](#) (this post)
 * Part 3 Next.js Dashboard
 
-## Deploy Data Producer
-
-As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1), the data generator and WebSocket server can be deployed using Docker Compose with the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) by executing `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`. The source code for this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos).
-
-![](backend.gif#center)
-
 ## Streamlit Frontend
 
-This Streamlit dashboard is designed to process and display real-time *theLook eCommerce data* using *pandas* for data manipulation, Streamlit's built-in *metric* component for KPIs, and *Apache ECharts* for visualizations.
+This Streamlit dashboard is designed to process and display real-time *theLook eCommerce data* using *pandas* for data manipulation, Streamlit's built-in *metric* component for KPIs, and *Apache ECharts* for visualizations. The source code for this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos).
 
 ### Components
 
-The dashboard components and data processing logic are managed by functions in `utils.py`. Below are the details of those functions.
+The dashboard components and data processing logic are managed by functions in `streamlit/utils.py`. Below are the details of those functions.
 
 1. Loading Records:
    - The `load_records()` function accepts a list of records, converts them into a **pandas DataFrame**, and ensures that the necessary columns are present.
@@ -281,8 +275,27 @@ else:
     generate_metrics(metric_placeholder, None)
 ```
 
-## Start Dashboard
+## Deployment
 
-The dashboard can be started by running the Streamlit app with the command `streamlit run streamlit/app.py`. Once started, it can be accessed in a browser at *http://localhost:8501*.
+### Data Producer and WebSocket Server
+
+As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1), the data generator and WebSocket server can be deployed using Docker Compose with the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) by executing `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`.
+
+![](backend.gif#center)
+
+### Frontend Dashboard
+
+The dashboard can be started by running the Streamlit app as shown below. Once started, it can be accessed in a browser at *http://localhost:8501*.
+
+```bash
+## create and activate a virtual environment
+# https://docs.python.org/3/library/venv.html
+
+## install pip packages
+$ pip install -r requirements.txt
+
+## start the app
+$ streamlit run streamlit/app.py
+```
 
 ![](featured.gif#center)

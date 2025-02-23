@@ -2,7 +2,7 @@
 title: Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1 Data Producer
 date: 2025-02-18
 draft: false
-featured: false
+featured: true
 comment: true
 toc: true
 reward: false
@@ -30,7 +30,7 @@ In this series, we develop real-time monitoring dashboard applications. A data g
 <!--more-->
 
 * [Part 1 Data Producer](#) (this post)
-* Part 2 Streamlit Dashboard
+* [Part 2 Streamlit Dashboard](/blog/2025-02-25-realtime-dashboard-2)
 * Part 3 Next.js Dashboard
 
 <!--more-->
