@@ -32,13 +32,10 @@ Welcome to theLook eCommerce Dashboard, a powerful tool designed to help busines
 * [Part 2 Streamlit Dashboard](/blog/2025-02-25-realtime-dashboard-2)
 * [Part 3 Next.js Dashboard](#) (this post)
 
-## Deploy Data Producer
-
-As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1), the data generator and WebSocket server can be deployed using Docker Compose with the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) by executing `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`. The source code for this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos).
-
-![](backend.gif#center)
-
 ## Next.js Frontend
+
+The source code for this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos).
+
 
 ### Components
 
@@ -436,8 +433,27 @@ export default function Home() {
 }
 ```
 
-## Start Dashboard
+## Deployment
 
-The dashboard can be started the command `pnpm dev`. Once started, it can be accessed in a browser at *http://localhost:3000*.
+### Data Producer and WebSocket Server
+
+As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1), the data generator and WebSocket server can be deployed using Docker Compose with the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) by executing `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`.
+
+![](backend.gif#center)
+
+### Frontend Dashboard
+
+The dashboard can be started in development mode as shown below. Once started, it can be accessed in a browser at *http://localhost:3000*.
+
+```bash
+## install pnpm if not done
+# https://pnpm.io/installation
+
+## install dependent packages
+$ pnpm install
+
+## start the app
+$ pnpm dev
+```
 
 ![](featured.gif#center)
