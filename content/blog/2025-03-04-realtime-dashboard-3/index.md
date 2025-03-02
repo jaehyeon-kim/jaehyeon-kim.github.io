@@ -1,7 +1,7 @@
 ---
 title: Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 3 Next.js Dashboard
 date: 2025-03-04
-draft: true
+draft: false
 featured: false
 comment: true
 toc: true
@@ -24,7 +24,7 @@ images: []
 description:
 ---
 
-Welcome to theLook eCommerce Dashboard, a powerful tool designed to help businesses track and analyze key metrics in real time. This dynamic dashboard provides an intuitive interface to visualize essential sales data, such as the number of orders, total sales, and more. Leveraging WebSocket technology, the dashboard seamlessly updates as new data flows in, giving users live insights into their eCommerce performance. With interactive charts and detailed metric cards, theLook empowers businesses to make data-driven decisions, optimize their operations, and stay ahead of trends—no matter where they are.
+In this post, we build a real-time monitoring dashboard using [Next.js](https://nextjs.org/), a React framework that supports server-side rendering, static site generation, and full-stack capabilities with built-in performance optimizations. Similar to the *Streamlit* app we developed in [Part 2](/blog/2025-02-25-realtime-dashboard-2), this dashboard connects to the WebSocket server from [Part 1](/blog/2025-02-18-realtime-dashboard-1) to continuously fetch and visualize key metrics such as **order counts**, **sales data**, and **revenue by traffic source and country**. With interactive bar charts and dynamic metrics, users can monitor sales trends and other critical business KPIs in real-time.  
 
 <!--more-->
 
@@ -34,26 +34,20 @@ Welcome to theLook eCommerce Dashboard, a powerful tool designed to help busines
 
 ## Next.js Frontend
 
-The source code for this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos).
+The Next.js dashboard processes and displays real-time *theLook eCommerce data*. It connects to the WebSocket server using the [*React useWebSocket*](https://github.com/robtaussig/react-use-websocket) package, while the UI is styled with [HeroUI (formerly NextUI)](https://www.heroui.com/) and [Tailwind CSS](https://tailwindcss.com/). Visualizations are powered by [Apache ECharts](https://github.com/hustcc/echarts-for-react). The source code for this post is available in this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos).
 
+### Metric Component
 
-### Components
-
-This code defines a React component called `Metric` that displays a metric card with the following props:
+We use a React component called `Metric` that displays a metric card with the following props:
 
 - `label`: The title or name of the metric.
 - `value`: The value of the metric (could represent a number or currency).
 - `delta`: The change in the metric value (used to indicate increase or decrease).
 - `is_currency`: A boolean flag to indicate whether the value should be formatted as a currency.
 
-### Key Features:
-- **Formatting**: The `value` is displayed with localization and a "$" sign if `is_currency` is true.
-- **Delta Indicator**: An arrow icon is displayed with a color that depends on whether `delta` is positive (green), negative (red), or zero (black). The delta is shown below the value in the footer.
-- **Card Layout**: The component uses `Card`, `CardHeader`, `CardBody`, `CardFooter`, and `Divider` components from NextUI for layout and styling.
-
 The card's visual layout includes the label at the top, the formatted value in large text, and the delta change with an arrow beneath it.
 
-```js
+```jsx
 // nextjs/src/components/metric.tsx
 "use client";
 
@@ -115,72 +109,10 @@ export default function Metric({
 
 ### Data Processing Utility
 
-This code defines a set of functions and interfaces used to manage and compute metrics and options related to sales data. Here’s a detailed breakdown of its structure:
+Since I have yet to find an effective data manipulation library comparable to Python's Pandas, data processing is handled using custom objects and functions. The code primarily operates on arrays of `Record`s to compute sales metrics and generate visual representations. The `getMetrics` and `createMetricItems` functions are used to calculate current/delta metrics and construct an array of `MetricProp`s that can be added to the *Metric* component. Also, the `createOptionsItems` function is responsible for generating data visualizations, specifically bar charts that show revenue by categories such as country and traffic source.
 
-### Interfaces:
-
-1. **MetricProps** (imported from `@/components/metric`):
-   - This defines the properties for a single metric, including:
-     - `label`: The label for the metric (e.g., "Number of Orders").
-     - `value`: The value of the metric.
-     - `delta`: The change (or delta) in the metric compared to a previous value.
-     - `is_currency`: A boolean indicating whether the metric value is in currency format.
-
-2. **Metrics**:
-   - Represents the main metrics related to orders and sales:
-     - `num_orders`: The total number of unique orders.
-     - `num_order_items`: The total number of unique items ordered.
-     - `total_sales`: The total sales revenue.
-
-3. **Record**:
-   - Represents a single record in the dataset, capturing detailed information such as:
-     - `user_id`: ID of the user.
-     - `age`, `gender`, `country`: User demographic and location.
-     - `traffic_source`: Where the user came from (e.g., Google, Facebook).
-     - `order_id`, `item_id`, `category`, `item_status`: Order and item details.
-     - `sale_price`: Price of the item in the order.
-     - `created_at`: Timestamp when the order was created.
-
-### Constants:
-
-1. **defaultMetrics**:
-   - Provides a default value for the `Metrics` interface with initial values of zero for all metrics.
-
-2. **defaultMetricItems**:
-   - Defines an array of `MetricProps` with initial values set to zero. It includes metrics for:
-     - Number of Orders
-     - Number of Order Items
-     - Total Sales (as currency)
-
-### Functions:
-
-1. **getMetrics(records: Record[])**:
-   - This function calculates the current metrics (`num_orders`, `num_order_items`, `total_sales`) from an array of `Record` objects:
-     - `num_orders`: Counts the unique `order_id` values.
-     - `num_order_items`: Counts the unique `item_id` values.
-     - `total_sales`: Sums up the `sale_price` of all records and rounds it.
-
-2. **createMetricItems(currMetrics: Metrics, prevMetrics: Metrics)**:
-   - This function generates an array of `MetricProps` (used to display metrics on the frontend). It calculates the change (`delta`) between the current and previous metrics for:
-     - Number of Orders
-     - Number of Order Items
-     - Total Sales (currency)
-   - It returns an array of `MetricProps`, which includes the label, value, delta, and currency flag.
-
-3. **createOptionsItems(records: Record[])**:
-   - This function creates chart configuration options for displaying revenue data:
-     - The `chartCols` array contains two columns: `country` and `traffic_source`, each paired with `sale_price`.
-     - For each column (`country` and `traffic_source`), it groups the records by the column value and sums the `sale_price`.
-     - It sorts the data in descending order of the summed `sale_price`.
-     - The function generates chart options for a bar chart with `xAxis` as the categories (e.g., countries or traffic sources) and `yAxis` as the corresponding revenue.
-     - The chart is configured with tooltip options and rotated labels for better readability.
-
-### Key Details:
-- The code relies on manipulating arrays of `Record` objects to calculate summary metrics and create visual representations (charts).
-- `getMetrics` and `createMetricItems` are used to calculate the current and delta metrics for display.
-- `createOptionsItems` is used for creating data visualizations, particularly bar charts to display revenue by various categories (country, traffic source).
-
-```js
+```jsx
+// nextjs/src/lib/processing.tsx
 import { MetricProps } from "@/components/metric";
 
 export interface Metrics {
@@ -301,42 +233,10 @@ export function createOptionsItems(records: Record[]) {
 
 ### Application
 
-This React component (`Home`) implements a dashboard that displays eCommerce metrics and charts, updated via a WebSocket connection. Here's a detailed breakdown of how it works:
+The main component builds a real-time eCommerce dashboard that connects to a WebSocket server at `ws://localhost:8000/ws` to fetch and display live data. It uses `react-use-websocket` to manage the WebSocket connection, and whenever new data is received, it updates the state with the latest metrics and chart options. The data processing is handled by helper functions (`getMetrics`, `createMetricItems`, and `createOptionsItems`), which compute summary metrics and prepare visualization data. The UI dynamically updates to display key business metrics using the `Metric` component and interactive bar charts powered by `echarts-for-react`. A checkbox allows users to toggle the WebSocket connection on or off, giving them control over real-time updates.
 
-### State Variables:
-- **`toConnect`**: A boolean to control whether to connect to the WebSocket server.
-- **`currMetrics` and `prevMetrics`**: Store the current and previous metrics (such as number of orders, sales, etc.).
-- **`metricItems`**: Stores the data for individual metric items (such as total sales, number of orders) that will be displayed on the dashboard.
-- **`chartOptions`**: Holds the configuration for charts to visualize data.
-
-### WebSocket:
-- The component uses the `react-use-websocket` hook to establish a WebSocket connection (`ws://localhost:8000/ws`) for real-time data updates.
-- The WebSocket connection can be toggled using a checkbox that sets `toConnect` to true or false.
-
-### `useEffect` Hook:
-- This hook listens for new data (`lastJsonMessage` from the WebSocket) and processes it when it arrives.
-- It parses the incoming data (assumed to be a JSON array of records), updates the metrics using `getMetrics`, `createMetricItems`, and `createOptionsItems` functions.
-  - **`getMetrics(records)`** computes overall metrics like number of orders, items, and total sales.
-  - **`createMetricItems(currMetrics, prevMetrics)`** creates metric cards showing the current values and changes (deltas) compared to the previous state.
-  - **`createOptionsItems(records)`** generates chart configurations, likely for visualizing revenue based on categories like `country` or `traffic_source`.
-
-### Component Functions:
-- **`createMetrics(metricItems)`**: Iterates over the `metricItems` array and creates `Metric` components to display metrics (like number of orders, sales).
-- **`createCharts(chartOptions)`**: Iterates over the `chartOptions` array and creates `ReactECharts` components for displaying charts. Each chart is configured based on the options generated by `createOptionsItems`.
-
-### UI Elements:
-- **Checkbox for WebSocket Connection**: A checkbox labeled "Connect to WS Server" that allows the user to toggle the WebSocket connection.
-- **Metric Cards**: Displays various metrics like "Number of Orders", "Total Sales", etc., based on the `metricItems` state.
-- **Charts**: Displays visualizations (e.g., bar charts) based on the `chartOptions` state, showing revenue by categories like `country` or `traffic source`.
-
-### Overall Flow:
-1. The component first displays a dashboard header and a checkbox to toggle the WebSocket connection.
-2. When data is received via WebSocket, it updates the metrics and charts by calculating new values and re-rendering the metrics and charts.
-3. Metrics are displayed in a grid layout, followed by charts showing relevant data visualizations.
-
-This setup allows for a dynamic dashboard that automatically updates as new data comes in via the WebSocket connection.
-
-```js
+```jsx
+// nextjs/src/app/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
