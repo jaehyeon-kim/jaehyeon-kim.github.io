@@ -31,7 +31,7 @@ In this series, we develop real-time monitoring dashboard applications. A data g
 
 * [Part 1 Data Producer](#) (this post)
 * [Part 2 Streamlit Dashboard](/blog/2025-02-25-realtime-dashboard-2)
-* Part 3 Next.js Dashboard
+* [Part 3 Next.js Dashboard](/blog/2025-03-04-realtime-dashboard-3)
 
 <!--more-->
 

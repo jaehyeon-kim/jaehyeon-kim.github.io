@@ -29,7 +29,7 @@ In this post, we develop a real-time monitoring dashboard using [Streamlit](http
 
 * [Part 1 Data Producer](/blog/2025-02-18-realtime-dashboard-1)
 * [Part 2 Streamlit Dashboard](#) (this post)
-* Part 3 Next.js Dashboard
+* [Part 3 Next.js Dashboard](/blog/2025-03-04-realtime-dashboard-3)
 
 ## Streamlit Frontend
 
