@@ -233,7 +233,7 @@ export function createOptionsItems(records: Record[]) {
 
 ### Application
 
-The main component builds a real-time eCommerce dashboard that connects to a WebSocket server at `ws://localhost:8000/ws` to fetch and display live data. It uses `react-use-websocket` to manage the WebSocket connection, and whenever new data is received, it updates the state with the latest metrics and chart options. The data processing is handled by helper functions (`getMetrics`, `createMetricItems`, and `createOptionsItems`), which compute summary metrics and prepare visualization data. The UI dynamically updates to display key business metrics using the `Metric` component and interactive bar charts powered by `echarts-for-react`. A checkbox allows users to toggle the WebSocket connection on or off, giving them control over real-time updates.
+The main component builds a real-time eCommerce dashboard that connects to a WebSocket server at `ws://localhost:8000/ws` to fetch and display live data. It uses the *React useWebSocket* package (`react-use-websocket`) to manage the WebSocket connection, and whenever new data is received, it updates the state with the latest metrics and chart options. The data processing is handled by helper functions (`getMetrics`, `createMetricItems`, and `createOptionsItems`), which compute summary metrics and prepare visualization data. The UI dynamically updates to display key business metrics using the *Metric* component and interactive bar charts powered by *Apache ECharts* (`echarts-for-react`). A checkbox allows users to toggle the WebSocket connection on or off, giving them control over real-time updates.
 
 ```jsx
 // nextjs/src/app/page.tsx
