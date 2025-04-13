@@ -9,7 +9,8 @@ reward: false
 pinned: false
 carousel: false
 featuredImage: false
-# series:
+series:
+  - Realtime Dashboard with FastAPI, Streamlit and Next.js
 categories:
   - Data Product
 tags: 
