@@ -12,7 +12,7 @@ featuredImage: false
 series:
   - Realtime Dashboard with FastAPI, Streamlit and Next.js
 categories:
-  - Data Product
+  - Development
 tags: 
   - Python
   - FastAPI

@@ -12,7 +12,7 @@ featuredImage: false
 # series:
 #   - API development with R
 categories:
-  - R
+  - Apache Spark
 tags: 
   - Apache Spark
   - R

@@ -11,8 +11,8 @@ carousel: false
 featuredImage: false
 series:
   - Parallel processing on single machine
-categories:
-  - R
+# categories:
+#   - R
 tags: 
   - R
 authors:

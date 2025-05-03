@@ -13,6 +13,8 @@ series:
   - Getting Started with Pyflink on AWS
 categories:
   - Data Streaming
+  - Apache Kafka
+  - Apache Flink
 tags:
   - Apache Flink
   - Pyflink

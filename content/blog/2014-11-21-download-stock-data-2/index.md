@@ -11,8 +11,8 @@ carousel: false
 featuredImage: false
 # series:
 #   - Tree based methods in R
-categories:
-  - R
+# categories:
+#   - R
 tags: 
   - R
 authors:

@@ -13,6 +13,7 @@ featuredImage: false
 #   - Kafka Development with Docker
 categories:
   - Data Streaming
+  - Apache Flink
 tags: 
   - Apache Kafka
   - Apache Flink

@@ -13,6 +13,8 @@ series:
   - Kafka, Flink and DynamoDB for Real Time Fraud Detection
 categories:
   - Data Streaming
+  - Apache Kafka
+  - Apache Flink
 tags:
   - Apache Flink
   - Pyflink

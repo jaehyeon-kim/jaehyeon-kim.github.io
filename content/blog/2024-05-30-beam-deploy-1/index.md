@@ -13,6 +13,7 @@ series:
   - Deploy Python Stream Processing App on Kubernetes
 categories:
   - Data Streaming
+  - Apache Flink
 tags: 
   - Apache Flink
   - Apache Kafka

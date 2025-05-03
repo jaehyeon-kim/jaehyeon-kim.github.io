@@ -11,6 +11,8 @@ carousel: false
 featuredImage: false
 categories:
   - Data Engineering
+  - Apache Spark
+  - Apache Flink
 tags: 
   - Apache Flink
   - PyFlink

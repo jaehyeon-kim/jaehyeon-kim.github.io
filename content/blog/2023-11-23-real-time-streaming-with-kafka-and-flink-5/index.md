@@ -13,6 +13,7 @@ series:
   - Real Time Streaming with Kafka and Flink
 categories:
   - Data Streaming
+  - Apache Flink
 tags: 
   - AWS
   - Amazon MSK

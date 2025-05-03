@@ -11,8 +11,8 @@ carousel: false
 featuredImage: false
 # series:
 #   - API development with R
-categories:
-  - General
+# categories:
+#   - R
 tags: 
   - Python
 authors:

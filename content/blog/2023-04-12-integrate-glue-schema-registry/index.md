@@ -13,6 +13,7 @@ featuredImage: false
 #   - 
 categories:
   - Data Streaming
+  - Apache Kafka
 tags: 
   - AWS
   - Amazon MSK

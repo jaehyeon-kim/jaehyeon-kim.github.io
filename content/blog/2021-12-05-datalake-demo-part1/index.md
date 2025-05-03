@@ -13,6 +13,8 @@ series:
   - Data Lake Demo Using Change Data Capture
 categories:
   - Data Engineering
+  - Apache Kafka
+  - Apache Spark
 tags: 
   - AWS
   - Amazon EMR

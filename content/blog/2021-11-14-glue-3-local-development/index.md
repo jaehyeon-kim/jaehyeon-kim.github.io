@@ -13,6 +13,7 @@ featuredImage: false
 #   - API development with R
 categories:
   - Data Engineering
+  - apache Spark
 tags: 
   - AWS
   - AWS Glue

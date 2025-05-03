@@ -12,6 +12,7 @@ featuredImage: false
 series:
   - Kafka Development with Docker
 categories:
+  - Data Streaming
   - Apache Kafka
 tags: 
   - Apache Kafka

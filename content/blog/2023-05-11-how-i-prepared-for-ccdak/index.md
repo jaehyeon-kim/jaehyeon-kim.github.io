@@ -11,8 +11,8 @@ carousel: false
 featuredImage: false
 # series:
 #   - Kafka Development with Docker
-categories:
-  - General
+# categories:
+#   - General
 tags: 
   - Apache Kafka
   - Confluent

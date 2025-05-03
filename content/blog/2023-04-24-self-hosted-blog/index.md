@@ -11,8 +11,8 @@ carousel: false
 featuredImage: false
 # series:
 #   - 
-categories:
-  - General
+# categories:
+#   - General
 tags: 
   - Hugo
   - Bootstrap

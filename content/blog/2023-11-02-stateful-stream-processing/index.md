@@ -13,6 +13,7 @@ featuredImage: false
 #   - Kafka Connect for AWS Services Integration
 categories:
   - Data Streaming
+  - Apache Flink
 tags: 
   - Stateful Stream Processing
   - Event Driven Architecture

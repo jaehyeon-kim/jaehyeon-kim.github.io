@@ -11,7 +11,7 @@ carousel: false
 featuredImage: false
 # series:
 categories:
-  - Data Streaming
+  - Apache Flink
 tags: 
   - Apache Flink
   - Docker
