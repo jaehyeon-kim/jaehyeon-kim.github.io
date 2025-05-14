@@ -1,3 +1,5 @@
+.ignore
+venv
 /node_modules
 /resources
 /public/*
