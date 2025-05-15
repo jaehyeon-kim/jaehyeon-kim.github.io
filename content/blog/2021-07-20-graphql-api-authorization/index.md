@@ -13,11 +13,13 @@ featuredImage: false
 #   - API development with R
 categories:
   - Development
+  - Security
 tags: 
-  - Apollo
+  - Apollo Server
   - Authorization
-  - GraphQL
+  - GraphQL API
   - Node.js
+  - Oso
 authors:
   - JaehyeonKim
 images: []

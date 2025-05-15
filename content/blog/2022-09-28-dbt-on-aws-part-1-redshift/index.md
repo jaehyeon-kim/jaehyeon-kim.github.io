@@ -15,9 +15,9 @@ categories:
   - Data Engineering
 tags: 
   - AWS
+  - AWS Serverless
   - Amazon Redshift
-  - Data Build Tool (DBT)
-  - Terraform
+  - dbt
 authors:
   - JaehyeonKim
 images: []

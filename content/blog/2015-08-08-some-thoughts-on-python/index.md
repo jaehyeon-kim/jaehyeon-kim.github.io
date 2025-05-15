@@ -11,10 +11,11 @@ carousel: false
 featuredImage: false
 # series:
 #   - API development with R
-# categories:
-#   - R
-tags: 
+categories:
+  - Development
+tags:
   - Python
+  - R
 authors:
   - JaehyeonKim
 images: []

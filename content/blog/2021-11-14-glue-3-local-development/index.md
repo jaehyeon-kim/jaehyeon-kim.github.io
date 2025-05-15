@@ -13,15 +13,12 @@ featuredImage: false
 #   - API development with R
 categories:
   - Data Engineering
-  - apache Spark
 tags: 
   - AWS
   - AWS Glue
   - Docker
-  - Apache Spark
   - PySpark
   - Python
-  - Visual Studio Code
 authors:
   - JaehyeonKim
 images: []

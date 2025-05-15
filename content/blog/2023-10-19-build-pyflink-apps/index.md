@@ -13,13 +13,11 @@ featuredImage: false
 #   - Kafka Development with Docker
 categories:
   - Data Streaming
-  - Apache Flink
 tags: 
-  - Apache Kafka
   - Apache Flink
-  - Pyflink
+  - Apache Kafka
   - Docker
-  - Docker Compose
+  - Pyflink
   - Python
 authors:
   - JaehyeonKim

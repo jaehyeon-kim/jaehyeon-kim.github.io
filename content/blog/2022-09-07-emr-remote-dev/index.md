@@ -13,14 +13,11 @@ featuredImage: false
 #   - Integrate Schema Registry with MSK Connect
 categories:
   - Data Engineering
-  - Apache Spark
 tags: 
   - AWS
   - Amazon EMR
   - Apache Spark
-  - Pyspark
-  - Visual Studio Code
-  - Terraform
+  - PySpark
 authors:
   - JaehyeonKim
 images: []

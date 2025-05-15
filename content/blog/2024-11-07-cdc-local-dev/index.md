@@ -11,14 +11,15 @@ carousel: false
 featuredImage: false
 # series:
 categories:
+  - Data Integration
   - Data Streaming
 tags: 
+  - GCP
+  - Google Pub/Sub
+  - Pub/Sub Emulator
   - Change Data Capture (CDC)
-  - PostgreSQL
   - Debezium
-  - Pub/Sub
-  - Docker
-  - Docker Compose
+  - PostgreSQL
 authors:
   - JaehyeonKim
 images: []

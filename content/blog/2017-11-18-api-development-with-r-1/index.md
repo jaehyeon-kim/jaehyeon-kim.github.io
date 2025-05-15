@@ -14,10 +14,11 @@ series:
 categories:
   - Development
 tags: 
+  - Docker
+  - Plumber
   - R
   - Rserve
   - rApache
-  - Plumber
 authors:
   - JaehyeonKim
 images: []

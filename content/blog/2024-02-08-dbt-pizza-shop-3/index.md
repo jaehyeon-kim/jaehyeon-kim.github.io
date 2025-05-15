@@ -14,10 +14,11 @@ series:
 categories:
   - Data Engineering
 tags: 
-  - Data Build Tool (DBT)
-  - GCP
   - BigQuery
+  - GCP
   - Python
+  - Docker
+  - dbt
 authors:
   - JaehyeonKim
 images: []

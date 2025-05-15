@@ -13,10 +13,12 @@ series:
   - Kafka Development with Docker
 categories:
   - Data Streaming
-  - Apache Kafka
 tags: 
+  - AWS
+  - AWS Glue Schema Registry
   - Apache Kafka
-  - Glue Schema Registry
+  - Kafka Connect
+  - Schema Registry
 authors:
   - JaehyeonKim
 images: []

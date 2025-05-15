@@ -12,11 +12,11 @@ featuredImage: false
 # series:
 #   - API development with R
 categories:
-  - Apache Spark
+  - Data Engineering
 tags: 
   - Apache Spark
-  - R
   - SparkR
+  - R
 authors:
   - JaehyeonKim
 images: []

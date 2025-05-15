@@ -14,13 +14,12 @@ series:
 categories:
   - Data Engineering
 tags: 
-  - Data Build Tool (DBT)
-  - GCP
-  - BigQuery
-  - Docker
-  - Docker Compose
   - Apache Airflow
+  - BigQuery
+  - GCP
+  - Docker
   - Python
+  - dbt
 authors:
   - JaehyeonKim
 images: []

@@ -14,12 +14,11 @@ series:
 categories:
   - Data Engineering
 tags: 
-  - Data Build Tool (DBT)
-  - GCP
   - BigQuery
-  - Continuous Integration
   - Continuous Delivery
+  - Continuous Integration
   - GitHub Actions
+  - dbt
 authors:
   - JaehyeonKim
 images: []

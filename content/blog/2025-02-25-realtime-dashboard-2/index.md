@@ -14,9 +14,9 @@ series:
 categories:
   - Development
 tags: 
+  - Apache ECharts
   - Python
   - Streamlit
-  - Apache ECharts
   - WebSocket
 authors:
   - JaehyeonKim

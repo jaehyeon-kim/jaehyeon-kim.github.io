@@ -15,9 +15,8 @@ categories:
   - Data Streaming
 tags: 
   - Apache Kafka
-  - Python
   - Docker
-  - Docker Compose
+  - Python
 authors:
   - JaehyeonKim
 images: []

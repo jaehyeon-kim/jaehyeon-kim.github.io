@@ -11,9 +11,9 @@ carousel: false
 featuredImage: false
 # series:
 #   - API development with R
-# categories:
-#   - R
-tags: 
+categories:
+  - Data Analysis
+tags:
   - R
 authors:
   - JaehyeonKim

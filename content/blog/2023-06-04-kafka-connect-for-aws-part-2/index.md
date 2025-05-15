@@ -13,15 +13,13 @@ series:
   - Kafka Connect for AWS Services Integration
 categories:
   - Data Streaming
-  - Apache Kafka
 tags: 
   - AWS
-  - Apache Kafka
-  - Kafka Connect
-  - Apache Camel
   - Amazon DynamoDB
+  - Apache Camel
+  - Apache Kafka
   - Docker
-  - Docker Compose
+  - Kafka Connect
 authors:
   - JaehyeonKim
 images: []

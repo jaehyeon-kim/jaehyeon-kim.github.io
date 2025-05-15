@@ -15,10 +15,10 @@ categories:
   - Data Engineering
 tags: 
   - AWS
+  - AWS Glue
   - Amazon Athena
   - Amazon QuickSight
-  - Data Build Tool (DBT)
-  - Terraform
+  - dbt
 authors:
   - JaehyeonKim
 images: []

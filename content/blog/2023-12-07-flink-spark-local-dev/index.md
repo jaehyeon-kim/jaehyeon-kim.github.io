@@ -10,19 +10,16 @@ pinned: false
 carousel: false
 featuredImage: false
 categories:
+  - Development
+  - Data Streaming
   - Data Engineering
-  - Apache Spark
-  - Apache Flink
 tags: 
-  - Apache Flink
-  - PyFlink
-  - Apache Spark
-  - PySpark
-  - Apache Kafka
+  - AWS
   - Amazon EMR
+  - Apache Flink
+  - Apache Kafka
+  - Apache Spark
   - Docker
-  - Docker Compose
-  - Python
 authors:
   - JaehyeonKim
 images: []

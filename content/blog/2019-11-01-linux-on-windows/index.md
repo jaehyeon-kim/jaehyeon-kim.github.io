@@ -14,16 +14,12 @@ featuredImage: false
 categories:
   - Development
 tags: 
-  - VSCode
-  - WSL
   - Docker
-  - Docker Compose
+  - WSL
   - Kubernetes
   - Minikube
-  - Rserve
-  - FastAPI
-  - R
   - Python
+  - R
 authors:
   - JaehyeonKim
 images: []

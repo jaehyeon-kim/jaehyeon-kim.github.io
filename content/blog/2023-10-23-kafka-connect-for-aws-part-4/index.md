@@ -12,15 +12,15 @@ featuredImage: false
 series:
   - Kafka Connect for AWS Services Integration
 categories:
+  - Data Integration
   - Data Streaming
-  - Apache Kafka
 tags: 
   - AWS
   - Apache Kafka
   - Kafka Connect
-  - OpenSearch
   - Docker
-  - Docker Compose
+  - Kafka Connect
+  - OpenSearch
 authors:
   - JaehyeonKim
 images: []

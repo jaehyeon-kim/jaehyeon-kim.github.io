@@ -14,12 +14,11 @@ series:
 categories:
   - Data Engineering
 tags: 
-  - Data Build Tool (DBT)
+  - Apache Airflow
   - PostgreSQL
   - Docker
-  - Docker Compose
-  - Apache Airflow
   - Python
+  - dbt
 authors:
   - JaehyeonKim
 images: []

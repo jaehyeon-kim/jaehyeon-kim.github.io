@@ -13,11 +13,11 @@ series:
   - Kafka Development with Docker
 categories:
   - Data Streaming
-  - Apache Kafka
 tags: 
   - Apache Kafka
   - Docker
-  - Docker Compose
+  - Kpow
+  - kafka-ui
 authors:
   - JaehyeonKim
 images: []

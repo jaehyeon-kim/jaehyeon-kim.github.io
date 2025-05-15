@@ -13,17 +13,13 @@ series:
   - Simplify Streaming Ingestion on AWS
 categories:
   - Data Streaming
-  - Apache Kafka
 tags: 
   - AWS
-  - Amazon MSK
-  - Amazon Athena
-  - Amazon EventBridge
   - AWS Lambda
-  - AWS SAM
+  - Amazon Athena
+  - Amazon MSK
   - Apache Kafka
   - Python
-  - Terraform
 authors:
   - JaehyeonKim
 images: []

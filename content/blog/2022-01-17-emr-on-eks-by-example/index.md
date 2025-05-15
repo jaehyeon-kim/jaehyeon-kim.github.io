@@ -13,11 +13,11 @@ featuredImage: false
 #   - Data Lake Demo Using Change Data Capture
 categories:
   - Data Engineering
-  - Apache Kafka
 tags: 
   - AWS
-  - Amazon EMR
   - Amazon EKS
+  - Amazon EMR
+  - EMR on EKS
   - Apache Spark
   - Kubernetes
 authors:

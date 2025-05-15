@@ -14,13 +14,11 @@ featuredImage: false
 categories:
   - Development
 tags: 
-  - Traefik
-  - FastAPI
-  - Rserve
-  - R
-  - Python
   - Docker
-  - Docker Compose
+  - FastAPI
+  - Python
+  - R
+  - Traefik
 authors:
   - JaehyeonKim
 images: []

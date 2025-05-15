@@ -11,17 +11,13 @@ carousel: false
 featuredImage: false
 # series:
 categories:
+  - Data Architecture
   - Data Streaming
 tags: 
-  - Data Architecture
-  - Real Time Data
-  - Data Lake
-  - Streamhouse
-  - Apache Paimon
-  - Apache Iceberg
-  - Fluss
   - Apache Flink
-  - Data Management
+  - Apache Iceberg
+  - Apache Paimon
+  - Fluss
 authors:
   - JaehyeonKim
 images: []

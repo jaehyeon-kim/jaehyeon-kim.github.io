@@ -12,10 +12,10 @@ featuredImage: false
 series:
   - Apache Beam Local Development with Python
 categories:
-  - Apache Beam
+  - Data Engineering
+  - Data Streaming
 tags: 
   - Apache Beam
-  - Apache Flink
   - Python
 authors:
   - JaehyeonKim

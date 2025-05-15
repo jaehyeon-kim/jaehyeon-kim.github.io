@@ -13,13 +13,13 @@ featuredImage: false
 #   - Integrate Schema Registry with MSK Connect
 categories:
   - Data Engineering
-  - Apache Spark
 tags: 
   - AWS
   - Amazon EKS
   - Amazon EMR
+  - EMR on EKS
   - Apache Spark
-  - Kubernetes
+  - Karpenter
   - Terraform
 authors:
   - JaehyeonKim

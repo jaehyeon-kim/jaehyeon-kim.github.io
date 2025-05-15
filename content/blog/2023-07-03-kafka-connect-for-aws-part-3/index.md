@@ -13,15 +13,14 @@ series:
   - Kafka Connect for AWS Services Integration
 categories:
   - Data Streaming
-  - Apache Kafka
+  - Data Integration
 tags: 
   - AWS
+  - Amazon DynamoDB
   - Amazon MSK
-  - Amazon MSK Connect
+  - Apache Camel
   - Apache Kafka
   - Kafka Connect
-  - Apache Camel
-  - Amazon DynamoDB
 authors:
   - JaehyeonKim
 images: []

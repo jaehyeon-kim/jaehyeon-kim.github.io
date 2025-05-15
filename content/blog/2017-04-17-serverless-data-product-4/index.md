@@ -16,13 +16,9 @@ categories:
 tags: 
   - AWS
   - AWS Lambda
-  - Amazon S3
   - Amazon API Gateway
-  - R
   - Python
-  - CloudFront
-  - Route53  
-  - React
+  - R
 authors:
   - JaehyeonKim
 images: []

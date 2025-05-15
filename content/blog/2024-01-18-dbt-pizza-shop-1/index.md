@@ -14,11 +14,10 @@ series:
 categories:
   - Data Engineering
 tags: 
-  - Data Build Tool (DBT)
   - PostgreSQL
   - Docker
-  - Docker Compose
   - Python
+  - dbt
 authors:
   - JaehyeonKim
 images: []

@@ -14,12 +14,11 @@ series:
 categories:
   - Development
 tags: 
-  - Python
   - FastAPI
-  - WebSocket
   - PostgreSQL
+  - Python
   - Docker
-  - Docker Compose
+  - WebSocket
 authors:
   - JaehyeonKim
 images: []

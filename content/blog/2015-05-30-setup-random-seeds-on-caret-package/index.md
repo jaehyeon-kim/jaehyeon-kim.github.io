@@ -12,8 +12,8 @@ featuredImage: false
 # series:
 #   - API development with R
 categories:
-  - Machine Learning
-tags: 
+  - Data Analysis
+tags:
   - R
 authors:
   - JaehyeonKim

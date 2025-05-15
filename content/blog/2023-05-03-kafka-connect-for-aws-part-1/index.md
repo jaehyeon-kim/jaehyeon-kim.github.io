@@ -13,9 +13,10 @@ series:
   - Kafka Connect for AWS Services Integration
 categories:
   - Data Streaming
-  - Apache Kafka
+  - Data Integration
 tags: 
   - AWS
+  - Amazon MSK
   - Apache Kafka
   - Kafka Connect
 authors:

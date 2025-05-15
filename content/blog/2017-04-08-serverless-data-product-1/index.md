@@ -17,8 +17,8 @@ tags:
   - AWS
   - AWS Lambda
   - Amazon API Gateway
-  - R
   - Python
+  - R
 authors:
   - JaehyeonKim
 images: []

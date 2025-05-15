@@ -13,12 +13,10 @@ series:
   - Kafka Development with Docker
 categories:
   - Data Streaming
-  - Apache Kafka
 tags: 
   - Apache Kafka
-  - Python
   - Docker
-  - Docker Compose
+  - Python
 authors:
   - JaehyeonKim
 images: []

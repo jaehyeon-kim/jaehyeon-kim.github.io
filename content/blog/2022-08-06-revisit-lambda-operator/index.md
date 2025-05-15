@@ -17,9 +17,8 @@ tags:
   - AWS
   - AWS Lambda
   - Apache Airflow
-  - Python
   - Docker
-  - Docker Compose
+  - Python
 authors:
   - JaehyeonKim
 images: []

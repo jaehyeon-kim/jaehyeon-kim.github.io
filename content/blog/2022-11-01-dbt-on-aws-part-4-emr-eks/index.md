@@ -15,12 +15,11 @@ categories:
   - Data Engineering
 tags: 
   - AWS
-  - Amazon EMR
   - Amazon EKS
-  - Amazon QuickSight
-  - Data Build Tool (DBT)
+  - Amazon EMR
+  - EMR on EKS
   - Apache Spark
-  - Terraform
+  - dbt
 authors:
   - JaehyeonKim
 images: []
