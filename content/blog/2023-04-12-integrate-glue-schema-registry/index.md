@@ -13,18 +13,11 @@ featuredImage: false
 #   - 
 categories:
   - Data Streaming
-  - Apache Kafka
 tags: 
-  - AWS
-  - Amazon MSK
   - AWS Glue Schema Registry
   - AWS Lambda
-  - AWS Serverless Application Model
   - Apache Kafka
   - Python
-  - Docker
-  - Docker Compose
-  - Terraform
 authors:
   - JaehyeonKim
 images: []

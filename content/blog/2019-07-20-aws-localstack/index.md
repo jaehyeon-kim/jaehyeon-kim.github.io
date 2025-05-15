@@ -15,15 +15,11 @@ categories:
   - Development
 tags: 
   - AWS
-  - Docker
-  - Docker Compose
   - AWS Lambda
-  - LocalStack
-  - S3
-  - SQS
-  - Python
+  - Docker
   - Flask
-  - Flask-RestPlus
+  - LocalStack
+  - Python
 authors:
   - JaehyeonKim
 images: []

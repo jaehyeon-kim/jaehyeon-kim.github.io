@@ -14,14 +14,12 @@ series:
 categories:
   - Data Engineering
 tags: 
-  - Data Build Tool (DBT)
   - AWS
   - Amazon Athena
-  - Apache Iceberg
-  - Docker
-  - Docker Compose
   - Apache Airflow
+  - Docker
   - Python
+  - dbt
 authors:
   - JaehyeonKim
 images: []

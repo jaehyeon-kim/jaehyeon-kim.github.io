@@ -14,8 +14,8 @@ featuredImage: false
 categories:
   - Development
 tags: 
+  - R Shiny
   - R
-  - Shiny
 authors:
   - JaehyeonKim
 images: []

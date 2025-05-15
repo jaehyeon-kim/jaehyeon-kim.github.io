@@ -12,12 +12,12 @@ featuredImage: false
 series:
   - Apache Beam Local Development with Python
 categories:
-  - Apache Beam
+  - Data Streaming
 tags: 
   - Apache Beam
   - Apache Flink
+  - Apache Kafka
   - Python
-  - Jupyter Notebook
 authors:
   - JaehyeonKim
 images: []

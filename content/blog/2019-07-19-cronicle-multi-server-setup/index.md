@@ -16,7 +16,6 @@ categories:
 tags: 
   - Cronicle
   - Docker
-  - Nginx
 authors:
   - JaehyeonKim
 images: []

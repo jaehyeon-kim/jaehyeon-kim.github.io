@@ -14,9 +14,10 @@ featuredImage: false
 categories:
   - Development
 tags: 
-  - R
-  - Shiny
   - JavaScript
+  - RServe
+  - R Shiny
+  - R
 authors:
   - JaehyeonKim
 images: []

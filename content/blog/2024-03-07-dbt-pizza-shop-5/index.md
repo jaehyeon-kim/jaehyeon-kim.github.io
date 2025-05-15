@@ -14,11 +14,11 @@ series:
 categories:
   - Data Engineering
 tags: 
-  - Data Build Tool (DBT)
   - AWS
   - Amazon Athena
-  - Apache Iceberg
   - Python
+  - Docker
+  - dbt
 authors:
   - JaehyeonKim
 images: []

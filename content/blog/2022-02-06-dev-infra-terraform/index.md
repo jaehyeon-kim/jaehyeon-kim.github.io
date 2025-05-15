@@ -15,8 +15,10 @@ categories:
   - Development
 tags: 
   - AWS
+  - Amazon Aurora
+  - PostgreSQL
+  - SoftEther VPN
   - Terraform
-  - VPN
 authors:
   - JaehyeonKim
 images: []

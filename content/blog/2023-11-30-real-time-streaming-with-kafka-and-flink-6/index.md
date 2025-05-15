@@ -13,16 +13,12 @@ series:
   - Real Time Streaming with Kafka and Flink
 categories:
   - Data Streaming
-  - Apache Kafka
 tags: 
   - AWS
-  - Amazon MSK
-  - Amazon MSK Connect
   - Amazon DynamoDB
+  - Apache Flink
   - Apache Kafka
   - Kafka Connect
-  - Docker
-  - Docker Compose
 authors:
   - JaehyeonKim
 images: []

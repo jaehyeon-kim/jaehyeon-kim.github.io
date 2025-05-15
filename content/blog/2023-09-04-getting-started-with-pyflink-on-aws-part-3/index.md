@@ -14,15 +14,12 @@ series:
 categories:
   - Data Streaming
 tags:
-  - Apache Flink
-  - Pyflink
-  - Apache Kafka
-  - Amazon Managed Service for Apache Flink
-  - Amazon Managed Flink
+  - AWS
   - Amazon MSK
-  - Python
+  - Apache Kafka
   - Docker
-  - Docker Compose
+  - Pyflink
+  - Python
 authors:
   - JaehyeonKim
 images: []

@@ -12,11 +12,10 @@ featuredImage: false
 # series:
 #   - Kafka Development with Docker
 # categories:
-#   - General
+#   - Certification
 tags: 
   - Apache Kafka
-  - Confluent
-  - Certification
+  - CCDAK
 authors:
   - JaehyeonKim
 images: []

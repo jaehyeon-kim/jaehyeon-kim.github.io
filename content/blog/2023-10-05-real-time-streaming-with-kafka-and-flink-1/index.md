@@ -13,27 +13,12 @@ series:
   - Real Time Streaming with Kafka and Flink
 categories:
   - Data Streaming
-  - Apache Kafka
-  - Apache Flink
 tags: 
   - AWS
   - Amazon MSK
-  - Amazon MSK Connect
-  - AWS Lambda
-  - Amazon S3
-  - Amazon DyanmoDB
-  - Amazon Athena
-  - AWS Glue
-  - Amazon OpenSearch Service
-  - Apache Kafka
-  - Kafka Connect
   - Apache Flink
+  - Apache Kafka
   - Pyflink
-  - Apache Camel
-  - OpenSearch
-  - Docker
-  - Docker Compose
-  - Python
 authors:
   - JaehyeonKim
 images: []

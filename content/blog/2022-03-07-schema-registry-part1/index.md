@@ -12,16 +12,16 @@ featuredImage: false
 series:
   - Integrate Schema Registry with MSK Connect
 categories:
+  - Data Integration
   - Data Streaming
-  - Apache Kafka
 tags: 
   - AWS
-  - Amazon MSK
-  - Amazon MSK Connect
   - Apache Kafka
-  - Kafka Connect
+  - Kafka connect
+  - Apicurio Registry
+  - Change Data Capture (CDC)
+  - Debezium
   - Docker
-  - Docker Compose
 authors:
   - JaehyeonKim
 images: []

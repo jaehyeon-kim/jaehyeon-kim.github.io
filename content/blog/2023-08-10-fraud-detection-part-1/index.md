@@ -13,18 +13,13 @@ series:
   - Kafka, Flink and DynamoDB for Real Time Fraud Detection
 categories:
   - Data Streaming
-  - Apache Kafka
-  - Apache Flink
 tags:
-  - Apache Flink
-  - Pyflink
-  - Apache Kafka
-  - Kafka Connect
+  - AWS
   - Amazon DynamoDB
-  - Python
+  - Apache Flink
+  - Apache Kafka
   - Docker
-  - Docker Compose
-  - Fraud Detection
+  - Python
 authors:
   - JaehyeonKim
 images: []

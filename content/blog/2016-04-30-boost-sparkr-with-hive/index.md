@@ -12,12 +12,13 @@ featuredImage: false
 # series:
 #   - API development with R
 categories:
-  - Apache Spark
+  - Data Engineering
 tags: 
   - Apache Spark
   - Apache Hive
-  - R
+  - HiveQL
   - SparkR
+  - R
 authors:
   - JaehyeonKim
 images: []

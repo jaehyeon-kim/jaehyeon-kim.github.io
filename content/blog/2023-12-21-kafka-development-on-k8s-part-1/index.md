@@ -13,13 +13,14 @@ series:
   - Kafka Development on Kubernetes
 categories:
   - Data Streaming
-  - Apache Kafka
+  - Kubernetes
 tags: 
   - Apache Kafka
   - Kubernetes
   - Minikube
-  - Strimzi
   - Docker
+  - Python
+  - Strimzi
 authors:
   - JaehyeonKim
 images: []

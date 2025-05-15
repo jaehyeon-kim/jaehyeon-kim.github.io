@@ -12,22 +12,18 @@ featuredImage: false
 series:
   - Data Lake Demo Using Change Data Capture
 categories:
+  - Data Streaming
   - Data Engineering
-  - Apache Kafka
-  - Apache Spark
+  - Data Integration
 tags: 
   - AWS
   - Amazon EMR
   - Amazon MSK
-  - Amazon MSK Connect
-  - Apache Spark
   - Apache Hudi
   - Apache Kafka
   - Kafka Connect
-  - Change Data Capture
-  - Data Lake
-  - Docker
-  - Docker Compose
+  - Change Data Capture (CDC)
+  - Debezium
 authors:
   - JaehyeonKim
 images: []

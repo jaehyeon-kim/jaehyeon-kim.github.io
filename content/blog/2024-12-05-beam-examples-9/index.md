@@ -13,14 +13,11 @@ series:
   - Apache Beam Python Examples
 categories:
   - Data Streaming
-  - Apache Beam
 tags: 
   - Apache Beam
   - Apache Flink
-  - gRPC
   - Python
-  - Docker
-  - Docker Compose
+  - Splittable DoFn
 authors:
   - JaehyeonKim
 images: []

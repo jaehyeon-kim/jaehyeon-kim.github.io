@@ -12,13 +12,12 @@ featuredImage: false
 series:
   - Kafka Development with Docker
 categories:
+  - Data Integration
   - Data Streaming
-  - Apache Kafka
 tags: 
   - Apache Kafka
-  - Kafka Connect
   - Docker
-  - Docker Compose
+  - Kafka Connect
 authors:
   - JaehyeonKim
 images: []

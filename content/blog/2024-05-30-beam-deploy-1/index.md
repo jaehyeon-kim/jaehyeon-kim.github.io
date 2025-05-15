@@ -13,14 +13,13 @@ series:
   - Deploy Python Stream Processing App on Kubernetes
 categories:
   - Data Streaming
-  - Apache Flink
+  - Kubernetes
 tags: 
   - Apache Flink
   - Apache Kafka
-  - Kubernetes
-  - Minikube
-  - Python
   - Docker
+  - Kubernetes
+  - Python
 authors:
   - JaehyeonKim
 images: []

@@ -11,9 +11,9 @@ carousel: false
 featuredImage: false
 series:
   - Parallel processing on single machine
-# categories:
-#   - R
-tags: 
+categories:
+  - Data Analysis
+tags:
   - R
 authors:
   - JaehyeonKim

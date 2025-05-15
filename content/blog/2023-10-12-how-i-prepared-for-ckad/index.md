@@ -12,10 +12,10 @@ featuredImage: false
 # series:
 #   - Kafka Development with Docker
 # categories:
-#   - General
+#   - Certification
 tags: 
+  - CKAD
   - Kubernetes
-  - Certification
 authors:
   - JaehyeonKim
 images: []

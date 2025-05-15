@@ -17,9 +17,8 @@ tags:
   - AWS
   - Amazon EMR
   - Amazon QuickSight
-  - Data Build Tool (DBT)
   - Apache Spark
-  - Terraform
+  - dbt
 authors:
   - JaehyeonKim
 images: []

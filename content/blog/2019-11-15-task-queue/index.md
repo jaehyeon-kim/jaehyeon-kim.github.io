@@ -15,14 +15,9 @@ categories:
   - Development
 tags: 
   - FastAPI
-  - Celery
-  - Redis
-  - Rserve
-  - R
   - Python
-  - Docker
-  - Docker Compose
-  - Kubernetes
+  - R
+  - RServe
 authors:
   - JaehyeonKim
 images: []

@@ -14,9 +14,9 @@ featuredImage: false
 categories:
   - Development
 tags: 
-  - R
-  - Shiny
   - JavaScript
+  - R Shiny
+  - R
   - Vue.js
 authors:
   - JaehyeonKim

@@ -13,19 +13,13 @@ featuredImage: false
 #   - Integrate Schema Registry with MSK Connect
 categories:
   - Data Engineering
-  - Apache Spark
 tags: 
   - AWS
   - Amazon EMR
-  - Apache Spark
-  - Pyspark
   - Apache Iceberg
-  - ETL
-  - SCD
-  - Slowly Changing Dimension
-  - Docker
-  - Docker Compose
-  - Visual Studio Code
+  - Apache Spark
+  - PySpark
+  - Python
 authors:
   - JaehyeonKim
 images: []

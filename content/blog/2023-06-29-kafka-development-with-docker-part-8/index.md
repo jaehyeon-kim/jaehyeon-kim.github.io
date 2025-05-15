@@ -13,13 +13,12 @@ series:
   - Kafka Development with Docker
 categories:
   - Data Streaming
-  - Apache Kafka
+  - Security
 tags: 
   - Apache Kafka
-  - Security
-  - Python
   - Docker
-  - Docker Compose
+  - Python
+  - SSL/TLS
 authors:
   - JaehyeonKim
 images: []

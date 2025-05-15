@@ -12,12 +12,12 @@ featuredImage: false
 series:
   - Apache Beam Local Development with Python
 categories:
-  - Apache Beam
+  - Data Processing
 tags: 
   - Apache Beam
-  - Apache Flink
-  - Python
+  - Beam SQL
   - Jupyter Notebook
+  - Python
 authors:
   - JaehyeonKim
 images: []

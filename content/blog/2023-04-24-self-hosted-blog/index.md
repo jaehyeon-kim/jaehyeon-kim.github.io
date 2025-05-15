@@ -13,10 +13,9 @@ featuredImage: false
 #   - 
 # categories:
 #   - General
-tags: 
-  - Hugo
-  - Bootstrap
-  - GitHub Pages
+# tags: 
+#   - GitHub Pages
+#   - Hugo
 authors:
   - JaehyeonKim
 images: []

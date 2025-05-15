@@ -14,10 +14,9 @@ series:
 categories:
   - Development
 tags: 
-  - React
-  - Next.js
-  - TypeScript
   - Apache ECharts
+  - Next.js
+  - React
   - WebSocket
 authors:
   - JaehyeonKim

@@ -11,11 +11,13 @@ carousel: false
 featuredImage: false
 # series:
 categories:
-  - Apache Flink
+  - Data Streaming
 tags: 
   - Apache Flink
   - Docker
   - Docker Compose
+  - Flink SQL
+  - Flink SQL Client
 authors:
   - JaehyeonKim
 images: []

@@ -12,8 +12,8 @@ featuredImage: false
 series:
   - Tree based methods in R
 categories:
-  - Machine Learning
-tags: 
+  - Data Analysis
+tags:
   - R
 authors:
   - JaehyeonKim

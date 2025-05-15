@@ -12,9 +12,11 @@ featuredImage: false
 # series:
 #   - Apache Beam Python Examples
 categories:
-  - Apache Beam
+  - Data Processing
 tags: 
   - Apache Beam
+  - Caching
+  - Data Enrichment
   - Python
 authors:
   - JaehyeonKim

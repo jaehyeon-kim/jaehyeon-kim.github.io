@@ -13,18 +13,13 @@ series:
   - Getting Started with Pyflink on AWS
 categories:
   - Data Streaming
-  - Apache Kafka
-  - Apache Flink
 tags:
-  - Apache Flink
-  - Pyflink
-  - Apache Kafka
-  - Amazon Managed Service for Apache Flink
-  - Amazon Managed Flink
+  - AWS
   - Amazon MSK
+  - Apache Flink
+  - Apache Kafka
+  - Pyflink
   - Python
-  - Docker
-  - Docker Compose
 authors:
   - JaehyeonKim
 images: []

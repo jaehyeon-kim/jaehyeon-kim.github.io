@@ -13,17 +13,12 @@ series:
   - Kafka Connect for AWS Services Integration
 categories:
   - Data Streaming
-  - Apache Kafka
 tags: 
   - AWS
   - Amazon MSK
-  - MSK Connect
   - Amazon OpenSearch Service
   - Apache Kafka
   - Kafka Connect
-  - OpenSearch
-  - Docker
-  - Docker Compose
 authors:
   - JaehyeonKim
 images: []

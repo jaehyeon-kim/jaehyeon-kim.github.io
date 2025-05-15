@@ -17,6 +17,9 @@ tags:
   - AWS
   - AWS Lambda
   - AWS SAM
+  - Python
+  - S3
+  - Serverless Application Model (SAM)
 authors:
   - JaehyeonKim
 images: []

@@ -13,18 +13,12 @@ series:
   - Real Time Streaming with Kafka and Flink
 categories:
   - Data Streaming
-  - Apache Kafka
-  - Apache Flink
 tags: 
   - AWS
-  - Amazon MSK
   - Amazon S3
-  - Amazon Athena
-  - Apache Kafka
   - Apache Flink
+  - Apache Kafka
   - Pyflink
-  - Docker
-  - Docker Compose
   - Python
 authors:
   - JaehyeonKim

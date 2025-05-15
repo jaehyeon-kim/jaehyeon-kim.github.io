@@ -14,9 +14,12 @@ featuredImage: false
 categories:
   - Development
 tags: 
+  - AWS
   - AWS Lambda
   - Amazon SQS
+  - EventBridge
   - Node.js
+  - Serverless Framework
 authors:
   - JaehyeonKim
 images: []
