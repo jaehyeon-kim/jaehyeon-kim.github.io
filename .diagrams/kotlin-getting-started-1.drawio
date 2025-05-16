@@ -1,0 +1,49 @@
+<mxfile host="65bd71144e">
+    <diagram id="yDFY6U7StCinaWoFonNR" name="Page-1">
+        <mxGraphModel dx="792" dy="359" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="kclgRzO7y8G4B5S8kXG3-33" value="Kafka Clients with JSON&lt;div&gt;Producing and Consuming Order Events&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="90" width="680" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="kclgRzO7y8G4B5S8kXG3-1" value="ProducerApp" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;arcSize=10;fontSize=14;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="180" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="kclgRzO7y8G4B5S8kXG3-2" value="Apache Kafka Cluster" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;" parent="1" vertex="1">
+                    <mxGeometry x="360" y="160" width="120" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="kclgRzO7y8G4B5S8kXG3-3" value="ConsumerApp" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;arcSize=10;fontSize=14;" parent="1" vertex="1">
+                    <mxGeometry x="640" y="180" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="kclgRzO7y8G4B5S8kXG3-4" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#000000;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="220" y="220" as="sourcePoint"/>
+                        <mxPoint x="340" y="220" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="kclgRzO7y8G4B5S8kXG3-5" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#000000;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="500" y="220" as="sourcePoint"/>
+                        <mxPoint x="630" y="220" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="kclgRzO7y8G4B5S8kXG3-6" value="Order&lt;br&gt;{ JSON }" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2;labelBackgroundColor=#ffffff;labelBorderColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="240" y="180" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="kclgRzO7y8G4B5S8kXG3-7" value="Order&lt;br&gt;{ JSON }" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2;labelBackgroundColor=#ffffff;labelBorderColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="520" y="180" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="kclgRzO7y8G4B5S8kXG3-8" value="Topic: orders-json" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="360" y="285" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="kclgRzO7y8G4B5S8kXG3-25" value="Generates &lt;b&gt;Order&lt;/b&gt; objects,&lt;br&gt;serializes to JSON,&lt;br&gt;sends to Kafka." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="270" width="160" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="kclgRzO7y8G4B5S8kXG3-27" value="Consumes &lt;b&gt;Order&lt;/b&gt; messages,&lt;br&gt;deserializes from JSON,&lt;br&gt;processes." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="620" y="270" width="160" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

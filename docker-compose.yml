@@ -1,5 +1,3 @@
-version: "3.5"
-
 services:
   hugo:
       image: peaceiris/hugo:v0.123.0-full
