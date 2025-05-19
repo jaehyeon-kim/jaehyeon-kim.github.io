@@ -1,0 +1,37 @@
+---
+title: Kafka Streams - Lightweight Real-Time Processing for Supplier Stats
+date: 2025-06-03
+draft: true
+featured: true
+comment: true
+toc: false
+reward: false
+pinned: false
+carousel: false
+featuredImage: false
+series:
+  - Getting Started with Real-Time Streaming in Kotlin
+categories:
+  - Data Streaming
+tags: 
+  - Apache Kafka
+  - Kafka Streams
+  - Kotlin
+  - Docker
+  - Kpow
+  - Factor House Local
+authors:
+  - JaehyeonKim
+images: []
+description:
+---
+
+To be updated
+
+<!--more-->
+
+* [Kafka Clients with JSON - Producing and Consuming Order Events](/blog/2025-05-20-kotlin-getting-started-kafka-json-clients)
+* [Kafka Clients with Avro - Schema Registry and Order Events](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients)
+* [Kafka Streams - Lightweight Real-Time Processing for Supplier Stats](#) (this post)
+* Flink DataStream API - Scalable Event Processing for Supplier Stats
+* Flink Table API - Declarative Analytics for Supplier Stats in Real Time
