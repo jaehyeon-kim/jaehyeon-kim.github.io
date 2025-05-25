@@ -30,7 +30,7 @@ This post explores a Kotlin-based Kafka project, meticulously detailing the cons
 <!--more-->
 
 * [Kafka Clients with JSON - Producing and Consuming Order Events](#) (this post)
-* Kafka Clients with Avro - Schema Registry and Order Events
+* [Kafka Clients with Avro - Schema Registry and Order Events](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients)
 * Kafka Streams - Lightweight Real-Time Processing for Supplier Stats
 * Flink DataStream API - Scalable Event Processing for Supplier Stats
 * Flink Table API - Declarative Analytics for Supplier Stats in Real Time
@@ -541,6 +541,8 @@ Our Kotlin Kafka applications can be launched in a couple of ways, catering to d
 
 1. **With Gradle (Development Mode)**: This method is convenient during development, allowing for quick iterations without needing to build a full JAR file each time.
 2. **Running the Shadow JAR (Deployment Mode)**: After building a "fat" JAR (also known as a shadow JAR) that includes all dependencies, the application can be run as a standalone executable. This is typical for deploying to non-development environments.
+
+> 💡 To build and run the application locally, ensure that **JDK 17** and **Gradle 7.0+** are installed.
 
 ```bash
 # 👉 With Gradle (Dev Mode)

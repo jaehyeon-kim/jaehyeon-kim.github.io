@@ -1,7 +1,7 @@
 ---
 title: Kafka Clients with Avro - Schema Registry and Order Events
 date: 2025-05-27
-draft: true
+draft: false
 featured: false
 comment: true
 toc: false
@@ -41,7 +41,7 @@ This project demonstrates two primary Kafka client applications:
 *   A **Producer Application** responsible for generating `Order` messages and publishing them to a Kafka topic using Avro serialization.
 *   A **Consumer Application** designed to subscribe to the same Kafka topic, deserialize the Avro messages, and process them, including retry logic and graceful handling of shutdowns.
 
-Both applications are packaged into a single executable JAR, and their execution mode (producer or consumer) is determined by a command-line argument.
+Both applications are packaged into a single executable JAR, and their execution mode (producer or consumer) is determined by a command-line argument. The source code for the applications discussed in this post can be found in the _orders-avro-clients_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/kotlin-examples).
 
 ### The Build Configuration
 
@@ -580,6 +580,8 @@ Our Kotlin Kafka applications can be launched in a couple of ways, catering to d
 
 1. **With Gradle (Development Mode)**: This method is convenient during development, allowing for quick iterations without needing to build a full JAR file each time.
 2. **Running the Shadow JAR (Deployment Mode)**: After building a "fat" JAR (also known as a shadow JAR) that includes all dependencies, the application can be run as a standalone executable. This is typical for deploying to non-development environments.
+
+> 💡 To build and run the application locally, ensure that **JDK 17** and **Gradle 7.0+** are installed.
 
 ```bash
 # 👉 With Gradle (Dev Mode)
