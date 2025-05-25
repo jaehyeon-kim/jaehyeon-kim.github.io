@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="kaDSRoGmf5ZaQqYn9ZpJ" name="Page-1">
-        <mxGraphModel dx="977" dy="523" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+        <mxGraphModel dx="1074" dy="899" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -19,7 +19,7 @@
                         <mxPoint x="470" y="210" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="PObQ90E0Y6O0iQnI_uE_-6" value="Sends Avro Messages&lt;br&gt;(Order Data)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="PObQ90E0Y6O0iQnI_uE_-5" vertex="1" connectable="0">
+                <mxCell id="PObQ90E0Y6O0iQnI_uE_-6" value="2. Sends avro messages&lt;br&gt;(Order Data)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="PObQ90E0Y6O0iQnI_uE_-5" vertex="1" connectable="0">
                     <mxGeometry x="-0.0161" y="2" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
@@ -30,7 +30,7 @@
                         <mxPoint x="700" y="210" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="PObQ90E0Y6O0iQnI_uE_-8" value="Consumes Avro Messages&lt;br&gt;(Order Data)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="PObQ90E0Y6O0iQnI_uE_-7" vertex="1" connectable="0">
+                <mxCell id="PObQ90E0Y6O0iQnI_uE_-8" value="3. consumes avro messages&lt;br&gt;(Order Data)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="PObQ90E0Y6O0iQnI_uE_-7" vertex="1" connectable="0">
                     <mxGeometry x="-0.2336" y="-1" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
@@ -48,7 +48,7 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="PObQ90E0Y6O0iQnI_uE_-11" value="1. Register Schema / Get ID" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="PObQ90E0Y6O0iQnI_uE_-10" vertex="1" connectable="0">
+                <mxCell id="PObQ90E0Y6O0iQnI_uE_-11" value="1. Validate/Register Schema" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="PObQ90E0Y6O0iQnI_uE_-10" vertex="1" connectable="0">
                     <mxGeometry x="-0.5238" y="-1" relative="1" as="geometry">
                         <mxPoint y="-10" as="offset"/>
                     </mxGeometry>
@@ -63,51 +63,51 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="PObQ90E0Y6O0iQnI_uE_-13" value="2. Fetch Schema by ID" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="PObQ90E0Y6O0iQnI_uE_-12" vertex="1" connectable="0">
+                <mxCell id="PObQ90E0Y6O0iQnI_uE_-13" value="4. Request schema (if not cached)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="PObQ90E0Y6O0iQnI_uE_-12" vertex="1" connectable="0">
                     <mxGeometry x="-0.3522" y="1" relative="1" as="geometry">
                         <mxPoint y="-9" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="2" value="Kafka Clients with JSON&lt;div&gt;Producing and Consuming Order Events&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+                <mxCell id="2" value="Kafka Clients with JSON&lt;div&gt;Producing and Consuming Order Events&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" parent="1" vertex="1">
                     <mxGeometry x="100" y="500" width="680" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="3" value="ProducerApp" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;arcSize=10;fontSize=14;" vertex="1" parent="1">
+                <mxCell id="3" value="ProducerApp" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;arcSize=10;fontSize=14;" parent="1" vertex="1">
                     <mxGeometry x="100" y="590" width="120" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="4" value="Apache Kafka Cluster" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;" vertex="1" parent="1">
+                <mxCell id="4" value="Apache Kafka Cluster" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;" parent="1" vertex="1">
                     <mxGeometry x="380" y="570" width="120" height="120" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="ConsumerApp" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;arcSize=10;fontSize=14;" vertex="1" parent="1">
+                <mxCell id="5" value="ConsumerApp" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;arcSize=10;fontSize=14;" parent="1" vertex="1">
                     <mxGeometry x="660" y="590" width="120" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="6" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#000000;" edge="1" parent="1">
+                <mxCell id="6" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#000000;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="240" y="630" as="sourcePoint"/>
                         <mxPoint x="360" y="630" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="7" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#000000;" edge="1" parent="1">
+                <mxCell id="7" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#000000;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="520" y="630" as="sourcePoint"/>
                         <mxPoint x="650" y="630" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="8" value="Order&lt;br&gt;{ JSON }" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2;labelBackgroundColor=#ffffff;labelBorderColor=none;" vertex="1" parent="1">
+                <mxCell id="8" value="Order&lt;br&gt;{ JSON }" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2;labelBackgroundColor=#ffffff;labelBorderColor=none;" parent="1" vertex="1">
                     <mxGeometry x="260" y="590" width="80" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="9" value="Order&lt;br&gt;{ JSON }" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2;labelBackgroundColor=#ffffff;labelBorderColor=none;" vertex="1" parent="1">
+                <mxCell id="9" value="Order&lt;br&gt;{ JSON }" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2;labelBackgroundColor=#ffffff;labelBorderColor=none;" parent="1" vertex="1">
                     <mxGeometry x="540" y="590" width="80" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="10" value="Topic: orders-json" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+                <mxCell id="10" value="Topic: orders-json" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;" parent="1" vertex="1">
                     <mxGeometry x="380" y="695" width="120" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="11" value="Generates &lt;b&gt;Order&lt;/b&gt; objects,&lt;br&gt;serializes to JSON,&lt;br&gt;sends to Kafka." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+                <mxCell id="11" value="Generates &lt;b&gt;Order&lt;/b&gt; objects,&lt;br&gt;serializes to JSON,&lt;br&gt;sends to Kafka." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
                     <mxGeometry x="80" y="680" width="160" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="12" value="Consumes &lt;b&gt;Order&lt;/b&gt; messages,&lt;br&gt;deserializes from JSON,&lt;br&gt;processes." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+                <mxCell id="12" value="Consumes &lt;b&gt;Order&lt;/b&gt; messages,&lt;br&gt;deserializes from JSON,&lt;br&gt;processes." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
                     <mxGeometry x="640" y="680" width="160" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="13" value="Kafka Clients with Avro&lt;div&gt;Schema Registry and Order Events&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+                <mxCell id="13" value="Kafka Clients with Avro&lt;div&gt;Schema Registry and Order Events&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" parent="1" vertex="1">
                     <mxGeometry x="190" y="90" width="680" height="60" as="geometry"/>
                 </mxCell>
             </root>
