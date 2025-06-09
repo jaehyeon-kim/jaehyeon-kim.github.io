@@ -33,7 +33,7 @@ In this post, we shift our focus from basic Kafka clients to real-time stream pr
 * [Kafka Clients with JSON - Producing and Consuming Order Events](/blog/2025-05-20-kotlin-getting-started-kafka-json-clients)
 * [Kafka Clients with Avro - Schema Registry and Order Events](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients)
 * [Kafka Streams - Lightweight Real-Time Processing for Supplier Stats](#) (this post)
-* Flink DataStream API - Scalable Event Processing for Supplier Stats
+* [Flink DataStream API - Scalable Event Processing for Supplier Stats](/blog/2025-06-10-kotlin-getting-started-flink-datastream)
 * Flink Table API - Declarative Analytics for Supplier Stats in Real Time
 
 ## Kafka Streams Application for Supplier Statistics
@@ -683,7 +683,7 @@ Once initialized, Kpow will be accessible at `http://localhost:3000`, showing Ka
 
 ### Start the Kafka Order Producer
 
-Our Kafka Streams application consumes order data from the `orders-avro` topic. We'll use the Avro producer developed in [Part 2 of this series](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients/) to generate this data. To effectively test our stream application's handling of event time and late records, we'll configure the producer to introduce a variable delay (up to 15 seconds) in the `bid_time` of the generated orders.
+Our Kafka Streams application consumes order data from the `orders-avro` topic. We'll use the Kafka producer developed in [Part 2 of this series](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients/) to generate this data. To effectively test our stream application's handling of event time and late records, we'll configure the producer to introduce a variable delay (up to 15 seconds) in the `bid_time` of the generated orders.
 
 Navigate to the directory of the producer application (_orders-avro-clients_ from the [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/kotlin-examples)) and run:
 
