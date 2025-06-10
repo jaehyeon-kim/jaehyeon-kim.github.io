@@ -19,6 +19,7 @@ tags:
   - Amazon OpenSearch Service
   - Apache Kafka
   - Kafka Connect
+  - Kpow
 authors:
   - JaehyeonKim
 images: []

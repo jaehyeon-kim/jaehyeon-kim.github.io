@@ -21,6 +21,7 @@ tags:
   - Apache Camel
   - Apache Kafka
   - Kafka Connect
+  - Kpow
 authors:
   - JaehyeonKim
 images: []

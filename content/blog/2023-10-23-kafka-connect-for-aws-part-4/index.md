@@ -21,6 +21,7 @@ tags:
   - Docker
   - Kafka Connect
   - OpenSearch
+  - Kpow
 authors:
   - JaehyeonKim
 images: []

@@ -335,7 +335,7 @@ networks:
 
 A Kafka cluster with a single broker and zookeeper node is used in this post. The broker has two listeners and the port 9092 and 29092 are used for internal and external communication respectively. The default number of topic partitions is set to 3. More details about Kafka cluster setup can be found in [this post](/blog/2023-05-04-kafka-development-with-docker-part-1/).
 
-The [UI for Apache Kafka (kafka-ui)](https://docs.kpow.io/ce/) is used for monitoring Kafka topics and related resources. The bootstrap server address and zookeeper access url are added as environment variables. See [this post](/blog/2023-05-18-kafka-development-with-docker-part-2/) for details about Kafka management apps.
+The UI for Apache Kafka (kafka-ui) is used for monitoring Kafka topics and related resources. The bootstrap server address and zookeeper access url are added as environment variables. See [this post](/blog/2023-05-18-kafka-development-with-docker-part-2/) for details about Kafka management apps.
 
 ```yaml
 # docker-compose.yml
