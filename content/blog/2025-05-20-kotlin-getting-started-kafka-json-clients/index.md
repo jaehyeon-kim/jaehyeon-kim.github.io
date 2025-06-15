@@ -33,7 +33,7 @@ This post explores a Kotlin-based Kafka project, meticulously detailing the cons
 * [Kafka Clients with Avro - Schema Registry and Order Events](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients)
 * [Kafka Streams - Lightweight Real-Time Processing for Supplier Stats](/blog/2025-06-03-kotlin-getting-started-kafka-streams)
 * [Flink DataStream API - Scalable Event Processing for Supplier Stats](/blog/2025-06-10-kotlin-getting-started-flink-datastream)
-* Flink Table API - Declarative Analytics for Supplier Stats in Real Time
+* [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](/blog/2025-06-17-kotlin-getting-started-flink-table)
 
 ## Kafka Client Applications
 
