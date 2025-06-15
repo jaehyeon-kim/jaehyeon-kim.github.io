@@ -34,7 +34,7 @@ In this post, we shift our focus from basic Kafka clients to real-time stream pr
 * [Kafka Clients with Avro - Schema Registry and Order Events](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients)
 * [Kafka Streams - Lightweight Real-Time Processing for Supplier Stats](#) (this post)
 * [Flink DataStream API - Scalable Event Processing for Supplier Stats](/blog/2025-06-10-kotlin-getting-started-flink-datastream)
-* Flink Table API - Declarative Analytics for Supplier Stats in Real Time
+* [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](/blog/2025-06-17-kotlin-getting-started-flink-table)
 
 ## Kafka Streams Application for Supplier Statistics
 

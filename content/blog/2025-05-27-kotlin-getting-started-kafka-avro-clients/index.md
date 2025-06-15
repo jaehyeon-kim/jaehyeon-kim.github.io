@@ -33,7 +33,7 @@ In this post, we'll explore a practical example of building Kafka client applica
 * [Kafka Clients with Avro - Schema Registry and Order Events](#) (this post)
 * [Kafka Streams - Lightweight Real-Time Processing for Supplier Stats](/blog/2025-06-03-kotlin-getting-started-kafka-streams)
 * [Flink DataStream API - Scalable Event Processing for Supplier Stats](/blog/2025-06-10-kotlin-getting-started-flink-datastream)
-* Flink Table API - Declarative Analytics for Supplier Stats in Real Time
+* [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](/blog/2025-06-17-kotlin-getting-started-flink-table)
 
 ## Kafka Client Applications
 

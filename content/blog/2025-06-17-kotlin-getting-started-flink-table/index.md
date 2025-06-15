@@ -1,7 +1,7 @@
 ---
 title: Flink Table API - Declarative Analytics for Supplier Stats in Real Time
 date: 2025-06-17
-draft: true
+draft: false
 featured: true
 comment: true
 toc: false
@@ -19,7 +19,6 @@ tags:
   - Kotlin
   - Docker
   - Kpow
-  - Flex
   - Factor House Local
 authors:
   - JaehyeonKim
@@ -27,7 +26,7 @@ images: []
 description:
 ---
 
-In our last post, we explored the fine-grained control of Flink's DataStream API. Now, we'll approach the same problem from a higher level of abstraction using the **Flink Table API**. This post demonstrates how to build a declarative analytics pipeline that processes our continuous stream of Avro-formatted order events. We will define a `Table` on top of a `DataStream` and use SQL-like expressions to perform windowed aggregations. This example highlights the power and simplicity of the Table API for analytical tasks and showcases Flink's seamless integration between its different API layers to handle complex requirements like late data.
+In the last post, we explored the fine-grained control of Flink's DataStream API. Now, we'll approach the same problem from a higher level of abstraction using the **Flink Table API**. This post demonstrates how to build a declarative analytics pipeline that processes our continuous stream of Avro-formatted order events. We will define a `Table` on top of a `DataStream` and use SQL-like expressions to perform windowed aggregations. This example highlights the power and simplicity of the Table API for analytical tasks and showcases Flink's seamless integration between its different API layers to handle complex requirements like late data.
 
 <!--more-->
 

@@ -19,7 +19,6 @@ tags:
   - Kotlin
   - Docker
   - Kpow
-  - Flex
   - Factor House Local
 authors:
   - JaehyeonKim
@@ -35,7 +34,7 @@ Building on our exploration of stream processing, we now transition from Kafka's
 * [Kafka Clients with Avro - Schema Registry and Order Events](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients)
 * [Kafka Streams - Lightweight Real-Time Processing for Supplier Stats](/blog/2025-06-03-kotlin-getting-started-kafka-streams)
 * [Flink DataStream API - Scalable Event Processing for Supplier Stats](#) (this post)
-* Flink Table API - Declarative Analytics for Supplier Stats in Real Time
+* [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](/blog/2025-06-17-kotlin-getting-started-flink-table)
 
 ## Flink DataStream Application
 
