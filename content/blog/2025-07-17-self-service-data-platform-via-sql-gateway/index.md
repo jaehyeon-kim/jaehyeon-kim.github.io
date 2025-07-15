@@ -1,6 +1,6 @@
 ---
 title: Self-service Data Platform via a Multi-tenant SQL Gateway
-date: 2025-07-14
+date: 2025-07-17
 draft: false
 featured: true
 comment: true
