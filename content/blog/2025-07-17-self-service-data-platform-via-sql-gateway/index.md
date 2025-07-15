@@ -64,6 +64,8 @@ This is the most established and widely used connection method, ideal for analys
 *   **Tools:** Tableau, PowerBI, DBeaver, Jupyter Notebooks (with PyHive), and other SQL-native clients.
 *   **Gateway's Role:** From the user's perspective, they are connecting to a traditional database. They don't need engine-specific drivers or complex connection strings. The immense complexity of the underlying Spark or Flink engines is completely abstracted away behind one familiar JDBC/ODBC endpoint. The Thrift interface uses long-lived connections, making it well-suited for the back-and-forth nature of an interactive session.
 
+> 💡 **Note:** While tools typically use JDBC or ODBC drivers, these drivers communicate over the Thrift protocol—hence the term "Thrift API" is technically accurate.
+
 #### REST API: Interface for Programmatic Workflows
 
 This interface is designed for automation, batch job submission, and integration into larger data pipelines.
@@ -73,6 +75,8 @@ This interface is designed for automation, batch job submission, and integration
 *   **Tools:**
     *   **Programmatic Clients:** Custom applications, workflow orchestrators like Apache Airflow, or scripts using tools like `curl`.
     *   **Command-Line Tool:** Kyuubi provides `kyuubi-ctl`, a command-line interface that uses the REST API for managing batch jobs via YAML files.
+
+> 💡 **Tip:** Because of its stateless nature, the REST API is particularly well-suited for distributed environments and works seamlessly with CI/CD systems and job schedulers.
 
 ### 2. Gateway Layer: Multi-Tenant Control Plane
 
