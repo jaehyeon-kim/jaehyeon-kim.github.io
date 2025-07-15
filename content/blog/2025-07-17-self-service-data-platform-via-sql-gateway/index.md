@@ -34,18 +34,16 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: Providing direct access to big data engines like Spark and Flink often creates chaos. A gateway-centric architecture solves this by introducing a robust control plane. This article presents a detailed blueprint using Apache Kyuubi, a multi-tenant SQL gateway, to provision and manage on-demand Spark, Flink, and Trino engines. Learn how this model delivers true self-service analytics with centralized governance, finally resolving the conflict between user empowerment and platform stability.
 ---
 
-In the modern data stack, providing direct access to powerful engines like Apache Spark and Flink is a double-edged sword. While it empowers users, it often leads to chaos: resource contention from "noisy neighbors," inconsistent security enforcement, and operational fragility. The core problem is the lack of a control plane between the users and the raw compute power.
+In the modern data stack, providing direct access to powerful engines like Apache Spark and Flink is a double-edged sword. While it empowers users, it often leads to chaos: resource contention from "noisy neighbors," inconsistent security enforcement, and operational fragility. The core problem is the lack of a robust control plane between users and the raw compute power. The solution, therefore, isn't to take power away from users, but to manage it through an intelligent intermediary.
 
-The solution is a gateway-centric architecture. This design is built around a single, powerful concept, as defined by the Apache Kyuubi project:
-
-<!--more-->
+This is where a gateway-centric architecture comes in. By placing a specialized gateway at the heart of the platform, we can transform this chaos into a stable, governed, and self-service system. The Apache Kyuubi project provides a perfect blueprint for this approach, defining its role as:
 
 > **Apache Kyuubi is a distributed, multi-tenant gateway providing unified access to big data engines like Spark and Flink via JDBC/ODBC for interactive queries and REST APIs for programmatic submissions.**
 
-This definition is not just a description; it's a blueprint. By architecting our platform around this model, we can deliver governed, self-service data access without compromising stability. Let's explore how each layer of a modern data platform is designed to support and leverage this gateway.
+This definition is more than just a product description; it's a strategic vision. By embracing this model, we can finally deliver on the promise of self-service data access without sacrificing stability or governance. Let's explore exactly how each layer of the platform is designed to support this powerful concept.
 
 ## Architecture: A Layer-by-Layer Breakdown
 
