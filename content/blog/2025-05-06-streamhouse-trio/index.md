@@ -12,6 +12,8 @@ featuredImage: false
 # series:
 categories:
   - Data Architecture
+  - Data Engineering
+  - Big Data
   - Data Streaming
 tags: 
   - Apache Flink
