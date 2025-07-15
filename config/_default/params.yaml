@@ -5,7 +5,7 @@ mainSections:
 
 # titleSeparator: '|' # Title separator. Default to -.
 
-description: Developer Experience at Factor House | Technical Content Creator
+description: Developer Experience at Factor House
 keywords: Analytics, Real-time Analytics, Data Engineering, Data Streaming, Architecture
 images:
   - site-feature-image.png
