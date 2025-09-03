@@ -716,7 +716,7 @@ The application can be run in two main ways:
     java -jar build/libs/orders-stats-streams-1.0.jar
     ```
 
-> 💡 To build and run the application locally, ensure that **JDK 17** and a recent version of Gradle (e.g., **7.6+** or **8.x**) are installed.
+> 💡 To build and run the application locally, ensure that **JDK 17** is installed.
 
 For this demonstration, we'll use Gradle to run the application in development mode. Upon starting, you'll see logs indicating the Kafka Streams application has initialized and is processing records from the `orders-avro` topic.
 

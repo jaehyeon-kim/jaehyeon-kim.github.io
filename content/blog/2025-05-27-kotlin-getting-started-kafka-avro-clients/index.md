@@ -581,7 +581,7 @@ Our Kotlin Kafka applications can be launched in a couple of ways, catering to d
 1. **With Gradle (Development Mode)**: This method is convenient during development, allowing for quick iterations without needing to build a full JAR file each time.
 2. **Running the Shadow JAR (Deployment Mode)**: After building a "fat" JAR (also known as a shadow JAR) that includes all dependencies, the application can be run as a standalone executable. This is typical for deploying to non-development environments.
 
-> 💡 To build and run the application locally, ensure that **JDK 17** and **Gradle 7.0+** are installed.
+> 💡 To build and run the application locally, ensure that **JDK 17** is installed.
 
 ```bash
 # 👉 With Gradle (Dev Mode)
