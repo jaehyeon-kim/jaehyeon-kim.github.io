@@ -9,6 +9,7 @@ defaultContentLanguage: en
 #  - fr
 #  - zh-cn
 #  - zh-tw
+timeout: "180s"
 paginate: 10
 # paginatePath: page
 enableRobotsTXT: true
