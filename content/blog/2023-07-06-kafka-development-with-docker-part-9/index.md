@@ -25,6 +25,18 @@ images: []
 description: To improve security, we can extend TLS (SSL or TLS/SSL) encryption either by enforcing two-way verification where a client certificate is verified by Kafka brokers (SSL authentication). Or we can choose a separate authentication mechanism, which is typically Simple Authentication and Security Layer (SASL). In this post, we will discuss how to implement SSL authentication with Java and Python client examples while SASL authentication is covered in the next post.
 ---
 
+[**UPDATE 2025-10-01**]
+
+Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
+
+For example:
+
+* `bitnami/kafka:2.8.1` → `bitnamilegacy/kafka:2.8.1`
+* `bitnami/zookeeper:3.7.0` → `bitnamilegacy/zookeeper:3.7.0`
+* `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
+
+---
+
 In the previous post, we discussed how to configure TLS (SSL or TLS/SSL) encryption with Java and Python client examples. SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). To improve security, we can add client authentication either by enforcing two-way verification where a client certificate is verified by Kafka brokers (SSL authentication). Or we can choose a separate authentication mechanism, which is typically [Simple Authentication and Security Layer (SASL)](https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer). In this post, we will discuss how to implement SSL authentication with Java and Python client examples while SASL authentication is covered in the next post.
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)

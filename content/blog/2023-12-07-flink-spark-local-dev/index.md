@@ -26,6 +26,18 @@ images: []
 description: Apache Flink became generally available for Amazon EMR on EKS from the EMR 6.15.0 releases. As it is integrated with the Glue Data Catalog, it can be particularly useful if we develop real time data ingestion/processing via Flink and build analytical queries using Spark (or any other tools or services that can access to the Glue Data Catalog). In this post, we will discuss how to set up a local development environment for Apache Flink and Spark using the EMR container images. After illustrating the environment setup, we will discuss a solution where data ingestion/processing is performed in real time using Apache Flink and the processed data is consumed by Apache Spark for analysis.
 ---
 
+[**UPDATE 2025-10-01**]
+
+Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
+
+For example:
+
+* `bitnami/kafka:2.8.1` → `bitnamilegacy/kafka:2.8.1`
+* `bitnami/zookeeper:3.7.0` → `bitnamilegacy/zookeeper:3.7.0`
+* `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
+
+---
+
 [Apache Flink became generally available](https://aws.amazon.com/about-aws/whats-new/2023/11/apache-flink-available-amazon-emr-eks/) for [Amazon EMR on EKS](https://aws.amazon.com/emr/features/eks/) from the [EMR 6.15.0 releases](https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/emr-eks-6.15.0.html), and we are able to pull the Flink (as well as Spark) container images from the [ECR Public Gallery](https://gallery.ecr.aws/emr-on-eks). As both of them can be integrated with the *Glue Data Catalog*, it can be particularly useful if we develop real time data ingestion/processing via Flink and build analytical queries using Spark (or any other tools or services that can access to the Glue Data Catalog).
 
 In this post, we will discuss how to set up a local development environment for Apache Flink and Spark using the EMR container images. For the former, a custom Docker image will be created, which downloads dependent connector Jar files into the Flink library folder, fixes process startup issues, and updates Hadoop configurations for Glue Data Catalog integration. For the latter, instead of creating a custom image, the EMR image is used to launch the Spark container where the required configuration updates are added at runtime via volume-mapping. After illustrating the environment setup, we will discuss a solution where data ingestion/processing is performed in real time using Apache Flink and the processed data is consumed by Apache Spark for analysis.

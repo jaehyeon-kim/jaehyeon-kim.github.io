@@ -23,6 +23,18 @@ images: []
 description: Apache Kafka is one of the key technologies for modern data streaming architectures on AWS. Developing and testing Kafka-related applications can be easier using Docker and Docker Compose. In this series of posts, I will demonstrate reference implementations of those applications in Dockerized environments.
 ---
 
+[**UPDATE 2025-10-01**]
+
+Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
+
+For example:
+
+* `bitnami/kafka:2.8.1` → `bitnamilegacy/kafka:2.8.1`
+* `bitnami/zookeeper:3.7.0` → `bitnamilegacy/zookeeper:3.7.0`
+* `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
+
+---
+
 I'm teaching myself [modern data streaming architectures](https://docs.aws.amazon.com/whitepapers/latest/build-modern-data-streaming-analytics-architectures/build-modern-data-streaming-analytics-architectures.html) on AWS, and [Apache Kafka](https://kafka.apache.org/) is one of the key technologies, which can be used for messaging, activity tracking, stream processing and so on. While applications tend to be deployed to cloud, it can be much easier if we develop and test those with [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) locally. As the series title indicates, I plan to publish articles that demonstrate Kafka and related tools in *Dockerized* environments. Although I covered some of them in previous posts, they are implemented differently in terms of the Kafka Docker image, the number of brokers, Docker volume mapping etc. It can be confusing, and one of the purposes of this series is to illustrate reference implementations that can be applied to future development projects. Also, I can extend my knowledge while preparing for this series. In fact Kafka security is one of the areas that I expect to learn further. Below shows a list of posts that I plan for now.
 
 * [Part 1 Cluster Setup](#) (this post)

@@ -24,6 +24,18 @@ images: []
 description: Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. In this post, I will illustrate how to set up a data ingestion pipeline using Kafka connectors. Fake customer and order data will be ingested into the corresponding topics using the MSK Data Generator source connector. The topic messages will then be saved into a S3 bucket using the Confluent S3 sink connector.
 ---
 
+[**UPDATE 2025-10-01**]
+
+Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
+
+For example:
+
+* `bitnami/kafka:2.8.1` → `bitnamilegacy/kafka:2.8.1`
+* `bitnami/zookeeper:3.7.0` → `bitnamilegacy/zookeeper:3.7.0`
+* `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
+
+---
+
 According to the documentation of [Apache Kafka](https://kafka.apache.org/documentation/#connect), *Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It makes it simple to quickly define connectors that move large collections of data into and out of Kafka*. Kafka Connect supports two types of connectors - source and sink. Source connectors are used to ingest messages from external systems into Kafka topics while messages are ingested into external systems form Kafka topics with sink connectors. In this post, I will illustrate how to set up a data ingestion pipeline using Kafka connectors. Fake customer and order data will be ingested into the corresponding topics using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) source connector. The topic messages will then be saved into a S3 bucket using the [Confluent S3](https://www.confluent.io/hub/confluentinc/kafka-connect-s3) sink connector.
 
 

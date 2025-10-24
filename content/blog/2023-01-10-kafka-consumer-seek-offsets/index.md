@@ -24,6 +24,18 @@ cevo: 23
 description: We will discuss how to configure the Kafka consumer to seek offsets by timestamp where topic partitions are dynamically assigned by subscription. Docker Compose is used for building a single node Kafka cluster and running multiple consumer instances.
 ---
 
+[**UPDATE 2025-10-01**]
+
+Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
+
+For example:
+
+* `bitnami/kafka:2.8.1` → `bitnamilegacy/kafka:2.8.1`
+* `bitnami/zookeeper:3.7.0` → `bitnamilegacy/zookeeper:3.7.0`
+* `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
+
+---
+
 Normally we consume Kafka messages from the beginning/end of a topic or last committed offsets. For backfilling or troubleshooting, however, we need to consume messages from a certain timestamp occasionally. If we know which topic partition to choose e.g. by [assigning a topic partition](https://kafka-python.readthedocs.io/en/master/apidoc/KafkaConsumer.html#kafka.KafkaConsumer.assign), we can easily override the fetch offset to a specific timestamp. When we deploy multiple consumer instances together, however, we make them [subscribe to a topic](https://kafka-python.readthedocs.io/en/master/apidoc/KafkaConsumer.html#kafka.KafkaConsumer.subscribe) and topic partitions are dynamically assigned, which means we cannot determine which fetch offset to use for an instance. In this post, we develop Kafka producer and consumer applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/) package and discuss how to configure the consumer instances to seek offsets to a specific timestamp where topic partitions are dynamically assigned by subscription.
 
 

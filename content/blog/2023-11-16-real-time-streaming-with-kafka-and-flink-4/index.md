@@ -27,6 +27,18 @@ images: []
 description: In this lab, we will create a Pyflink application that exports Kafka topic messages into a S3 bucket. The app enriches the records by adding a new column using a user defined function and writes them via the FileSystem SQL connector. This allows us to achieve a simpler architecture compared to the original lab where the records are sent into Amazon Kinesis Data Firehose, enriched by a separate Lambda function and written to a S3 bucket afterwards. While the records are being written to the S3 bucket, a Glue table will be created to query them on Amazon Athena.
 ---
 
+[**UPDATE 2025-10-01**]
+
+Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
+
+For example:
+
+* `bitnami/kafka:2.8.1` → `bitnamilegacy/kafka:2.8.1`
+* `bitnami/zookeeper:3.7.0` → `bitnamilegacy/zookeeper:3.7.0`
+* `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
+
+---
+
 In this lab, we will create a Pyflink application that exports Kafka topic messages into a S3 bucket. The app enriches the records by adding a new column using a user defined function and writes them via the [FileSystem SQL connector](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/connectors/table/filesystem/). This allows us to achieve a simpler architecture compared to the [original lab](https://catalog.us-east-1.prod.workshops.aws/workshops/2300137e-f2ac-4eb9-a4ac-3d25026b235f/en-US/lab-3-kdf) where the records are sent into Amazon Kinesis Data Firehose, enriched by a separate Lambda function and written to a S3 bucket afterwards. While the records are being written to the S3 bucket, a Glue table will be created to query them on Amazon Athena.
 
 * [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)

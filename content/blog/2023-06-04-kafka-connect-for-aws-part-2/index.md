@@ -27,6 +27,18 @@ cevo: 29
 description: The suite of Apache Camel Kafka connectors and the Kinesis Kafka connector from the AWS Labs can be effective for building data ingestion pipelines that integrate AWS services. In this post, I will illustrate how to develop the Camel DynamoDB sink connector using Docker. Fake order data will be generated using the MSK Data Generator source connector, and the sink connector will be configured to consume the topic messages to ingest them into a DynamoDB table.
 ---
 
+[**UPDATE 2025-10-01**]
+
+Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
+
+For example:
+
+* `bitnami/kafka:2.8.1` → `bitnamilegacy/kafka:2.8.1`
+* `bitnami/zookeeper:3.7.0` → `bitnamilegacy/zookeeper:3.7.0`
+* `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
+
+---
+
 In [Part 1](/blog/2023-05-03-kafka-connect-for-aws-part-1), we reviewed Kafka connectors focusing on AWS services integration. Among the available connectors, the suite of [Apache Camel Kafka connectors](https://camel.apache.org/camel-kafka-connector/latest/index.html) and the [Kinesis Kafka connector](https://github.com/awslabs/kinesis-kafka-connector) from the AWS Labs can be effective for building data ingestion pipelines on AWS. In this post, I will illustrate how to develop the Camel DynamoDB sink connector using Docker. Fake order data will be generated using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) source connector, and the sink connector will be configured to consume the topic messages to ingest them into a DynamoDB table.
 
 * [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1)

@@ -25,6 +25,18 @@ images: []
 description: We can configure Kafka clients and other components to use TLS (SSL or TLS/SSL) encryption to secure communication. It is a one-way verification process where a server certificate is verified by a client via SSL Handshake. Moreover we can improve security by adding client authentication. In this post, we will discuss how to configure SSL encryption with Java and Python client examples while client authentication will be covered in later posts.
 ---
 
+[**UPDATE 2025-10-01**]
+
+Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
+
+For example:
+
+* `bitnami/kafka:2.8.1` → `bitnamilegacy/kafka:2.8.1`
+* `bitnami/zookeeper:3.7.0` → `bitnamilegacy/zookeeper:3.7.0`
+* `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
+
+---
+
 By default, Apache Kafka communicates in *PLAINTEXT*, which means that all data is sent without being encrypted. To secure communication, we can configure Kafka clients and other components to use [Transport Layer Security (TLS)](https://en.wikipedia.org/wiki/Transport_Layer_Security) encryption. Note that TLS is also referred to [Secure Sockets Layer (SSL)](https://en.wikipedia.org/wiki/Transport_Layer_Security#SSL_1.0,_2.0,_and_3.0) or TLS/SSL. SSL is the predecessor of TLS, and has been deprecated since June 2015. However, it is used in configuration and code instead of TLS for historical reasons. In this post, SSL, TLS and TLS/SSL will be used interchangeably. SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). Moreover, we can improve security by adding client authentication. For example, we can enforce two-way verification so that a client certificate is verified by Kafka brokers as well (*SSL Authentication*). Alternatively we can choose a separate authentication mechanism and typically [Simple Authentication and Security Layer (SASL)](https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer) is used (*SASL Authentication*). In this post, we will discuss how to configure SSL encryption with Java and Python client examples while SSL and SASL client authentication will be covered in later posts.
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)

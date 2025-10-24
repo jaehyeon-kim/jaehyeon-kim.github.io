@@ -29,6 +29,18 @@ description: We'll discuss how to create a Spark local dev environment for EMR u
 [**UPDATE 2023-12-07**]
 - I wrote a [new post](/blog/2023-12-07-flink-spark-local-dev) that simplifies the Spark configuration dramatically. Besides, the log configuration is based on Log4J2, which applies to newer Spark versions. Moreover, the container is configured to run the Spark History Server, and it allows us to debug and diagnose completed and running Spark applications. I recommend referring to the new post.
 
+[**UPDATE 2025-10-01**]
+
+Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
+
+For example:
+
+* `bitnami/kafka:2.8.1` → `bitnamilegacy/kafka:2.8.1`
+* `bitnami/zookeeper:3.7.0` → `bitnamilegacy/zookeeper:3.7.0`
+* `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
+
+---
+
 [Amazon EMR](https://aws.amazon.com/emr/) is a managed service that simplifies running Apache Spark on AWS. It has multiple deployment options that cover EC2, [EKS](https://aws.amazon.com/emr/features/eks/), [Outposts](https://aws.amazon.com/emr/features/outposts/) and [Serverless](https://aws.amazon.com/emr/serverless/). For development and testing, [EMR Notebooks](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html) or [EMR Studio](https://aws.amazon.com/emr/features/studio/) can be an option. Both provide a Jupyter Notebook environment and the former is only available for EMR on EC2. There are cases, however, that development (and learning) is performed in a local environment more efficiently. The AWS Glue team understands this demand, and they illustrate how to make use of a custom Docker image for Glue in a [recent blog post](https://aws.amazon.com/blogs/big-data/develop-and-test-aws-glue-version-3-0-jobs-locally-using-a-docker-container/). However, we don’t hear similar news from the EMR team. In order to fill the gap, we’ll discuss how to create a Spark local development environment for EMR using Docker and/or VSCode. Typical Spark development examples will be demonstrated, which covers Spark Submit, Pytest, PySpark shell, Jupyter Notebook and Spark Structured Streaming. For the Spark Submit and Jupyter Notebook examples, [Glue Catalog integration](https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-spark-glue.html) will be illustrated as well. And both the cases of utilising [Visual Studio Code Remote - Containers](https://code.visualstudio.com/docs/remote/containers) extension and running as an isolated container will be covered in some key examples.
 
 

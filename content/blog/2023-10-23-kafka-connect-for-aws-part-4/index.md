@@ -28,6 +28,18 @@ images: []
 description: Kafka Connect can be an effective tool to ingest data from Apache Kafka into OpenSearch. In this post, we will discuss how to develop a data pipeline from Apache Kafka into OpenSearch locally using Docker while the pipeline will be deployed on AWS in the next post. Fake impressions and clicks data will be pushed into Kafka topics using a Kafka source connector and those records will be ingested into OpenSearch indexes using a sink connector for near-real time analytics.
 ---
 
+[**UPDATE 2025-10-01**]
+
+Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
+
+For example:
+
+* `bitnami/kafka:2.8.1` → `bitnamilegacy/kafka:2.8.1`
+* `bitnami/zookeeper:3.7.0` → `bitnamilegacy/zookeeper:3.7.0`
+* `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
+
+---
+
 [OpenSearch](https://opensearch.org/) is a popular search and analytics engine and its use cases cover log analytics, real-time application monitoring, and clickstream analysis. OpenSearch can be deployed on its own or via [Amazon OpenSearch Service](https://aws.amazon.com/opensearch-service/). [Apache Kafka](https://kafka.apache.org/) is a distributed event store and stream-processing platform, and it aims to provide a unified, high-throughput, low-latency platform for handling real-time data feeds. On AWS, Apache Kafka can be deployed via [Amazon Managed Streaming for Apache Kafka (MSK)](https://aws.amazon.com/msk/).
 
 When it comes to ingesting data from Apache Kafka into OpenSearch, OpenSearch has a tool called [Data Prepper](https://opensearch.org/docs/latest/data-prepper/index/) and Amazon OpenSearch Service has a feature called [Amazon OpenSearch Ingestion](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ingestion.html). Alternatively we can use [Kafka Connect](https://kafka.apache.org/documentation/#connect), which is a tool for scalably and reliably streaming data between Apache Kafka and other systems. On AWS, we can run fully managed Kafka workload using [Amazon MSK Connect](https://aws.amazon.com/msk/features/msk-connect/).

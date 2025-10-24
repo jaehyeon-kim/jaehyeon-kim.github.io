@@ -27,6 +27,18 @@ images: []
 description: In Part 3, we developed a data ingestion pipeline using Kafka Connect source and sink connectors without enabling schemas. Later we discussed the benefits of schema registry when developing Kafka applications in Part 5. In this post, I'll demonstrate how to enhance the existing data ingestion pipeline by integrating AWS Glue Schema Registry.
 ---
 
+[**UPDATE 2025-10-01**]
+
+Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
+
+For example:
+
+* `bitnami/kafka:2.8.1` → `bitnamilegacy/kafka:2.8.1`
+* `bitnami/zookeeper:3.7.0` → `bitnamilegacy/zookeeper:3.7.0`
+* `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
+
+---
+
 In [Part 3](/blog/2023-05-25-kafka-development-with-docker-part-3), we developed a data ingestion pipeline with fake online order data using Kafka Connect source and sink connectors. Schemas are not enabled on both of them as there was not an integrated schema registry. Later we discussed how producers and consumers to Kafka topics can use schemas to ensure data consistency and compatibility as schemas evolve in [Part 5](/blog/2023-06-08-kafka-development-with-docker-part-5). In this post, I'll demonstrate how to enhance the existing data ingestion pipeline by integrating [*AWS Glue Schema Registry*](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html).
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
