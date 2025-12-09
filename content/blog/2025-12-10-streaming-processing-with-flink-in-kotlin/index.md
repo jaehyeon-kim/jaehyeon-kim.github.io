@@ -152,4 +152,4 @@ To launch the apps, use the `run` task and set the desired main class with the `
 
 ### Conclusion
 
-Working through the examples in Kotlin has been an effective way to dive deeper into Apache Flink. Translating the examples to Kotlin not only forced me to understand the concepts more thoroughly but also provided a great opportunity to get hands-on with the latest APIs and build practices. For anyone who has read the book but wants to work with a more modern JVM language, I hope sharing my experience and code is helpful. It's been a fun and effective learning journey.
+Working through the examples in Kotlin has been an effective way to dive deeper into Apache Flink. Translating the examples to Kotlin not only forced me to understand the concepts more thoroughly but also provided a great opportunity to get hands-on with the latest APIs and build practices. For those looking to learn Apache Flink through up-to-date examples, I hope sharing my experience and code proves helpful. It's been a fun and effective learning journey.
