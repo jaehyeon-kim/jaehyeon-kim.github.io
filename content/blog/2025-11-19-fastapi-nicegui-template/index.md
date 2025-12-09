@@ -10,9 +10,9 @@ pinned: false
 carousel: false
 featuredImage: false
 # series:
-tags: 
+categories: 
   - Development
-authors:
+tags:
   - FastAPI
   - NiceGUI
   - Python
