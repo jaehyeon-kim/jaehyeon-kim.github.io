@@ -39,6 +39,44 @@ This article explores an alternative approach: an integrated architecture where 
 
 We will provide a technical analysis of this architecture's implementation by integrating FastAPI and NiceGUI, referencing the complete project template available at [jaehyeon-kim/nicegui-fastapi-template](https://github.com/jaehyeon-kim/nicegui-fastapi-template).
 
+---
+
+## 💡 Version 2.0: Unified Application Architecture
+
+The initial version was designed with a distinct separation between a FastAPI backend and a NiceGUI frontend, which communicated over HTTP. This new version consolidates the application, leveraging the fact that NiceGUI is built on top of FastAPI. The result is a more tightly integrated structure that allows the UI and API logic to coexist in the same process.
+
+### Key Architectural Changes
+
+- **Single FastAPI Instance:** The separate FastAPI server process has been removed. The application now operates on the single FastAPI instance provided by `nicegui.app`.
+- **Direct Function Calls:** UI event handlers no longer make HTTP requests (`httpx`) to the backend. They now import and call the necessary Python functions from the repository layer directly, removing the network layer for UI-to-backend communication.
+- **Preserved API Endpoints:** The original API, intended for external clients, is maintained. It is mounted using FastAPI's `APIRouter` onto the main NiceGUI application, ensuring that JSON endpoints remain available.
+- **Consolidated Codebase:** The `frontend` and `backend` directories have been merged into a single application package (e.g., `app` or `src`). A `run.py` script at the project root now serves as the single entry point.
+- **Shared Logic:** Business logic, such as permission checks and database operations, has been centralized in the repository layer, where it is called by both the UI event handlers and the API endpoints.
+
+This updated architecture provides a more direct and cohesive way to build full-stack applications where the UI and backend logic are tightly coupled.
+
+### Project Structure
+
+The application is structured with a single entry point, **`app.py`**, at the project root, and a main source package, **`src/`**, which contains all the application's logic. This design provides a clear separation between the runnable script and the installable source code.
+
+*   **`app.py`**: This script is the single entry point for the application. It is responsible for creating the main NiceGUI `app` instance, including all the API routers from `src/backend/`, importing the UI pages from `src/frontend/` to register their routes, and starting the web server.
+
+*   **`src/`**: This directory is the main Python package for the application. It contains all the core logic, API definitions, and UI code, organized into the following modules:
+    *   **`backend/`**: Contains the code for the data-only API, intended for external clients.
+        *   `endpoints/`: Each file defines a set of related API routes (e.g., for items, users, login) using FastAPI's `APIRouter`.
+        *   `deps.py`: Manages FastAPI's dependency injection system for the API, such as providing database sessions or the current authenticated user.
+    *   **`core/`**: Holds application-wide configuration (`config.py`) and security-related functions like password hashing and token creation (`security.py`).
+    *   **`db/`**: Manages all database interactions, including engine creation, session management (`session.py`), and initial database setup (`init_db.py`).
+    *   **`frontend/`**: Contains all the NiceGUI code for the user interface.
+        *   `components/`: Holds reusable UI elements and utilities, such as `header.py`, `footer.py`, `notifications.py`, and authentication helpers in `auth_utils.py`.
+        *   `layouts/`: Defines the overall page structure, like the main dashboard frame, ensuring a consistent look and feel.
+        *   `pages/`: Each file represents a specific UI view, such as the login screen (`login.py`) or the item management page (`items.py`), using the `@ui.page` decorator.
+        *   `state.py`: A module for managing UI-specific state, like the user's authentication token.
+    *   **`models/`**: Contains the SQLModel (and Pydantic) schemas that define database tables and data structures used across the entire application.
+    *   **`repositories/`**: This is the core business logic and data access layer. It abstracts all database queries and contains functions for data manipulation. In this unified architecture, its functions are now called directly by **both** the API endpoints in `src/backend/` and the UI event handlers in `src/frontend/`.
+
+---
+
 ## FastAPI Backend
 
 FastAPI provides a robust foundation for the backend due to several key technical features:
