@@ -4,7 +4,7 @@ date: 2025-07-17
 draft: false
 featured: true
 comment: true
-toc: false
+toc: true
 reward: false
 pinned: false
 carousel: false
@@ -228,6 +228,6 @@ GROUP BY
 5.  The `SELECT` query runs continuously. As new data arrives in Kafka, Flink processes it, calculates the tumbling window aggregates, and streams the updated results back *through the Kyuubi gateway to the analyst's SQL client*.
 6.  Simultaneously, the **OpenLineage** agent reports to **Marquez** that a new data flow has been established, drawing a lineage graph from the Kafka topic to this Flink SQL job.
 
-### **Conclusion: The Power of a Gateway-Centric Design**
+## Conclusion: The Power of a Gateway-Centric Design
 
 Building a successful self-service platform is not about exposing raw power, but about providing controlled, stable, and governed access. By embracing a gateway-centric architecture built around the principles embodied by Apache Kyuubi, you can finally resolve the conflict between user empowerment and platform stability. The gateway acts as the indispensable control plane, turning a potential "Wild West" of big data engines into a well-regulated, multi-tenant, and powerful SQL service for the entire organization—for both batch and real-time workloads.
