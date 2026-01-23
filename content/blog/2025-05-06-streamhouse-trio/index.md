@@ -4,7 +4,7 @@ date: 2025-05-06
 draft: false
 featured: true
 comment: true
-toc: false
+toc: true
 reward: false
 pinned: false
 carousel: false
@@ -123,7 +123,7 @@ These three technologies aren't competitors; they are complementary components o
     - **Paimon:** Also provides Spark connectors for reading and writing Paimon tables, aiming for broad engine compatibility.
     - **Fluss:** Less direct integration currently; data would typically flow *through* Flink *to* Spark or be read from Paimon/Iceberg by Spark.
 
-### **Real-time User Activity Tracking for an E-commerce Platform Scenario**
+### Real-time User Activity Tracking for an E-commerce Platform Scenario
 
 Imagine an e-commerce website that wants to track user actions (like clicks, page views, adding items to cart) in real-time. They have several goals:
 
