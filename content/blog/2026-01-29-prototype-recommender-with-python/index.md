@@ -1,6 +1,6 @@
 ---
 title: Prototyping a Live Product Recommender with Python
-date: 2026-01-29
+date: 2026-01-27
 draft: false
 featured: true
 comment: true
