@@ -19,7 +19,7 @@ tags:
   - Reinforcement Learning
   - Machine Learning
   - Online Learning
-  - Product Recommendation
+  - Recommender System
   - MABWiser
   - Mab2Rec
 authors:
