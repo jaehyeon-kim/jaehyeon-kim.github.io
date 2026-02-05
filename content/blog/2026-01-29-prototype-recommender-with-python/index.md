@@ -1,5 +1,5 @@
 ---
-title: Prototyping a Live Product Recommender with Python
+title: Prototyping an Online Recommender in Python
 date: 2026-01-27
 draft: false
 featured: true
@@ -10,7 +10,7 @@ pinned: false
 carousel: false
 featuredImage: false
 series:
-  - Building a Real-Time Product Recommender using Contextual Bandits
+  - "From Prototype to Production: Real-Time Product Recommendation with Contextual Bandits"
 categories:
   - Machine Learning
 tags:
@@ -25,7 +25,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Traditional recommenders struggle with cold-start users and short-term context. Contextual Multi-Armed Bandits (CMAB) continuously learns online, balancing exploitation and exploration based on real-time context. In Part 1, we build a Python prototype to simulate user behavior and validate the algorithm, laying the groundwork for scalable, real-time recommendations.
+description: Traditional recommendation systems struggle with cold-start users and short-term context. Contextual Multi-Armed Bandits (CMAB) continuously learns online, balancing exploitation and exploration based on real-time context. In Part 1, we build a Python prototype to simulate user behavior and validate the algorithm, laying the groundwork for scalable, real-time recommendations.
 ---
 
 ## Overview
@@ -46,7 +46,7 @@ By conditioning decisions on live context, CMAB adapts instantly to changing use
 * **Beyond A/B Testing:** Instead of finding a single global winner, CMAB enables **1:1 personalization**, selecting the best option for this user in this context.
 * **Real-Time Adaptation:** Unlike batch-trained models that quickly become stale, CMAB updates incrementally, making it ideal for news/products recommendation, dynamic pricing, or inventory-aware ranking.
 
-Several CMAB implementations exist, including [**Vowpal Wabbit**](https://vowpalwabbit.org/) and [**River ML**](https://riverml.xyz/latest/). In this post, we use [**Mab2Rec**](https://github.com/fidelity/mab2rec) for offline policy evaluation and [**MABWiser**](https://github.com/fidelity/mabwiser) to build the live recommender prototype.
+Several CMAB implementations exist, including [**Vowpal Wabbit**](https://vowpalwabbit.org/) and [**River ML**](https://riverml.xyz/latest/). In this post, we use [**Mab2Rec**](https://github.com/fidelity/mab2rec) for offline policy evaluation and [**MABWiser**](https://github.com/fidelity/mabwiser) to build the product recommender prototype.
 
 ### Data Streaming Opportunity
 
@@ -231,7 +231,7 @@ We generate 10,000 historical events to serve as our "Offline Training" dataset.
 
 Because the user and product are matched randomly (not by a recommender), the **Average Click Rate (CTR)** is naturally low. In this example, it is around **13.65%**, and this serves as our baseline.
 
-💡 There are three main scripts for this post: `prepare_data.py` for feature engineering and bandit history simulation, `evalue.py` for offline policy evaluation, and `live_recommender.py` for live recommendations. Each script accepts a `--seed` argument, which defaults to *1237*. As long as the seed remains the same, running the scripts will produce identical outputs.
+💡 There are three main scripts for this post: `prepare_data.py` for feature engineering and bandit history simulation, `evalue.py` for offline policy evaluation, and `local_recommender.py` for running product recommendation locally. Each script accepts a `--seed` argument, which defaults to *1237*. As long as the seed remains the same, running the scripts will produce identical outputs.
 
 ```bash
 (venv) $ python product-recommender/recsys-engine/prepare_data.py
@@ -318,9 +318,9 @@ Here is exactly how `mab2rec` calculates that **20.5%**:
 
 The dataset average (**13.7%**) includes all the "Bad Random Choices" (Row A). The LinUCB score (**20.5%**) **filters out** the bad choices. It effectively says: *"On the rare occasions where the random history actually showed the right product (Row B), did the user click?"* Since LinUCB focuses only on the "Right Products," the click rate for those specific matches is much higher than the average of the random pile.
 
-## Live Recommender Simulation
+## Simulation of the Selected Product Recommender Locally
 
-With the model selected, we built a live recommender script. This script acts as the Server, the User, and the Trainer simultaneously in a continuous loop.
+With the model selected, we built a script to simulate the product recommender locally. This script acts as the Server, the User, and the Trainer simultaneously in a continuous loop.
 
 ### Step 1: Pre-training (Offline Replay)
 
@@ -336,75 +336,84 @@ We simulate a sequence of user visits:
 4.  **Reaction:** The `GroundTruth` Oracle decides if the user clicks.
 5.  **Online Update:** We call `model.partial_fit()`. **This updates the matrices ($A$ and $b$) instantly.** The very next recommendation will reflect this new learning.
 
-Here is a sample of 30 recommendation records from the live loop.
+Here is a sample of 30 recommendation records from the local simulation.
 
 ```bash
-(venv) $ python product-recommender/recsys-engine/live_recommender.py 
-[2026-01-26 19:18:49] INFO    : Loaded 1000 users
-[2026-01-26 19:18:49] INFO    : Loading artifacts...
-[2026-01-26 19:18:53] INFO    : Loaded 200 products.
-[2026-01-26 19:18:53] INFO    : Pre-training model from history...
-[2026-01-26 19:18:53] INFO    : Model pre-trained on 10000 events.
+(venv) $ python product-recommender/recsys-engine/local_recommender.py 
+[2026-02-05 15:47:43] INFO    : Loaded 1000 users
+[2026-02-05 15:47:43] INFO    : Loading artifacts...
+[2026-02-05 15:47:48] INFO    : Loaded 200 products.
+[2026-02-05 15:47:48] INFO    : Pre-training model from history...
+[2026-02-05 15:47:48] INFO    : Model pre-trained on 10000 events.
 
 --- STARTING LIVE LOOP (30 visits) ---
 
-User 0153 (56 yo) @ Tue 21:17 -> Recs: [058, 126, 018, 200, 085] -> Clicked: 058 (❌)
-User 0909 (21 yo) @ Thu 12:12 -> Recs: [165, 087, 026, 147, 157] -> Clicked: 165 (❌)
-User 0406 (30 yo) @ Thu 01:43 -> Recs: [147, 089, 165, 127, 105] -> Clicked: 147 (❌)
-User 0317 (31 yo) @ Sat 18:54 -> Recs: [042, 051, 008, 018, 040] -> Clicked: 042 (✅)
-User 0246 (44 yo) @ Sun 06:31 -> Recs: [192, 139, 008, 040, 051] -> Clicked: 192 (✅)
-User 0974 (61 yo) @ Sun 15:52 -> Recs: [051, 009, 058, 059, 124] -> Clicked: 051 (✅)
-User 0234 (26 yo) @ Fri 13:30 -> Recs: [036, 103, 002, 186, 070] -> Clicked: 070 (✅)
-User 0360 (35 yo) @ Fri 13:06 -> Recs: [015, 171, 069, 038, 036] -> Clicked: 015 (❌)
-User 0513 (51 yo) @ Fri 03:47 -> Recs: [058, 073, 124, 074, 051] -> Clicked: 058 (❌)
-User 0640 (33 yo) @ Fri 21:08 -> Recs: [023, 124, 073, 126, 090] -> Clicked: 023 (❌)
-User 0363 (31 yo) @ Wed 19:54 -> Recs: [200, 126, 085, 018, 067] -> Clicked: 067 (✅)
-User 0718 (58 yo) @ Thu 19:23 -> Recs: [018, 086, 036, 019, 047] -> Clicked: 018 (✅)
-User 0390 (49 yo) @ Sat 21:15 -> Recs: [018, 042, 040, 036, 049] -> Clicked: 018 (✅)
-User 0425 (39 yo) @ Sat 22:11 -> Recs: [042, 018, 040, 043, 056] -> Clicked: 043 (✅)
-User 0792 (21 yo) @ Wed 10:39 -> Recs: [192, 139, 102, 073, 189] -> Clicked: 189 (✅)
-User 0190 (41 yo) @ Wed 04:14 -> Recs: [200, 124, 057, 076, 015] -> Clicked: 124 (✅)
-User 0544 (41 yo) @ Sun 17:01 -> Recs: [009, 020, 051, 036, 087] -> Clicked: 036 (✅)
-User 0192 (17 yo) @ Sat 01:08 -> Recs: [055, 139, 041, 042, 008] -> Clicked: 055 (✅)
-User 0757 (55 yo) @ Wed 02:15 -> Recs: [200, 124, 037, 015, 076] -> Clicked: 200 (✅)
-User 0904 (60 yo) @ Sun 22:41 -> Recs: [042, 018, 103, 019, 041] -> Clicked: 019 (✅)
-User 0552 (39 yo) @ Wed 22:26 -> Recs: [126, 018, 058, 036, 195] -> Clicked: 036 (✅)
-User 0540 (36 yo) @ Sun 07:52 -> Recs: [043, 073, 041, 192, 014] -> Clicked: 043 (✅)
-User 0326 (26 yo) @ Thu 05:15 -> Recs: [200, 124, 057, 139, 076] -> Clicked: 200 (❌)
-User 0834 (29 yo) @ Sun 02:07 -> Recs: [051, 002, 036, 103, 057] -> Clicked: 036 (✅)
-User 0290 (21 yo) @ Sat 15:28 -> Recs: [051, 038, 036, 040, 008] -> Clicked: 038 (✅)
-User 0275 (18 yo) @ Mon 11:56 -> Recs: [189, 002, 160, 078, 103] -> Clicked: 189 (✅)
-User 0327 (23 yo) @ Mon 07:29 -> Recs: [192, 189, 139, 190, 193] -> Clicked: 192 (✅)
-User 0144 (67 yo) @ Sat 20:37 -> Recs: [043, 036, 018, 014, 009] -> Clicked: 018 (✅)
-User 0497 (60 yo) @ Mon 16:13 -> Recs: [015, 171, 069, 038, 049] -> Clicked: 015 (❌)
-User 0508 (64 yo) @ Tue 08:50 -> Recs: [192, 194, 190, 189, 123] -> Clicked: 194 (✅)
+User 0153 (56 yo) @ Fri 00:58 -> Recs: [200, 124, 015, 058, 011] -> Clicked: 200 (❌)
+User 0909 (21 yo) @ Sat 15:53 -> Recs: [038, 040, 017, 020, 046] -> Clicked: 038 (❌)
+User 0406 (30 yo) @ Sat 05:24 -> Recs: [020, 041, 008, 055, 040] -> Clicked: 020 (✅)
+User 0317 (31 yo) @ Sat 05:38 -> Recs: [008, 055, 057, 059, 139] -> Clicked: 055 (✅)
+User 0246 (44 yo) @ Mon 02:04 -> Recs: [015, 058, 057, 011, 124] -> Clicked: 015 (❌)
+User 0974 (61 yo) @ Fri 01:16 -> Recs: [058, 073, 124, 074, 051] -> Clicked: 058 (❌)
+User 0234 (26 yo) @ Thu 12:16 -> Recs: [036, 103, 002, 186, 070] -> Clicked: 036 (❌)
+User 0360 (35 yo) @ Sat 20:23 -> Recs: [058, 051, 008, 042, 018] -> Clicked: 042 (✅)
+User 0513 (51 yo) @ Sun 05:37 -> Recs: [051, 059, 043, 014, 020] -> Clicked: 051 (✅)
+User 0640 (33 yo) @ Mon 00:49 -> Recs: [073, 124, 023, 147, 074] -> Clicked: 073 (❌)
+User 0363 (31 yo) @ Fri 23:35 -> Recs: [200, 126, 085, 058, 018] -> Clicked: 018 (✅)
+User 0718 (58 yo) @ Sat 23:05 -> Recs: [018, 036, 040, 042, 020] -> Clicked: 018 (✅)
+User 0390 (49 yo) @ Tue 00:56 -> Recs: [147, 165, 020, 089, 047] -> Clicked: 147 (❌)
+User 0425 (39 yo) @ Thu 03:59 -> Recs: [147, 165, 062, 028, 055] -> Clicked: 147 (❌)
+User 0792 (21 yo) @ Sun 23:28 -> Recs: [042, 056, 018, 043, 046] -> Clicked: 042 (✅)
+User 0190 (41 yo) @ Sat 10:54 -> Recs: [192, 139, 189, 008, 055] -> Clicked: 192 (✅)
+User 0544 (41 yo) @ Tue 20:42 -> Recs: [018, 058, 090, 043, 147] -> Clicked: 018 (❌)
+User 0192 (17 yo) @ Sat 18:38 -> Recs: [042, 056, 018, 046, 043] -> Clicked: 042 (✅)
+User 0757 (55 yo) @ Thu 16:08 -> Recs: [015, 171, 165, 037, 126] -> Clicked: 126 (✅)
+User 0904 (60 yo) @ Sat 02:07 -> Recs: [103, 041, 017, 042, 057] -> Clicked: 042 (✅)
+User 0552 (39 yo) @ Tue 11:33 -> Recs: [192, 190, 189, 194, 193] -> Clicked: 192 (✅)
+User 0540 (36 yo) @ Sat 08:56 -> Recs: [043, 041, 192, 014, 073] -> Clicked: 043 (✅)
+User 0326 (26 yo) @ Wed 13:04 -> Recs: [015, 171, 165, 023, 126] -> Clicked: 015 (❌)
+User 0834 (29 yo) @ Sat 22:58 -> Recs: [051, 002, 042, 058, 036] -> Clicked: 051 (✅)
+User 0290 (21 yo) @ Mon 19:09 -> Recs: [058, 200, 004, 018, 085] -> Clicked: 018 (✅)
+User 0275 (18 yo) @ Wed 11:10 -> Recs: [189, 002, 160, 078, 103] -> Clicked: 189 (❌)
+User 0327 (23 yo) @ Wed 19:54 -> Recs: [200, 126, 018, 085, 058] -> Clicked: 200 (❌)
+User 0144 (67 yo) @ Thu 12:31 -> Recs: [087, 126, 047, 103, 034] -> Clicked: 087 (❌)
+User 0497 (60 yo) @ Sun 08:26 -> Recs: [192, 139, 008, 189, 059] -> Clicked: 192 (✅)
+User 0508 (64 yo) @ Tue 12:41 -> Recs: [165, 087, 026, 171, 037] -> Clicked: 165 (❌)
 
 --- END LOOP ---
 ```
 
-### Live Simulation Evaluation
+### Evaluation of Simulation
 
-The model demonstrated exceptional performance with an **80% Click-Through Rate (24/30 clicks)**.
+The system is behaving exactly as a Contextual Bandit should. It is aggressively exploiting known high-probability zones while struggling (realistically) in neutral zones.
 
-**Key Observations:**
+#### The "Weekend Pizza" Strategy is Dominant
 
-* **Morning Coffee Rule Verified:** The model successfully identified the specific "Morning Coffee" preference (IDs 189–194) on weekdays.
-    *   *Evidence:* **User 0327** (Mon 07:29) was recommended a list entirely composed of coffee (IDs 192, 189, 139, 190, 193) and clicked **Long Black (192)**.
-    *   *Evidence:* **User 0508** (Tue 08:50) and **User 0792** (Wed 10:39) were similarly targeted and clicked **Iced Chocolate (194)** and **Flat White (189)** respectively.
+The model has learned that Weekends (Sat/Sun) are for **Pizzas (Category 40s)**.
+*   **User 0360 (Sat 20:23):** Recommended `[..., 042 (Aussie Pizza), ...]` $\to$ Clicked ✅.
+*   **User 0513 (Sun 05:37):** Recommended `[051 (Buffalo Pizza), 059 (Lamb Pizza)...]` $\to$ Clicked ✅.
+*   **User 0834 (Sat 22:58):** Recommended `[051 (Buffalo Pizza)... 042 (Aussie Pizza)]` $\to$ Clicked ✅.
+*   **Insight:** The model pushes Pizzas hard on weekends regardless of the specific hour, resulting in a very high conversion rate for these users.
 
-* **Weekend Comfort Food Verified:** On Saturdays and Sundays, the model pivoted hard to **Pizzas** and **Burgers**, regardless of the time.
-    *   *Evidence:* **User 0317** (Sat 18:54) and **User 0425** (Sat 22:11) were served lists dominated by Pizza IDs (042, 040, 043) and clicked **The Aussie Pizza (042)** and **Meat Lovers Pizza (043)**.
-    *   *Evidence:* Even early on a Sunday, **User 0540** (Sun 07:52) prioritized and clicked **Meat Lovers Pizza (043)**, showing the "Weekend" signal overpowered the "Morning" signal in this instance.
+#### The "Morning Coffee" Precision
 
-* **The "No-Click" Zones (Weekdays):** Most failures (❌) occurred during **Weekday Afternoons or Late Nights** (e.g., Thu 12:12, Fri 13:06, Fri 03:47).
-    *   *Reasoning:* Our Ground Truth formula defined specific boosts for *Mornings* and *Weekends*. It did not define strong preferences for a "Tuesday Night," leading to lower interaction probabilities that the model correctly struggled to predict.
+The model correctly switches strategies based on the hour, even distinguishing "Weekend Morning" from "Weekend Night".
 
-💡 **Conclusion:** The LinUCB algorithm has successfully reverse-engineered the hidden logic (Time + Context) and is actively exploiting it to drive high engagement.
+*   **User 0552 (Tue 11:33):** It is a Weekday Morning. The model recommended **5 Coffees** `[192, 190, 189, 194, 193]`. The user clicked `192` (Long Black). ✅
+*   **User 0497 (Sun 08:26):** It is a Weekend, but it is Morning. The model prioritized **Coffee (192, 189)** over Pizza. The user clicked `192`. ✅
+*   **User 0508 (Tue 12:41):** This is a great edge case. It is **41 minutes past** the "Morning" cutoff (12:00). The model stopped recommending Coffee and switched to Lunch items (Steamed Veggies, Burritos). The user did not click ❌, but the *behavior* change proves the features are working perfectly.
 
-❗ **Why is the CTR (80%) so high?**
-* In real-world production systems, a CTR of 2-5% is typical. Our simulation reaches about 80% due to the **Top-5 "Safety Net"**. By showing 5 relevant items, each with roughly a 50% chance of being clicked when the context matches, the probability of *at least one* click in the list approaches 97%.
-* For a demo, this high signal is intentional. It clearly demonstrates that the architecture works and that the model has learned the rules, without the distraction of realistic randomness.
+#### Perfect Recommendation, No Interaction (Realism)
 
+*   **User 0275 (Wed 11:10):** The model recommended `189` (Flat White). However, the user ignored it, and the result was ❌ (No Reward).
+*   **Why?** This mimics real life. Even if the recommendation is perfect, users don't always convert. In the `GroundTruth`, the probability caps at ~50% (sigmoid of 0). This "Bad Luck" outcome confirms your evaluation pipeline is honest.
+
+### Conclusion
+
+The simulation is successful. A **53% CTR** with clear differentiation between **Time-of-Day** (Coffee vs. Lunch) and **Day-of-Week** (Pizza vs. Regular) confirms that:
+
+1.  The features (`is_morning`, `is_weekend`) are correctly generated.
+2.  The LinUCB model has learned the coefficients for those features from the history.
+3.  The inference logic in `local_recommender.py` is correctly applying those coefficients.
 
 ## What's Next?
 
@@ -415,7 +424,7 @@ We have successfully prototyped a Contextual Bandit that learns time-based prefe
 3.  **Fault Tolerance:** If the script crashes, the learned state is lost.
 4.  **Concurrency:** A single Python process cannot handle thousands of concurrent requests.
 
-In **Part 2: Scaling Online Learning with Flink, Kafka, and Redis**, we will transform this prototype into an **Event-Driven Architecture**:
+In **Part 2: Scaling Product Recommender Systems Using Event-Driven Architecture**, we will transform this prototype into an *Event-Driven Architecture*:
 
 * **Kafka** will transport click events asynchronously.
 * **Flink** will handle distributed, stateful model training.
