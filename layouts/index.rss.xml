@@ -1,0 +1,30 @@
+{{- $pages := where .Site.RegularPages "Draft" false -}}
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+  <channel>
+    <title>{{ .Site.Title | safeHTML }}</title>
+    <link>{{ .Site.BaseURL | safeURL }}</link>
+    <description>{{ .Site.Params.description | safeHTML }}</description>
+    <language>{{ .Site.Language.Lang }}</language>
+
+    {{- range first 20 $pages -}}
+    <item>
+      <title>{{ .Title | safeHTML }}</title>
+      <link>{{ .Permalink | safeURL }}</link>
+      <guid>{{ .Permalink | safeURL }}</guid>
+      <pubDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</pubDate>
+
+      <description><![CDATA[
+        {{ .Summary | safeHTML }}
+      ]]></description>
+
+      <content:encoded><![CDATA[
+        {{ .Content | safeHTML }}
+      ]]></content:encoded>
+    </item>
+    {{- end }}
+  </channel>
+</rss>

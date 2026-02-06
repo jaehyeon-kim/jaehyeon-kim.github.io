@@ -1,4 +1,4 @@
-baseURL: /
+baseURL: https://jaehyeon.me/
 title: Jaehyeon Kim
 theme: github.com/razonyang/hugo-theme-bootstrap
 copyright: 'Copyright © 2023-{year} Jaehyeon Kim. All Rights Reserved.'
@@ -45,3 +45,19 @@ markup:
     endLevel: 6
     ordered: false
     startLevel: 2
+
+outputs:
+  home:
+    - HTML
+    - RSS
+  section:
+    blog:
+      - HTML
+      - RSS
+
+outputFormats:
+  RSS:
+    mediatype: "application/rss+xml"
+    baseName: "index"
+    isPlainText: true
+    notAlternative: true
