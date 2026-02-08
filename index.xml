@@ -691,7 +691,7 @@ Contextual Multi-Armed Bandits (CMAB) address these gaps through online learning
 <li><strong>Fault Tolerance:</strong> If the script crashes, the learned state is lost.</li>
 <li><strong>Concurrency:</strong> A single Python process cannot handle thousands of concurrent requests.</li>
 </ol>
-<p>In <strong>Part 2: Scaling Product Recommender Systems Using Event-Driven Architecture</strong>, we will transform this prototype into an <em>Event-Driven Architecture</em>:</p>
+<p>In <strong>Part 2: Productionizing Product Recommender Systems Using Event-Driven Architecture</strong>, we will transform this prototype into an <em>Event-Driven Architecture</em>:</p>
 <ul>
 <li><strong>Kafka</strong> will transport click events asynchronously.</li>
 <li><strong>Flink</strong> will handle distributed, stateful model training.</li>
