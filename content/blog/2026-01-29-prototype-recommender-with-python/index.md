@@ -424,7 +424,7 @@ We have successfully prototyped a Contextual Bandit that learns time-based prefe
 3.  **Fault Tolerance:** If the script crashes, the learned state is lost.
 4.  **Concurrency:** A single Python process cannot handle thousands of concurrent requests.
 
-In **Part 2: Scaling Product Recommender Systems Using Event-Driven Architecture**, we will transform this prototype into an *Event-Driven Architecture*:
+In **Part 2: Productionizing Product Recommender Systems Using Event-Driven Architecture**, we will transform this prototype into an *Event-Driven Architecture*:
 
 * **Kafka** will transport click events asynchronously.
 * **Flink** will handle distributed, stateful model training.
