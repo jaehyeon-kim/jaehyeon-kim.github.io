@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Prototyping an Online Recommender in Python</title><link>https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/</link><guid>https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/</guid><pubDate>Tue, 27 Jan 2026 00:00:00 +0000</pubDate><description>
-Overview Traditional recommendation systems, like Collaborative Filtering, are widely used but have limitations. They struggle with the cold-start problem (new users have no history) and rely heavily on long-term signals. They also often ignore short-term context such as time of day, device, location, or session intent, and can miss nuances, for example, a user wanting coffee in the morning but pizza at night.
-Contextual Multi-Armed Bandits (CMAB) address these gaps through online learning.</description><content:encoded><![CDATA[
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Prototyping an Online Product Recommender in Python</title><link>https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/</link><guid>https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/</guid><pubDate>Tue, 27 Jan 2026 00:00:00 +0000</pubDate><description>
+Overview Traditional recommendation approaches such as Collaborative Filtering remain widely adopted, yet they come with notable constraints. They are particularly vulnerable to the cold-start problem, where new users lack sufficient interaction history, and they depend heavily on long-term behavioral data. As a result, they frequently overlook real-time contextual signals, including time of day, device type, location, or session intent. This can prevent them from capturing situational preferences, such as someone preferring coffee in the morning but pizza in the evening.</description><content:encoded><![CDATA[
         
 <h2 id="overview" data-numberify>Overview<a class="anchor ms-1" href="#overview"></a></h2>
-<p>Traditional recommendation systems, like <a href="https://en.wikipedia.org/wiki/Collaborative_filtering" target="_blank" rel="noopener noreferrer">Collaborative Filtering<i class="fas fa-external-link-square-alt ms-1"></i></a>, are widely used but have limitations. They struggle with the <strong>cold-start problem</strong> (new users have no history) and rely heavily on long-term signals. They also often ignore <strong>short-term context</strong> such as time of day, device, location, or session intent, and can miss nuances, for example, a user wanting <strong>coffee in the morning but pizza at night</strong>.</p>
+<p>Traditional recommendation approaches such as <a href="https://en.wikipedia.org/wiki/Collaborative_filtering" target="_blank" rel="noopener noreferrer">Collaborative Filtering<i class="fas fa-external-link-square-alt ms-1"></i></a> remain widely adopted, yet they come with notable constraints. They are particularly vulnerable to the <strong>cold-start problem</strong>, where new users lack sufficient interaction history, and they depend heavily on long-term behavioral data. As a result, they frequently overlook <strong>real-time contextual signals</strong>, including time of day, device type, location, or session intent. This can prevent them from capturing situational preferences, such as someone preferring <strong>coffee in the morning but pizza in the evening</strong>.</p>
 <p><a href="https://en.wikipedia.org/wiki/Multi-armed_bandit#Contextual_bandit" target="_blank" rel="noopener noreferrer"><strong>Contextual Multi-Armed Bandits (CMAB)</strong><i class="fas fa-external-link-square-alt ms-1"></i></a> address these gaps through <strong>online learning</strong>.</p>
 <p>As a practical form of <a href="https://en.wikipedia.org/wiki/Reinforcement_learning" target="_blank" rel="noopener noreferrer">reinforcement learning<i class="fas fa-external-link-square-alt ms-1"></i></a>, CMAB balances two goals in real time:</p>
 <ol>
@@ -53,8 +52,7 @@ Contextual Multi-Armed Bandits (CMAB) address these gaps through online learning
 </span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"># scikit-learn                       1.8.0</span>
 </span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"># textwiser                          2.0.2</span>
 </span></span></code></pre></div><blockquote>
-
-<h2 id="-source-code-for-the-post" data-numberify>📂 Source Code for the Post<a class="anchor ms-1" href="#-source-code-for-the-post"></a></h2>
+<p><strong>📂 Source Code for the Post</strong></p>
 <p>The source code for this post is available in the <strong>product-recommender</strong> folder of the <a href="https://github.com/jaehyeon-kim/streaming-demos" target="_blank" rel="noopener noreferrer">streaming-demos<i class="fas fa-external-link-square-alt ms-1"></i></a> GitHub repository.</p>
 </blockquote>
 
@@ -676,12 +674,9 @@ Contextual Multi-Armed Bandits (CMAB) address these gaps through online learning
 </ul>
 
 <h3 id="conclusion" data-numberify>Conclusion<a class="anchor ms-1" href="#conclusion"></a></h3>
-<p>The simulation is successful. A <strong>53% CTR</strong> with clear differentiation between <strong>Time-of-Day</strong> (Coffee vs. Lunch) and <strong>Day-of-Week</strong> (Pizza vs. Regular) confirms that:</p>
-<ol>
-<li>The features (<code>is_morning</code>, <code>is_weekend</code>) are correctly generated.</li>
-<li>The LinUCB model has learned the coefficients for those features from the history.</li>
-<li>The inference logic in <code>local_recommender.py</code> is correctly applying those coefficients.</li>
-</ol>
+<p>Across 30 simulated visits, CTR reached <strong>53%</strong>.</p>
+<p>This elevated CTR indicates that the model has internalized dominant temporal and demographic patterns encoded in the simulation. It aggressively exploits strong signals such as weekend pizza and morning coffee while still exploring less-certain regions.</p>
+<p>Importantly, the simulation includes realistic noise. Even strong recommendations do not always convert, reflecting probabilistic user behavior.</p>
 
 <h2 id="whats-next" data-numberify>What&rsquo;s Next?<a class="anchor ms-1" href="#whats-next"></a></h2>
 <p>We have successfully prototyped a Contextual Bandit that learns time-based preferences. However, this Python script has major limitations for a production environment:</p>
@@ -691,7 +686,7 @@ Contextual Multi-Armed Bandits (CMAB) address these gaps through online learning
 <li><strong>Fault Tolerance:</strong> If the script crashes, the learned state is lost.</li>
 <li><strong>Concurrency:</strong> A single Python process cannot handle thousands of concurrent requests.</li>
 </ol>
-<p>In <strong>Part 2: Productionizing Product Recommender Systems Using Event-Driven Architecture</strong>, we will transform this prototype into an <em>Event-Driven Architecture</em>:</p>
+<p>In <strong>Part 2: Productionizing an Online Product Recommender Using Event Driven Architecture</strong>, we will transform this prototype into an <em>Event-Driven Architecture</em>:</p>
 <ul>
 <li><strong>Kafka</strong> will transport click events asynchronously.</li>
 <li><strong>Flink</strong> will handle distributed, stateful model training.</li>
