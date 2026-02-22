@@ -2,7 +2,7 @@
 title: Prototyping an Online Product Recommender in Python
 date: 2026-01-27
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 reward: false
@@ -424,7 +424,7 @@ We have successfully prototyped a Contextual Bandit that learns time-based prefe
 3.  **Fault Tolerance:** If the script crashes, the learned state is lost.
 4.  **Concurrency:** A single Python process cannot handle thousands of concurrent requests.
 
-In **Part 2: Productionizing an Online Product Recommender Using Event Driven Architecture**, we will transform this prototype into an *Event-Driven Architecture*:
+In [**Part 2**](/blog/2026-02-23-productionize-recommender-with-eda/), we will transform this prototype into an *Event-Driven Architecture*:
 
 * **Kafka** will transport click events asynchronously.
 * **Flink** will handle distributed, stateful model training.
