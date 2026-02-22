@@ -52,6 +52,8 @@ To move from prototype to production, we split the application into two distinct
 > 
 > The source code for this post is available in the **product-recommender** folder of the [streaming-demos](https://github.com/jaehyeon-kim/streaming-demos) GitHub repository.  
 
+![Architecture](featured.gif#center)
+
 ## Flink Application Design
 
 The [Flink job (`recsys-trainer`)](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-recommender/recsys-trainer) ties these concepts together using a few specific patterns.

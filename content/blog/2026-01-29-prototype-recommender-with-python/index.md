@@ -52,7 +52,9 @@ Several CMAB implementations exist, including [**Vowpal Wabbit**](https://vowpal
 
 CMAB performs well in **data streaming environments**. Integrated with platforms like **Kafka** and **Flink**, it learns directly from event streams, creating a feedback loop that responds to trends and shifts in user intent in sub-seconds.
 
-In this series, **Part 1** (*this post*) builds a complete **Python prototype** to validate the algorithm and simulate user behavior. **Part 2** (*coming soon*) will scale this to a distributed, event-driven architecture.
+In this series, **Part 1** (*this post*) builds a complete **Python prototype** to validate the algorithm and simulate user behavior. [**Part 2**](/blog/2026-02-23-productionize-recommender-with-eda/) will scale this to a distributed, event-driven architecture.
+
+![Architecture](featured.gif#center)
 
 ## Tech Stack
 
