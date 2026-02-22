@@ -1,5 +1,5 @@
 ---
-title: Prototyping an Online Recommender in Python
+title: Prototyping an Online Product Recommender in Python
 date: 2026-01-27
 draft: false
 featured: true
@@ -25,12 +25,12 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Traditional recommendation systems struggle with cold-start users and short-term context. Contextual Multi-Armed Bandits (CMAB) continuously learns online, balancing exploitation and exploration based on real-time context. In Part 1, we build a Python prototype to simulate user behavior and validate the algorithm, laying the groundwork for scalable, real-time recommendations.
+description: Traditional recommendation systems often struggle with cold-start users and with incorporating immediate contextual signals. In contrast, Contextual Multi-Armed Bandits, or CMAB, learn continuously in an online setting by balancing exploration and exploitation using real-time context. In Part 1, we develop a Python prototype that simulates user behavior and validates the algorithm, establishing a foundation for scalable, real-time recommendation systems.
 ---
 
 ## Overview
 
-Traditional recommendation systems, like [Collaborative Filtering](https://en.wikipedia.org/wiki/Collaborative_filtering), are widely used but have limitations. They struggle with the **cold-start problem** (new users have no history) and rely heavily on long-term signals. They also often ignore **short-term context** such as time of day, device, location, or session intent, and can miss nuances, for example, a user wanting **coffee in the morning but pizza at night**.
+Traditional recommendation approaches such as [Collaborative Filtering](https://en.wikipedia.org/wiki/Collaborative_filtering) remain widely adopted, yet they come with notable constraints. They are particularly vulnerable to the **cold-start problem**, where new users lack sufficient interaction history, and they depend heavily on long-term behavioral data. As a result, they frequently overlook **real-time contextual signals**, including time of day, device type, location, or session intent. This can prevent them from capturing situational preferences, such as someone preferring **coffee in the morning but pizza in the evening**.
 
 [**Contextual Multi-Armed Bandits (CMAB)**](https://en.wikipedia.org/wiki/Multi-armed_bandit#Contextual_bandit) address these gaps through **online learning**.
 
@@ -88,7 +88,7 @@ $ source venv/bin/activate
 # textwiser                          2.0.2
 ```
 
-> ## 📂 Source Code for the Post
+> **📂 Source Code for the Post**
 > 
 > The source code for this post is available in the **product-recommender** folder of the [streaming-demos](https://github.com/jaehyeon-kim/streaming-demos) GitHub repository.  
 
@@ -409,11 +409,11 @@ The model correctly switches strategies based on the hour, even distinguishing "
 
 ### Conclusion
 
-The simulation is successful. A **53% CTR** with clear differentiation between **Time-of-Day** (Coffee vs. Lunch) and **Day-of-Week** (Pizza vs. Regular) confirms that:
+Across 30 simulated visits, CTR reached **53%**.
 
-1.  The features (`is_morning`, `is_weekend`) are correctly generated.
-2.  The LinUCB model has learned the coefficients for those features from the history.
-3.  The inference logic in `local_recommender.py` is correctly applying those coefficients.
+This elevated CTR indicates that the model has internalized dominant temporal and demographic patterns encoded in the simulation. It aggressively exploits strong signals such as weekend pizza and morning coffee while still exploring less-certain regions.
+
+Importantly, the simulation includes realistic noise. Even strong recommendations do not always convert, reflecting probabilistic user behavior.
 
 ## What's Next?
 
@@ -424,7 +424,7 @@ We have successfully prototyped a Contextual Bandit that learns time-based prefe
 3.  **Fault Tolerance:** If the script crashes, the learned state is lost.
 4.  **Concurrency:** A single Python process cannot handle thousands of concurrent requests.
 
-In **Part 2: Productionizing Product Recommender Systems Using Event-Driven Architecture**, we will transform this prototype into an *Event-Driven Architecture*:
+In **Part 2: Productionizing an Online Product Recommender Using Event Driven Architecture**, we will transform this prototype into an *Event-Driven Architecture*:
 
 * **Kafka** will transport click events asynchronously.
 * **Flink** will handle distributed, stateful model training.
