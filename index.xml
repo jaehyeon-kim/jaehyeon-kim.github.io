@@ -1,4 +1,167 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Prototyping an Online Product Recommender in Python</title><link>https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/</link><guid>https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/</guid><pubDate>Tue, 27 Jan 2026 00:00:00 +0000</pubDate><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Productionizing an Online Product Recommender using Event Driven Architecture</title><link>https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/</link><guid>https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/</guid><pubDate>Mon, 23 Feb 2026 00:00:00 +0000</pubDate><description><![CDATA[
+        <p>In <a href="/blog/2026-01-29-prototype-recommender-with-python/"><strong>Part 1</strong></a>, we built a contextual bandit prototype using Python and <a href="https://github.com/fidelity/mab2rec" target="_blank" rel="noopener noreferrer"><code>Mab2Rec</code><i class="fas fa-external-link-square-alt ms-1"></i></a>. While effective for testing algorithms locally, a monolithic script cannot handle production scale. Real-world recommendation systems require low-latency inference for users and high-throughput training for model updates.</p>
+<p>This post demonstrates how to decouple these concerns using an event-driven architecture with Apache Flink, Kafka, and Redis.</p>
+      ]]></description><content:encoded><![CDATA[
+        <p>In <a href="/blog/2026-01-29-prototype-recommender-with-python/"><strong>Part 1</strong></a>, we built a contextual bandit prototype using Python and <a href="https://github.com/fidelity/mab2rec" target="_blank" rel="noopener noreferrer"><code>Mab2Rec</code><i class="fas fa-external-link-square-alt ms-1"></i></a>. While effective for testing algorithms locally, a monolithic script cannot handle production scale. Real-world recommendation systems require low-latency inference for users and high-throughput training for model updates.</p>
+<p>This post demonstrates how to decouple these concerns using an event-driven architecture with Apache Flink, Kafka, and Redis.</p>
+<h2 id="system-architecture" data-numberify>System Architecture<a class="anchor ms-1" href="#system-architecture"></a></h2>
+<p>To move from prototype to production, we split the application into two distinct layers: Serving and Training.</p>
+<ul>
+<li><strong>Python Client (Serving):</strong> A lightweight, stateless client responsible for inference. It fetches pre-calculated model parameters from Redis, computes scores locally to make product recommendations, and captures user feedback.</li>
+<li><strong>Kafka (Transport):</strong> Buffers feedback events asynchronously, decoupling the speed of serving from the speed of training.</li>
+<li><strong>Flink (Training):</strong> A stateful streaming application. It consumes feedback events, updates the model parameters (LinUCB matrices $A$ and $b$), and pushes the inverted matrices back to Redis.
+<ul>
+<li>❗ Unlike <em>Part 1</em>, where training relied on <a href="https://github.com/fidelity/mabwiser" target="_blank" rel="noopener noreferrer"><code>MABWiser</code><i class="fas fa-external-link-square-alt ms-1"></i></a>, here it is performed via explicit matrix operations.</li>
+</ul>
+</li>
+<li><strong>Redis (Model Store):</strong> Stores the latest model parameters ($A^{-1}$ and $b$) for low-latency access by the client.</li>
+</ul>
+<blockquote>
+<p><strong>📂 Source Code for the Post</strong></p>
+<p>The source code for this post is available in the <strong>product-recommender</strong> folder of the <a href="https://github.com/jaehyeon-kim/streaming-demos" target="_blank" rel="noopener noreferrer">streaming-demos<i class="fas fa-external-link-square-alt ms-1"></i></a> GitHub repository.</p>
+</blockquote>
+
+<h2 id="flink-application-design" data-numberify>Flink Application Design<a class="anchor ms-1" href="#flink-application-design"></a></h2>
+<p>The <a href="https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-recommender/recsys-trainer" target="_blank" rel="noopener noreferrer">Flink job (<code>recsys-trainer</code>)<i class="fas fa-external-link-square-alt ms-1"></i></a> ties these concepts together using a few specific patterns.</p>
+
+<h3 id="stateful-model-training" data-numberify>Stateful Model Training<a class="anchor ms-1" href="#stateful-model-training"></a></h3>
+<p>The core challenge in distributed online learning is managing state. The <a href="https://github.com/jaehyeon-kim/streaming-demos/blob/main/product-recommender/recsys-trainer/src/main/kotlin/me/jaehyeon/topology/processing/LinUCBUpdater.kt" target="_blank" rel="noopener noreferrer"><code>LinUCBUpdater</code> function<i class="fas fa-external-link-square-alt ms-1"></i></a> in the Flink trainer acts as the system&rsquo;s memory. It implements a <strong>disjoint LinUCB</strong> model, meaning it maintains a completely independent set of matrices for <strong>each unique product</strong>.</p>
+<p>❗The matrices are used to calculate scores for making recommendations.</p>
+<p>For each <code>product_id</code>, Flink maintains two pieces of state in RocksDB:</p>
+<ol>
+<li><strong>Matrix $A$ ($d \times d$):</strong> Represents the covariance of features seen so far. It tracks <strong>Exposure</strong>, recording how many times specific user contexts (e.g., &ldquo;Morning Users&rdquo; or &ldquo;Weekend Users&rdquo;) have been seen for a specific product.</li>
+<li><strong>Vector $b$ ($d \times 1$):</strong> Represents the accumulated reward. It tracks <strong>Success</strong>, recording which features actually led to a click.</li>
+</ol>
+<p>The matrix $A$ is initialized as a scaled identity matrix $A_0 = \lambda I$ to ensure invertibility and to encode an initial prior of uniform uncertainty across feature dimensions.</p>
+<p>When a feedback event arrives (Context $x$, Reward $r$), Flink performs the updates:</p>
+<ul>
+<li><strong>Update A:</strong> $A \leftarrow A + x x^T$. The outer product $x x^T$ increases covariance along the observed feature directions. As similar contexts repeat, $A$ grows in those directions, reflecting increased confidence.</li>
+<li><strong>Update b:</strong> $b \leftarrow b + r x$. If the user clicked ($r=1$), we add their feature vector to $b$, reinforcing that preference pattern.</li>
+</ul>
+<p>The updated $A$ and $b$ are stored immediately in <strong>Flink keyed state (backed by RocksDB)</strong>. With checkpointing enabled, this state is durably persisted and recovered in case of failure.</p>
+<p><strong>Optimization 1: Inversion on Write</strong></p>
+<p>To generate a score, we need the inverse matrix $A^{-1}$, which is computationally expensive. If we performed this inversion inside the Python client for every recommendation request, latency would increase significantly. Instead, the Flink training job periodically loads $A$ from state, factorizes it using <strong>LU decomposition</strong>, computes $A^{-1}$, and stores the inverse in Redis. Because the contextual feature dimension in this demo is small, recomputing the inverse periodically remains efficient while keeping the serving layer lightweight.</p>
+<p><strong>Optimization 2: Batched Updates</strong></p>
+<p>In a high-traffic environment, a popular product might receive thousands of clicks per second. Inverting the matrix and writing to Redis for <em>every single click</em> would be inefficient.</p>
+<p>To solve this, we use Flink timers to buffer updates. The model state ($A$ and $b$) is updated immediately for every event, while the expensive inversion and Redis write are triggered periodically (e.g., every 5 seconds). This drastically reduces CPU load and network traffic while keeping the model fresh.</p>
+
+<h3 id="scalable-inference-logic" data-numberify>Scalable Inference Logic<a class="anchor ms-1" href="#scalable-inference-logic"></a></h3>
+<p>The Python client (<a href="https://github.com/jaehyeon-kim/streaming-demos/blob/main/product-recommender/recsys-engine/eda_recommender.py" target="_blank" rel="noopener noreferrer"><code>eda_recommender.py</code><i class="fas fa-external-link-square-alt ms-1"></i></a>) is responsible for ranking items. It uses the <strong>Upper Confidence Bound (UCB)</strong> formula to balance exploiting known good items and exploring uncertain ones.</p>
+<p>For a given user context vector $x$ and product $a$, the score is calculated as:</p>
+<p>$$ \text{Score}_a = x^T \theta_a + \alpha \sqrt{x^T A_a^{-1} x}, \quad \text{where } \theta_a = A_a^{-1} b_a $$</p>
+<p><strong>Prediction ($x^T \theta_a$)</strong><br>
+This is the standard Linear Regression prediction. It asks: <em>&ldquo;Based on historical data, how likely is this user to click?&rdquo;</em> If the user matches features stored in vector $b$ (features that previously led to clicks), this term is high.</p>
+<p><strong>Exploration ($\alpha \sqrt{x^T A_a^{-1} x}$)</strong></p>
+<ul>
+<li><strong>Familiar User:</strong> If we have seen this user type many times, the matrix $A$ accumulates repeated contributions of $x x^T$. This increases the magnitude of $A$ in those feature directions. Because the exploration term depends on $x^T A^{-1} x$, a larger $A$ leads to a smaller quadratic form, shrinking the confidence bound. The model therefore relies more on exploitation.</li>
+<li><strong>Cold Start:</strong> If we have rarely (or never) observed this feature pattern, $A$ remains close to its initial regularized identity matrix. After inversion, these directions yield larger values of $x^T A^{-1} x$, increasing the confidence bound and encouraging exploration to reduce uncertainty.</li>
+<li>❗ $\alpha$ is a hyperparameter and it is set to 0.1 as determined in <em>Part 1</em>.</li>
+</ul>
+
+<h3 id="hybrid-source-for-warm-start" data-numberify>Hybrid Source for Warm Start<a class="anchor ms-1" href="#hybrid-source-for-warm-start"></a></h3>
+<p>Contextual bandits suffer from the &ldquo;Cold Start&rdquo; problem. To mitigate this, we implement a <strong>Hybrid Source</strong>.</p>
+<ol>
+<li><strong>File Source:</strong> Reads the historical CSV (<code>training_log.csv</code>) generated in <em>Part 1</em> to bootstrap the model state.</li>
+<li><strong>Kafka Source:</strong> Automatically switches to the live <code>feedback-events</code> topic once the historical data is processed.</li>
+</ol>
+
+<h3 id="custom-redis-sink" data-numberify>Custom Redis Sink<a class="anchor ms-1" href="#custom-redis-sink"></a></h3>
+<p>We implement a custom Sink using the Sink V2 API and Jedis. This allows us to perform efficient <code>SET</code> operations to update the model parameters in Redis directly from the Flink stream. Because each update overwrites the full parameter vector, repeated writes remain logically safe under at-least-once delivery semantics. Besides, because the upstream <code>LinUCBUpdater</code> batches the emissions, this sink receives highly aggregated model updates, preventing Redis from being overwhelmed by write operations.</p>
+
+<h2 id="recommender-simulation-design" data-numberify>Recommender Simulation Design<a class="anchor ms-1" href="#recommender-simulation-design"></a></h2>
+<p>To validate the architecture without live user traffic, we designed a Python client (<code>eda_recommender.py</code>) that simulates the entire lifecycle of a recommendation request. This script plays two roles simultaneously: it acts as the <strong>Recommendation Service</strong> (serving predictions) and the <strong>User</strong> (providing feedback).</p>
+
+<h3 id="serving-logic" data-numberify>Serving Logic<a class="anchor ms-1" href="#serving-logic"></a></h3>
+<p>In a production environment, this logic would live in a high-performance API. For this simulation, the Python client:</p>
+<ol>
+<li><strong>Context Generation:</strong> Creates a synthetic user profile (Age, Gender) and derives key temporal features (e.g., <em>Morning</em>, <em>Weekend</em>) from a simulated timestamp to form the full context.</li>
+<li><strong>Model Retrieval:</strong> Fetches the latest LinUCB parameters ($A^{-1}$ and $b$) for all active products directly from Redis.</li>
+<li><strong>Scoring and Ranking:</strong> Calculates the UCB score for every product, ranks them in descending order, and returns the <strong>top 5 highest-scoring items</strong> as the recommendation set.</li>
+</ol>
+
+<h3 id="feedback-generation" data-numberify>Feedback Generation<a class="anchor ms-1" href="#feedback-generation"></a></h3>
+<p>To prove the model is learning, the simulation follows the same <strong>&ldquo;Ground Truth&rdquo;</strong> logic used in <em>Part 1</em>:</p>
+<ul>
+<li><strong>Morning Routine:</strong> Users click &ldquo;Drinks &amp; Desserts&rdquo; (Coffee) between 6 AM and 11 AM.</li>
+<li><strong>Weekend Treats:</strong> On Saturdays and Sundays, users prefer &ldquo;Pizzas&rdquo; or &ldquo;Burgers.&rdquo;</li>
+<li><strong>Price Sensitivity:</strong> Users under 25 avoid expensive items.</li>
+</ul>
+<p>If any of the recommended top 5 items matches the user&rsquo;s current context (e.g., showing a Latte on a Tuesday morning), the script generates a Reward (1). Otherwise, it generates no reward (0). This feedback is serialized to Avro and produced to Kafka, completing the loop.</p>
+
+<h2 id="environment-setup" data-numberify>Environment Setup<a class="anchor ms-1" href="#environment-setup"></a></h2>
+<p>We use Docker Compose to orchestrate the infrastructure (Kafka, Flink, Redis) and Gradle to build the Kotlin application.</p>
+
+<h3 id="prerequisites" data-numberify>Prerequisites<a class="anchor ms-1" href="#prerequisites"></a></h3>
+<p>Clone the repository and infrastructure utilities, then download the required connectors (Kafka, Flink, Avro).</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl">git clone https://github.com/jaehyeon-kim/streaming-demos.git
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="nb">cd</span> streaming-demos
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># Clone Factor House Local for infrastructure definitions</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">git clone https://github.com/factorhouse/factorhouse-local.git
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># Download Kafka/Flink Dependencies</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">./factorhouse-local/resources/setup-env.sh
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="nb">cd</span> product-recommender
+</span></span></code></pre></div>
+<h3 id="build-and-launch" data-numberify>Build and Launch<a class="anchor ms-1" href="#build-and-launch"></a></h3>
+<p>We bootstrap the environment by generating training data, building the Flink JAR, and launching the cluster. We use Kpow and Flex to monitor the Kafka and Flink clusters; these tools require a Factor House community license. Visit the <a href="https://account.factorhouse.io/auth/getting_started" target="_blank" rel="noopener noreferrer">Factor House License Portal<i class="fas fa-external-link-square-alt ms-1"></i></a> to generate your license, save the details in a file (e.g., <code>license.env</code>), and export the associated environment variables (<code>KPOW_LICENSE</code> and <code>FLEX_LICENSE</code>).</p>
+<p>With the license configured, launch the Docker Compose services as shown below.</p>
+<p><em>❗ You do not need Kotlin or Gradle installed locally. The <code>./gradlew</code> script handles all build dependencies.</em></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># Setup Python and Generate Bootstrap Data</span>
+</span></span><span class="line"><span class="ln"> 2</span><span class="cl">python3 -m venv venv
+</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="nb">source</span> venv/bin/activate
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl">pip install -r requirements.txt
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">python recsys-engine/prepare_data.py
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># Build Flink Application (Shadow Jar)</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="nb">cd</span> recsys-trainer
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">./gradlew shadowJar
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="nb">cd</span> ..
+</span></span><span class="line"><span class="ln">11</span><span class="cl">
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"># Launch Infrastructure (Kafka, Flink, Redis, Kpow)</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="nb">export</span> <span class="nv">KPOW_SUFFIX</span><span class="o">=</span><span class="s2">&#34;-ce&#34;</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="nb">export</span> <span class="nv">FLEX_SUFFIX</span><span class="o">=</span><span class="s2">&#34;-ce&#34;</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="nb">export</span> <span class="nv">KPOW_LICENSE</span><span class="o">=</span>&lt;path-to-license-file&gt;
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="nb">export</span> <span class="nv">FLEX_LICENSE</span><span class="o">=</span>&lt;path-to-license-file&gt;
+</span></span><span class="line"><span class="ln">17</span><span class="cl">
+</span></span><span class="line"><span class="ln">18</span><span class="cl">docker compose -p kpow -f ../factorhouse-local/compose-kpow.yml up -d <span class="se">\
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="se"></span>  <span class="o">&amp;&amp;</span> docker compose -p stripped -f ./compose-stripped.yml up -d <span class="se">\
+</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="se"></span>  <span class="o">&amp;&amp;</span> docker compose -p flex -f ./compose-flex.yml up -d
+</span></span></code></pre></div>
+<h2 id="live-recommender-simulation" data-numberify>Live Recommender Simulation<a class="anchor ms-1" href="#live-recommender-simulation"></a></h2>
+<p>Once the infrastructure is running, Flink will first process the historical events to warm up. Once the historical processing is complete, we can run the Python client to simulate live traffic.</p>
+<p>To visualize the system in action, open two terminals.</p>
+<p><strong>Terminal 1: Client</strong></p>
+<p>Run the Python script. It acts as the user, receiving recommendations and sending feedback (clicks) to Kafka.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">python recsys-engine/eda_recommender.py
+</span></span></code></pre></div><p><strong>Terminal 2: Trainer</strong></p>
+<p>Watch the Flink TaskManager logs. You will see the application reacting to the events sent to the <code>feedback-events</code> topic in real-time.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker logs taskmanager -f
+</span></span></code></pre></div><p><strong>Result</strong></p>
+<p>You will see a series of feedback events generated by users on the left-hand side. On the right-hand side, you can see the logs confirming that model parameters are being sent to Redis in batches.</p>
+<p>This confirms the closed loop: <strong>Read (Redis) -&gt; Act (Kafka) -&gt; Learn (Flink) -&gt; Write (Redis)</strong>.</p>
+<p><picture><img class="img-fluid mx-auto d-block" alt="Live Simulation Result" src="/blog/2026-02-23-productionize-recommender-with-eda/recommender-output.gif" loading="lazy" width="1665" height="1476" />
+</picture>
+
+</p>
+<p>You can inspect feedback events on Kpow at <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer">http://localhost:3000<i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
+<p><picture><img class="img-fluid mx-auto d-block" alt="Feedback Events" src="/blog/2026-02-23-productionize-recommender-with-eda/feedback-events.png" loading="lazy" width="981" height="1123" />
+</picture>
+
+</p>
+
+<h2 id="teardown" data-numberify>Teardown<a class="anchor ms-1" href="#teardown"></a></h2>
+<p>To stop the cluster and remove resources:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker compose -p flex -f ./compose-flex.yml down <span class="se">\
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  <span class="o">&amp;&amp;</span> docker compose -p stripped -f ./compose-stripped.yml down <span class="se">\
+</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  <span class="o">&amp;&amp;</span> docker compose -p kpow -f ../factorhouse-local/compose-kpow.yml down
+</span></span></code></pre></div>
+<h2 id="conclusion" data-numberify>Conclusion<a class="anchor ms-1" href="#conclusion"></a></h2>
+<p>Traditional recommendation systems such as Collaborative Filtering rely on long-term interaction history and often treat user preferences as static. As a result, they struggle to incorporate <strong>immediate context</strong>, missing situational shifts like a user preferring <strong>coffee in the morning but pizza in the evening</strong>.</p>
+<p>To overcome this, we use <strong>Contextual Multi-Armed Bandits (CMAB)</strong>, an online learning approach that balances <strong>exploitation</strong> and <strong>exploration</strong> using real-time contextual signals. While our Python prototype in <em>Part 1</em> validated the concept, it was not built for scale.</p>
+<p>We then evolved it into a production-ready <strong>event-driven architecture</strong>: <strong>Kafka</strong> streams feedback events, <strong>Flink</strong> handles distributed stateful training, and <strong>Redis</strong> serves precomputed parameters for low-latency inference. This design enables horizontal scalability and real-time adaptation to user behavior.</p>
+      ]]></content:encoded></item><item><title>Prototyping an Online Product Recommender in Python</title><link>https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/</link><guid>https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/</guid><pubDate>Tue, 27 Jan 2026 00:00:00 +0000</pubDate><description>
 Overview Traditional recommendation approaches such as Collaborative Filtering remain widely adopted, yet they come with notable constraints. They are particularly vulnerable to the cold-start problem, where new users lack sufficient interaction history, and they depend heavily on long-term behavioral data. As a result, they frequently overlook real-time contextual signals, including time of day, device type, location, or session intent. This can prevent them from capturing situational preferences, such as someone preferring coffee in the morning but pizza in the evening.</description><content:encoded><![CDATA[
         
 <h2 id="overview" data-numberify>Overview<a class="anchor ms-1" href="#overview"></a></h2>
@@ -686,7 +849,7 @@ Overview Traditional recommendation approaches such as Collaborative Filtering r
 <li><strong>Fault Tolerance:</strong> If the script crashes, the learned state is lost.</li>
 <li><strong>Concurrency:</strong> A single Python process cannot handle thousands of concurrent requests.</li>
 </ol>
-<p>In <strong>Part 2: Productionizing an Online Product Recommender Using Event Driven Architecture</strong>, we will transform this prototype into an <em>Event-Driven Architecture</em>:</p>
+<p>In <a href="/blog/2026-02-23-productionize-recommender-with-eda/"><strong>Part 2</strong></a>, we will transform this prototype into an <em>Event-Driven Architecture</em>:</p>
 <ul>
 <li><strong>Kafka</strong> will transport click events asynchronously.</li>
 <li><strong>Flink</strong> will handle distributed, stateful model training.</li>
@@ -8937,572 +9100,6 @@ The <code>avro</code> block in <code>build.gradle.kts</code> configures the Avro
 </p>
 <p>On Kafka UI, we can check messages are sent to the normal and <em>droppable</em> output topics.</p>
 <p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-10-24-beam-examples-7/all-topics.png" loading="lazy" width="1168" height="332" />
-</picture>
-
-</p>
-      ]]></content:encoded></item><item><title>Apache Beam Python Examples - Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn</title><link>https://jaehyeon.me/blog/2024-10-02-beam-examples-6/</link><guid>https://jaehyeon.me/blog/2024-10-02-beam-examples-6/</guid><pubDate>Wed, 02 Oct 2024 00:00:00 +0000</pubDate><description><![CDATA[
-        <p>In the <a href="/blog/2024-09-25-beam-examples-5">previous post</a>, we continued discussing an Apache Beam pipeline that arguments input data by calling a <strong>Remote Procedure Call (RPC)</strong> service. A pipeline was developed that makes a single RPC call for a bundle of elements. The bundle size is determined by the runner, however, we may encounter an issue e.g. if an RPC service becomes quite slower if many elements are included in a single request. We can improve the pipeline using stateful <code>DoFn</code> where the number elements to process and maximum wait seconds can be controlled by <em>state</em> and <em>timers</em>. Note that, although the stateful <code>DoFn</code> used in this post solves the data augmentation task well, in practice, we should use the built-in transforms such as <a href="https://beam.apache.org/documentation/transforms/python/aggregation/batchelements/" target="_blank" rel="noopener noreferrer">BatchElements<i class="fas fa-external-link-square-alt ms-1"></i></a> and <a href="https://beam.apache.org/documentation/transforms/python/aggregation/groupintobatches/" target="_blank" rel="noopener noreferrer">GroupIntoBatches<i class="fas fa-external-link-square-alt ms-1"></i></a> whenever possible.</p>
-      ]]></description><content:encoded><![CDATA[
-        <p>In the <a href="/blog/2024-09-25-beam-examples-5">previous post</a>, we continued discussing an Apache Beam pipeline that arguments input data by calling a <strong>Remote Procedure Call (RPC)</strong> service. A pipeline was developed that makes a single RPC call for a bundle of elements. The bundle size is determined by the runner, however, we may encounter an issue e.g. if an RPC service becomes quite slower if many elements are included in a single request. We can improve the pipeline using stateful <code>DoFn</code> where the number elements to process and maximum wait seconds can be controlled by <em>state</em> and <em>timers</em>. Note that, although the stateful <code>DoFn</code> used in this post solves the data augmentation task well, in practice, we should use the built-in transforms such as <a href="https://beam.apache.org/documentation/transforms/python/aggregation/batchelements/" target="_blank" rel="noopener noreferrer">BatchElements<i class="fas fa-external-link-square-alt ms-1"></i></a> and <a href="https://beam.apache.org/documentation/transforms/python/aggregation/groupintobatches/" target="_blank" rel="noopener noreferrer">GroupIntoBatches<i class="fas fa-external-link-square-alt ms-1"></i></a> whenever possible.</p>
-<ul>
-<li><a href="/blog/2024-07-04-beam-examples-1">Part 1 Calculate K Most Frequent Words and Max Word Length</a></li>
-<li><a href="/blog/2024-07-18-beam-examples-2">Part 2 Calculate Average Word Length with/without Fixed Look back</a></li>
-<li><a href="/blog/2024-08-01-beam-examples-3">Part 3 Build Sport Activity Tracker with/without SQL</a></li>
-<li><a href="/blog/2024-08-15-beam-examples-4">Part 4 Call RPC Service for Data Augmentation</a></li>
-<li><a href="/blog/2024-09-18-beam-examples-5">Part 5 Call RPC Service in Batch using Stateless DoFn</a></li>
-<li><a href="/blog/2024-10-02-beam-examples-6/#">Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn</a> (this post)</li>
-<li><a href="/blog/2024-10-24-beam-examples-7">Part 7 Separate Droppable Data into Side Output</a></li>
-<li><a href="/blog/2024-11-21-beam-examples-8">Part 8 Enhance Sport Activity Tracker with Runner Motivation</a></li>
-<li><a href="/blog/2024-12-05-beam-examples-9">Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn</a></li>
-<li><a href="/blog/2024-12-19-beam-examples-10">Part 10 Develop Streaming File Reader using Splittable DoFn</a></li>
-</ul>
-
-<h2 id="development-environment" data-numberify>Development Environment<a class="anchor ms-1" href="#development-environment"></a></h2>
-<p>The development environment has an Apache Flink cluster, Apache Kafka cluster and <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer">gRPC<i class="fas fa-external-link-square-alt ms-1"></i></a> server. For Flink, we can use either an embedded cluster or a local cluster while <a href="https://docs.docker.com/compose/" target="_blank" rel="noopener noreferrer">Docker Compose<i class="fas fa-external-link-square-alt ms-1"></i></a> is used for the rest. See <a href="/blog/2024-07-04-beam-examples-1">Part 1</a> for details about how to set up the development environment. The source of this post can be found in this <a href="https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines" target="_blank" rel="noopener noreferrer"><strong>GitHub repository</strong><i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-
-<h3 id="manage-environment" data-numberify>Manage Environment<a class="anchor ms-1" href="#manage-environment"></a></h3>
-<p>The Flink and Kafka clusters and gRPC server are managed by the following bash scripts.</p>
-<ul>
-<li><code>./setup/start-flink-env.sh</code></li>
-<li><code>./setup/stop-flink-env.sh</code></li>
-</ul>
-<p>Those scripts accept four flags: <code>-f</code>, <code>-k</code> and <code>-g</code> to start/stop individual resources or <code>-a</code> to manage all of them. We can add multiple flags to start/stop relevant resources. Note that the scripts assume Flink 1.18.1 by default, and we can specify a specific Flink version if it is different from it e.g. <code>FLINK_VERSION=1.17.2 ./setup/start-flink-env.sh</code>.</p>
-<p>Below shows how to start resources using the start-up script. We need to launch both the Flink/Kafka clusters and gRPC server if we deploy a Beam pipeline on a local Flink cluster. Otherwise, we can start the Kafka cluster and gRPC server only.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">## start a local flink can kafka cluster</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">./setup/start-flink-env.sh -f -k -g
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1"># [+] Running 6/6</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1">#  ⠿ Network app-network      Created                                                        0.0s</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1">#  ⠿ Volume &#34;kafka_0_data&#34;    Created                                                        0.0s</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1">#  ⠿ Volume &#34;zookeeper_data&#34;  Created                                                        0.0s</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">#  ⠿ Container zookeeper      Started                                                        0.5s</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">#  ⠿ Container kafka-0        Started                                                        0.7s</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1">#  ⠿ Container kafka-ui       Started                                                        0.9s</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># [+] Running 2/2</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1">#  ⠿ Network grpc-network   Created                                                          0.0s</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1">#  ⠿ Container grpc-server  Started                                                          0.4s</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"># start flink 1.18.1...</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"># Starting cluster.</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"># Starting standalonesession daemon on host &lt;hostname&gt;.</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"># Starting taskexecutor daemon on host &lt;hostname&gt;.</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">
-</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1">## start a local kafka cluster only</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">./setup/start-flink-env.sh -k -g
-</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1"># [+] Running 6/6</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="c1">#  ⠿ Network app-network      Created                                                        0.0s</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1">#  ⠿ Volume &#34;kafka_0_data&#34;    Created                                                        0.0s</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1">#  ⠿ Volume &#34;zookeeper_data&#34;  Created                                                        0.0s</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1">#  ⠿ Container zookeeper      Started                                                        0.5s</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1">#  ⠿ Container kafka-0        Started                                                        0.7s</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1">#  ⠿ Container kafka-ui       Started                                                        0.9s</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1"># [+] Running 2/2</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="c1">#  ⠿ Network grpc-network   Created                                                          0.0s</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1">#  ⠿ Container grpc-server  Started                                                          0.4s</span>
-</span></span></code></pre></div>
-<h2 id="remote-procedure-call-rpc-service" data-numberify>Remote Procedure Call (RPC) Service<a class="anchor ms-1" href="#remote-procedure-call-rpc-service"></a></h2>
-<p>The RPC service have two methods - <code>resolve</code> and <code>resolveBatch</code>. The former accepts a request with a string and returns an integer while the latter accepts a list of string requests and returns a list of integer responses. See <a href="/blog/2024-08-15-beam-examples-4">Part 4</a> for details about how the RPC service is developed.</p>
-<p>Overall, we have the following files for the gRPC server and client applications, and the <code>server.py</code> gets started when we execute the start-up script with the <code>-g</code> flag.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl">tree -P <span class="s2">&#34;serv*|proto&#34;</span> -I <span class="s2">&#34;*pycache*&#34;</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">.
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">├── proto
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">│   └── service.proto
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">├── server.py
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">├── server_client.py
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">├── service_pb2.py
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">└── service_pb2_grpc.py
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="m">1</span> directory, <span class="m">5</span> files
-</span></span></code></pre></div><p>We can check the client and server applications as Python scripts. If we select 1, the next prompt requires to enter a word. Upon entering a word, it returns a tuple of the word and its length as an output. We can make an RPC request with a text if we select 2. Similar to the earlier call, it returns enriched outputs as multiple tuples.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-10-02-beam-examples-6/rpc-demo.png" loading="lazy" width="876" height="412" />
-</picture>
-
-</p>
-
-<h2 id="beam-pipeline" data-numberify>Beam Pipeline<a class="anchor ms-1" href="#beam-pipeline"></a></h2>
-<p>We develop an Apache Beam pipeline that accesses an external RPC service to augment input elements. In this version, it is configured so that a single RPC call is made for multiple elements in batch. Moreover, using <em>state</em> and <em>timers</em>, it controls how many elements to process in a batch and how long to keep elements before flushing them.</p>
-
-<h3 id="shared-source" data-numberify>Shared Source<a class="anchor ms-1" href="#shared-source"></a></h3>
-<p>We have multiple pipelines that read text messages from an input Kafka topic and write outputs to an output topic. Therefore, the data source and sink transforms are refactored into a utility module as shown below. Note that, the Kafka read and write transforms have an argument called <code>deprecated_read</code>, which forces to use the legacy read when it is set to <em>True</em>. We will use the legacy read in this post to prevent a problem that is described in this <a href="https://github.com/apache/beam/issues/20979" target="_blank" rel="noopener noreferrer">GitHub issue<i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># chapter3/io_utils.py</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="nn">re</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="nn">typing</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kn">import</span> <span class="nn">apache_beam</span> <span class="k">as</span> <span class="nn">beam</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam</span> <span class="kn">import</span> <span class="n">pvalue</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.io</span> <span class="kn">import</span> <span class="n">kafka</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="k">def</span> <span class="nf">decode_message</span><span class="p">(</span><span class="n">kafka_kv</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">kafka_kv</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="k">return</span> <span class="n">kafka_kv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">
-</span></span><span class="line"><span class="ln">14</span><span class="cl">
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">element</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&#34;[A-Za-z\&#39;]+&#34;</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">
-</span></span><span class="line"><span class="ln">18</span><span class="cl">
-</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="k">class</span> <span class="nc">ReadWordsFromKafka</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">PTransform</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">        <span class="n">bootstrap_servers</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">        <span class="n">topics</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="n">group_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">        <span class="n">deprecated_read</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">boostrap_servers</span> <span class="o">=</span> <span class="n">bootstrap_servers</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">topics</span> <span class="o">=</span> <span class="n">topics</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">group_id</span> <span class="o">=</span> <span class="n">group_id</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">expansion_service</span> <span class="o">=</span> <span class="kc">None</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">        <span class="k">if</span> <span class="n">deprecated_read</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">expansion_service</span> <span class="o">=</span> <span class="n">kafka</span><span class="o">.</span><span class="n">default_io_expansion_service</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">                <span class="p">[</span><span class="s2">&#34;--experiments=use_deprecated_read&#34;</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">
-</span></span><span class="line"><span class="ln">40</span><span class="cl">    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">pvalue</span><span class="o">.</span><span class="n">PBegin</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">41</span><span class="cl">        <span class="k">return</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl">            <span class="nb">input</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;ReadFromKafka&#34;</span>
-</span></span><span class="line"><span class="ln">44</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">kafka</span><span class="o">.</span><span class="n">ReadFromKafka</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">                <span class="n">consumer_config</span><span class="o">=</span><span class="p">{</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl">                    <span class="s2">&#34;bootstrap.servers&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">boostrap_servers</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">47</span><span class="cl">                    <span class="s2">&#34;auto.offset.reset&#34;</span><span class="p">:</span> <span class="s2">&#34;latest&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">48</span><span class="cl">                    <span class="c1"># &#34;enable.auto.commit&#34;: &#34;true&#34;,</span>
-</span></span><span class="line"><span class="ln">49</span><span class="cl">                    <span class="s2">&#34;group.id&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_id</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">50</span><span class="cl">                <span class="p">},</span>
-</span></span><span class="line"><span class="ln">51</span><span class="cl">                <span class="n">topics</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">topics</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">52</span><span class="cl">                <span class="n">timestamp_policy</span><span class="o">=</span><span class="n">kafka</span><span class="o">.</span><span class="n">ReadFromKafka</span><span class="o">.</span><span class="n">create_time_policy</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">53</span><span class="cl">                <span class="n">commit_offset_in_finalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">54</span><span class="cl">                <span class="n">expansion_service</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expansion_service</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">55</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">56</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;DecodeMessage&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">decode_message</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">57</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;ExtractWords&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">FlatMap</span><span class="p">(</span><span class="n">tokenize</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">58</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">59</span><span class="cl">
-</span></span><span class="line"><span class="ln">60</span><span class="cl">
-</span></span><span class="line"><span class="ln">61</span><span class="cl"><span class="k">class</span> <span class="nc">WriteOutputsToKafka</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">PTransform</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">62</span><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">63</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">64</span><span class="cl">        <span class="n">bootstrap_servers</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">65</span><span class="cl">        <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">66</span><span class="cl">        <span class="n">deprecated_read</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="c1"># TO DO: remove as it applies only to ReadFromKafka</span>
-</span></span><span class="line"><span class="ln">67</span><span class="cl">        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">68</span><span class="cl">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">69</span><span class="cl">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">70</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">boostrap_servers</span> <span class="o">=</span> <span class="n">bootstrap_servers</span>
-</span></span><span class="line"><span class="ln">71</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">topic</span> <span class="o">=</span> <span class="n">topic</span>
-</span></span><span class="line"><span class="ln">72</span><span class="cl">        <span class="c1"># TO DO: remove as it applies only to ReadFromKafka</span>
-</span></span><span class="line"><span class="ln">73</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">expansion_service</span> <span class="o">=</span> <span class="kc">None</span>
-</span></span><span class="line"><span class="ln">74</span><span class="cl">        <span class="k">if</span> <span class="n">deprecated_read</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">75</span><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">expansion_service</span> <span class="o">=</span> <span class="n">kafka</span><span class="o">.</span><span class="n">default_io_expansion_service</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">76</span><span class="cl">                <span class="p">[</span><span class="s2">&#34;--experiments=use_deprecated_read&#34;</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">77</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">78</span><span class="cl">
-</span></span><span class="line"><span class="ln">79</span><span class="cl">    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcoll</span><span class="p">:</span> <span class="n">pvalue</span><span class="o">.</span><span class="n">PCollection</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">80</span><span class="cl">        <span class="k">return</span> <span class="n">pcoll</span> <span class="o">|</span> <span class="s2">&#34;WriteToKafka&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">kafka</span><span class="o">.</span><span class="n">WriteToKafka</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">81</span><span class="cl">            <span class="n">producer_config</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;bootstrap.servers&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">boostrap_servers</span><span class="p">},</span>
-</span></span><span class="line"><span class="ln">82</span><span class="cl">            <span class="n">topic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">topic</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">83</span><span class="cl">            <span class="n">expansion_service</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expansion_service</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">84</span><span class="cl">        <span class="p">)</span>
-</span></span></code></pre></div>
-<h3 id="pipeline-source" data-numberify>Pipeline Source<a class="anchor ms-1" href="#pipeline-source"></a></h3>
-<p>In <code>BatchRpcDoFnStateful</code>, we use state and timers to control how many elements to process in a batch and how long to keep elements before flushing them.</p>
-<p><strong>State</strong></p>
-<ul>
-<li><code>BATCH_SIZE</code>
-<ul>
-<li>A varying integer value is kept in this state, and its value increases by one when a new element is added to a <em>batch</em>. It is used to determine whether to flush the elements in a batch for processing.</li>
-</ul>
-</li>
-<li><code>BATCH</code>
-<ul>
-<li>Input elements are kept in this state until being flushed.</li>
-</ul>
-</li>
-</ul>
-<p><strong>Timers</strong></p>
-<ul>
-<li><code>FLUSH_TIMER</code>
-<ul>
-<li>This timer is triggered when it exceeds the maximum wait seconds. Without this timer, input elements may be held forever if the number of elements is less than the defined batch size.</li>
-</ul>
-</li>
-<li><code>EOW_TIMER</code>
-<ul>
-<li>This timer is set up to ensure any existing elements are flushed at the end of the window.</li>
-</ul>
-</li>
-</ul>
-<p>In the <code>process</code> method, we set the flush and end of window timers. These timers ensure that elements are flushed even if there is no element or fewer elements than the batch size in a batch. Then, we add a new element to the batch and increase the batch size by one. Finally, the elements are flushed if the current batch size is greater than or equal to the defined batch size.</p>
-<p>In the <code>flush</code> method, it begins with collecting elements in the batch, followed by clearing up all <em>state</em> and <em>timers</em>. Then, a single RPC call is made to the <code>resolveBatch</code> method after unique input elements are converted into a <code>RequestList</code> object. Once a response is made, output elements are constructed by augmenting input elements with the response, and the output elements are returned as a list.</p>
-<p>Note that stateful <code>DoFn</code> requires a key-value pair as its input because state access is within the content of the key and window. Therefore, we apply a transform called <code>ToBuckets</code> before the main transform. That transform converts a word into a key-value pair where the key is obtained by taking the Unicode code point for the first character of the word and the value is the word itself.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln">  1</span><span class="cl"><span class="c1"># chapter3/rpc_pardo_stateful.py</span>
-</span></span><span class="line"><span class="ln">  2</span><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
-</span></span><span class="line"><span class="ln">  3</span><span class="cl"><span class="kn">import</span> <span class="nn">argparse</span>
-</span></span><span class="line"><span class="ln">  4</span><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
-</span></span><span class="line"><span class="ln">  5</span><span class="cl"><span class="kn">import</span> <span class="nn">re</span>
-</span></span><span class="line"><span class="ln">  6</span><span class="cl"><span class="kn">import</span> <span class="nn">typing</span>
-</span></span><span class="line"><span class="ln">  7</span><span class="cl"><span class="kn">import</span> <span class="nn">logging</span>
-</span></span><span class="line"><span class="ln">  8</span><span class="cl">
-</span></span><span class="line"><span class="ln">  9</span><span class="cl"><span class="kn">import</span> <span class="nn">apache_beam</span> <span class="k">as</span> <span class="nn">beam</span>
-</span></span><span class="line"><span class="ln"> 10</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.timeutil</span> <span class="kn">import</span> <span class="n">TimeDomain</span>
-</span></span><span class="line"><span class="ln"> 11</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.userstate</span> <span class="kn">import</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 12</span><span class="cl">    <span class="n">ReadModifyWriteStateSpec</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 13</span><span class="cl">    <span class="n">BagStateSpec</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 14</span><span class="cl">    <span class="n">TimerSpec</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 15</span><span class="cl">    <span class="n">on_timer</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 16</span><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 17</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.window</span> <span class="kn">import</span> <span class="n">GlobalWindow</span>
-</span></span><span class="line"><span class="ln"> 18</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.utils.windowed_value</span> <span class="kn">import</span> <span class="n">WindowedValue</span>
-</span></span><span class="line"><span class="ln"> 19</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.utils.timestamp</span> <span class="kn">import</span> <span class="n">Timestamp</span><span class="p">,</span> <span class="n">Duration</span>
-</span></span><span class="line"><span class="ln"> 20</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.options.pipeline_options</span> <span class="kn">import</span> <span class="n">PipelineOptions</span>
-</span></span><span class="line"><span class="ln"> 21</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.options.pipeline_options</span> <span class="kn">import</span> <span class="n">SetupOptions</span>
-</span></span><span class="line"><span class="ln"> 22</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 23</span><span class="cl"><span class="kn">from</span> <span class="nn">io_utils</span> <span class="kn">import</span> <span class="n">ReadWordsFromKafka</span><span class="p">,</span> <span class="n">WriteOutputsToKafka</span>
-</span></span><span class="line"><span class="ln"> 24</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 25</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 26</span><span class="cl"><span class="k">class</span> <span class="nc">ValueCoder</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">coders</span><span class="o">.</span><span class="n">Coder</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 27</span><span class="cl">    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
-</span></span><span class="line"><span class="ln"> 28</span><span class="cl">        <span class="s2">&#34;&#34;&#34;Encode to bytes with a trace that coder was used.&#34;&#34;&#34;</span>
-</span></span><span class="line"><span class="ln"> 29</span><span class="cl">        <span class="k">return</span> <span class="sa">f</span><span class="s2">&#34;x:</span><span class="si">{</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 30</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 31</span><span class="cl">    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 32</span><span class="cl">        <span class="n">s</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 33</span><span class="cl">        <span class="k">assert</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&#34;x:&#34;</span>
-</span></span><span class="line"><span class="ln"> 34</span><span class="cl">        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&#34;:&#34;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:])</span>
-</span></span><span class="line"><span class="ln"> 35</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 36</span><span class="cl">    <span class="k">def</span> <span class="nf">is_deterministic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 37</span><span class="cl">        <span class="k">return</span> <span class="kc">True</span>
-</span></span><span class="line"><span class="ln"> 38</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 39</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 40</span><span class="cl"><span class="n">beam</span><span class="o">.</span><span class="n">coders</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">register_coder</span><span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">ValueCoder</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 41</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 42</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 43</span><span class="cl"><span class="k">def</span> <span class="nf">create_message</span><span class="p">(</span><span class="n">element</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
-</span></span><span class="line"><span class="ln"> 44</span><span class="cl">    <span class="n">msg</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&#34;word&#34;</span><span class="p">:</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&#34;length&#34;</span><span class="p">:</span> <span class="n">element</span><span class="p">[</span><span class="mi">1</span><span class="p">]})</span>
-</span></span><span class="line"><span class="ln"> 45</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 46</span><span class="cl">    <span class="k">return</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">),</span> <span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 47</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 48</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 49</span><span class="cl"><span class="k">def</span> <span class="nf">to_buckets</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 50</span><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">%</span> <span class="mi">10</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 51</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 52</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 53</span><span class="cl"><span class="k">class</span> <span class="nc">BatchRpcDoFnStateful</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 54</span><span class="cl">    <span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span>
-</span></span><span class="line"><span class="ln"> 55</span><span class="cl">    <span class="n">stub</span> <span class="o">=</span> <span class="kc">None</span>
-</span></span><span class="line"><span class="ln"> 56</span><span class="cl">    <span class="n">hostname</span> <span class="o">=</span> <span class="s2">&#34;localhost&#34;</span>
-</span></span><span class="line"><span class="ln"> 57</span><span class="cl">    <span class="n">port</span> <span class="o">=</span> <span class="s2">&#34;50051&#34;</span>
-</span></span><span class="line"><span class="ln"> 58</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 59</span><span class="cl">    <span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="n">ReadModifyWriteStateSpec</span><span class="p">(</span><span class="s2">&#34;batch_size&#34;</span><span class="p">,</span> <span class="n">beam</span><span class="o">.</span><span class="n">coders</span><span class="o">.</span><span class="n">VarIntCoder</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln"> 60</span><span class="cl">    <span class="n">BATCH</span> <span class="o">=</span> <span class="n">BagStateSpec</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 61</span><span class="cl">        <span class="s2">&#34;batch&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 62</span><span class="cl">        <span class="n">beam</span><span class="o">.</span><span class="n">coders</span><span class="o">.</span><span class="n">WindowedValueCoder</span><span class="p">(</span><span class="n">wrapped_value_coder</span><span class="o">=</span><span class="n">ValueCoder</span><span class="p">()),</span>
-</span></span><span class="line"><span class="ln"> 63</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 64</span><span class="cl">    <span class="n">FLUSH_TIMER</span> <span class="o">=</span> <span class="n">TimerSpec</span><span class="p">(</span><span class="s2">&#34;flush_timer&#34;</span><span class="p">,</span> <span class="n">TimeDomain</span><span class="o">.</span><span class="n">REAL_TIME</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 65</span><span class="cl">    <span class="n">EOW_TIMER</span> <span class="o">=</span> <span class="n">TimerSpec</span><span class="p">(</span><span class="s2">&#34;end_of_time&#34;</span><span class="p">,</span> <span class="n">TimeDomain</span><span class="o">.</span><span class="n">WATERMARK</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 66</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 67</span><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_wait_secs</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 68</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
-</span></span><span class="line"><span class="ln"> 69</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">max_wait_secs</span> <span class="o">=</span> <span class="n">max_wait_secs</span>
-</span></span><span class="line"><span class="ln"> 70</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 71</span><span class="cl">    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 72</span><span class="cl">        <span class="kn">import</span> <span class="nn">grpc</span>
-</span></span><span class="line"><span class="ln"> 73</span><span class="cl">        <span class="kn">import</span> <span class="nn">service_pb2_grpc</span>
-</span></span><span class="line"><span class="ln"> 74</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 75</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">:</span> <span class="n">grpc</span><span class="o">.</span><span class="n">Channel</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 76</span><span class="cl">            <span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="ln"> 77</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 78</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="o">=</span> <span class="n">service_pb2_grpc</span><span class="o">.</span><span class="n">RpcServiceStub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 79</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 80</span><span class="cl">    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 81</span><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 82</span><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln"> 83</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 84</span><span class="cl">    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 85</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 86</span><span class="cl">        <span class="n">element</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln"> 87</span><span class="cl">        <span class="n">batch</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">StateParam</span><span class="p">(</span><span class="n">BATCH</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln"> 88</span><span class="cl">        <span class="n">batch_size</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">StateParam</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln"> 89</span><span class="cl">        <span class="n">flush_timer</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">TimerParam</span><span class="p">(</span><span class="n">FLUSH_TIMER</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln"> 90</span><span class="cl">        <span class="n">eow_timer</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">TimerParam</span><span class="p">(</span><span class="n">EOW_TIMER</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln"> 91</span><span class="cl">        <span class="n">timestamp</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">TimestampParam</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 92</span><span class="cl">        <span class="n">win_param</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">WindowParam</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 93</span><span class="cl">    <span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 94</span><span class="cl">        <span class="n">current_size</span> <span class="o">=</span> <span class="n">batch_size</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="ow">or</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="ln"> 95</span><span class="cl">        <span class="k">if</span> <span class="n">current_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 96</span><span class="cl">            <span class="n">flush_timer</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">Timestamp</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">Duration</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_wait_secs</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln"> 97</span><span class="cl">            <span class="n">eow_timer</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">GlobalWindow</span><span class="p">()</span><span class="o">.</span><span class="n">max_timestamp</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln"> 98</span><span class="cl">        <span class="n">current_size</span> <span class="o">+=</span> <span class="mi">1</span>
-</span></span><span class="line"><span class="ln"> 99</span><span class="cl">        <span class="n">batch_size</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">current_size</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">100</span><span class="cl">        <span class="n">batch</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">101</span><span class="cl">            <span class="n">WindowedValue</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">element</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="p">(</span><span class="n">win_param</span><span class="p">,))</span>
-</span></span><span class="line"><span class="ln">102</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">103</span><span class="cl">        <span class="k">if</span> <span class="n">current_size</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">104</span><span class="cl">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">flush_timer</span><span class="p">,</span> <span class="n">eow_timer</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">105</span><span class="cl">
-</span></span><span class="line"><span class="ln">106</span><span class="cl">    <span class="nd">@on_timer</span><span class="p">(</span><span class="n">FLUSH_TIMER</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">107</span><span class="cl">    <span class="k">def</span> <span class="nf">on_flush_timer</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">108</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">109</span><span class="cl">        <span class="n">batch</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">StateParam</span><span class="p">(</span><span class="n">BATCH</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">110</span><span class="cl">        <span class="n">batch_size</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">StateParam</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">111</span><span class="cl">        <span class="n">flush_timer</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">TimerParam</span><span class="p">(</span><span class="n">FLUSH_TIMER</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">112</span><span class="cl">        <span class="n">eow_timer</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">TimerParam</span><span class="p">(</span><span class="n">EOW_TIMER</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">113</span><span class="cl">    <span class="p">):</span>
-</span></span><span class="line"><span class="ln">114</span><span class="cl">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">flush_timer</span><span class="p">,</span> <span class="n">eow_timer</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">115</span><span class="cl">
-</span></span><span class="line"><span class="ln">116</span><span class="cl">    <span class="nd">@on_timer</span><span class="p">(</span><span class="n">EOW_TIMER</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">117</span><span class="cl">    <span class="k">def</span> <span class="nf">on_eow_timer</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">118</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">119</span><span class="cl">        <span class="n">batch</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">StateParam</span><span class="p">(</span><span class="n">BATCH</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">120</span><span class="cl">        <span class="n">batch_size</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">StateParam</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">121</span><span class="cl">        <span class="n">flush_timer</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">TimerParam</span><span class="p">(</span><span class="n">FLUSH_TIMER</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">122</span><span class="cl">        <span class="n">eow_timer</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">TimerParam</span><span class="p">(</span><span class="n">EOW_TIMER</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">123</span><span class="cl">    <span class="p">):</span>
-</span></span><span class="line"><span class="ln">124</span><span class="cl">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">flush_timer</span><span class="p">,</span> <span class="n">eow_timer</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">125</span><span class="cl">
-</span></span><span class="line"><span class="ln">126</span><span class="cl">    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">127</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">128</span><span class="cl">        <span class="n">batch</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">StateParam</span><span class="p">(</span><span class="n">BATCH</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">129</span><span class="cl">        <span class="n">batch_size</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">StateParam</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">130</span><span class="cl">        <span class="n">flush_timer</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">TimerParam</span><span class="p">(</span><span class="n">FLUSH_TIMER</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">131</span><span class="cl">        <span class="n">eow_timer</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">TimerParam</span><span class="p">(</span><span class="n">EOW_TIMER</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">132</span><span class="cl">    <span class="p">):</span>
-</span></span><span class="line"><span class="ln">133</span><span class="cl">        <span class="kn">import</span> <span class="nn">service_pb2</span>
-</span></span><span class="line"><span class="ln">134</span><span class="cl">
-</span></span><span class="line"><span class="ln">135</span><span class="cl">        <span class="n">elements</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">136</span><span class="cl">
-</span></span><span class="line"><span class="ln">137</span><span class="cl">        <span class="n">batch</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">138</span><span class="cl">        <span class="n">batch_size</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">139</span><span class="cl">        <span class="k">if</span> <span class="n">flush_timer</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">140</span><span class="cl">            <span class="n">flush_timer</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">141</span><span class="cl">        <span class="k">if</span> <span class="n">eow_timer</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">142</span><span class="cl">            <span class="n">eow_timer</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">143</span><span class="cl">
-</span></span><span class="line"><span class="ln">144</span><span class="cl">        <span class="n">unqiue_values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">e</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">145</span><span class="cl">        <span class="n">request_list</span> <span class="o">=</span> <span class="n">service_pb2</span><span class="o">.</span><span class="n">RequestList</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">146</span><span class="cl">        <span class="n">request_list</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">147</span><span class="cl">            <span class="p">[</span><span class="n">service_pb2</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">unqiue_values</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">148</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">149</span><span class="cl">        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">resolveBatch</span><span class="p">(</span><span class="n">request_list</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">150</span><span class="cl">        <span class="n">resolved</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">151</span><span class="cl">            <span class="nb">zip</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">unqiue_values</span><span class="p">],</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">output</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">response</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">152</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">153</span><span class="cl">
-</span></span><span class="line"><span class="ln">154</span><span class="cl">        <span class="k">return</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">155</span><span class="cl">            <span class="n">WindowedValue</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">156</span><span class="cl">                <span class="n">value</span><span class="o">=</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">resolved</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]]),</span>
-</span></span><span class="line"><span class="ln">157</span><span class="cl">                <span class="n">timestamp</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">158</span><span class="cl">                <span class="n">windows</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">windows</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">159</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">160</span><span class="cl">            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">elements</span>
-</span></span><span class="line"><span class="ln">161</span><span class="cl">        <span class="p">]</span>
-</span></span><span class="line"><span class="ln">162</span><span class="cl">
-</span></span><span class="line"><span class="ln">163</span><span class="cl">
-</span></span><span class="line"><span class="ln">164</span><span class="cl"><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_main_session</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">165</span><span class="cl">    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&#34;Beam pipeline arguments&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">166</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">167</span><span class="cl">        <span class="s2">&#34;--bootstrap_servers&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">168</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="s2">&#34;host.docker.internal:29092&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">169</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Kafka bootstrap server addresses&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">170</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">171</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&#34;--input_topic&#34;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&#34;input-topic&#34;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Input topic&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">172</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">173</span><span class="cl">        <span class="s2">&#34;--output_topic&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">174</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&#34;_&#34;</span><span class="p">,</span> <span class="s2">&#34;-&#34;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&#34;.py$&#34;</span><span class="p">,</span> <span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))),</span>
-</span></span><span class="line"><span class="ln">175</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Output topic&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">176</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">177</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">178</span><span class="cl">        <span class="s2">&#34;--batch_size&#34;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Batch size to process&#34;</span>
-</span></span><span class="line"><span class="ln">179</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">180</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">181</span><span class="cl">        <span class="s2">&#34;--max_wait_secs&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">182</span><span class="cl">        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">183</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">184</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Maximum wait seconds before processing&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">185</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">186</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">187</span><span class="cl">        <span class="s2">&#34;--deprecated_read&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">188</span><span class="cl">        <span class="n">action</span><span class="o">=</span><span class="s2">&#34;store_true&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">189</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="s2">&#34;Whether to use a deprecated read. See https://github.com/apache/beam/issues/20979&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">190</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">191</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">deprecated_read</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">192</span><span class="cl">
-</span></span><span class="line"><span class="ln">193</span><span class="cl">    <span class="n">known_args</span><span class="p">,</span> <span class="n">pipeline_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">194</span><span class="cl">
-</span></span><span class="line"><span class="ln">195</span><span class="cl">    <span class="c1"># # We use the save_main_session option because one or more DoFn&#39;s in this</span>
-</span></span><span class="line"><span class="ln">196</span><span class="cl">    <span class="c1"># # workflow rely on global context (e.g., a module imported at module level).</span>
-</span></span><span class="line"><span class="ln">197</span><span class="cl">    <span class="n">pipeline_options</span> <span class="o">=</span> <span class="n">PipelineOptions</span><span class="p">(</span><span class="n">pipeline_args</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">198</span><span class="cl">    <span class="n">pipeline_options</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">SetupOptions</span><span class="p">)</span><span class="o">.</span><span class="n">save_main_session</span> <span class="o">=</span> <span class="n">save_main_session</span>
-</span></span><span class="line"><span class="ln">199</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;known args - </span><span class="si">{</span><span class="n">known_args</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">200</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;pipeline options - </span><span class="si">{</span><span class="n">pipeline_options</span><span class="o">.</span><span class="n">display_data</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">201</span><span class="cl">
-</span></span><span class="line"><span class="ln">202</span><span class="cl">    <span class="k">with</span> <span class="n">beam</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">pipeline_options</span><span class="p">)</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">203</span><span class="cl">        <span class="p">(</span>
-</span></span><span class="line"><span class="ln">204</span><span class="cl">            <span class="n">p</span>
-</span></span><span class="line"><span class="ln">205</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;ReadInputsFromKafka&#34;</span>
-</span></span><span class="line"><span class="ln">206</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">ReadWordsFromKafka</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">207</span><span class="cl">                <span class="n">bootstrap_servers</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">bootstrap_servers</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">208</span><span class="cl">                <span class="n">topics</span><span class="o">=</span><span class="p">[</span><span class="n">known_args</span><span class="o">.</span><span class="n">input_topic</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln">209</span><span class="cl">                <span class="n">group_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">known_args</span><span class="o">.</span><span class="n">output_topic</span><span class="si">}</span><span class="s2">-group&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">210</span><span class="cl">                <span class="n">deprecated_read</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">deprecated_read</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">211</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">212</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;ToBuckets&#34;</span>
-</span></span><span class="line"><span class="ln">213</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">to_buckets</span><span class="p">)</span><span class="o">.</span><span class="n">with_output_types</span><span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">214</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;RequestRPC&#34;</span>
-</span></span><span class="line"><span class="ln">215</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">ParDo</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">216</span><span class="cl">                <span class="n">BatchRpcDoFnStateful</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">217</span><span class="cl">                    <span class="n">batch_size</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">218</span><span class="cl">                    <span class="n">max_wait_secs</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">max_wait_secs</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">219</span><span class="cl">                <span class="p">)</span>
-</span></span><span class="line"><span class="ln">220</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">221</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;CreateMessags&#34;</span>
-</span></span><span class="line"><span class="ln">222</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">create_message</span><span class="p">)</span><span class="o">.</span><span class="n">with_output_types</span><span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">223</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;WriteOutputsToKafka&#34;</span>
-</span></span><span class="line"><span class="ln">224</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">WriteOutputsToKafka</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">225</span><span class="cl">                <span class="n">bootstrap_servers</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">bootstrap_servers</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">226</span><span class="cl">                <span class="n">topic</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">output_topic</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">227</span><span class="cl">                <span class="n">deprecated_read</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">deprecated_read</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">228</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">229</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">230</span><span class="cl">
-</span></span><span class="line"><span class="ln">231</span><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">232</span><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&#34;Building pipeline ...&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">233</span><span class="cl">
-</span></span><span class="line"><span class="ln">234</span><span class="cl">
-</span></span><span class="line"><span class="ln">235</span><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">236</span><span class="cl">    <span class="n">run</span><span class="p">()</span>
-</span></span></code></pre></div>
-<h4 id="pipeline-test" data-numberify>Pipeline Test<a class="anchor ms-1" href="#pipeline-test"></a></h4>
-<p>As described in <a href="https://beam.apache.org/documentation/pipelines/test-your-pipeline/" target="_blank" rel="noopener noreferrer">this documentation<i class="fas fa-external-link-square-alt ms-1"></i></a>, we can test a Beam pipeline as following.</p>
-<ol>
-<li>Create a <code>TestPipeline</code>.</li>
-<li>Create some static, known test input data.</li>
-<li>Create a <code>PCollection</code> of input data using the <code>Create</code> transform (if bounded source) or a <code>TestStream</code> (if unbounded source)</li>
-<li>Apply the transform to the input <code>PCollection</code> and save the resulting output <code>PCollection</code>.</li>
-<li>Use <code>PAssert</code> and its subclasses (or <a href="https://beam.apache.org/releases/pydoc/current/apache_beam.testing.util.html" target="_blank" rel="noopener noreferrer">testing utils<i class="fas fa-external-link-square-alt ms-1"></i></a> in Python) to verify that the output <code>PCollection</code> contains the elements that you expect.</li>
-</ol>
-<p>We use a text file that keeps a random text (<code>input/lorem.txt</code>) for testing. Then, we add the lines into a test stream and apply the main transform. Finally, we compare the actual output with an expected output. The expected output is a list of tuples where each element is a word and its length. Note that the <em>FlinkRunner</em> is used for testing because output collection failed by the Python <em>DirectRunner</em>, resulting in testing failure.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># chapter3/rpc_pardo_stateful_test.py</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="nn">unittest</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="kn">import</span> <span class="nn">typing</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kn">from</span> <span class="nn">concurrent</span> <span class="kn">import</span> <span class="n">futures</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="kn">import</span> <span class="nn">apache_beam</span> <span class="k">as</span> <span class="nn">beam</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.coders</span> <span class="kn">import</span> <span class="n">coders</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.testing.test_pipeline</span> <span class="kn">import</span> <span class="n">TestPipeline</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.testing.util</span> <span class="kn">import</span> <span class="n">assert_that</span><span class="p">,</span> <span class="n">equal_to</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.testing.test_stream</span> <span class="kn">import</span> <span class="n">TestStream</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.options.pipeline_options</span> <span class="kn">import</span> <span class="n">PipelineOptions</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">
-</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="kn">import</span> <span class="nn">grpc</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="kn">import</span> <span class="nn">service_pb2_grpc</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="kn">import</span> <span class="nn">server</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">
-</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="kn">from</span> <span class="nn">rpc_pardo_stateful</span> <span class="kn">import</span> <span class="n">to_buckets</span><span class="p">,</span> <span class="n">BatchRpcDoFnStateful</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="kn">from</span> <span class="nn">io_utils</span> <span class="kn">import</span> <span class="n">tokenize</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">
-</span></span><span class="line"><span class="ln">21</span><span class="cl">
-</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="k">class</span> <span class="nc">MyItem</span><span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">NamedTuple</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="n">word</span><span class="p">:</span> <span class="nb">str</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="n">length</span><span class="p">:</span> <span class="nb">int</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">
-</span></span><span class="line"><span class="ln">26</span><span class="cl">
-</span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="n">beam</span><span class="o">.</span><span class="n">coders</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">register_coder</span><span class="p">(</span><span class="n">MyItem</span><span class="p">,</span> <span class="n">beam</span><span class="o">.</span><span class="n">coders</span><span class="o">.</span><span class="n">RowCoder</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">
-</span></span><span class="line"><span class="ln">29</span><span class="cl">
-</span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inputpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inputpath</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="s2">&#34;r&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">
-</span></span><span class="line"><span class="ln">34</span><span class="cl">
-</span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="k">def</span> <span class="nf">compute_expected_output</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">    <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">        <span class="n">words</span> <span class="o">=</span> <span class="p">[(</span><span class="n">w</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">))</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">)]</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">        <span class="n">output</span> <span class="o">=</span> <span class="n">output</span> <span class="o">+</span> <span class="n">words</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">    <span class="k">return</span> <span class="n">output</span>
-</span></span><span class="line"><span class="ln">41</span><span class="cl">
-</span></span><span class="line"><span class="ln">42</span><span class="cl">
-</span></span><span class="line"><span class="ln">43</span><span class="cl"><span class="k">class</span> <span class="nc">RpcParDooStatefulTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">44</span><span class="cl">    <span class="n">server_class</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">RpcServiceServicer</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">    <span class="n">port</span> <span class="o">=</span> <span class="mi">50051</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl">
-</span></span><span class="line"><span class="ln">47</span><span class="cl">    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">48</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">server</span><span class="p">(</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">49</span><span class="cl">        <span class="n">service_pb2_grpc</span><span class="o">.</span><span class="n">add_RpcServiceServicer_to_server</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">50</span><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">server_class</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span>
-</span></span><span class="line"><span class="ln">51</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">52</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">add_insecure_port</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;[::]:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">53</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">54</span><span class="cl">
-</span></span><span class="line"><span class="ln">55</span><span class="cl">    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">56</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">57</span><span class="cl">
-</span></span><span class="line"><span class="ln">58</span><span class="cl">    <span class="k">def</span> <span class="nf">test_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">59</span><span class="cl">        <span class="n">pipeline_opts</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;runner&#34;</span><span class="p">:</span> <span class="s2">&#34;FlinkRunner&#34;</span><span class="p">,</span> <span class="s2">&#34;parallelism&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&#34;streaming&#34;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">60</span><span class="cl">        <span class="n">options</span> <span class="o">=</span> <span class="n">PipelineOptions</span><span class="p">([],</span> <span class="o">**</span><span class="n">pipeline_opts</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">61</span><span class="cl">        <span class="k">with</span> <span class="n">TestPipeline</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">62</span><span class="cl">            <span class="n">PARENT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)))</span>
-</span></span><span class="line"><span class="ln">63</span><span class="cl">            <span class="n">lines</span> <span class="o">=</span> <span class="n">read_file</span><span class="p">(</span><span class="s2">&#34;lorem.txt&#34;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PARENT_DIR</span><span class="p">,</span> <span class="s2">&#34;inputs&#34;</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln">64</span><span class="cl">            <span class="n">test_stream</span> <span class="o">=</span> <span class="n">TestStream</span><span class="p">(</span><span class="n">coder</span><span class="o">=</span><span class="n">coders</span><span class="o">.</span><span class="n">StrUtf8Coder</span><span class="p">())</span><span class="o">.</span><span class="n">with_output_types</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">65</span><span class="cl">            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">66</span><span class="cl">                <span class="n">test_stream</span><span class="o">.</span><span class="n">add_elements</span><span class="p">([</span><span class="n">line</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">67</span><span class="cl">            <span class="n">test_stream</span><span class="o">.</span><span class="n">advance_watermark_to_infinity</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">68</span><span class="cl">
-</span></span><span class="line"><span class="ln">69</span><span class="cl">            <span class="n">output</span> <span class="o">=</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">70</span><span class="cl">                <span class="n">p</span>
-</span></span><span class="line"><span class="ln">71</span><span class="cl">                <span class="o">|</span> <span class="n">test_stream</span>
-</span></span><span class="line"><span class="ln">72</span><span class="cl">                <span class="o">|</span> <span class="s2">&#34;ExtractWords&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">FlatMap</span><span class="p">(</span><span class="n">tokenize</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">73</span><span class="cl">                <span class="o">|</span> <span class="s2">&#34;ToBuckets&#34;</span>
-</span></span><span class="line"><span class="ln">74</span><span class="cl">                <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">to_buckets</span><span class="p">)</span><span class="o">.</span><span class="n">with_output_types</span><span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">75</span><span class="cl">                <span class="o">|</span> <span class="s2">&#34;RequestRPC&#34;</span>
-</span></span><span class="line"><span class="ln">76</span><span class="cl">                <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">ParDo</span><span class="p">(</span><span class="n">BatchRpcDoFnStateful</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_wait_secs</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln">77</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">78</span><span class="cl">
-</span></span><span class="line"><span class="ln">79</span><span class="cl">            <span class="n">EXPECTED_OUTPUT</span> <span class="o">=</span> <span class="n">compute_expected_output</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">80</span><span class="cl">
-</span></span><span class="line"><span class="ln">81</span><span class="cl">            <span class="n">assert_that</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">equal_to</span><span class="p">(</span><span class="n">EXPECTED_OUTPUT</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln">82</span><span class="cl">
-</span></span><span class="line"><span class="ln">83</span><span class="cl">
-</span></span><span class="line"><span class="ln">84</span><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">85</span><span class="cl">    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
-</span></span></code></pre></div><p>We can execute the pipeline test as shown below.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">python chapter3/rpc_pardo_stateful_test.py 
-</span></span><span class="line"><span class="ln">2</span><span class="cl">WARNING:root:Waiting <span class="k">for</span> grpc channel to be ready at localhost:46459.
-</span></span><span class="line"><span class="ln">3</span><span class="cl">WARNING:root:Waiting <span class="k">for</span> grpc channel to be ready at localhost:46459.
-</span></span><span class="line"><span class="ln">4</span><span class="cl">WARNING:root:Waiting <span class="k">for</span> grpc channel to be ready at localhost:46459.
-</span></span><span class="line"><span class="ln">5</span><span class="cl">.
-</span></span><span class="line"><span class="ln">6</span><span class="cl">----------------------------------------------------------------------
-</span></span><span class="line"><span class="ln">7</span><span class="cl">Ran <span class="m">1</span> <span class="nb">test</span> in 19.801s
-</span></span><span class="line"><span class="ln">8</span><span class="cl">
-</span></span><span class="line"><span class="ln">9</span><span class="cl">OK
-</span></span></code></pre></div>
-<h4 id="pipeline-execution" data-numberify>Pipeline Execution<a class="anchor ms-1" href="#pipeline-execution"></a></h4>
-<p>Note that the Kafka bootstrap server is accessible on port <em>29092</em> outside the Docker network, and it can be accessed on <em>localhost:29092</em> from the Docker host machine and on <em>host.docker.internal:29092</em> from a Docker container that is launched with the host network. We use both types of the bootstrap server address - the former is used by the Kafka producer app and the latter by a Java IO expansion service, which is launched in a Docker container. Note further that, for the latter to work, we have to update the <em>/etc/hosts</em> file by adding an entry for <em>host.docker.internal</em> as shown below.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">cat /etc/hosts <span class="p">|</span> grep host.docker.internal
-</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"># 127.0.0.1       host.docker.internal</span>
-</span></span></code></pre></div><p>We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - <code>python utils/faker_shifted_gen.py</code>.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-10-02-beam-examples-6/input-messages.png" loading="lazy" width="1148" height="552" />
-</picture>
-
-</p>
-<p>When executing the pipeline, we specify only a single known argument that enables to use the legacy read (<code>--deprecated_read</code>) while accepting default values of the other known arguments (<code>bootstrap_servers</code>, <code>input_topic</code> &hellip;). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (<code>--flink_master=localhost:8081</code>). Alternatively, we can use an embedded Flink cluster if we exclude that argument.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">## start the beam pipeline</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1">## exclude --flink_master if using an embedded cluster</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">python chapter3/rpc_pardo_stateful.py --deprecated_read <span class="se">\
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>    --job_name<span class="o">=</span>rpc-pardo-stateful --runner FlinkRunner --flink_master<span class="o">=</span>localhost:8081 <span class="se">\
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>    --streaming --environment_type<span class="o">=</span>LOOPBACK --parallelism<span class="o">=</span><span class="m">3</span> --checkpointing_interval<span class="o">=</span><span class="m">10000</span>
-</span></span></code></pre></div><p>On Flink UI, we see the pipeline has two tasks. The first task is until converting words into key-value pairs while the latter executes the main transform and sends output messages to the Kafka topic.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-10-02-beam-examples-6/pipeline-dag.png" loading="lazy" width="1110" height="808" />
-</picture>
-
-</p>
-<p>On Kafka UI, we can check the output message is a dictionary of a word and its length.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-10-02-beam-examples-6/output-messages.png" loading="lazy" width="1148" height="570" />
 </picture>
 
 </p>
