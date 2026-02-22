@@ -20,6 +20,10 @@
 <p><strong>📂 Source Code for the Post</strong></p>
 <p>The source code for this post is available in the <strong>product-recommender</strong> folder of the <a href="https://github.com/jaehyeon-kim/streaming-demos" target="_blank" rel="noopener noreferrer">streaming-demos<i class="fas fa-external-link-square-alt ms-1"></i></a> GitHub repository.</p>
 </blockquote>
+<p><picture><img class="img-fluid mx-auto d-block" alt="Architecture" src="/blog/2026-02-23-productionize-recommender-with-eda/featured.gif" loading="lazy" width="1698" height="1268" />
+</picture>
+
+</p>
 
 <h2 id="flink-application-design" data-numberify>Flink Application Design<a class="anchor ms-1" href="#flink-application-design"></a></h2>
 <p>The <a href="https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-recommender/recsys-trainer" target="_blank" rel="noopener noreferrer">Flink job (<code>recsys-trainer</code>)<i class="fas fa-external-link-square-alt ms-1"></i></a> ties these concepts together using a few specific patterns.</p>
@@ -183,7 +187,11 @@ Overview Traditional recommendation approaches such as Collaborative Filtering r
 
 <h3 id="data-streaming-opportunity" data-numberify>Data Streaming Opportunity<a class="anchor ms-1" href="#data-streaming-opportunity"></a></h3>
 <p>CMAB performs well in <strong>data streaming environments</strong>. Integrated with platforms like <strong>Kafka</strong> and <strong>Flink</strong>, it learns directly from event streams, creating a feedback loop that responds to trends and shifts in user intent in sub-seconds.</p>
-<p>In this series, <strong>Part 1</strong> (<em>this post</em>) builds a complete <strong>Python prototype</strong> to validate the algorithm and simulate user behavior. <strong>Part 2</strong> (<em>coming soon</em>) will scale this to a distributed, event-driven architecture.</p>
+<p>In this series, <strong>Part 1</strong> (<em>this post</em>) builds a complete <strong>Python prototype</strong> to validate the algorithm and simulate user behavior. <a href="/blog/2026-02-23-productionize-recommender-with-eda/"><strong>Part 2</strong></a> will scale this to a distributed, event-driven architecture.</p>
+<p><picture><img class="img-fluid mx-auto d-block" alt="Architecture" src="/blog/2026-01-29-prototype-recommender-with-python/featured.gif" loading="lazy" width="1916" height="1160" />
+</picture>
+
+</p>
 
 <h2 id="tech-stack" data-numberify>Tech Stack<a class="anchor ms-1" href="#tech-stack"></a></h2>
 <p>We are building this prototype using <strong>Python 3.11</strong>.</p>
