@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Reveal.js Features</title><link>https://jaehyeon.me/slides/2026-03-06-test-slides/</link><guid>https://jaehyeon.me/slides/2026-03-06-test-slides/</guid><pubDate>Sat, 07 Mar 2026 00:00:00 +0000</pubDate><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Reveal.js Features</title><link>https://jaehyeon.me/slides/2026-03-06-reavealjs-demo/</link><guid>https://jaehyeon.me/slides/2026-03-06-reavealjs-demo/</guid><pubDate>Sat, 07 Mar 2026 00:00:00 +0000</pubDate><description>
 Reveal.js Features Demonstrating Reveal.js Featuresfor Engineering Presentation
 1. Image Embedding Standard Markdown or HTML backgrounds
 &amp;ndash;
@@ -16,7 +16,7 @@ Tool Purpose Status Kafka Streaming ✅ Flink Processing ✅ Pinot Analytics �
 
 <h2 id="1-image-embedding" data-numberify>1. Image Embedding<a class="anchor ms-1" href="#1-image-embedding"></a></h2>
 <p>Standard Markdown or HTML backgrounds</p>
-<p><picture><img class="img-fluid " alt="Local Image" src="/slides/2026-03-06-test-slides/featured.jpg" loading="lazy" width="2048" height="339" />
+<p><picture><img class="img-fluid " alt="Local Image" src="/slides/2026-03-06-reavealjs-demo/featured.jpg" loading="lazy" width="2048" height="339" />
 </picture>
 
 </p>
