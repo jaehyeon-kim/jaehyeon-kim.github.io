@@ -1,4 +1,102 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Productionizing an Online Product Recommender using Event Driven Architecture</title><link>https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/</link><guid>https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/</guid><pubDate>Mon, 23 Feb 2026 00:00:00 +0000</pubDate><description><![CDATA[
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Reveal.js Features</title><link>https://jaehyeon.me/slides/2026-03-06-test-slides/</link><guid>https://jaehyeon.me/slides/2026-03-06-test-slides/</guid><pubDate>Sat, 07 Mar 2026 00:00:00 +0000</pubDate><description>
+Reveal.js Features Demonstrating Reveal.js Featuresfor Engineering Presentation
+1. Image Embedding Standard Markdown or HTML backgrounds
+&amp;ndash;
+Full Background Slide (Use &amp;ndash; for vertical slides)
+Cosmic Background This slide has a remote image background.
+2. LaTeX Math Rendered via MathJax
+The Probability Density Function for a Normal Distribution:
+$$ f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{ -\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2 } $$
+3. HTML Tables Markdown and HTML mix
+Tool Purpose Status Kafka Streaming ✅ Flink Processing ✅ Pinot Analytics 🚀 4.</description><content:encoded><![CDATA[
+        
+<h2 id="revealjs-features" data-numberify>Reveal.js Features<a class="anchor ms-1" href="#revealjs-features"></a></h2>
+<p>Demonstrating Reveal.js Features<!-- raw HTML omitted -->for Engineering Presentation</p>
+<hr>
+
+<h2 id="1-image-embedding" data-numberify>1. Image Embedding<a class="anchor ms-1" href="#1-image-embedding"></a></h2>
+<p>Standard Markdown or HTML backgrounds</p>
+<p><picture><img class="img-fluid " alt="Local Image" src="/slides/2026-03-06-test-slides/featured.jpg" loading="lazy" width="2048" height="339" />
+</picture>
+
+</p>
+<!-- raw HTML omitted -->
+<p>&ndash;</p>
+
+<h3 id="full-background-slide" data-numberify>Full Background Slide<a class="anchor ms-1" href="#full-background-slide"></a></h3>
+<p>(Use &ndash; for vertical slides)</p>
+<!-- raw HTML omitted -->
+
+<h2 id="cosmic-background" data-numberify>Cosmic Background<a class="anchor ms-1" href="#cosmic-background"></a></h2>
+<p>This slide has a remote image background.</p>
+<hr>
+
+<h2 id="2-latex-math" data-numberify>2. LaTeX Math<a class="anchor ms-1" href="#2-latex-math"></a></h2>
+<p>Rendered via MathJax</p>
+<p>The Probability Density Function for a Normal Distribution:</p>
+<p>$$
+f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{ -\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2 }
+$$</p>
+<hr>
+
+<h2 id="3-html-tables" data-numberify>3. HTML Tables<a class="anchor ms-1" href="#3-html-tables"></a></h2>
+<p>Markdown and HTML mix</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Tool</th>
+<th style="text-align:left">Purpose</th>
+<th style="text-align:left">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Kafka</td>
+<td style="text-align:left">Streaming</td>
+<td style="text-align:left">✅</td>
+</tr>
+<tr>
+<td style="text-align:left">Flink</td>
+<td style="text-align:left">Processing</td>
+<td style="text-align:left">✅</td>
+</tr>
+<tr>
+<td style="text-align:left">Pinot</td>
+<td style="text-align:left">Analytics</td>
+<td style="text-align:left">🚀</td>
+</tr>
+</tbody>
+</table>
+<hr>
+
+<h2 id="4-charts-mermaidjs" data-numberify>4. Charts (Mermaid.js)<a class="anchor ms-1" href="#4-charts-mermaidjs"></a></h2>
+<p>Diagrams from Code</p>
+<!-- raw HTML omitted -->
+<hr>
+
+<h2 id="5-code-highlighting" data-numberify>5. Code Highlighting<a class="anchor ms-1" href="#5-code-highlighting"></a></h2>
+<p>Highlight specific lines (Click next)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">def</span> <span class="nf">process_stream</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">    <span class="c1"># Step 1: Clean</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    
+</span></span><span class="line"><span class="ln">6</span><span class="cl">    <span class="c1"># Step 2: Return</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">    <span class="k">return</span> <span class="n">data</span>
+</span></span></code></pre></div><hr>
+
+<h2 id="6-fragments" data-numberify>6. Fragments<a class="anchor ms-1" href="#6-fragments"></a></h2>
+
+<h3 id="step-by-step-visibility" data-numberify>Step-by-step visibility<a class="anchor ms-1" href="#step-by-step-visibility"></a></h3>
+<ul>
+<li>Item 1 (Fades in) <!-- raw HTML omitted --></li>
+<li>Item 2 (Fades in second) <!-- raw HTML omitted --></li>
+<li>Item 3 (Grows larger) <!-- raw HTML omitted --></li>
+<li>Item 4 (Turns red) <!-- raw HTML omitted --></li>
+<li>Item 5 (Fades out) <!-- raw HTML omitted --></li>
+</ul>
+
+      ]]></content:encoded></item><item><title>Productionizing an Online Product Recommender using Event Driven Architecture</title><link>https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/</link><guid>https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/</guid><pubDate>Mon, 23 Feb 2026 00:00:00 +0000</pubDate><description><![CDATA[
         <p>In <a href="/blog/2026-01-29-prototype-recommender-with-python/"><strong>Part 1</strong></a>, we built a contextual bandit prototype using Python and <a href="https://github.com/fidelity/mab2rec" target="_blank" rel="noopener noreferrer"><code>Mab2Rec</code><i class="fas fa-external-link-square-alt ms-1"></i></a>. While effective for testing algorithms locally, a monolithic script cannot handle production scale. Real-world recommendation systems require low-latency inference for users and high-throughput training for model updates.</p>
 <p>This post demonstrates how to decouple these concerns using an event-driven architecture with Apache Flink, Kafka, and Redis.</p>
       ]]></description><content:encoded><![CDATA[
@@ -8418,697 +8516,4 @@ The <code>avro</code> block in <code>build.gradle.kts</code> configures the Avro
 </span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="o">{</span><span class="s1">&#39;order_id&#39;</span>: <span class="s1">&#39;5928f275-9333-4036-ad25-c92d47c6b2ed&#39;</span>, <span class="s1">&#39;user_id&#39;</span>: <span class="s1">&#39;e9c4a660-8b0b-4b50-a48f-f99480779070&#39;</span>, <span class="s1">&#39;status&#39;</span>: <span class="s1">&#39;Complete&#39;</span>, <span class="s1">&#39;gender&#39;</span>: <span class="s1">&#39;M&#39;</span>, <span class="s1">&#39;created_at&#39;</span>: 1615172100000000, <span class="s1">&#39;returned_at&#39;</span>: None, <span class="s1">&#39;shipped_at&#39;</span>: 1615278480000000, <span class="s1">&#39;delivered_at&#39;</span>: <span class="s1">&#39;2021-03-11 14:06:00&#39;</span>, <span class="s1">&#39;num_of_item&#39;</span>: 1, <span class="s1">&#39;__deleted&#39;</span>: <span class="s1">&#39;false&#39;</span>, <span class="s1">&#39;__op&#39;</span>: <span class="s1">&#39;r&#39;</span>, <span class="s1">&#39;__db&#39;</span>: <span class="s1">&#39;develop&#39;</span>, <span class="s1">&#39;__table&#39;</span>: <span class="s1">&#39;orders&#39;</span>, <span class="s1">&#39;__schema&#39;</span>: <span class="s1">&#39;ecommerce&#39;</span>, <span class="s1">&#39;__lsn&#39;</span>: 32919936, <span class="s1">&#39;__source_ts_ms&#39;</span>: 1730183224763<span class="o">}</span>
 </span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="o">{</span><span class="s1">&#39;order_id&#39;</span>: <span class="s1">&#39;27937664-36b0-4b1c-a0f6-2e027701398e&#39;</span>, <span class="s1">&#39;user_id&#39;</span>: <span class="s1">&#39;e3ed22b9-4101-46e9-b642-a0317332f267&#39;</span>, <span class="s1">&#39;status&#39;</span>: <span class="s1">&#39;Cancelled&#39;</span>, <span class="s1">&#39;gender&#39;</span>: <span class="s1">&#39;M&#39;</span>, <span class="s1">&#39;created_at&#39;</span>: 1719298320000000, <span class="s1">&#39;returned_at&#39;</span>: None, <span class="s1">&#39;shipped_at&#39;</span>: None, <span class="s1">&#39;delivered_at&#39;</span>: None, <span class="s1">&#39;num_of_item&#39;</span>: 2, <span class="s1">&#39;__deleted&#39;</span>: <span class="s1">&#39;false&#39;</span>, <span class="s1">&#39;__op&#39;</span>: <span class="s1">&#39;r&#39;</span>, <span class="s1">&#39;__db&#39;</span>: <span class="s1">&#39;develop&#39;</span>, <span class="s1">&#39;__table&#39;</span>: <span class="s1">&#39;orders&#39;</span>, <span class="s1">&#39;__schema&#39;</span>: <span class="s1">&#39;ecommerce&#39;</span>, <span class="s1">&#39;__lsn&#39;</span>: 32919936, <span class="s1">&#39;__source_ts_ms&#39;</span>: 1730183224763<span class="o">}</span>
 </span></span></code></pre></div>
-      ]]></content:encoded></item><item><title>Apache Beam Python Examples - Part 7 Separate Droppable Data into Side Output</title><link>https://jaehyeon.me/blog/2024-10-24-beam-examples-7/</link><guid>https://jaehyeon.me/blog/2024-10-24-beam-examples-7/</guid><pubDate>Thu, 24 Oct 2024 00:00:00 +0000</pubDate><description><![CDATA[
-        <p>We develop an Apache Beam pipeline that separates <em>droppable</em> elements from the rest of the data. <em>Droppable</em> elements are those that come later when the watermark passes the window max timestamp plus allowed lateness. Using a timer in a <em>Stateful</em> DoFn, <em>droppable</em> data is separated from normal data and dispatched into a side output rather than being discarded silently, which is the default behaviour. Note that this pipeline works in a situation where <em>droppable</em> elements do not appear often, and thus the chance that a <em>droppable</em> element is delivered as the first element in a particular window is low.</p>
-      ]]></description><content:encoded><![CDATA[
-        <p>We develop an Apache Beam pipeline that separates <em>droppable</em> elements from the rest of the data. <em>Droppable</em> elements are those that come later when the watermark passes the window max timestamp plus allowed lateness. Using a timer in a <em>Stateful</em> DoFn, <em>droppable</em> data is separated from normal data and dispatched into a side output rather than being discarded silently, which is the default behaviour. Note that this pipeline works in a situation where <em>droppable</em> elements do not appear often, and thus the chance that a <em>droppable</em> element is delivered as the first element in a particular window is low.</p>
-<ul>
-<li><a href="/blog/2024-07-04-beam-examples-1">Part 1 Calculate K Most Frequent Words and Max Word Length</a></li>
-<li><a href="/blog/2024-07-18-beam-examples-2">Part 2 Calculate Average Word Length with/without Fixed Look back</a></li>
-<li><a href="/blog/2024-08-01-beam-examples-3">Part 3 Build Sport Activity Tracker with/without SQL</a></li>
-<li><a href="/blog/2024-08-15-beam-examples-4">Part 4 Call RPC Service for Data Augmentation</a></li>
-<li><a href="/blog/2024-09-18-beam-examples-5">Part 5 Call RPC Service in Batch using Stateless DoFn</a></li>
-<li><a href="/blog/2024-10-02-beam-examples-6">Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn</a></li>
-<li><a href="/blog/2024-10-24-beam-examples-7/#">Part 7 Separate Droppable Data into Side Output</a> (this post)</li>
-<li><a href="/blog/2024-11-21-beam-examples-8">Part 8 Enhance Sport Activity Tracker with Runner Motivation</a></li>
-<li><a href="/blog/2024-12-05-beam-examples-9">Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn</a></li>
-<li><a href="/blog/2024-12-19-beam-examples-10">Part 10 Develop Streaming File Reader using Splittable DoFn</a></li>
-</ul>
-
-<h2 id="development-environment" data-numberify>Development Environment<a class="anchor ms-1" href="#development-environment"></a></h2>
-<p>The development environment has an Apache Flink cluster, Apache Kafka cluster and <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer">gRPC<i class="fas fa-external-link-square-alt ms-1"></i></a> server. The gRPC server was used in Part 4 to 6. For Flink, we can use either an embedded cluster or a local cluster while <a href="https://docs.docker.com/compose/" target="_blank" rel="noopener noreferrer">Docker Compose<i class="fas fa-external-link-square-alt ms-1"></i></a> is used for the rest. See <a href="/blog/2024-07-04-beam-examples-1">Part 1</a> for details about how to set up the development environment. The source of this post can be found in this <a href="https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines" target="_blank" rel="noopener noreferrer"><strong>GitHub repository</strong><i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-
-<h3 id="manage-environment" data-numberify>Manage Environment<a class="anchor ms-1" href="#manage-environment"></a></h3>
-<p>The Flink and Kafka clusters and gRPC server are managed by the following bash scripts.</p>
-<ul>
-<li><code>./setup/start-flink-env.sh</code></li>
-<li><code>./setup/stop-flink-env.sh</code></li>
-</ul>
-<p>Those scripts accept four flags: <code>-f</code>, <code>-k</code> and <code>-g</code> to start/stop individual resources or <code>-a</code> to manage all of them. We can add multiple flags to start/stop relevant resources. Note that the scripts assume Flink 1.18.1 by default, and we can specify a specific Flink version if it is different from it e.g. <code>FLINK_VERSION=1.17.2 ./setup/start-flink-env.sh</code>.</p>
-<p>Below shows how to start resources using the start-up script. We need to launch both the Flink and Kafka clusters if we deploy a Beam pipeline on a local Flink cluster. Otherwise, we can start the Kafka cluster only.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">## start a local flink can kafka cluster</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">./setup/start-flink-env.sh -f -k
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="c1"># start kafka...</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># [+] Running 6/6</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="c1">#  ⠿ Network app-network      Created                                     0.0s</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1">#  ⠿ Volume &#34;zookeeper_data&#34;  Created                                     0.0s</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1">#  ⠿ Volume &#34;kafka_0_data&#34;    Created                                     0.0s</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1">#  ⠿ Container zookeeper      Started                                     0.3s</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1">#  ⠿ Container kafka-0        Started                                     0.5s</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1">#  ⠿ Container kafka-ui       Started                                     0.8s</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1"># start flink 1.18.1...</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"># Starting cluster.</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"># Starting standalonesession daemon on host &lt;hostname&gt;.</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"># Starting taskexecutor daemon on host &lt;hostname&gt;.</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">
-</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1">## start a local kafka cluster only</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">./setup/start-flink-env.sh -k
-</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1"># start kafka...</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1"># [+] Running 6/6</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1">#  ⠿ Network app-network      Created                                     0.0s</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="c1">#  ⠿ Volume &#34;zookeeper_data&#34;  Created                                     0.0s</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1">#  ⠿ Volume &#34;kafka_0_data&#34;    Created                                     0.0s</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1">#  ⠿ Container zookeeper      Started                                     0.3s</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="c1">#  ⠿ Container kafka-0        Started                                     0.5s</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1">#  ⠿ Container kafka-ui       Started                                     0.8s</span>
-</span></span></code></pre></div>
-<h2 id="kafka-producer" data-numberify>Kafka Producer<a class="anchor ms-1" href="#kafka-producer"></a></h2>
-<p>We create a Kafka producer using the <a href="https://kafka-python.readthedocs.io/en/master/index.html" target="_blank" rel="noopener noreferrer">kafka-python<i class="fas fa-external-link-square-alt ms-1"></i></a> package. It generates text messages with the <a href="https://faker.readthedocs.io/en/master/" target="_blank" rel="noopener noreferrer">Faker<i class="fas fa-external-link-square-alt ms-1"></i></a> package and sends them to an input topic. Note that we randomly shift back message creation timestamps to simulate late data, and about 20 percent of messages are affected - see below for details about how Beam&rsquo;s <code>KafkaIO</code> utilises Kafka message timestamp instead of processing timestamp. We can run the producer simply by executing the producer script.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># utils/faker_shifted_gen.py</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="nn">argparse</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kn">from</span> <span class="nn">faker</span> <span class="kn">import</span> <span class="n">Faker</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kn">from</span> <span class="nn">producer</span> <span class="kn">import</span> <span class="n">TextProducer</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&#34;Fake Text Data Generator&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">        <span class="s2">&#34;--bootstrap_servers&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="s2">&#34;-b&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="s2">&#34;localhost:29092&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Comma separated string of Kafka bootstrap addresses&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="s2">&#34;--topic_name&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">        <span class="s2">&#34;-t&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="s2">&#34;input-topic&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Kafka topic name&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">        <span class="s2">&#34;--max_shift_seconds&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">        <span class="s2">&#34;-m&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;The maximum amount of time that a message create stamp is shifted back.&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="s2">&#34;--delay_seconds&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">        <span class="s2">&#34;-d&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;The amount of time that a record should be delayed.&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">
-</span></span><span class="line"><span class="ln">40</span><span class="cl">    <span class="n">producer</span> <span class="o">=</span> <span class="n">TextProducer</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">bootstrap_servers</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">topic_name</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">41</span><span class="cl">    <span class="n">fake</span> <span class="o">=</span> <span class="n">Faker</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl">    <span class="n">Faker</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1237</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">
-</span></span><span class="line"><span class="ln">44</span><span class="cl">    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">        <span class="n">text</span> <span class="o">=</span> <span class="n">fake</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">max_nb_chars</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl">        <span class="n">current</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">47</span><span class="cl">        <span class="n">shift</span> <span class="o">=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="ln">48</span><span class="cl">        <span class="k">if</span> <span class="n">fake</span><span class="o">.</span><span class="n">random_int</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">49</span><span class="cl">            <span class="n">shift</span> <span class="o">=</span> <span class="n">fake</span><span class="o">.</span><span class="n">random_element</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">max_shift_seconds</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln">50</span><span class="cl">        <span class="n">shifted</span> <span class="o">=</span> <span class="n">current</span> <span class="o">-</span> <span class="n">shift</span>
-</span></span><span class="line"><span class="ln">51</span><span class="cl">        <span class="n">producer</span><span class="o">.</span><span class="n">send_to_kafka</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="n">timestamp_ms</span><span class="o">=</span><span class="n">shifted</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">52</span><span class="cl">        <span class="nb">print</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">53</span><span class="cl">            <span class="sa">f</span><span class="s2">&#34;text - </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">, ts - </span><span class="si">{</span><span class="n">current</span><span class="si">}</span><span class="s2">, shift - </span><span class="si">{</span><span class="n">shift</span><span class="si">}</span><span class="s2"> secs - shifted ts </span><span class="si">{</span><span class="n">shifted</span><span class="si">}</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="ln">54</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">55</span><span class="cl">        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">)</span>
-</span></span></code></pre></div><p>The producer app sends the input messages using the following Kafka producer class.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># utils/producer.py</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">from</span> <span class="nn">kafka</span> <span class="kn">import</span> <span class="n">KafkaProducer</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="k">class</span> <span class="nc">TextProducer</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bootstrap_servers</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">topic_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">bootstrap_servers</span> <span class="o">=</span> <span class="n">bootstrap_servers</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">topic_name</span> <span class="o">=</span> <span class="n">topic_name</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">kafka_producer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_producer</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="k">def</span> <span class="nf">create_producer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">        <span class="s2">&#34;&#34;&#34;
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="s2">        Returns a KafkaProducer instance
-</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="s2">        &#34;&#34;&#34;</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="k">return</span> <span class="n">KafkaProducer</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">            <span class="n">bootstrap_servers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bootstrap_servers</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">            <span class="n">value_serializer</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">
-</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="k">def</span> <span class="nf">send_to_kafka</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">timestamp_ms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="s2">&#34;&#34;&#34;
-</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="s2">        Sends text to a Kafka topic.
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="s2">        &#34;&#34;&#34;</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="k">try</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">            <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;topic&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">topic_name</span><span class="p">,</span> <span class="s2">&#34;value&#34;</span><span class="p">:</span> <span class="n">text</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">            <span class="k">if</span> <span class="n">timestamp_ms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">                <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s2">&#34;timestamp_ms&#34;</span><span class="p">:</span> <span class="n">timestamp_ms</span><span class="p">}}</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">kafka_producer</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">kafka_producer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&#34;fails to send a message&#34;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-</span></span></code></pre></div><p>When we run the Kafka producer, it prints messages and associating timestamps. As mentioned, the <em>shifted</em> timestamp values are recorded as message timestamps.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl">python utils/faker_shifted_gen.py 
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">text - Church., ts - 1729476924, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476924</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">text - For., ts - 1729476925, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476925</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">text - Have., ts - 1729476926, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476926</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">text - Health., ts - 1729476927, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476927</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">text - Join., ts - 1729476928, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476928</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">text - Nice., ts - 1729476929, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476929</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">text - New., ts - 1729476930, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476930</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">text - Executive., ts - 1729476931, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476931</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">text - Memory., ts - 1729476932, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476932</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">text - Charge., ts - 1729476933, <span class="nb">shift</span> - <span class="m">11</span> secs - shifted ts <span class="m">1729476922</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">text - Indeed., ts - 1729476934, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476934</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">text - Say <span class="k">then</span>., ts - 1729476935, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476935</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">text - Eat nice., ts - 1729476936, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476936</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">text - Possible., ts - 1729476937, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476937</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">text - Protect., ts - 1729476938, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476938</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">text - Shake., ts - 1729476939, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476939</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">text - Newspaper., ts - 1729476940, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476940</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">text - Language., ts - 1729476941, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476941</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">text - Forward., ts - 1729476942, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476942</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">text - Order., ts - 1729476943, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476943</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">text - Thank., ts - 1729476944, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476944</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">text - Growth., ts - 1729476945, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476945</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">text - Structure., ts - 1729476946, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476946</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">text - Those us., ts - 1729476947, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476947</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">text - Decade., ts - 1729476948, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476948</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">text - College., ts - 1729476949, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476949</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">text - Along., ts - 1729476950, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476950</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">text - Sense., ts - 1729476951, <span class="nb">shift</span> - <span class="m">9</span> secs - shifted ts <span class="m">1729476942</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">text - Land skin., ts - 1729476952, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476952</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">text - Service., ts - 1729476953, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476953</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">text - While., ts - 1729476954, <span class="nb">shift</span> - <span class="m">10</span> secs - shifted ts <span class="m">1729476944</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">text - Method., ts - 1729476955, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476955</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">text - Spend., ts - 1729476956, <span class="nb">shift</span> - <span class="m">14</span> secs - shifted ts <span class="m">1729476942</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">text - Drive., ts - 1729476957, <span class="nb">shift</span> - <span class="m">0</span> secs - shifted ts <span class="m">1729476957</span>
-</span></span></code></pre></div>
-<h2 id="beam-pipeline" data-numberify>Beam Pipeline<a class="anchor ms-1" href="#beam-pipeline"></a></h2>
-<p>We develop an Apache Beam pipeline that separates *droppable *elements from the rest of the data. <em>Droppable</em> elements are those that come later when the watermark passes the window max timestamp plus allowed lateness. Using a timer in a <em>Stateful</em> DoFn, <em>droppable</em> data is separated from normal data and dispatched into a side output rather than being discarded silently, which is the default behaviour. Note that this pipeline works in a situation where <em>droppable</em> elements do not appear often, and thus the chance that a <em>droppable</em> element is delivered as the first element in a particular window is low.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-10-24-beam-examples-7/droppable.png" loading="lazy" width="388" height="277" />
-</picture>
-
-</p>
-
-<h3 id="shared-source" data-numberify>Shared Source<a class="anchor ms-1" href="#shared-source"></a></h3>
-<p>We have multiple pipelines that read text messages from an input Kafka topic and write outputs to an output topic. Therefore, the data source and sink transforms are refactored into a utility module as shown below. Note that, the Kafka read and write transforms have an argument called <code>deprecated_read</code>, which forces to use the legacy read when it is set to <em>True</em>. We will use the legacy read in this post to prevent a problem that is described in this <a href="https://github.com/apache/beam/issues/20979" target="_blank" rel="noopener noreferrer">GitHub issue<i class="fas fa-external-link-square-alt ms-1"></i></a>. Note further that, by default, <em>timestamp policy</em> of the Kafka read transform is configured to use processing timestamp (wall clock), and it is not possible to simulate late data. We change it to use message creation time (<code>create_time_policy</code>) instead so that both the timestamp of elements and watermark propagation are based on Kafka message (creation) timestamp.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># chapter3/io_utils.py</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="nn">re</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="nn">typing</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kn">import</span> <span class="nn">apache_beam</span> <span class="k">as</span> <span class="nn">beam</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam</span> <span class="kn">import</span> <span class="n">pvalue</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.io</span> <span class="kn">import</span> <span class="n">kafka</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="k">def</span> <span class="nf">decode_message</span><span class="p">(</span><span class="n">kafka_kv</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">kafka_kv</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="k">return</span> <span class="n">kafka_kv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">
-</span></span><span class="line"><span class="ln">14</span><span class="cl">
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">element</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&#34;[A-Za-z\&#39;]+&#34;</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">
-</span></span><span class="line"><span class="ln">18</span><span class="cl">
-</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="k">class</span> <span class="nc">ReadWordsFromKafka</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">PTransform</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">        <span class="n">bootstrap_servers</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">        <span class="n">topics</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="n">group_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">        <span class="n">deprecated_read</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">boostrap_servers</span> <span class="o">=</span> <span class="n">bootstrap_servers</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">topics</span> <span class="o">=</span> <span class="n">topics</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">group_id</span> <span class="o">=</span> <span class="n">group_id</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">expansion_service</span> <span class="o">=</span> <span class="kc">None</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">        <span class="k">if</span> <span class="n">deprecated_read</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">expansion_service</span> <span class="o">=</span> <span class="n">kafka</span><span class="o">.</span><span class="n">default_io_expansion_service</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">                <span class="p">[</span><span class="s2">&#34;--experiments=use_deprecated_read&#34;</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">
-</span></span><span class="line"><span class="ln">40</span><span class="cl">    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">pvalue</span><span class="o">.</span><span class="n">PBegin</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">41</span><span class="cl">        <span class="k">return</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl">            <span class="nb">input</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;ReadFromKafka&#34;</span>
-</span></span><span class="line"><span class="ln">44</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">kafka</span><span class="o">.</span><span class="n">ReadFromKafka</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">                <span class="n">consumer_config</span><span class="o">=</span><span class="p">{</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl">                    <span class="s2">&#34;bootstrap.servers&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">boostrap_servers</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">47</span><span class="cl">                    <span class="s2">&#34;auto.offset.reset&#34;</span><span class="p">:</span> <span class="s2">&#34;latest&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">48</span><span class="cl">                    <span class="c1"># &#34;enable.auto.commit&#34;: &#34;true&#34;,</span>
-</span></span><span class="line"><span class="ln">49</span><span class="cl">                    <span class="s2">&#34;group.id&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_id</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">50</span><span class="cl">                <span class="p">},</span>
-</span></span><span class="line"><span class="ln">51</span><span class="cl">                <span class="n">topics</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">topics</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">52</span><span class="cl">                <span class="n">timestamp_policy</span><span class="o">=</span><span class="n">kafka</span><span class="o">.</span><span class="n">ReadFromKafka</span><span class="o">.</span><span class="n">create_time_policy</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">53</span><span class="cl">                <span class="n">commit_offset_in_finalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">54</span><span class="cl">                <span class="n">expansion_service</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expansion_service</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">55</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">56</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;DecodeMessage&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">decode_message</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">57</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;ExtractWords&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">FlatMap</span><span class="p">(</span><span class="n">tokenize</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">58</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">59</span><span class="cl">
-</span></span><span class="line"><span class="ln">60</span><span class="cl">
-</span></span><span class="line"><span class="ln">61</span><span class="cl"><span class="k">class</span> <span class="nc">WriteOutputsToKafka</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">PTransform</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">62</span><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">63</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">64</span><span class="cl">        <span class="n">bootstrap_servers</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">65</span><span class="cl">        <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">66</span><span class="cl">        <span class="n">deprecated_read</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="c1"># TO DO: remove as it applies only to ReadFromKafka</span>
-</span></span><span class="line"><span class="ln">67</span><span class="cl">        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">68</span><span class="cl">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">69</span><span class="cl">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">70</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">boostrap_servers</span> <span class="o">=</span> <span class="n">bootstrap_servers</span>
-</span></span><span class="line"><span class="ln">71</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">topic</span> <span class="o">=</span> <span class="n">topic</span>
-</span></span><span class="line"><span class="ln">72</span><span class="cl">        <span class="c1"># TO DO: remove as it applies only to ReadFromKafka</span>
-</span></span><span class="line"><span class="ln">73</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">expansion_service</span> <span class="o">=</span> <span class="kc">None</span>
-</span></span><span class="line"><span class="ln">74</span><span class="cl">        <span class="k">if</span> <span class="n">deprecated_read</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">75</span><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">expansion_service</span> <span class="o">=</span> <span class="n">kafka</span><span class="o">.</span><span class="n">default_io_expansion_service</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">76</span><span class="cl">                <span class="p">[</span><span class="s2">&#34;--experiments=use_deprecated_read&#34;</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">77</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">78</span><span class="cl">
-</span></span><span class="line"><span class="ln">79</span><span class="cl">    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcoll</span><span class="p">:</span> <span class="n">pvalue</span><span class="o">.</span><span class="n">PCollection</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">80</span><span class="cl">        <span class="k">return</span> <span class="n">pcoll</span> <span class="o">|</span> <span class="s2">&#34;WriteToKafka&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">kafka</span><span class="o">.</span><span class="n">WriteToKafka</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">81</span><span class="cl">            <span class="n">producer_config</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;bootstrap.servers&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">boostrap_servers</span><span class="p">},</span>
-</span></span><span class="line"><span class="ln">82</span><span class="cl">            <span class="n">topic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">topic</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">83</span><span class="cl">            <span class="n">expansion_service</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expansion_service</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">84</span><span class="cl">        <span class="p">)</span>
-</span></span></code></pre></div>
-<h3 id="pipeline-source" data-numberify>Pipeline Source<a class="anchor ms-1" href="#pipeline-source"></a></h3>
-<p>Once messages are read from Kafka and assigned into a fixed window, the main transform (<code>SplitDroppable</code>) is applied to elements, which dispatches (<em>droppable</em>) late data into a side output. Specifically it performs</p>
-<ul>
-<li><code>Reify.Window()</code> - It converts an element in a PCollection into a tuple of <em>element</em>, <em>timestamp</em>, and <em>window</em>.</li>
-<li><code>beam.Map(to_kv) | beam.WindowInto(GlobalWindows())</code> - The tuple element is changed into a key-value pair by taking the <em>window</em> as the key, followed by re-windowing the key-value pair into the <em>Global</em> window. Note that we should use the <em>Global</em> window to prevent from (late) elements being discarded silently when the watermark passes the window GC time (or the watermark passes the window max timestamp plus allowed lateness if you like).</li>
-<li><code>beam.ParDo(SplitDroppableDataFn(windowing=windowing))</code> - Elements are classified as (<em>droppable</em>) late or normal using the window GC timer and split into the main and side output accordingly.</li>
-<li><code>Rewindow(windowing=windowing)</code> - Elements in the main output is re-windowed according to its original window function while those in the <em>droppable</em> output are returned as they are.</li>
-</ul>
-<p>Below shows the sequence of transforms of the main transform.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-10-24-beam-examples-7/pipeline.png" loading="lazy" width="478" height="371" />
-</picture>
-
-</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln">  1</span><span class="cl"><span class="c1"># chapter3/droppable_data_filter.py</span>
-</span></span><span class="line"><span class="ln">  2</span><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
-</span></span><span class="line"><span class="ln">  3</span><span class="cl"><span class="kn">import</span> <span class="nn">argparse</span>
-</span></span><span class="line"><span class="ln">  4</span><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
-</span></span><span class="line"><span class="ln">  5</span><span class="cl"><span class="kn">import</span> <span class="nn">re</span>
-</span></span><span class="line"><span class="ln">  6</span><span class="cl"><span class="kn">import</span> <span class="nn">typing</span>
-</span></span><span class="line"><span class="ln">  7</span><span class="cl"><span class="kn">import</span> <span class="nn">logging</span>
-</span></span><span class="line"><span class="ln">  8</span><span class="cl">
-</span></span><span class="line"><span class="ln">  9</span><span class="cl"><span class="kn">import</span> <span class="nn">apache_beam</span> <span class="k">as</span> <span class="nn">beam</span>
-</span></span><span class="line"><span class="ln"> 10</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam</span> <span class="kn">import</span> <span class="n">pvalue</span><span class="p">,</span> <span class="n">Windowing</span>
-</span></span><span class="line"><span class="ln"> 11</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.trigger</span> <span class="kn">import</span> <span class="n">AccumulationMode</span>
-</span></span><span class="line"><span class="ln"> 12</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.timeutil</span> <span class="kn">import</span> <span class="n">TimeDomain</span>
-</span></span><span class="line"><span class="ln"> 13</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.userstate</span> <span class="kn">import</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 14</span><span class="cl">    <span class="n">ReadModifyWriteStateSpec</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 15</span><span class="cl">    <span class="n">TimerSpec</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 16</span><span class="cl">    <span class="n">on_timer</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 17</span><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 18</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.window</span> <span class="kn">import</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 19</span><span class="cl">    <span class="n">GlobalWindows</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 20</span><span class="cl">    <span class="n">BoundedWindow</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 21</span><span class="cl">    <span class="n">FixedWindows</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 22</span><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 23</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.util</span> <span class="kn">import</span> <span class="n">Reify</span>
-</span></span><span class="line"><span class="ln"> 24</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.utils.timestamp</span> <span class="kn">import</span> <span class="n">Timestamp</span>
-</span></span><span class="line"><span class="ln"> 25</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.options.pipeline_options</span> <span class="kn">import</span> <span class="n">PipelineOptions</span>
-</span></span><span class="line"><span class="ln"> 26</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.options.pipeline_options</span> <span class="kn">import</span> <span class="n">SetupOptions</span>
-</span></span><span class="line"><span class="ln"> 27</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 28</span><span class="cl"><span class="kn">from</span> <span class="nn">io_utils</span> <span class="kn">import</span> <span class="n">ReadWordsFromKafka</span><span class="p">,</span> <span class="n">WriteOutputsToKafka</span>
-</span></span><span class="line"><span class="ln"> 29</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 30</span><span class="cl"><span class="n">MAIN_OUTPUT</span> <span class="o">=</span> <span class="s2">&#34;main_output&#34;</span>
-</span></span><span class="line"><span class="ln"> 31</span><span class="cl"><span class="n">DROPPABLE_OUTPUT</span> <span class="o">=</span> <span class="s2">&#34;droppable_output&#34;</span>
-</span></span><span class="line"><span class="ln"> 32</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 33</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 34</span><span class="cl"><span class="k">def</span> <span class="nf">create_message</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 35</span><span class="cl">    <span class="n">element</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Timestamp</span><span class="p">,</span> <span class="n">Timestamp</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span> <span class="n">is_main</span><span class="p">:</span> <span class="nb">bool</span>
-</span></span><span class="line"><span class="ln"> 36</span><span class="cl"><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 37</span><span class="cl">    <span class="k">if</span> <span class="n">is_main</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 38</span><span class="cl">        <span class="n">msg</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 39</span><span class="cl">            <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 40</span><span class="cl">                <span class="s2">&#34;start&#34;</span><span class="p">:</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">seconds</span><span class="p">(),</span>
-</span></span><span class="line"><span class="ln"> 41</span><span class="cl">                <span class="s2">&#34;end&#34;</span><span class="p">:</span> <span class="n">element</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">seconds</span><span class="p">(),</span>
-</span></span><span class="line"><span class="ln"> 42</span><span class="cl">                <span class="s2">&#34;word&#34;</span><span class="p">:</span> <span class="n">element</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln"> 43</span><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 44</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 45</span><span class="cl">        <span class="n">key</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 46</span><span class="cl">    <span class="k">else</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 47</span><span class="cl">        <span class="n">msg</span> <span class="o">=</span> <span class="n">element</span>
-</span></span><span class="line"><span class="ln"> 48</span><span class="cl">        <span class="n">key</span> <span class="o">=</span> <span class="n">msg</span>
-</span></span><span class="line"><span class="ln"> 49</span><span class="cl">    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="s1">&#39;main&#39;</span> <span class="k">if</span> <span class="n">is_main</span> <span class="k">else</span> <span class="s1">&#39;droppable&#39;</span><span class="si">}</span><span class="s2"> message - </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 50</span><span class="cl">    <span class="k">return</span> <span class="n">key</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">),</span> <span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 51</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 52</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 53</span><span class="cl"><span class="k">class</span> <span class="nc">SplitDroppable</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">PTransform</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 54</span><span class="cl">    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcoll</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 55</span><span class="cl">        <span class="n">windowing</span><span class="p">:</span> <span class="n">Windowing</span> <span class="o">=</span> <span class="n">pcoll</span><span class="o">.</span><span class="n">windowing</span>
-</span></span><span class="line"><span class="ln"> 56</span><span class="cl">        <span class="k">assert</span> <span class="n">windowing</span><span class="o">.</span><span class="n">windowfn</span> <span class="o">!=</span> <span class="n">GlobalWindows</span>
-</span></span><span class="line"><span class="ln"> 57</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 58</span><span class="cl">        <span class="k">def</span> <span class="nf">to_kv</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 59</span><span class="cl">            <span class="n">element</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Timestamp</span><span class="p">,</span> <span class="n">BoundedWindow</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln"> 60</span><span class="cl">        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-</span></span><span class="line"><span class="ln"> 61</span><span class="cl">            <span class="n">value</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">window</span> <span class="o">=</span> <span class="n">element</span>
-</span></span><span class="line"><span class="ln"> 62</span><span class="cl">            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">value</span>
-</span></span><span class="line"><span class="ln"> 63</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 64</span><span class="cl">        <span class="n">outputs</span><span class="p">:</span> <span class="n">pvalue</span><span class="o">.</span><span class="n">DoOutputsTuple</span> <span class="o">=</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 65</span><span class="cl">            <span class="n">pcoll</span>
-</span></span><span class="line"><span class="ln"> 66</span><span class="cl">            <span class="o">|</span> <span class="n">Reify</span><span class="o">.</span><span class="n">Window</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln"> 67</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">to_kv</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 68</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">WindowInto</span><span class="p">(</span><span class="n">GlobalWindows</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln"> 69</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">ParDo</span><span class="p">(</span><span class="n">SplitDroppableDataFn</span><span class="p">(</span><span class="n">windowing</span><span class="o">=</span><span class="n">windowing</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln"> 70</span><span class="cl">            <span class="o">.</span><span class="n">with_outputs</span><span class="p">(</span><span class="n">DROPPABLE_OUTPUT</span><span class="p">,</span> <span class="n">main</span><span class="o">=</span><span class="n">MAIN_OUTPUT</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 71</span><span class="cl">            <span class="o">.</span><span class="n">with_input_types</span><span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln"> 72</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 73</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 74</span><span class="cl">        <span class="n">pcolls</span> <span class="o">=</span> <span class="p">{}</span>
-</span></span><span class="line"><span class="ln"> 75</span><span class="cl">        <span class="n">pcolls</span><span class="p">[</span><span class="n">MAIN_OUTPUT</span><span class="p">]</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="n">MAIN_OUTPUT</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 76</span><span class="cl">        <span class="n">pcolls</span><span class="p">[</span><span class="n">DROPPABLE_OUTPUT</span><span class="p">]</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="n">DROPPABLE_OUTPUT</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 77</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 78</span><span class="cl">        <span class="k">return</span> <span class="n">pcolls</span> <span class="o">|</span> <span class="n">Rewindow</span><span class="p">(</span><span class="n">windowing</span><span class="o">=</span><span class="n">windowing</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 79</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 80</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 81</span><span class="cl"><span class="k">class</span> <span class="nc">SplitDroppableDataFn</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 82</span><span class="cl">    <span class="n">TOO_LATE</span> <span class="o">=</span> <span class="n">ReadModifyWriteStateSpec</span><span class="p">(</span><span class="s2">&#34;too_late&#34;</span><span class="p">,</span> <span class="n">beam</span><span class="o">.</span><span class="n">coders</span><span class="o">.</span><span class="n">BooleanCoder</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln"> 83</span><span class="cl">    <span class="n">WINDOW_GC_TIMER</span> <span class="o">=</span> <span class="n">TimerSpec</span><span class="p">(</span><span class="s2">&#34;window_gc_timer&#34;</span><span class="p">,</span> <span class="n">TimeDomain</span><span class="o">.</span><span class="n">WATERMARK</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 84</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 85</span><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">windowing</span><span class="p">:</span> <span class="n">Windowing</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 86</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">windowing</span> <span class="o">=</span> <span class="n">windowing</span>
-</span></span><span class="line"><span class="ln"> 87</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 88</span><span class="cl">    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 89</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 90</span><span class="cl">        <span class="n">element</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln"> 91</span><span class="cl">        <span class="n">too_late</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">StateParam</span><span class="p">(</span><span class="n">TOO_LATE</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln"> 92</span><span class="cl">        <span class="n">window_gc_timer</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">TimerParam</span><span class="p">(</span><span class="n">WINDOW_GC_TIMER</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln"> 93</span><span class="cl">    <span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 94</span><span class="cl">        <span class="n">max_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_max_ts</span><span class="p">(</span><span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln"> 95</span><span class="cl">        <span class="n">allowed_lateness_sec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">windowing</span><span class="o">.</span><span class="n">allowed_lateness</span><span class="o">.</span><span class="n">micros</span> <span class="o">//</span> <span class="mi">1000000</span>
-</span></span><span class="line"><span class="ln"> 96</span><span class="cl">        <span class="n">too_late_for_window</span> <span class="o">=</span> <span class="n">too_late</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="ow">or</span> <span class="kc">False</span>
-</span></span><span class="line"><span class="ln"> 97</span><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;string (value) - </span><span class="si">{</span><span class="n">element</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">, window (key) </span><span class="si">{</span><span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 98</span><span class="cl">        <span class="k">if</span> <span class="n">too_late_for_window</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 99</span><span class="cl">            <span class="n">timer_val</span> <span class="o">=</span> <span class="n">max_ts</span> <span class="o">+</span> <span class="n">allowed_lateness_sec</span>
-</span></span><span class="line"><span class="ln">100</span><span class="cl">            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;set up eow timer at </span><span class="si">{</span><span class="n">timer_val</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">101</span><span class="cl">            <span class="n">window_gc_timer</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">timer_val</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">102</span><span class="cl">        <span class="k">if</span> <span class="n">too_late_for_window</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">103</span><span class="cl">            <span class="k">yield</span> <span class="n">pvalue</span><span class="o">.</span><span class="n">TaggedOutput</span><span class="p">(</span><span class="n">DROPPABLE_OUTPUT</span><span class="p">,</span> <span class="n">element</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">104</span><span class="cl">        <span class="k">else</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">105</span><span class="cl">            <span class="k">yield</span> <span class="n">element</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">106</span><span class="cl">
-</span></span><span class="line"><span class="ln">107</span><span class="cl">    <span class="nd">@on_timer</span><span class="p">(</span><span class="n">WINDOW_GC_TIMER</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">108</span><span class="cl">    <span class="k">def</span> <span class="nf">on_window_gc_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">too_late</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">StateParam</span><span class="p">(</span><span class="n">TOO_LATE</span><span class="p">)):</span>
-</span></span><span class="line"><span class="ln">109</span><span class="cl">        <span class="n">too_late</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">110</span><span class="cl">
-</span></span><span class="line"><span class="ln">111</span><span class="cl">    <span class="nd">@staticmethod</span>
-</span></span><span class="line"><span class="ln">112</span><span class="cl">    <span class="k">def</span> <span class="nf">get_max_ts</span><span class="p">(</span><span class="n">window_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">113</span><span class="cl">        <span class="s2">&#34;&#34;&#34;Extract the maximum timestamp of a window string eg) &#39;[0.001, 600.001)&#39;&#34;&#34;&#34;</span>
-</span></span><span class="line"><span class="ln">114</span><span class="cl">        <span class="n">bounds</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&#34;[\d]+[.\d]+&#34;</span><span class="p">,</span> <span class="n">window_str</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">115</span><span class="cl">        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
-</span></span><span class="line"><span class="ln">116</span><span class="cl">        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">117</span><span class="cl">
-</span></span><span class="line"><span class="ln">118</span><span class="cl">
-</span></span><span class="line"><span class="ln">119</span><span class="cl"><span class="k">class</span> <span class="nc">Rewindow</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">PTransform</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">120</span><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">windowing</span><span class="p">:</span> <span class="n">Windowing</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">121</span><span class="cl">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">122</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">windowing</span> <span class="o">=</span> <span class="n">windowing</span>
-</span></span><span class="line"><span class="ln">123</span><span class="cl">
-</span></span><span class="line"><span class="ln">124</span><span class="cl">    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pcolls</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">125</span><span class="cl">        <span class="n">window_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">windowing</span><span class="o">.</span><span class="n">windowfn</span>
-</span></span><span class="line"><span class="ln">126</span><span class="cl">        <span class="n">allowed_lateness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">windowing</span><span class="o">.</span><span class="n">allowed_lateness</span>
-</span></span><span class="line"><span class="ln">127</span><span class="cl">        <span class="c1"># closing_behavior = self.windowing.closing_behavior # emit always</span>
-</span></span><span class="line"><span class="ln">128</span><span class="cl">        <span class="c1"># on_time_behavior = self.windowing.on_time_behavior # fire always</span>
-</span></span><span class="line"><span class="ln">129</span><span class="cl">        <span class="n">timestamp_combiner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">windowing</span><span class="o">.</span><span class="n">timestamp_combiner</span>
-</span></span><span class="line"><span class="ln">130</span><span class="cl">        <span class="n">trigger_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">windowing</span><span class="o">.</span><span class="n">triggerfn</span>
-</span></span><span class="line"><span class="ln">131</span><span class="cl">        <span class="n">accumulation_mode</span> <span class="o">=</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">132</span><span class="cl">            <span class="n">AccumulationMode</span><span class="o">.</span><span class="n">DISCARDING</span>
-</span></span><span class="line"><span class="ln">133</span><span class="cl">            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">windowing</span><span class="o">.</span><span class="n">accumulation_mode</span> <span class="o">==</span> <span class="mi">1</span>
-</span></span><span class="line"><span class="ln">134</span><span class="cl">            <span class="k">else</span> <span class="n">AccumulationMode</span><span class="o">.</span><span class="n">ACCUMULATING</span>
-</span></span><span class="line"><span class="ln">135</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">136</span><span class="cl">        <span class="n">main_output</span> <span class="o">=</span> <span class="n">pcolls</span><span class="p">[</span><span class="n">MAIN_OUTPUT</span><span class="p">]</span> <span class="o">|</span> <span class="s2">&#34;MainWindowInto&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">WindowInto</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">137</span><span class="cl">            <span class="n">windowfn</span><span class="o">=</span><span class="n">window_fn</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">138</span><span class="cl">            <span class="n">trigger</span><span class="o">=</span><span class="n">trigger_fn</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">139</span><span class="cl">            <span class="n">accumulation_mode</span><span class="o">=</span><span class="n">accumulation_mode</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">140</span><span class="cl">            <span class="n">timestamp_combiner</span><span class="o">=</span><span class="n">timestamp_combiner</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">141</span><span class="cl">            <span class="n">allowed_lateness</span><span class="o">=</span><span class="n">allowed_lateness</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">142</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">143</span><span class="cl">        <span class="k">return</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">144</span><span class="cl">            <span class="s2">&#34;main_output&#34;</span><span class="p">:</span> <span class="n">main_output</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">145</span><span class="cl">            <span class="s2">&#34;droppable_output&#34;</span><span class="p">:</span> <span class="n">pcolls</span><span class="p">[</span><span class="n">DROPPABLE_OUTPUT</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln">146</span><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="ln">147</span><span class="cl">
-</span></span><span class="line"><span class="ln">148</span><span class="cl">
-</span></span><span class="line"><span class="ln">149</span><span class="cl"><span class="k">class</span> <span class="nc">AddWindowTS</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">150</span><span class="cl">    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">win_param</span><span class="o">=</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">WindowParam</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">151</span><span class="cl">        <span class="k">yield</span> <span class="p">(</span><span class="n">win_param</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">win_param</span><span class="o">.</span><span class="n">end</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">152</span><span class="cl">
-</span></span><span class="line"><span class="ln">153</span><span class="cl">
-</span></span><span class="line"><span class="ln">154</span><span class="cl"><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_main_session</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">155</span><span class="cl">    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&#34;Beam pipeline arguments&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">156</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">157</span><span class="cl">        <span class="s2">&#34;--bootstrap_servers&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">158</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="s2">&#34;host.docker.internal:29092&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">159</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Kafka bootstrap server addresses&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">160</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">161</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&#34;--input_topic&#34;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&#34;input-topic&#34;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Input topic&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">162</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&#34;--window_length&#34;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Input topic&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">163</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&#34;--allowed_lateness&#34;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Input topic&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">164</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">165</span><span class="cl">        <span class="s2">&#34;--output_topic&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">166</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&#34;_&#34;</span><span class="p">,</span> <span class="s2">&#34;-&#34;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&#34;.py$&#34;</span><span class="p">,</span> <span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))),</span>
-</span></span><span class="line"><span class="ln">167</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Output topic&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">168</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">169</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">170</span><span class="cl">        <span class="s2">&#34;--deprecated_read&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">171</span><span class="cl">        <span class="n">action</span><span class="o">=</span><span class="s2">&#34;store_true&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">172</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="s2">&#34;Whether to use a deprecated read. See https://github.com/apache/beam/issues/20979&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">173</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">174</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">deprecated_read</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">175</span><span class="cl">
-</span></span><span class="line"><span class="ln">176</span><span class="cl">    <span class="n">known_args</span><span class="p">,</span> <span class="n">pipeline_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">177</span><span class="cl">
-</span></span><span class="line"><span class="ln">178</span><span class="cl">    <span class="c1"># # We use the save_main_session option because one or more DoFn&#39;s in this</span>
-</span></span><span class="line"><span class="ln">179</span><span class="cl">    <span class="c1"># # workflow rely on global context (e.g., a module imported at module level).</span>
-</span></span><span class="line"><span class="ln">180</span><span class="cl">    <span class="n">pipeline_options</span> <span class="o">=</span> <span class="n">PipelineOptions</span><span class="p">(</span><span class="n">pipeline_args</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">181</span><span class="cl">    <span class="n">pipeline_options</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">SetupOptions</span><span class="p">)</span><span class="o">.</span><span class="n">save_main_session</span> <span class="o">=</span> <span class="n">save_main_session</span>
-</span></span><span class="line"><span class="ln">182</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;known args - </span><span class="si">{</span><span class="n">known_args</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">183</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;pipeline options - </span><span class="si">{</span><span class="n">pipeline_options</span><span class="o">.</span><span class="n">display_data</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">184</span><span class="cl">
-</span></span><span class="line"><span class="ln">185</span><span class="cl">    <span class="k">with</span> <span class="n">beam</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">pipeline_options</span><span class="p">)</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">186</span><span class="cl">        <span class="n">outputs</span> <span class="o">=</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">187</span><span class="cl">            <span class="n">p</span>
-</span></span><span class="line"><span class="ln">188</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;ReadInputsFromKafka&#34;</span>
-</span></span><span class="line"><span class="ln">189</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">ReadWordsFromKafka</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">190</span><span class="cl">                <span class="n">bootstrap_servers</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">bootstrap_servers</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">191</span><span class="cl">                <span class="n">topics</span><span class="o">=</span><span class="p">[</span><span class="n">known_args</span><span class="o">.</span><span class="n">input_topic</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln">192</span><span class="cl">                <span class="n">group_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">known_args</span><span class="o">.</span><span class="n">output_topic</span><span class="si">}</span><span class="s2">-group&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">193</span><span class="cl">                <span class="n">deprecated_read</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">deprecated_read</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">194</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">195</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;Windowing&#34;</span>
-</span></span><span class="line"><span class="ln">196</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">WindowInto</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">197</span><span class="cl">                <span class="n">FixedWindows</span><span class="p">(</span><span class="n">known_args</span><span class="o">.</span><span class="n">window_length</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">198</span><span class="cl">                <span class="n">allowed_lateness</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">allowed_lateness</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">199</span><span class="cl">                <span class="n">accumulation_mode</span><span class="o">=</span><span class="n">AccumulationMode</span><span class="o">.</span><span class="n">DISCARDING</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">200</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">201</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;SpiltDroppable&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">SplitDroppable</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">202</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">203</span><span class="cl">
-</span></span><span class="line"><span class="ln">204</span><span class="cl">        <span class="p">(</span>
-</span></span><span class="line"><span class="ln">205</span><span class="cl">            <span class="n">outputs</span><span class="p">[</span><span class="n">MAIN_OUTPUT</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">206</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;AddWindowTimestamp&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">ParDo</span><span class="p">(</span><span class="n">AddWindowTS</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">207</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;CreateMainMessage&#34;</span>
-</span></span><span class="line"><span class="ln">208</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">create_message</span><span class="p">,</span> <span class="n">is_main</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">with_output_types</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">209</span><span class="cl">                <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">210</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">211</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;WriteToMainTopic&#34;</span>
-</span></span><span class="line"><span class="ln">212</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">WriteOutputsToKafka</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">213</span><span class="cl">                <span class="n">bootstrap_servers</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">bootstrap_servers</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">214</span><span class="cl">                <span class="n">topic</span><span class="o">=</span><span class="s2">&#34;output-normal-topic&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">215</span><span class="cl">                <span class="n">deprecated_read</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">deprecated_read</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">216</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">217</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">218</span><span class="cl">
-</span></span><span class="line"><span class="ln">219</span><span class="cl">        <span class="p">(</span>
-</span></span><span class="line"><span class="ln">220</span><span class="cl">            <span class="n">outputs</span><span class="p">[</span><span class="n">DROPPABLE_OUTPUT</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">221</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;CreateDroppableMessage&#34;</span>
-</span></span><span class="line"><span class="ln">222</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">create_message</span><span class="p">,</span> <span class="n">is_main</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">with_output_types</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">223</span><span class="cl">                <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">224</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">225</span><span class="cl">            <span class="o">|</span> <span class="s2">&#34;WriteToDroppableTopic&#34;</span>
-</span></span><span class="line"><span class="ln">226</span><span class="cl">            <span class="o">&gt;&gt;</span> <span class="n">WriteOutputsToKafka</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">227</span><span class="cl">                <span class="n">bootstrap_servers</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">bootstrap_servers</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">228</span><span class="cl">                <span class="n">topic</span><span class="o">=</span><span class="s2">&#34;output-droppable-topic&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">229</span><span class="cl">                <span class="n">deprecated_read</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">deprecated_read</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">230</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">231</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">232</span><span class="cl">
-</span></span><span class="line"><span class="ln">233</span><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">234</span><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&#34;Building pipeline ...&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">235</span><span class="cl">
-</span></span><span class="line"><span class="ln">236</span><span class="cl">
-</span></span><span class="line"><span class="ln">237</span><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">238</span><span class="cl">    <span class="n">run</span><span class="p">()</span>
-</span></span></code></pre></div>
-<h4 id="pipeline-test" data-numberify>Pipeline Test<a class="anchor ms-1" href="#pipeline-test"></a></h4>
-<p>As described in <a href="https://beam.apache.org/documentation/pipelines/test-your-pipeline/" target="_blank" rel="noopener noreferrer">this documentation<i class="fas fa-external-link-square-alt ms-1"></i></a>, we can test a Beam pipeline as following.</p>
-<ol>
-<li>Create a <code>TestPipeline</code>.</li>
-<li>Create some static, known test input data.</li>
-<li>Create a <code>PCollection</code> of input data using the <code>Create</code> transform (if bounded source) or a <code>TestStream</code> (if unbounded source)</li>
-<li>Apply the transform to the input <code>PCollection</code> and save the resulting output <code>PCollection</code>.</li>
-<li>Use <code>PAssert</code> and its subclasses (or <a href="https://beam.apache.org/releases/pydoc/current/apache_beam.testing.util.html" target="_blank" rel="noopener noreferrer">testing utils<i class="fas fa-external-link-square-alt ms-1"></i></a> in Python) to verify that the output <code>PCollection</code> contains the elements that you expect.</li>
-</ol>
-<p>There are two test cases. The first case has a pipeline that processes elements as described in the following schedule. Therefore, it is expected to return a single <em>droppable</em> element.</p>
-<ul>
-<li>Watermark propagates to 0</li>
-<li>First element arrives - value: <em>a</em>, timestamp 3 (normal)</li>
-<li>Watermark propagates to 6.999</li>
-<li>Second element arrives - value: <em>b</em>, timestamp 4 (normal)</li>
-<li>Watermark propagates to 7 (Any elements less than 7 will be considered as late!)</li>
-<li>Third element arrives - value: <em>c</em>, timestamp 0 (<em>late</em>)</li>
-</ul>
-<p>The second case shows a drawback of the pipeline logic where it treats a late element as normal if it comes as the first element. This is because, when such an element is delivered for the first time, the state is empty and timer is not set up properly. <a href="https://www.packtpub.com/en-us/product/building-big-data-pipelines-with-apache-beam-9781800564930" target="_blank" rel="noopener noreferrer">Building Big Data Pipelines with Apache Beam<i class="fas fa-external-link-square-alt ms-1"></i></a> that this example is based on has a solution to fix this issue, and you may check the book if interested.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln">  1</span><span class="cl"><span class="c1"># chapter3/droppable_data_filter_test.py</span>
-</span></span><span class="line"><span class="ln">  2</span><span class="cl"><span class="kn">import</span> <span class="nn">unittest</span>
-</span></span><span class="line"><span class="ln">  3</span><span class="cl">
-</span></span><span class="line"><span class="ln">  4</span><span class="cl"><span class="kn">import</span> <span class="nn">apache_beam</span> <span class="k">as</span> <span class="nn">beam</span>
-</span></span><span class="line"><span class="ln">  5</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.coders</span> <span class="kn">import</span> <span class="n">coders</span>
-</span></span><span class="line"><span class="ln">  6</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.window</span> <span class="kn">import</span> <span class="n">IntervalWindow</span>
-</span></span><span class="line"><span class="ln">  7</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.testing.test_pipeline</span> <span class="kn">import</span> <span class="n">TestPipeline</span>
-</span></span><span class="line"><span class="ln">  8</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.testing.util</span> <span class="kn">import</span> <span class="n">assert_that</span><span class="p">,</span> <span class="n">equal_to</span><span class="p">,</span> <span class="n">equal_to_per_window</span>
-</span></span><span class="line"><span class="ln">  9</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.testing.test_stream</span> <span class="kn">import</span> <span class="n">TestStream</span>
-</span></span><span class="line"><span class="ln"> 10</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.trigger</span> <span class="kn">import</span> <span class="n">AccumulationMode</span>
-</span></span><span class="line"><span class="ln"> 11</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.window</span> <span class="kn">import</span> <span class="n">FixedWindows</span><span class="p">,</span> <span class="n">TimestampedValue</span>
-</span></span><span class="line"><span class="ln"> 12</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.options.pipeline_options</span> <span class="kn">import</span> <span class="n">PipelineOptions</span><span class="p">,</span> <span class="n">StandardOptions</span>
-</span></span><span class="line"><span class="ln"> 13</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.utils.timestamp</span> <span class="kn">import</span> <span class="n">Timestamp</span>
-</span></span><span class="line"><span class="ln"> 14</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 15</span><span class="cl"><span class="kn">from</span> <span class="nn">io_utils</span> <span class="kn">import</span> <span class="n">tokenize</span>
-</span></span><span class="line"><span class="ln"> 16</span><span class="cl"><span class="kn">from</span> <span class="nn">droppable_data_filter</span> <span class="kn">import</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 17</span><span class="cl">    <span class="n">SplitDroppable</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 18</span><span class="cl">    <span class="n">MAIN_OUTPUT</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 19</span><span class="cl">    <span class="n">DROPPABLE_OUTPUT</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 20</span><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 21</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 22</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 23</span><span class="cl"><span class="k">class</span> <span class="nc">DroppableDataFilterTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 24</span><span class="cl">    <span class="k">def</span> <span class="nf">test_windowing_behaviour</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 25</span><span class="cl">        <span class="n">options</span> <span class="o">=</span> <span class="n">PipelineOptions</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln"> 26</span><span class="cl">        <span class="n">options</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">StandardOptions</span><span class="p">)</span><span class="o">.</span><span class="n">streaming</span> <span class="o">=</span> <span class="kc">True</span>
-</span></span><span class="line"><span class="ln"> 27</span><span class="cl">        <span class="n">now</span> <span class="o">=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="ln"> 28</span><span class="cl">        <span class="c1"># now = int(time.time())</span>
-</span></span><span class="line"><span class="ln"> 29</span><span class="cl">        <span class="k">with</span> <span class="n">TestPipeline</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 30</span><span class="cl">            <span class="n">test_stream</span> <span class="o">=</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 31</span><span class="cl">                <span class="n">TestStream</span><span class="p">(</span><span class="n">coder</span><span class="o">=</span><span class="n">coders</span><span class="o">.</span><span class="n">StrUtf8Coder</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln"> 32</span><span class="cl">                <span class="o">.</span><span class="n">with_output_types</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 33</span><span class="cl">                <span class="o">.</span><span class="n">advance_watermark_to</span><span class="p">(</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">now</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln"> 34</span><span class="cl">                <span class="o">.</span><span class="n">add_elements</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 35</span><span class="cl">                    <span class="p">[</span><span class="n">TimestampedValue</span><span class="p">(</span><span class="s2">&#34;a&#34;</span><span class="p">,</span> <span class="n">Timestamp</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">now</span> <span class="o">+</span> <span class="mi">3</span><span class="p">))]</span>
-</span></span><span class="line"><span class="ln"> 36</span><span class="cl">                <span class="p">)</span>  <span class="c1"># fine, before watermark - on time</span>
-</span></span><span class="line"><span class="ln"> 37</span><span class="cl">                <span class="o">.</span><span class="n">advance_watermark_to</span><span class="p">(</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">now</span> <span class="o">+</span> <span class="mf">6.999</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln"> 38</span><span class="cl">                <span class="o">.</span><span class="n">add_elements</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 39</span><span class="cl">                    <span class="p">[</span><span class="n">TimestampedValue</span><span class="p">(</span><span class="s2">&#34;b&#34;</span><span class="p">,</span> <span class="n">Timestamp</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">now</span> <span class="o">+</span> <span class="mi">4</span><span class="p">))]</span>
-</span></span><span class="line"><span class="ln"> 40</span><span class="cl">                <span class="p">)</span>  <span class="c1"># late, but within allowed lateness</span>
-</span></span><span class="line"><span class="ln"> 41</span><span class="cl">                <span class="o">.</span><span class="n">advance_watermark_to</span><span class="p">(</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">now</span> <span class="o">+</span> <span class="mi">7</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln"> 42</span><span class="cl">                <span class="o">.</span><span class="n">add_elements</span><span class="p">([</span><span class="n">TimestampedValue</span><span class="p">(</span><span class="s2">&#34;c&#34;</span><span class="p">,</span> <span class="n">now</span><span class="p">)])</span>  <span class="c1"># droppable</span>
-</span></span><span class="line"><span class="ln"> 43</span><span class="cl">                <span class="o">.</span><span class="n">advance_watermark_to_infinity</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln"> 44</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 45</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 46</span><span class="cl">            <span class="n">outputs</span> <span class="o">=</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 47</span><span class="cl">                <span class="n">p</span>
-</span></span><span class="line"><span class="ln"> 48</span><span class="cl">                <span class="o">|</span> <span class="n">test_stream</span>
-</span></span><span class="line"><span class="ln"> 49</span><span class="cl">                <span class="o">|</span> <span class="s2">&#34;ExtractWords&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">FlatMap</span><span class="p">(</span><span class="n">tokenize</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 50</span><span class="cl">                <span class="o">|</span> <span class="s2">&#34;Windowing&#34;</span>
-</span></span><span class="line"><span class="ln"> 51</span><span class="cl">                <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">WindowInto</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 52</span><span class="cl">                    <span class="n">FixedWindows</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln"> 53</span><span class="cl">                    <span class="n">allowed_lateness</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 54</span><span class="cl">                    <span class="n">accumulation_mode</span><span class="o">=</span><span class="n">AccumulationMode</span><span class="o">.</span><span class="n">DISCARDING</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 55</span><span class="cl">                <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 56</span><span class="cl">                <span class="o">|</span> <span class="s2">&#34;SpiltDroppable&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">SplitDroppable</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln"> 57</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 58</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 59</span><span class="cl">            <span class="n">main_expected</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 60</span><span class="cl">                <span class="n">IntervalWindow</span><span class="p">(</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">now</span><span class="p">),</span> <span class="n">Timestamp</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">now</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)):</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 61</span><span class="cl">                    <span class="s2">&#34;a&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 62</span><span class="cl">                    <span class="s2">&#34;b&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 63</span><span class="cl">                <span class="p">],</span>
-</span></span><span class="line"><span class="ln"> 64</span><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 65</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 66</span><span class="cl">            <span class="n">assert_that</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 67</span><span class="cl">                <span class="n">outputs</span><span class="p">[</span><span class="n">MAIN_OUTPUT</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln"> 68</span><span class="cl">                <span class="n">equal_to_per_window</span><span class="p">(</span><span class="n">main_expected</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln"> 69</span><span class="cl">                <span class="n">reify_windows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 70</span><span class="cl">                <span class="n">label</span><span class="o">=</span><span class="s2">&#34;assert_main&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 71</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 72</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 73</span><span class="cl">            <span class="n">assert_that</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 74</span><span class="cl">                <span class="n">outputs</span><span class="p">[</span><span class="n">DROPPABLE_OUTPUT</span><span class="p">],</span> <span class="n">equal_to</span><span class="p">([</span><span class="s2">&#34;c&#34;</span><span class="p">]),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&#34;assert_droppable&#34;</span>
-</span></span><span class="line"><span class="ln"> 75</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 76</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 77</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 78</span><span class="cl"><span class="k">class</span> <span class="nc">DroppableDataFilterTestFail</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 79</span><span class="cl">    <span class="nd">@unittest.expectedFailure</span>
-</span></span><span class="line"><span class="ln"> 80</span><span class="cl">    <span class="k">def</span> <span class="nf">test_windowing_behaviour</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 81</span><span class="cl">        <span class="n">options</span> <span class="o">=</span> <span class="n">PipelineOptions</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln"> 82</span><span class="cl">        <span class="n">options</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">StandardOptions</span><span class="p">)</span><span class="o">.</span><span class="n">streaming</span> <span class="o">=</span> <span class="kc">True</span>
-</span></span><span class="line"><span class="ln"> 83</span><span class="cl">        <span class="n">now</span> <span class="o">=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="ln"> 84</span><span class="cl">        <span class="c1"># now = int(time.time())</span>
-</span></span><span class="line"><span class="ln"> 85</span><span class="cl">        <span class="k">with</span> <span class="n">TestPipeline</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 86</span><span class="cl">            <span class="n">test_stream</span> <span class="o">=</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 87</span><span class="cl">                <span class="n">TestStream</span><span class="p">(</span><span class="n">coder</span><span class="o">=</span><span class="n">coders</span><span class="o">.</span><span class="n">StrUtf8Coder</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln"> 88</span><span class="cl">                <span class="o">.</span><span class="n">with_output_types</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 89</span><span class="cl">                <span class="o">.</span><span class="n">advance_watermark_to</span><span class="p">(</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">now</span> <span class="o">+</span> <span class="mf">7.5</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln"> 90</span><span class="cl">                <span class="o">.</span><span class="n">add_elements</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 91</span><span class="cl">                    <span class="p">[</span><span class="n">TimestampedValue</span><span class="p">(</span><span class="s2">&#34;c&#34;</span><span class="p">,</span> <span class="n">now</span><span class="p">)]</span>
-</span></span><span class="line"><span class="ln"> 92</span><span class="cl">                <span class="p">)</span>  <span class="c1"># should be dropped but not!</span>
-</span></span><span class="line"><span class="ln"> 93</span><span class="cl">                <span class="o">.</span><span class="n">advance_watermark_to_infinity</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln"> 94</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 95</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 96</span><span class="cl">            <span class="n">outputs</span> <span class="o">=</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 97</span><span class="cl">                <span class="n">p</span>
-</span></span><span class="line"><span class="ln"> 98</span><span class="cl">                <span class="o">|</span> <span class="n">test_stream</span>
-</span></span><span class="line"><span class="ln"> 99</span><span class="cl">                <span class="o">|</span> <span class="s2">&#34;Extract words&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">FlatMap</span><span class="p">(</span><span class="n">tokenize</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">100</span><span class="cl">                <span class="o">|</span> <span class="s2">&#34;Windowing&#34;</span>
-</span></span><span class="line"><span class="ln">101</span><span class="cl">                <span class="o">&gt;&gt;</span> <span class="n">beam</span><span class="o">.</span><span class="n">WindowInto</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">102</span><span class="cl">                    <span class="n">FixedWindows</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">103</span><span class="cl">                    <span class="n">allowed_lateness</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">104</span><span class="cl">                    <span class="n">accumulation_mode</span><span class="o">=</span><span class="n">AccumulationMode</span><span class="o">.</span><span class="n">DISCARDING</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">105</span><span class="cl">                <span class="p">)</span>
-</span></span><span class="line"><span class="ln">106</span><span class="cl">                <span class="o">|</span> <span class="s2">&#34;SpiltDroppable&#34;</span> <span class="o">&gt;&gt;</span> <span class="n">SplitDroppable</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">107</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">108</span><span class="cl">
-</span></span><span class="line"><span class="ln">109</span><span class="cl">            <span class="n">assert_that</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">110</span><span class="cl">                <span class="n">outputs</span><span class="p">[</span><span class="n">DROPPABLE_OUTPUT</span><span class="p">],</span> <span class="n">equal_to</span><span class="p">([</span><span class="s2">&#34;c&#34;</span><span class="p">]),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&#34;assert_droppable&#34;</span>
-</span></span><span class="line"><span class="ln">111</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">112</span><span class="cl">
-</span></span><span class="line"><span class="ln">113</span><span class="cl">
-</span></span><span class="line"><span class="ln">114</span><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">115</span><span class="cl">    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
-</span></span></code></pre></div><p>We can execute the pipeline test as shown below.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">python chapter3/droppable_data_filter_test.py 
-</span></span><span class="line"><span class="ln">2</span><span class="cl">...
-</span></span><span class="line"><span class="ln">3</span><span class="cl">----------------------------------------------------------------------
-</span></span><span class="line"><span class="ln">4</span><span class="cl">Ran <span class="m">2</span> tests in 0.979s
-</span></span><span class="line"><span class="ln">5</span><span class="cl">
-</span></span><span class="line"><span class="ln">6</span><span class="cl">OK <span class="o">(</span>expected <span class="nv">failures</span><span class="o">=</span>1<span class="o">)</span>
-</span></span></code></pre></div>
-<h4 id="pipeline-execution" data-numberify>Pipeline Execution<a class="anchor ms-1" href="#pipeline-execution"></a></h4>
-<p>Note that the Kafka bootstrap server is accessible on port <em>29092</em> outside the Docker network, and it can be accessed on <em>localhost:29092</em> from the Docker host machine and on <em>host.docker.internal:29092</em> from a Docker container that is launched with the host network. We use both types of the bootstrap server address - the former is used by the Kafka producer app and the latter by a Java IO expansion service, which is launched in a Docker container. Note further that, for the latter to work, we have to update the <em>/etc/hosts</em> file by adding an entry for <em>host.docker.internal</em> as shown below.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">cat /etc/hosts <span class="p">|</span> grep host.docker.internal
-</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"># 127.0.0.1       host.docker.internal</span>
-</span></span></code></pre></div><p>We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - <code>python utils/faker_shifted_gen.py</code>.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-10-24-beam-examples-7/input-messages.png" loading="lazy" width="1073" height="592" />
-</picture>
-
-</p>
-<p>When executing the pipeline, we specify only a single known argument that enables to use the legacy read (<code>--deprecated_read</code>) while accepting default values of the other known arguments (<code>bootstrap_servers</code>, <code>input_topic</code> &hellip;). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (<code>--flink_master=localhost:8081</code>). Alternatively, we can use an embedded Flink cluster if we exclude that argument.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">## start the beam pipeline</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1">## exclude --flink_master if using an embedded cluster</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">python chapter3/droppable_data_filter.py --deprecated_read <span class="se">\
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>	--job_name<span class="o">=</span>droppable-data-filter --runner FlinkRunner --flink_master<span class="o">=</span>localhost:8081 <span class="se">\
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>	--streaming --environment_type<span class="o">=</span>LOOPBACK --parallelism<span class="o">=</span><span class="m">3</span> --checkpointing_interval<span class="o">=</span><span class="m">10000</span>
-</span></span></code></pre></div><p>On Flink UI, we see the pipeline has two tasks. The first task is until windowing elements in a fixed window while the latter executes the main transform and sends the normal and <em>droppable</em> elements into output topics respectively.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-10-24-beam-examples-7/pipeline-dag.png" loading="lazy" width="1136" height="808" />
-</picture>
-
-</p>
-<p>On Kafka UI, we can check messages are sent to the normal and <em>droppable</em> output topics.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-10-24-beam-examples-7/all-topics.png" loading="lazy" width="1168" height="332" />
-</picture>
-
-</p>
       ]]></content:encoded></item></channel></rss>
