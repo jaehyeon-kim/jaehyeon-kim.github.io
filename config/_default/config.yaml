@@ -51,9 +51,19 @@ outputs:
     - HTML
     - RSS
   section:
-    blog:
-      - HTML
-      - RSS
+    - HTML
+    - RSS
+  page:
+    - HTML
+
+# outputs:
+#   home:
+#     - HTML
+#     - RSS
+#   section:
+#     blog:
+#       - HTML
+#       - RSS
 
 outputFormats:
   RSS:
