@@ -2,6 +2,7 @@ mainSections:
   - blog
   - posts
   # - news
+  # - slides
 
 # titleSeparator: '|' # Title separator. Default to -.
 
@@ -87,11 +88,11 @@ viewer: true # Image Viewer
 
 sidebar:
   # fixed: true
-  # archives: true # Enable archives widget
-  # taxonomiesToggle: false # Disable taxonomy toggle
-  # categories: true # Enable categories widget
-  # tags: true # Enable tags widget
-  # series: true # Enable series widget
+  archives: false # Enable archives widget
+  # taxonomiesToggle: true # Disable taxonomy toggle
+  categories: false # Enable categories widget
+  tags: false # Enable tags widget
+  series: false # Enable series widget
   # authors: true # Enable authors widget
   # postsToggle: false # Disable posts toggle
   # featuredPosts: true # Enable featured posts widget
@@ -119,10 +120,10 @@ post:
   # It supports only of the manual summaries spliting via <!--more-->.
   # readMoreFromContent: true
 
-archive:
-  paginate: 20 # Archive pagination. Default to 100.
-  # basePath = "/archiv" # The base path of archive pages.
-  # dateFormat: 01-02 # Archive date format. Default to Jan 2.
+# archive:
+#   paginate: 20 # Archive pagination. Default to 100.
+#   # basePath = "/archiv" # The base path of archive pages.
+#   # dateFormat: 01-02 # Archive date format. Default to Jan 2.
 
 analytics:
   # baidu:  # Baidu Analytics
@@ -258,7 +259,7 @@ topAppBar:
     github: jaehyeon-kim
     linkedin: jaehyeon-kim-76b93429
     # patreon:  
-    paypal: dottami
+    # paypal: dottami
 
 #docs:
   # nav:
