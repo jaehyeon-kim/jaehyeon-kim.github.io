@@ -1,6 +1,6 @@
 ---
 title: "Reveal.js Features"
-date: 2026-03-07
+date: 2026-03-09
 # Choose theme: black, white, league, beige, night, solarized, dracula
 reveal_theme: "black" 
 layout: "single"
