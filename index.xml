@@ -100,7 +100,7 @@ $$</p>
         <p>For a long time, I wanted a way to host my technical presentations directly on my website without relying on external platforms or bulky PDF exports. I wanted a <strong>&ldquo;Slides as Code&rdquo;</strong> approach: version-controlled Markdown files that live natively alongside my blog posts.</p>
       ]]></description><content:encoded><![CDATA[
         <p>For a long time, I wanted a way to host my technical presentations directly on my website without relying on external platforms or bulky PDF exports. I wanted a <strong>&ldquo;Slides as Code&rdquo;</strong> approach: version-controlled Markdown files that live natively alongside my blog posts.</p>
-<h2 id="the-choice-marp-vs-revealjs" data-numberify>The Choice: Marp vs. Reveal.js<a class="anchor ms-1" href="#the-choice-marp-vs-revealjs"></a></h2>
+<h2 id="choosing-between-marp-and-revealjs" data-numberify>Choosing between Marp and Reveal.js<a class="anchor ms-1" href="#choosing-between-marp-and-revealjs"></a></h2>
 <p>When looking for a solution, I initially considered <strong>Marp</strong>.</p>
 <p>Marp is undeniably easier to author initially; its VS Code extension with live preview makes designing slides feel like magic. However, it presented a hurdle for my Hugo integration as it requires separate compilation.</p>
 <p>Marp requires a separate build step to convert Markdown into standalone HTML. To integrate it, I would have to manually export each deck and move the resulting HTML into my <code>static/</code> folder. This felt &ldquo;disconnected&rdquo; from the Hugo ecosystem.</p>
@@ -128,7 +128,7 @@ $$</p>
 </div>
 <p><em>You can use your arrow keys to navigate the slides above, or click the &ldquo;View Full Screen&rdquo; button for the complete experience.</em></p>
 
-<h2 id="how-the-configuration-works" data-numberify>How the Configuration Works<a class="anchor ms-1" href="#how-the-configuration-works"></a></h2>
+<h2 id="how-it-works" data-numberify>How It Works<a class="anchor ms-1" href="#how-it-works"></a></h2>
 <p>I chose to keep slides independent from my main blog posts to avoid cluttering my main feed. Using Hugo&rsquo;s <strong>Leaf Bundles</strong>, each presentation gets its own folder for local assets like images.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">content/slides/
 </span></span><span class="line"><span class="ln">2</span><span class="cl">└── 2026-03-06-revealjs-demo/            
@@ -136,7 +136,7 @@ $$</p>
 </span></span><span class="line"><span class="ln">4</span><span class="cl">    └── featured.jpg                      # Thumbnail for list view
 </span></span></code></pre></div>
 <h3 id="custom-shell-layout" data-numberify>Custom &ldquo;Shell&rdquo; Layout<a class="anchor ms-1" href="#custom-shell-layout"></a></h3>
-<p>The secret is a custom layout at <code>layouts/slides/single.html</code>. Instead of using my theme&rsquo;s standard blog layout (which includes headers and sidebars), I created a clean &ldquo;shell&rdquo; that loads the Reveal.js engine from a CDN.</p>
+<p>The secret is a custom layout at <a href="https://github.com/jaehyeon-kim/jaehyeon-kim.github.io/blob/master/layouts/slides/single.html" target="_blank" rel="noopener noreferrer"><code>layouts/slides/single.html</code><i class="fas fa-external-link-square-alt ms-1"></i></a>. Instead of using my theme&rsquo;s standard blog layout (which includes headers and sidebars), I created a clean &ldquo;shell&rdquo; that loads the Reveal.js engine from a CDN.</p>
 <p>Crucially, I use <code>{{ .RawContent }}</code> instead of <code>{{ .Content }}</code>. This is because Reveal.js needs the raw Markdown syntax (like <code>---</code> for slide breaks) to calculate transitions in the browser, rather than the pre-rendered HTML Hugo usually provides.</p>
 
 <h3 id="advanced-technical-features" data-numberify>Advanced Technical Features<a class="anchor ms-1" href="#advanced-technical-features"></a></h3>
@@ -178,7 +178,7 @@ $$</p>
 
 <h2 id="why-this-works-for-me" data-numberify>Why this works for me<a class="anchor ms-1" href="#why-this-works-for-me"></a></h2>
 <p>By leveraging Hugo&rsquo;s <strong>Directory Inference</strong>, any file I drop into <code>content/slides/</code> automatically inherits this powerful shell. I no longer &ldquo;design&rdquo; slides; I <strong>engineer</strong> them.</p>
-<p>While Marp might be slightly easier to &ldquo;write,&rdquo; the Reveal.js integration is much easier to <strong>maintain</strong>. It turns my site into a single source of truth for both my articles and my presentations.</p>
+<p>While Marp might be slightly easier to <strong>write</strong>, the Reveal.js integration is much easier to <strong>maintain</strong>. It turns my site into a single source of truth for both my articles and my presentations.</p>
 <p>You can check out my latest presentations in the <a href="/slides/">Slides</a> section!</p>
       ]]></content:encoded></item><item><title>Productionizing an Online Product Recommender using Event Driven Architecture</title><link>https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/</link><guid>https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/</guid><pubDate>Mon, 23 Feb 2026 00:00:00 +0000</pubDate><description><![CDATA[
         <p>In <a href="/blog/2026-01-29-prototype-recommender-with-python/"><strong>Part 1</strong></a>, we built a contextual bandit prototype using Python and <a href="https://github.com/fidelity/mab2rec" target="_blank" rel="noopener noreferrer"><code>Mab2Rec</code><i class="fas fa-external-link-square-alt ms-1"></i></a>. While effective for testing algorithms locally, a monolithic script cannot handle production scale. Real-world recommendation systems require low-latency inference for users and high-throughput training for model updates.</p>
