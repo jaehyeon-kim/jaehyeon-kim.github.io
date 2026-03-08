@@ -27,7 +27,7 @@ For a long time, I wanted a way to host my technical presentations directly on m
 
 <!--more-->
 
-## The Choice: Marp vs. Reveal.js
+## Choosing between Marp and Reveal.js
 
 When looking for a solution, I initially considered **Marp**. 
 
@@ -48,7 +48,7 @@ Before diving into the configuration, you can interact with the live demo below.
 
 *You can use your arrow keys to navigate the slides above, or click the "View Full Screen" button for the complete experience.*
 
-## How the Configuration Works
+## How It Works
 
 I chose to keep slides independent from my main blog posts to avoid cluttering my main feed. Using Hugo's **Leaf Bundles**, each presentation gets its own folder for local assets like images.
 
@@ -61,7 +61,7 @@ content/slides/
 
 ### Custom "Shell" Layout
 
-The secret is a custom layout at `layouts/slides/single.html`. Instead of using my theme's standard blog layout (which includes headers and sidebars), I created a clean "shell" that loads the Reveal.js engine from a CDN.
+The secret is a custom layout at [`layouts/slides/single.html`](https://github.com/jaehyeon-kim/jaehyeon-kim.github.io/blob/master/layouts/slides/single.html). Instead of using my theme's standard blog layout (which includes headers and sidebars), I created a clean "shell" that loads the Reveal.js engine from a CDN.
 
 Crucially, I use `{{ .RawContent }}` instead of `{{ .Content }}`. This is because Reveal.js needs the raw Markdown syntax (like `---` for slide breaks) to calculate transitions in the browser, rather than the pre-rendered HTML Hugo usually provides.
 
@@ -111,6 +111,6 @@ Moving forward, the goal is to ensure that even the most complex architectural d
 
 By leveraging Hugo's **Directory Inference**, any file I drop into `content/slides/` automatically inherits this powerful shell. I no longer "design" slides; I **engineer** them. 
 
-While Marp might be slightly easier to "write," the Reveal.js integration is much easier to **maintain**. It turns my site into a single source of truth for both my articles and my presentations.
+While Marp might be slightly easier to **write**, the Reveal.js integration is much easier to **maintain**. It turns my site into a single source of truth for both my articles and my presentations.
 
 You can check out my latest presentations in the [Slides](/slides/) section!
