@@ -43,7 +43,7 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 <ul>
 <li><strong>MABWiser:</strong> Algorithm implementation.</li>
 <li><strong>Mab2Rec:</strong> Offline policy evaluation.</li>
-<li><strong>TextWiser:</strong> Item representations via text featurization.</li>
+<li><strong>TextWiser:</strong> Text featurization.</li>
 </ul>
 </li>
 </ul>
@@ -127,7 +127,7 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 <!-- raw HTML omitted -->
 <ul>
 <li><!-- raw HTML omitted -->●<!-- raw HTML omitted --> <strong>Exploitation:</strong> Predicted reward ($x^T \theta_a$).</li>
-<li><!-- raw HTML omitted -->●<!-- raw HTML omitted --> <strong>Exploration:</strong> The &ldquo;Uncertainty Bonus&rdquo; (UCB).</li>
+<li><!-- raw HTML omitted -->●<!-- raw HTML omitted --> <strong>Exploration:</strong> Uncertainty bonus (UCB).</li>
 <li><strong>$\theta_a = A_a^{-1} b_a$</strong>: <strong>Model weights</strong> estimated via Ridge Regression.</li>
 </ul>
 <!-- raw HTML omitted -->
