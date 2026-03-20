@@ -24,11 +24,11 @@ Contextual Bandits &amp; Event-Driven Architecture
 ## Why Contextual Bandits?
 
 - **Problem:** Conventional recommenders (e.g., Collaborative Filtering)
-  - Ignore real-time context (e.g., Time of Day).
-  - Struggle with &#34;Cold Starts&#34;.
+  - Ignore situational context (e.g., Time of Day, Location, Device).
+  - Struggle with &#34;Cold Starts&#34; for new items/users.
 - **Solution:** Contextual Multi-Armed Bandits (CMAB).
-  - **Exploitation:** Recommend what is known to work.
-  - **Exploration:** Test new options to adapt to trends.
+  - **Exploitation:** Maximize immediate reward using current knowledge.
+  - **Exploration:** Gather information on uncertain items to improve future performance.
 
 [Part 1: Prototype](#prototype) | [Part 2: Productionization](#production)
 
@@ -46,9 +46,9 @@ Prototype an online product recommender with Python
 - [Vowpal Wabbit](https://vowpalwabbit.org/) &lt;!-- .element: target=&#34;_blank&#34; --&gt; and [River ML](https://riverml.xyz/latest/) &lt;!-- .element: target=&#34;_blank&#34; --&gt; are well-known for CMAB.
   - *Gap:* Lack of end-to-end examples integrating feature engineering and offline policy evaluation.
 - [Fidelity Investments Open Source](https://github.com/fidelity) &lt;!-- .element: target=&#34;_blank&#34; --&gt;
-  - **MABWiser:** For creating multi-armed bandit algorithms.
-  - **Mab2Rec:** For performing offline policy evaluation.
-  - **TextWiser:** For text featurization.
+  - **MABWiser:** Algorithm implementation.
+  - **Mab2Rec:** Offline policy evaluation.
+  - **TextWiser:** Item representations via text featurization.
 
 --
 
@@ -75,9 +75,26 @@ From synthetic data generation to live simulation.
 &lt;div style=&#34;text-align: left;&#34;&gt;
 
 Why LinUCB?
+
 - **Best Trade-off:** High Ranking (AUC) &#43; High Engagement (CTR).
 - **Beats LinGreedy:** Explores effectively (CTR 0.20 vs 0.11).
 - **Beats LinTS:** Ranks accurately (AUC 0.86 vs 0.64).
+
+&lt;/div&gt;
+
+--
+
+## LinUCB Algorithm
+
+Balancing Exploitation and Exploration
+
+$$ \text{Score}_a = \color{cyan}{x^T \theta_a} &#43; \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$
+
+&lt;div style=&#34;margin-top: 20px; font-size: 0.8em;&#34;&gt;
+
+- &lt;span style=&#34;color: cyan;&#34;&gt;●&lt;/span&gt; **Exploitation:** Predicted reward ($x^T \theta_a$).
+- &lt;span style=&#34;color: orange;&#34;&gt;●&lt;/span&gt; **Exploration:** The &#34;Uncertainty Bonus&#34; (UCB).
+- **$\theta_a = A_a^{-1} b_a$**: **Model weights** estimated via Ridge Regression.
 
 &lt;/div&gt;
 
@@ -133,7 +150,7 @@ Decoupling *Serving* from *Training*.
 
 ## Training (Apache Flink)
 
-$$ \text{Score}_a = x^T \theta_a &#43; \alpha \sqrt{x^T A_a^{-1} x}, \quad \text{where } \theta_a = A_a^{-1} b_a $$
+$$ \text{Score}_a = \color{cyan}{x^T \theta_a} &#43; \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$
 
 - **Stateful Processing:** Flink acts as the system&#39;s &#34;Online Memory&#34; (via RocksDB).
 - **Asynchronous Updates:** 

@@ -1,10 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Building a Real-Time Recommender: Contextual Bandits & Event-Driven Architecture</title><link>https://jaehyeon.me/slides/2026-03-21-product-recommender/</link><guid>https://jaehyeon.me/slides/2026-03-21-product-recommender/</guid><pubDate>Sat, 21 Mar 2026 00:00:00 +0000</pubDate><description><![CDATA[
-        Building a Real-Time Product Recommender Contextual Bandits &amp; Event-Driven Architecture
-Why Contextual Bandits? Problem: Conventional recommenders (e.g., Collaborative Filtering) Ignore real-time context (e.g., Time of Day). Struggle with &ldquo;Cold Starts&rdquo;. Solution: Contextual Multi-Armed Bandits (CMAB). Exploitation: Recommend what is known to work. Exploration: Test new options to adapt to trends. Part 1: Prototype | Part 2: Productionization
-Part 1: Prototype Prototype an online product recommender with Python
-&ndash;
-Python Ecosystem Vowpal Wabbit and River ML are well-known for CMAB.
-      ]]></description><content:encoded><![CDATA[
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Building a Real-Time Recommender: Contextual Bandits & Event-Driven Architecture</title><link>https://jaehyeon.me/slides/2026-03-21-product-recommender/</link><guid>https://jaehyeon.me/slides/2026-03-21-product-recommender/</guid><pubDate>Sat, 21 Mar 2026 00:00:00 +0000</pubDate><description>
+Building a Real-Time Product Recommender Contextual Bandits &amp;amp; Event-Driven Architecture
+Why Contextual Bandits? Problem: Conventional recommenders (e.g., Collaborative Filtering) Ignore situational context (e.g., Time of Day, Location, Device). Struggle with &amp;ldquo;Cold Starts&amp;rdquo; for new items/users. Solution: Contextual Multi-Armed Bandits (CMAB). Exploitation: Maximize immediate reward using current knowledge. Exploration: Gather information on uncertain items to improve future performance. Part 1: Prototype | Part 2: Productionization
+Part 1: Prototype Prototype an online product recommender with Python</description><content:encoded><![CDATA[
         <!-- raw HTML omitted -->
 <!-- raw HTML omitted -->
 
@@ -16,14 +13,14 @@ Python Ecosystem Vowpal Wabbit and River ML are well-known for CMAB.
 <ul>
 <li><strong>Problem:</strong> Conventional recommenders (e.g., Collaborative Filtering)
 <ul>
-<li>Ignore real-time context (e.g., Time of Day).</li>
-<li>Struggle with &ldquo;Cold Starts&rdquo;.</li>
+<li>Ignore situational context (e.g., Time of Day, Location, Device).</li>
+<li>Struggle with &ldquo;Cold Starts&rdquo; for new items/users.</li>
 </ul>
 </li>
 <li><strong>Solution:</strong> Contextual Multi-Armed Bandits (CMAB).
 <ul>
-<li><strong>Exploitation:</strong> Recommend what is known to work.</li>
-<li><strong>Exploration:</strong> Test new options to adapt to trends.</li>
+<li><strong>Exploitation:</strong> Maximize immediate reward using current knowledge.</li>
+<li><strong>Exploration:</strong> Gather information on uncertain items to improve future performance.</li>
 </ul>
 </li>
 </ul>
@@ -44,9 +41,9 @@ Python Ecosystem Vowpal Wabbit and River ML are well-known for CMAB.
 </li>
 <li><a href="https://github.com/fidelity" target="_blank" rel="noopener noreferrer">Fidelity Investments Open Source<i class="fas fa-external-link-square-alt ms-1"></i></a> <!-- raw HTML omitted -->
 <ul>
-<li><strong>MABWiser:</strong> For creating multi-armed bandit algorithms.</li>
-<li><strong>Mab2Rec:</strong> For performing offline policy evaluation.</li>
-<li><strong>TextWiser:</strong> For text featurization.</li>
+<li><strong>MABWiser:</strong> Algorithm implementation.</li>
+<li><strong>Mab2Rec:</strong> Offline policy evaluation.</li>
+<li><strong>TextWiser:</strong> Item representations via text featurization.</li>
 </ul>
 </li>
 </ul>
@@ -124,6 +121,18 @@ Python Ecosystem Vowpal Wabbit and River ML are well-known for CMAB.
 <!-- raw HTML omitted -->
 <p>&ndash;</p>
 
+<h2 id="linucb-algorithm" data-numberify>LinUCB Algorithm<a class="anchor ms-1" href="#linucb-algorithm"></a></h2>
+<p>Balancing Exploitation and Exploration</p>
+<p>$$ \text{Score}_a = \color{cyan}{x^T \theta_a} + \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$</p>
+<!-- raw HTML omitted -->
+<ul>
+<li><!-- raw HTML omitted -->●<!-- raw HTML omitted --> <strong>Exploitation:</strong> Predicted reward ($x^T \theta_a$).</li>
+<li><!-- raw HTML omitted -->●<!-- raw HTML omitted --> <strong>Exploration:</strong> The &ldquo;Uncertainty Bonus&rdquo; (UCB).</li>
+<li><strong>$\theta_a = A_a^{-1} b_a$</strong>: <strong>Model weights</strong> estimated via Ridge Regression.</li>
+</ul>
+<!-- raw HTML omitted -->
+<p>&ndash;</p>
+
 <h2 id="limitations" data-numberify>Limitations<a class="anchor ms-1" href="#limitations"></a></h2>
 <p>A monolithic Python script isn&rsquo;t built for scale.</p>
 <ul>
@@ -164,7 +173,7 @@ Python Ecosystem Vowpal Wabbit and River ML are well-known for CMAB.
 <p>&ndash;</p>
 
 <h2 id="training-apache-flink" data-numberify>Training (Apache Flink)<a class="anchor ms-1" href="#training-apache-flink"></a></h2>
-<p>$$ \text{Score}_a = x^T \theta_a + \alpha \sqrt{x^T A_a^{-1} x}, \quad \text{where } \theta_a = A_a^{-1} b_a $$</p>
+<p>$$ \text{Score}_a = \color{cyan}{x^T \theta_a} + \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$</p>
 <ul>
 <li><strong>Stateful Processing:</strong> Flink acts as the system&rsquo;s &ldquo;Online Memory&rdquo; (via RocksDB).</li>
 <li><strong>Asynchronous Updates:</strong>
