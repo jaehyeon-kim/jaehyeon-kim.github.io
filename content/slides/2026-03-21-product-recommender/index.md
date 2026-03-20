@@ -54,7 +54,7 @@ Prototype an online product recommender with Python
 - [Fidelity Investments Open Source](https://github.com/fidelity) <!-- .element: target="_blank" -->
   - **MABWiser:** Algorithm implementation.
   - **Mab2Rec:** Offline policy evaluation.
-  - **TextWiser:** Item representations via text featurization.
+  - **TextWiser:** Text featurization.
 
 --
 
@@ -99,7 +99,7 @@ $$ \text{Score}_a = \color{cyan}{x^T \theta_a} + \color{orange}{\alpha \sqrt{x^T
 <div style="margin-top: 20px; font-size: 0.8em;">
 
 - <span style="color: cyan;">●</span> **Exploitation:** Predicted reward ($x^T \theta_a$).
-- <span style="color: orange;">●</span> **Exploration:** The "Uncertainty Bonus" (UCB).
+- <span style="color: orange;">●</span> **Exploration:** Uncertainty bonus (UCB).
 - **$\theta_a = A_a^{-1} b_a$**: **Model weights** estimated via Ridge Regression.
 
 </div>
