@@ -30,11 +30,11 @@ Contextual Bandits & Event-Driven Architecture
 ## Why Contextual Bandits?
 
 - **Problem:** Conventional recommenders (e.g., Collaborative Filtering)
-  - Ignore real-time context (e.g., Time of Day).
-  - Struggle with "Cold Starts".
+  - Ignore situational context (e.g., Time of Day, Location, Device).
+  - Struggle with "Cold Starts" for new items/users.
 - **Solution:** Contextual Multi-Armed Bandits (CMAB).
-  - **Exploitation:** Recommend what is known to work.
-  - **Exploration:** Test new options to adapt to trends.
+  - **Exploitation:** Maximize immediate reward using current knowledge.
+  - **Exploration:** Gather information on uncertain items to improve future performance.
 
 [Part 1: Prototype](#prototype) | [Part 2: Productionization](#production)
 
@@ -52,9 +52,9 @@ Prototype an online product recommender with Python
 - [Vowpal Wabbit](https://vowpalwabbit.org/) <!-- .element: target="_blank" --> and [River ML](https://riverml.xyz/latest/) <!-- .element: target="_blank" --> are well-known for CMAB.
   - *Gap:* Lack of end-to-end examples integrating feature engineering and offline policy evaluation.
 - [Fidelity Investments Open Source](https://github.com/fidelity) <!-- .element: target="_blank" -->
-  - **MABWiser:** For creating multi-armed bandit algorithms.
-  - **Mab2Rec:** For performing offline policy evaluation.
-  - **TextWiser:** For text featurization.
+  - **MABWiser:** Algorithm implementation.
+  - **Mab2Rec:** Offline policy evaluation.
+  - **TextWiser:** Item representations via text featurization.
 
 --
 
@@ -81,9 +81,26 @@ From synthetic data generation to live simulation.
 <div style="text-align: left;">
 
 Why LinUCB?
+
 - **Best Trade-off:** High Ranking (AUC) + High Engagement (CTR).
 - **Beats LinGreedy:** Explores effectively (CTR 0.20 vs 0.11).
 - **Beats LinTS:** Ranks accurately (AUC 0.86 vs 0.64).
+
+</div>
+
+--
+
+## LinUCB Algorithm
+
+Balancing Exploitation and Exploration
+
+$$ \text{Score}_a = \color{cyan}{x^T \theta_a} + \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$
+
+<div style="margin-top: 20px; font-size: 0.8em;">
+
+- <span style="color: cyan;">●</span> **Exploitation:** Predicted reward ($x^T \theta_a$).
+- <span style="color: orange;">●</span> **Exploration:** The "Uncertainty Bonus" (UCB).
+- **$\theta_a = A_a^{-1} b_a$**: **Model weights** estimated via Ridge Regression.
 
 </div>
 
@@ -139,7 +156,7 @@ Decoupling *Serving* from *Training*.
 
 ## Training (Apache Flink)
 
-$$ \text{Score}_a = x^T \theta_a + \alpha \sqrt{x^T A_a^{-1} x}, \quad \text{where } \theta_a = A_a^{-1} b_a $$
+$$ \text{Score}_a = \color{cyan}{x^T \theta_a} + \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$
 
 - **Stateful Processing:** Flink acts as the system's "Online Memory" (via RocksDB).
 - **Asynchronous Updates:** 
