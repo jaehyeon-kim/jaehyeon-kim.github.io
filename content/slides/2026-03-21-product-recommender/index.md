@@ -66,6 +66,12 @@ From synthetic data generation to live simulation.
 
 --
 
+## Live Demo & Walkthrough
+
+Let's dive into the code.
+
+--
+
 ## Offline Policy Evaluation
 
 | Model | AUC(score)@5 | CTR(score)@5 | Precision@5 | Recall@5 |
@@ -113,12 +119,6 @@ A monolithic Python script isn't built for scale.
 - **Latency:** Training blocks inference.
 - **Scalability:** Matrix math in memory limits the catalog size.
 - **Fault Tolerance:** If the script crashes, the learned state is lost.
-
---
-
-## Live Demo & Walkthrough
-
-Let's dive into the code.
 
 [Back to Start](#/) | **[Jump to Productionization](#production)**
 
