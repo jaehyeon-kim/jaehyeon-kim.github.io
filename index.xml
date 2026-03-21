@@ -54,6 +54,10 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 <!-- raw HTML omitted -->
 <p>&ndash;</p>
 
+<h2 id="live-demo--walkthrough" data-numberify>Live Demo & Walkthrough<a class="anchor ms-1" href="#live-demo--walkthrough"></a></h2>
+<p>Let&rsquo;s dive into the code.</p>
+<p>&ndash;</p>
+
 <h2 id="offline-policy-evaluation" data-numberify>Offline Policy Evaluation<a class="anchor ms-1" href="#offline-policy-evaluation"></a></h2>
 <table>
 <thead>
@@ -140,10 +144,6 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 <li><strong>Scalability:</strong> Matrix math in memory limits the catalog size.</li>
 <li><strong>Fault Tolerance:</strong> If the script crashes, the learned state is lost.</li>
 </ul>
-<p>&ndash;</p>
-
-<h2 id="live-demo--walkthrough" data-numberify>Live Demo & Walkthrough<a class="anchor ms-1" href="#live-demo--walkthrough"></a></h2>
-<p>Let&rsquo;s dive into the code.</p>
 <p><a href="/slides/2026-03-21-product-recommender/#/">Back to Start</a> | <strong><a href="/slides/2026-03-21-product-recommender/#production">Jump to Productionization</a></strong></p>
 <hr>
 <!-- raw HTML omitted -->
