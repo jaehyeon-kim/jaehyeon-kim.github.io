@@ -2,16 +2,34 @@
 <link rel=stylesheet href=https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/black.css id=theme><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css></head><body><div class=reveal><div class=slides><section data-markdown data-separator=^--- data-separator-vertical=^--><textarea data-template>
 
 &lt;style&gt;
-  /* Shrink all list items and paragraphs to 80% of normal size */
-  .reveal p, 
-  .reveal li {
+  /* Global text sizing for this presentation */
+  .reveal p, .reveal li {
     font-size: 0.8em;
-    line-height: 1.4; /* Adds a bit of breathing room between lines */
+    line-height: 1.4;
   }
-  
-  /* Optional: Shrink the sub-lists (like the Exploitation/Exploration bullets) a bit more */
   .reveal ul ul li {
     font-size: 0.9em;
+  }
+
+  #eda-slide ul, #eda-slide li, #eda-slide p {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  #eda-slide ul { 
+    padding-left: 0.8em !important; /* Move bullets closer to the left edge */
+    margin-left: 0 !important; 
+  }
+  #eda-slide ul ul { 
+    padding-left: 0.9em !important; /* Narrower nested indent */
+  }
+
+  #eda-slide .mjx-container { 
+    margin: 0 !important; 
+    padding: 0 !important; 
+    display: inline-block !important; /* Prevents block-level &#34;push&#34; */
   }
 &lt;/style&gt;
 
@@ -125,39 +143,83 @@ Scaling with an Event-Driven Architecture
 
 --
 
+&lt;!-- .slide: id=&#34;eda-slide&#34; --&gt;
 ## Architecture
+### Serving (Python &amp; Redis)
 
-Decoupling *Serving* from *Training*.
+&lt;div style=&#34;display: grid; grid-template-columns: 42% 58%; gap: 10px; align-items: center; width: 106%; margin-left: -3%;&#34;&gt;
+  &lt;!-- Left Column: Centered block, left-aligned text --&gt;
+  &lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+    &lt;div style=&#34;text-align: left; font-size: 0.9em; line-height: 1.2;&#34;&gt;
 
-&lt;img src=&#34;featured.gif&#34; alt=&#34;Workflow Diagram&#34; style=&#34;max-height: 42vh; max-width: 100%; margin: 0 auto; display: block;&#34;&gt;
+- **Stateless Inference:**
+  - The client does *not* train. 
+- **Low Latency:**
+  - Fetches pre-computed LinUCB parameters from Redis.
+- **Action:** 
+  - Calculates scores,
+  - Ranks items, and 
+  - Sends feedback to Kafka.
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Right Column --&gt;
+  &lt;div&gt;
+    &lt;img src=&#34;featured.gif&#34; style=&#34;width: 100%; max-height: 60vh; object-fit: contain; border: 2px solid #555; border-radius: 8px; display: block;&#34;&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
 
 --
 
-## Serving (Python &amp; Redis)
+&lt;!-- .slide: id=&#34;eda-slide&#34; --&gt;
+## Architecture
+### Transport (Apache Kafka)
 
-- **Stateless Inference:** The client does *not* train. 
-- **Low Latency:** Fetches pre-computed LinUCB parameters directly from Redis.
-- **Action:** Calculates scores, ranks items, and sends user feedback to Kafka.
+&lt;div style=&#34;display: grid; grid-template-columns: 42% 58%; gap: 10px; align-items: center; width: 106%; margin-left: -3%;&#34;&gt;
+  &lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+    &lt;div style=&#34;text-align: left; font-size: 0.8em; line-height: 1.2;&#34;&gt;
+
+- **Asynchronous Buffer:**
+  - Decouples user-facing app speed from backend training.
+- **Durability:** 
+  - Stores &#34;Ground Truth&#34; events safely for replay or analytics.
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div&gt;
+    &lt;img src=&#34;featured.gif&#34; style=&#34;width: 100%; max-height: 60vh; object-fit: contain; border: 2px solid #555; border-radius: 8px; display: block;&#34;&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
 
 --
 
-## Transport (Apache Kafka)
+&lt;!-- .slide: id=&#34;eda-slide&#34; --&gt;
+## Architecture
+### Training (Apache Flink)
 
-- **Asynchronous Buffer:** Decouples the speed of the user-facing web app from the backend training engine.
-- **Durability:** Stores the &#34;Ground Truth&#34; feedback events safely for replay or analytics.
+&lt;!-- Math Section: Negative margin pulls the grid up to fit everything --&gt;
+&lt;div style=&#34;font-size: 0.55em; margin-bottom: -20px !important; text-align: center; position: relative; z-index: 10;&#34;&gt;
+$$ \text{Score}_a = \color{cyan}{x^T \theta_a} &#43; \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}}, \quad \text{where } \theta_a = A_a^{-1} b_a $$
+&lt;/div&gt;
 
---
+&lt;div style=&#34;display: grid; grid-template-columns: 42% 58%; gap: 10px; align-items: center; width: 106%; margin-left: -3%;&#34;&gt;
+  &lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+    &lt;div style=&#34;text-align: left; font-size: 0.75em; line-height: 1.1;&#34;&gt;
 
-## Training (Apache Flink)
-
-$$ \text{Score}_a = \color{cyan}{x^T \theta_a} &#43; \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$
-
-- **Stateful Processing:** Flink acts as the system&#39;s &#34;Online Memory&#34; (via RocksDB).
+- **Stateful Processing:**
+  - Flink acts as &#34;Online Memory&#34;.
 - **Asynchronous Updates:** 
-  - **Fast Path:** Updates $A$ and $b$ state for every event.
-    - ($A \leftarrow A &#43; x x^T$ and $b \leftarrow b &#43; r x$)
-  - **Slow Path:** Every 5s, computes the Matrix Inverse $A^{-1}$.
-- **Sync to Redis:** Periodically emits **Inverse Matrix ($A^{-1}$)** and **Reward Vector ($b$)** for real-time serving.
+  - **Fast Path:** Updates $A$ and $b$.
+    - ($A \leftarrow A &#43; x x^T, b \leftarrow b &#43; r x$)
+  - **Slow Path:** Every 5s, computes $A^{-1}$.
+- **Sync to Redis:** Emits $A^{-1}$ and $b$.
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div style=&#34;text-align: center;&#34;&gt;
+    &lt;img src=&#34;featured.gif&#34; style=&#34;width: 100%; max-height: 52vh; object-fit: contain; border: 2px solid #555; border-radius: 8px; display: block;&#34;&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
 
 --
 
@@ -206,6 +268,7 @@ Bridging the gap between Data Science and Data Engineering.
 
 - [GitHub Repository](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-recommender) &lt;!-- .element: target=&#34;_blank&#34; --&gt;
 - Blog Posts: [Part 1: Prototype](https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/) &lt;!-- .element: target=&#34;_blank&#34; --&gt; | [Part 2: Productionization](https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/) &lt;!-- .element: target=&#34;_blank&#34; --&gt;
+- [Youtube Playlist](https://youtube.com/playlist?list=PLrISYKWzp0eTTAbkhahnuyLOBlesOY5vN&amp;si=ML-G-oYqJaMD9fnY) &lt;!-- .element: target=&#34;_blank&#34; --&gt;
 &lt;/div&gt;
 
 [Back to Start](#/)

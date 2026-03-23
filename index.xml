@@ -151,43 +151,100 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 <h2 id="part-2-productionization" data-numberify>Part 2: Productionization<a class="anchor ms-1" href="#part-2-productionization"></a></h2>
 <p>Scaling with an Event-Driven Architecture</p>
 <p>&ndash;</p>
+<!-- raw HTML omitted -->
 
 <h2 id="architecture" data-numberify>Architecture<a class="anchor ms-1" href="#architecture"></a></h2>
-<p>Decoupling <em>Serving</em> from <em>Training</em>.</p>
+
+<h3 id="serving-python--redis" data-numberify>Serving (Python & Redis)<a class="anchor ms-1" href="#serving-python--redis"></a></h3>
+<!-- raw HTML omitted -->
+<ul>
+<li>
+<p><strong>Stateless Inference:</strong></p>
+<ul>
+<li>The client does <em>not</em> train.</li>
+</ul>
+</li>
+<li>
+<p><strong>Low Latency:</strong></p>
+<ul>
+<li>Fetches pre-computed LinUCB parameters from Redis.</li>
+</ul>
+</li>
+<li>
+<p><strong>Action:</strong></p>
+<ul>
+<li>Calculates scores,</li>
+<li>Ranks items, and</li>
+<li>Sends feedback to Kafka.
+<!-- raw HTML omitted -->
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+</li>
+</ul>
 <!-- raw HTML omitted -->
 <p>&ndash;</p>
+<!-- raw HTML omitted -->
 
-<h2 id="serving-python--redis" data-numberify>Serving (Python & Redis)<a class="anchor ms-1" href="#serving-python--redis"></a></h2>
-<ul>
-<li><strong>Stateless Inference:</strong> The client does <em>not</em> train.</li>
-<li><strong>Low Latency:</strong> Fetches pre-computed LinUCB parameters directly from Redis.</li>
-<li><strong>Action:</strong> Calculates scores, ranks items, and sends user feedback to Kafka.</li>
-</ul>
-<p>&ndash;</p>
+<h2 id="architecture-1" data-numberify>Architecture<a class="anchor ms-1" href="#architecture-1"></a></h2>
 
-<h2 id="transport-apache-kafka" data-numberify>Transport (Apache Kafka)<a class="anchor ms-1" href="#transport-apache-kafka"></a></h2>
+<h3 id="transport-apache-kafka" data-numberify>Transport (Apache Kafka)<a class="anchor ms-1" href="#transport-apache-kafka"></a></h3>
+<!-- raw HTML omitted -->
 <ul>
-<li><strong>Asynchronous Buffer:</strong> Decouples the speed of the user-facing web app from the backend training engine.</li>
-<li><strong>Durability:</strong> Stores the &ldquo;Ground Truth&rdquo; feedback events safely for replay or analytics.</li>
-</ul>
-<p>&ndash;</p>
-
-<h2 id="training-apache-flink" data-numberify>Training (Apache Flink)<a class="anchor ms-1" href="#training-apache-flink"></a></h2>
-<p>$$ \text{Score}_a = \color{cyan}{x^T \theta_a} + \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$</p>
+<li>
+<p><strong>Asynchronous Buffer:</strong></p>
 <ul>
-<li><strong>Stateful Processing:</strong> Flink acts as the system&rsquo;s &ldquo;Online Memory&rdquo; (via RocksDB).</li>
-<li><strong>Asynchronous Updates:</strong>
-<ul>
-<li><strong>Fast Path:</strong> Updates $A$ and $b$ state for every event.
-<ul>
-<li>($A \leftarrow A + x x^T$ and $b \leftarrow b + r x$)</li>
+<li>Decouples user-facing app speed from backend training.</li>
 </ul>
 </li>
-<li><strong>Slow Path:</strong> Every 5s, computes the Matrix Inverse $A^{-1}$.</li>
+<li>
+<p><strong>Durability:</strong></p>
+<ul>
+<li>Stores &ldquo;Ground Truth&rdquo; events safely for replay or analytics.
+<!-- raw HTML omitted -->
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<p>&ndash;</p>
+<!-- raw HTML omitted -->
+
+<h2 id="architecture-2" data-numberify>Architecture<a class="anchor ms-1" href="#architecture-2"></a></h2>
+
+<h3 id="training-apache-flink" data-numberify>Training (Apache Flink)<a class="anchor ms-1" href="#training-apache-flink"></a></h3>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<ul>
+<li>
+<p><strong>Stateful Processing:</strong></p>
+<ul>
+<li>Flink acts as &ldquo;Online Memory&rdquo;.</li>
 </ul>
 </li>
-<li><strong>Sync to Redis:</strong> Periodically emits <strong>Inverse Matrix ($A^{-1}$)</strong> and <strong>Reward Vector ($b$)</strong> for real-time serving.</li>
+<li>
+<p><strong>Asynchronous Updates:</strong></p>
+<ul>
+<li><strong>Fast Path:</strong> Updates $A$ and $b$.
+<ul>
+<li>($A \leftarrow A + x x^T, b \leftarrow b + r x$)</li>
 </ul>
+</li>
+<li><strong>Slow Path:</strong> Every 5s, computes $A^{-1}$.</li>
+</ul>
+</li>
+<li>
+<p><strong>Sync to Redis:</strong> Emits $A^{-1}$ and $b$.</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+</li>
+</ul>
+<!-- raw HTML omitted -->
 <p>&ndash;</p>
 
 <h2 id="live-demo--walkthrough-1" data-numberify>Live Demo & Walkthrough<a class="anchor ms-1" href="#live-demo--walkthrough-1"></a></h2>
@@ -231,6 +288,7 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 <ul>
 <li><a href="https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-recommender" target="_blank" rel="noopener noreferrer">GitHub Repository<i class="fas fa-external-link-square-alt ms-1"></i></a> <!-- raw HTML omitted --></li>
 <li>Blog Posts: <a href="https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/">Part 1: Prototype</a> <!-- raw HTML omitted --> | <a href="https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/">Part 2: Productionization</a> <!-- raw HTML omitted --></li>
+<li><a href="https://youtube.com/playlist?list=PLrISYKWzp0eTTAbkhahnuyLOBlesOY5vN&amp;si=ML-G-oYqJaMD9fnY" target="_blank" rel="noopener noreferrer">Youtube Playlist<i class="fas fa-external-link-square-alt ms-1"></i></a> <!-- raw HTML omitted --></li>
 </ul>
 <!-- raw HTML omitted -->
 <p><a href="/slides/2026-03-21-product-recommender/#/">Back to Start</a></p>
