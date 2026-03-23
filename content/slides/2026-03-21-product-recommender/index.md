@@ -8,16 +8,34 @@ description: "A walkthrough of building and scaling a Contextual Multi-Armed Ban
 ---
 
 <style>
-  /* Shrink all list items and paragraphs to 80% of normal size */
-  .reveal p, 
-  .reveal li {
+  /* Global text sizing for this presentation */
+  .reveal p, .reveal li {
     font-size: 0.8em;
-    line-height: 1.4; /* Adds a bit of breathing room between lines */
+    line-height: 1.4;
   }
-  
-  /* Optional: Shrink the sub-lists (like the Exploitation/Exploration bullets) a bit more */
   .reveal ul ul li {
     font-size: 0.9em;
+  }
+
+  #eda-slide ul, #eda-slide li, #eda-slide p {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  #eda-slide ul { 
+    padding-left: 0.8em !important; /* Move bullets closer to the left edge */
+    margin-left: 0 !important; 
+  }
+  #eda-slide ul ul { 
+    padding-left: 0.9em !important; /* Narrower nested indent */
+  }
+
+  #eda-slide .mjx-container { 
+    margin: 0 !important; 
+    padding: 0 !important; 
+    display: inline-block !important; /* Prevents block-level "push" */
   }
 </style>
 
@@ -131,39 +149,83 @@ Scaling with an Event-Driven Architecture
 
 --
 
+<!-- .slide: id="eda-slide" -->
 ## Architecture
+### Serving (Python & Redis)
 
-Decoupling *Serving* from *Training*.
+<div style="display: grid; grid-template-columns: 42% 58%; gap: 10px; align-items: center; width: 106%; margin-left: -3%;">
+  <!-- Left Column: Centered block, left-aligned text -->
+  <div style="display: flex; justify-content: center;">
+    <div style="text-align: left; font-size: 0.9em; line-height: 1.2;">
 
-<img src="featured.gif" alt="Workflow Diagram" style="max-height: 42vh; max-width: 100%; margin: 0 auto; display: block;">
+- **Stateless Inference:**
+  - The client does *not* train. 
+- **Low Latency:**
+  - Fetches pre-computed LinUCB parameters from Redis.
+- **Action:** 
+  - Calculates scores,
+  - Ranks items, and 
+  - Sends feedback to Kafka.
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div>
+    <img src="featured.gif" style="width: 100%; max-height: 60vh; object-fit: contain; border: 2px solid #555; border-radius: 8px; display: block;">
+  </div>
+</div>
 
 --
 
-## Serving (Python & Redis)
+<!-- .slide: id="eda-slide" -->
+## Architecture
+### Transport (Apache Kafka)
 
-- **Stateless Inference:** The client does *not* train. 
-- **Low Latency:** Fetches pre-computed LinUCB parameters directly from Redis.
-- **Action:** Calculates scores, ranks items, and sends user feedback to Kafka.
+<div style="display: grid; grid-template-columns: 42% 58%; gap: 10px; align-items: center; width: 106%; margin-left: -3%;">
+  <div style="display: flex; justify-content: center;">
+    <div style="text-align: left; font-size: 0.8em; line-height: 1.2;">
+
+- **Asynchronous Buffer:**
+  - Decouples user-facing app speed from backend training.
+- **Durability:** 
+  - Stores "Ground Truth" events safely for replay or analytics.
+    </div>
+  </div>
+
+  <div>
+    <img src="featured.gif" style="width: 100%; max-height: 60vh; object-fit: contain; border: 2px solid #555; border-radius: 8px; display: block;">
+  </div>
+</div>
 
 --
 
-## Transport (Apache Kafka)
+<!-- .slide: id="eda-slide" -->
+## Architecture
+### Training (Apache Flink)
 
-- **Asynchronous Buffer:** Decouples the speed of the user-facing web app from the backend training engine.
-- **Durability:** Stores the "Ground Truth" feedback events safely for replay or analytics.
+<!-- Math Section: Negative margin pulls the grid up to fit everything -->
+<div style="font-size: 0.55em; margin-bottom: -20px !important; text-align: center; position: relative; z-index: 10;">
+$$ \text{Score}_a = \color{cyan}{x^T \theta_a} + \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}}, \quad \text{where } \theta_a = A_a^{-1} b_a $$
+</div>
 
---
+<div style="display: grid; grid-template-columns: 42% 58%; gap: 10px; align-items: center; width: 106%; margin-left: -3%;">
+  <div style="display: flex; justify-content: center;">
+    <div style="text-align: left; font-size: 0.75em; line-height: 1.1;">
 
-## Training (Apache Flink)
-
-$$ \text{Score}_a = \color{cyan}{x^T \theta_a} + \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$
-
-- **Stateful Processing:** Flink acts as the system's "Online Memory" (via RocksDB).
+- **Stateful Processing:**
+  - Flink acts as "Online Memory".
 - **Asynchronous Updates:** 
-  - **Fast Path:** Updates $A$ and $b$ state for every event.
-    - ($A \leftarrow A + x x^T$ and $b \leftarrow b + r x$)
-  - **Slow Path:** Every 5s, computes the Matrix Inverse $A^{-1}$.
-- **Sync to Redis:** Periodically emits **Inverse Matrix ($A^{-1}$)** and **Reward Vector ($b$)** for real-time serving.
+  - **Fast Path:** Updates $A$ and $b$.
+    - ($A \leftarrow A + x x^T, b \leftarrow b + r x$)
+  - **Slow Path:** Every 5s, computes $A^{-1}$.
+- **Sync to Redis:** Emits $A^{-1}$ and $b$.
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <img src="featured.gif" style="width: 100%; max-height: 52vh; object-fit: contain; border: 2px solid #555; border-radius: 8px; display: block;">
+  </div>
+</div>
 
 --
 
@@ -212,6 +274,7 @@ Bridging the gap between Data Science and Data Engineering.
 
 - [GitHub Repository](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-recommender) <!-- .element: target="_blank" -->
 - Blog Posts: [Part 1: Prototype](https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/) <!-- .element: target="_blank" --> | [Part 2: Productionization](https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/) <!-- .element: target="_blank" -->
+- [Youtube Playlist](https://youtube.com/playlist?list=PLrISYKWzp0eTTAbkhahnuyLOBlesOY5vN&si=ML-G-oYqJaMD9fnY) <!-- .element: target="_blank" -->
 </div>
 
 [Back to Start](#/)
