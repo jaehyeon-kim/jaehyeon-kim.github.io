@@ -127,7 +127,7 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 
 <h2 id="linucb-algorithm" data-numberify>LinUCB Algorithm<a class="anchor ms-1" href="#linucb-algorithm"></a></h2>
 <p>Balancing Exploitation and Exploration</p>
-<p>$$ \text{Score}_a = \color{cyan}{x^T \theta_a} + \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$</p>
+<p>$$ \text{Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{+}} \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$</p>
 <!-- raw HTML omitted -->
 <ul>
 <li><!-- raw HTML omitted -->●<!-- raw HTML omitted --> <strong>Exploitation:</strong> Predicted reward ($x^T \theta_a$).</li>
@@ -154,6 +154,40 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 <!-- raw HTML omitted -->
 
 <h2 id="architecture" data-numberify>Architecture<a class="anchor ms-1" href="#architecture"></a></h2>
+
+<h3 id="training-apache-flink" data-numberify>Training (Apache Flink)<a class="anchor ms-1" href="#training-apache-flink"></a></h3>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<ul>
+<li>
+<p><strong>Stateful Processing:</strong></p>
+<ul>
+<li>Flink acts as &ldquo;Online Memory&rdquo;.</li>
+</ul>
+</li>
+<li>
+<p><strong>Asynchronous Updates:</strong></p>
+<ul>
+<li><strong>Fast Path:</strong> Updates $A$ and $b$.
+<ul>
+<li>($A \leftarrow A + x x^T, b \leftarrow b + r x$)</li>
+</ul>
+</li>
+<li><strong>Slow Path:</strong> Every 5s, computes $A^{-1}$.</li>
+</ul>
+</li>
+<li>
+<p><strong>Sync to Redis:</strong> Emits $A^{-1}$ and $b$.</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<p>&ndash;</p>
+<!-- raw HTML omitted -->
+
+<h2 id="architecture-1" data-numberify>Architecture<a class="anchor ms-1" href="#architecture-1"></a></h2>
 
 <h3 id="serving-python--redis" data-numberify>Serving (Python & Redis)<a class="anchor ms-1" href="#serving-python--redis"></a></h3>
 <!-- raw HTML omitted -->
@@ -188,7 +222,7 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 <p>&ndash;</p>
 <!-- raw HTML omitted -->
 
-<h2 id="architecture-1" data-numberify>Architecture<a class="anchor ms-1" href="#architecture-1"></a></h2>
+<h2 id="architecture-2" data-numberify>Architecture<a class="anchor ms-1" href="#architecture-2"></a></h2>
 
 <h3 id="transport-apache-kafka" data-numberify>Transport (Apache Kafka)<a class="anchor ms-1" href="#transport-apache-kafka"></a></h3>
 <!-- raw HTML omitted -->
@@ -206,40 +240,6 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 <!-- raw HTML omitted -->
 </li>
 </ul>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-</li>
-</ul>
-<!-- raw HTML omitted -->
-<p>&ndash;</p>
-<!-- raw HTML omitted -->
-
-<h2 id="architecture-2" data-numberify>Architecture<a class="anchor ms-1" href="#architecture-2"></a></h2>
-
-<h3 id="training-apache-flink" data-numberify>Training (Apache Flink)<a class="anchor ms-1" href="#training-apache-flink"></a></h3>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<ul>
-<li>
-<p><strong>Stateful Processing:</strong></p>
-<ul>
-<li>Flink acts as &ldquo;Online Memory&rdquo;.</li>
-</ul>
-</li>
-<li>
-<p><strong>Asynchronous Updates:</strong></p>
-<ul>
-<li><strong>Fast Path:</strong> Updates $A$ and $b$.
-<ul>
-<li>($A \leftarrow A + x x^T, b \leftarrow b + r x$)</li>
-</ul>
-</li>
-<li><strong>Slow Path:</strong> Every 5s, computes $A^{-1}$.</li>
-</ul>
-</li>
-<li>
-<p><strong>Sync to Redis:</strong> Emits $A^{-1}$ and $b$.</p>
 <!-- raw HTML omitted -->
 <!-- raw HTML omitted -->
 </li>
