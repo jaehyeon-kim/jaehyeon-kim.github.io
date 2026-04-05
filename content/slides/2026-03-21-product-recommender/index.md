@@ -118,7 +118,7 @@ Why LinUCB?
 
 Balancing Exploitation and Exploration
 
-$$ \text{Score}_a = \color{cyan}{x^T \theta_a} + \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$
+$$ \text{Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{+}} \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$
 
 <div style="margin-top: 20px; font-size: 0.8em;">
 
@@ -146,6 +146,36 @@ A monolithic Python script isn't built for scale.
 ## Part 2: Productionization
 
 Scaling with an Event-Driven Architecture
+
+--
+
+<!-- .slide: id="eda-slide" -->
+## Architecture
+### Training (Apache Flink)
+
+<!-- Math Section: Negative margin pulls the grid up to fit everything -->
+<div style="font-size: 0.55em; margin-bottom: -20px !important; text-align: center; position: relative; z-index: 10;">
+$$ \text{LinUCB: Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{+}} \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}} \color{white}{, \quad \text{where } \theta_a = A_a^{-1} b_a} $$
+</div>
+
+<div style="display: grid; grid-template-columns: 42% 58%; gap: 10px; align-items: center; width: 106%; margin-left: -3%;">
+  <div style="display: flex; justify-content: center;">
+    <div style="text-align: left; font-size: 0.75em; line-height: 1.1;">
+
+- **Stateful Processing:**
+  - Flink acts as "Online Memory".
+- **Asynchronous Updates:** 
+  - **Fast Path:** Updates $A$ and $b$.
+    - ($A \leftarrow A + x x^T, b \leftarrow b + r x$)
+  - **Slow Path:** Every 5s, computes $A^{-1}$.
+- **Sync to Redis:** Emits $A^{-1}$ and $b$.
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <img src="featured.gif" style="width: 100%; max-height: 52vh; object-fit: contain; border: 2px solid #555; border-radius: 8px; display: block;">
+  </div>
+</div>
 
 --
 
@@ -194,36 +224,6 @@ Scaling with an Event-Driven Architecture
 
   <div>
     <img src="featured.gif" style="width: 100%; max-height: 60vh; object-fit: contain; border: 2px solid #555; border-radius: 8px; display: block;">
-  </div>
-</div>
-
---
-
-<!-- .slide: id="eda-slide" -->
-## Architecture
-### Training (Apache Flink)
-
-<!-- Math Section: Negative margin pulls the grid up to fit everything -->
-<div style="font-size: 0.55em; margin-bottom: -20px !important; text-align: center; position: relative; z-index: 10;">
-$$ \text{Score}_a = \color{cyan}{x^T \theta_a} + \color{orange}{\alpha \sqrt{x^T A_a^{-1} x}}, \quad \text{where } \theta_a = A_a^{-1} b_a $$
-</div>
-
-<div style="display: grid; grid-template-columns: 42% 58%; gap: 10px; align-items: center; width: 106%; margin-left: -3%;">
-  <div style="display: flex; justify-content: center;">
-    <div style="text-align: left; font-size: 0.75em; line-height: 1.1;">
-
-- **Stateful Processing:**
-  - Flink acts as "Online Memory".
-- **Asynchronous Updates:** 
-  - **Fast Path:** Updates $A$ and $b$.
-    - ($A \leftarrow A + x x^T, b \leftarrow b + r x$)
-  - **Slow Path:** Every 5s, computes $A^{-1}$.
-- **Sync to Redis:** Emits $A^{-1}$ and $b$.
-    </div>
-  </div>
-
-  <div style="text-align: center;">
-    <img src="featured.gif" style="width: 100%; max-height: 52vh; object-fit: contain; border: 2px solid #555; border-radius: 8px; display: block;">
   </div>
 </div>
 
