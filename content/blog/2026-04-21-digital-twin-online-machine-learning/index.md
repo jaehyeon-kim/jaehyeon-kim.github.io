@@ -30,6 +30,12 @@ description: |
 
 ## Overview
 
+Imagine using a rolling pin to flatten out a thick piece of dough. A Hot Strip Mill does the exact same thing, but with glowing red-hot steel slabs (often heated over 1000°C) and massive mechanical rollers. The steel is passed through a series of these rollers, crushing it down from a thick block into a long, thin sheet.
+
+Calculating the exact **Rolling Force** required to crush the steel is critical. If the machine pushes too hard, it can severely damage the rollers; if it doesn't push hard enough, the steel doesn't reach the target thickness. Because the rollers are constantly grinding against raw steel, their physical shape slowly degrades over time. As the machinery wears down, the legacy mathematical formulas used to predict that perfect force slowly become inaccurate. This physical degradation is the root of the **Concept Drift** our real-time ML pipeline is solving.
+
+![Hot Rolling Process](hot-rolling-process.png#center)
+
 In heavy industrial manufacturing, such as steel hot strip rolling, deterministic physics formulas are the traditional standard for calculating the exact force required to deform a slab of steel. However, these pure physics models share a fatal flaw: they assume a pristine factory state. As physical rollers grind against red-hot steel over hours of production, they experience mechanical wear. 
 
 As the machinery degrades, the actual physical force required drifts away from the theoretical prediction. In data science, this is a classic manifestation of **Concept Drift**.
