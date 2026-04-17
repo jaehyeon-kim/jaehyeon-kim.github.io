@@ -1,4 +1,113 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Building a Real-Time Recommender: Contextual Bandits & Event-Driven Architecture</title><link>https://jaehyeon.me/slides/2026-03-21-product-recommender/</link><guid>https://jaehyeon.me/slides/2026-03-21-product-recommender/</guid><pubDate>Sat, 21 Mar 2026 00:00:00 +0000</pubDate><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning</title><link>https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/</link><guid>https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/</guid><pubDate>Tue, 21 Apr 2026 00:00:00 +0000</pubDate><description>
+Overview In heavy industrial manufacturing, such as steel hot strip rolling, deterministic physics formulas are the traditional standard for calculating the exact force required to deform a slab of steel. However, these pure physics models share a fatal flaw: they assume a pristine factory state. As physical rollers grind against red-hot steel over hours of production, they experience mechanical wear.
+As the machinery degrades, the actual physical force required drifts away from the theoretical prediction.</description><content:encoded><![CDATA[
+        
+<h2 id="overview" data-numberify>Overview<a class="anchor ms-1" href="#overview"></a></h2>
+<p>In heavy industrial manufacturing, such as steel hot strip rolling, deterministic physics formulas are the traditional standard for calculating the exact force required to deform a slab of steel. However, these pure physics models share a fatal flaw: they assume a pristine factory state. As physical rollers grind against red-hot steel over hours of production, they experience mechanical wear.</p>
+<p>As the machinery degrades, the actual physical force required drifts away from the theoretical prediction. In data science, this is a classic manifestation of <strong>Concept Drift</strong>.</p>
+<p><picture><img class="img-fluid mx-auto d-block" alt="Drift and Convergence Lifecycle" src="/blog/2026-04-21-digital-twin-online-machine-learning/drift-convergence-lifecycle.png" loading="lazy" width="1034" height="588" />
+</picture>
+
+</p>
+<p>To tackle this, I recently built a real-time, fault-tolerant Online Machine Learning (OML) pipeline and Digital Twin. By combining Apache Kafka, Apache Flink (written in Kotlin), and the Massive Online Analysis (MOA) framework, the system learns the <em>new</em> physical reality of the worn machinery on the fly, autonomously correcting the physics baseline safely behind a deterministic Shadow Mode router.</p>
+<p>Here is an overview of the architecture and the engineering challenges solved along the way. The complete source code for this project, including the Flink stream processor and the Python Digital Twin simulation, is available on <a href="https://github.com/jaehyeon-kim/oml-digital-twin-hotrolling" target="_blank" rel="noopener noreferrer">GitHub<i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
+
+<h2 id="architecture-at-a-glance" data-numberify>Architecture at a Glance<a class="anchor ms-1" href="#architecture-at-a-glance"></a></h2>
+<p><picture><img class="img-fluid mx-auto d-block" alt="High-Level System Architecture" src="/blog/2026-04-21-digital-twin-online-machine-learning/featured.png" loading="lazy" width="1082" height="460" />
+</picture>
+
+</p>
+<p>The project is split into three highly decoupled domains:</p>
+<ol>
+<li><strong>Digital Twin (Python):</strong> Utilizing the <a href="https://github.com/jaehyeon-kim/dynamic-des" target="_blank" rel="noopener noreferrer">Dynamic DES<i class="fas fa-external-link-square-alt ms-1"></i></a> Python package, this layer generates synthetic rolling events, applies simulated mechanical wear, calculates theoretical/actual physics, and pushes the data to Kafka.</li>
+<li><strong>Message Broker (Kafka):</strong> Handles the asynchronous, high-throughput streaming of prediction requests and delayed ground-truth target forces.</li>
+<li><strong>Stream Processor (Flink/Kotlin):</strong> The core engine. It aligns asynchronous streams, trains the machine learning models dynamically, evaluates safety guardrails, and sinks metrics to ClickHouse for evaluation in real-time.</li>
+</ol>
+<p>Moving data from the Digital Twin through Kafka to Flink looks straightforward in a diagram, but real-world industrial physics and distributed systems are highly complex. To make this pipeline robust enough for the unpredictability of a live factory floor, we had to overcome four major engineering challenges.</p>
+
+<h2 id="challenges" data-numberify>Challenges<a class="anchor ms-1" href="#challenges"></a></h2>
+<p>Taking an online machine learning model out of the lab and deploying it into a live industrial environment introduces a unique set of hurdles. From managing the physical delays of factory sensors to ensuring the model never commands a physically unsafe action, here is a breakdown of the four primary engineering challenges we tackled to make this architecture more robust.</p>
+
+<h3 id="challenge-1-asynchronous-industrial-streams" data-numberify>Challenge 1: Asynchronous Industrial Streams<a class="anchor ms-1" href="#challenge-1-asynchronous-industrial-streams"></a></h3>
+<p>Industrial data streams are inherently asynchronous. The factory floor requests a prediction <em>before</em> the steel enters the rolling stand (Event A), but the ground-truth sensor data confirming the actual required force arrives <em>after</em> the steel is crushed (Event B).</p>
+<p>To execute machine learning, these two events must be perfectly joined. However, network latency and partition skew in Kafka mean that these events might arrive out of order.</p>
+<p><picture><img class="img-fluid mx-auto d-block" alt="Flink Application DAG" src="/blog/2026-04-21-digital-twin-online-machine-learning/stream-processing-flink.png" loading="lazy" width="1158" height="522" />
+</picture>
+
+</p>
+<p>In Flink, this is solved using a <code>KeyedCoProcessFunction</code>. By keying the streams on a composite <code>Slab ID</code> + <code>Pass Number</code>, Flink guarantees both events route to the exact same TaskManager. The <code>EventMatchProcessFunction</code> utilizes Flink&rsquo;s <code>ValueState</code> to buffer whichever event arrives first. It then registers a processing-time timer (Time-To-Live). If the matching event arrives, they are joined and emitted. If the timer expires (e.g., a physical sensor failure), the orphaned state is safely purged to prevent memory leaks.</p>
+
+<h3 id="challenge-2-online-residual-learning" data-numberify>Challenge 2: Online Residual Learning<a class="anchor ms-1" href="#challenge-2-online-residual-learning"></a></h3>
+<p>Instead of training a batch model offline on historical data, which would instantly become obsolete the moment the rollers wore down further, the Flink pipeline trains on the continuous stream of slabs using a strict <strong>Test-then-Train</strong> (prequential) paradigm.</p>
+<p>Crucially, the ML models do not predict the absolute rolling force from scratch. Instead, they utilize <strong>Residual Learning</strong>. They predict the residual error between the theoretical formula and the actual physical force.</p>
+<p>To execute this, the pipeline integrates the Java MOA framework. The primary production model is <strong>AMRules</strong> (Adaptive Model Rules), a streaming rule-learning algorithm. It builds an ensemble of rules that calculate a linear combination of physical attributes, continuously updating weights via the Delta rule.</p>
+<p>Unlike static models, AMRules runs an internal Page-Hinkley test to detect sudden physical shocks (like a roller bearing breaking) and instantly prunes obsolete rules, allowing rapid convergence to new physical realities. Furthermore, because ML models require normalized inputs, the pipeline implements <strong>Welford&rsquo;s Online Algorithm</strong> in a custom Flink state object to calculate streaming Z-scores on the fly without needing to load full datasets into memory.</p>
+
+<h3 id="challenge-3-shadow-mode-router" data-numberify>Challenge 3: Shadow Mode Router<a class="anchor ms-1" href="#challenge-3-shadow-mode-router"></a></h3>
+<p>Industrial Machine Learning cannot operate without strict safety boundaries. A model error that generates excessive rolling force could severely damage a multi-million-dollar rolling stand or create a major production bottleneck in the factory.</p>
+<p><picture><img class="img-fluid mx-auto d-block" alt="Shadow Mode Router Decision Logic" src="/blog/2026-04-21-digital-twin-online-machine-learning/shadow-mode-router.png" loading="lazy" width="557" height="747" />
+</picture>
+
+</p>
+<p>Before any ML-adjusted prediction is allowed to influence the factory floor, it must pass through a deterministic <strong>Shadow Mode Router</strong> consisting of two guardrails:</p>
+<ol>
+<li><strong>Stateless Mechanical Limits:</strong> Calculates the residual difference between the model&rsquo;s requested force and the physics baseline. If the model requests a deviation outside of physical safety bounds (e.g., &gt; +25% or &lt; -20%), the prediction is instantly rejected.</li>
+<li><strong>Stateful Trust Score:</strong> Using an Exponentially Weighted Moving Average (EWMA), the router continuously tracks the Absolute Percentage Error (APE) of both the model and the pure physics baseline. If the model&rsquo;s average error trails the physics baseline by a defined &ldquo;Trust Deficit&rdquo; margin, it is benched.</li>
+</ol>
+<p>If either guardrail is triggered, the router safely falls back to the deterministic Physics Baseline. The ML model continues to train in the background (Shadow Mode) until it re-learns the physical reality, improves its EWMA trust score, and is autonomously promoted back to active control.</p>
+
+<h3 id="challenge-4-checkpointing-complex-ml-state" data-numberify>Challenge 4: Checkpointing Complex ML State<a class="anchor ms-1" href="#challenge-4-checkpointing-complex-ml-state"></a></h3>
+<p>For Flink to provide exactly-once processing guarantees, it must asynchronously snapshot the state of operators to a durable backend like RocksDB.</p>
+<p>While simple tracking states serialize perfectly into basic Flink <code>ValueState&lt;Double&gt;</code>, the AMRules model is a deeply complex, dynamic tree structure. Allowing Flink&rsquo;s default Kryo serializers to traverse this massive object graph during checkpointing causes severe performance degradation and frequent serialization crashes.</p>
+<p>To bypass this, the <code>MoaEvaluationProcessFunction</code> interacts with the MOA model as a standard Java object in memory for high-performance execution. However, upon every state update, it manually serializes the model into a raw byte array (<code>ValueState&lt;ByteArray&gt;</code>) using Java&rsquo;s native <code>ObjectOutputStream</code>. When Flink triggers a checkpoint, it simply flushes these pre-serialized byte arrays to disk. Upon recovery, Flink deserializes the bytes, instantly restoring the exact computational brain-state of the algorithm.</p>
+
+<h2 id="system-in-action" data-numberify>System in Action<a class="anchor ms-1" href="#system-in-action"></a></h2>
+<p>You can easily spin up the entire architecture locally to see the system in action. The project repository includes a complete Docker Compose environment that provisions Kafka, Flink, and ClickHouse.</p>
+<p>To get started, simply clone the repository, build the Flink application using the provided Gradle wrapper, and bring up the infrastructure. Once the environment is running, you can launch the Python-based data generator to simulate the steel rolling process and open the NiceGUI control dashboard to monitor the machine learning metrics in real-time.</p>
+<p>For detailed, step-by-step instructions on cloning the repository, configuring licenses, and deploying the Flink job, refer to the <a href="https://github.com/jaehyeon-kim/oml-digital-twin-hotrolling/tree/main?tab=readme-ov-file#-getting-started" target="_blank" rel="noopener noreferrer">Getting Started<i class="fas fa-external-link-square-alt ms-1"></i></a> section in the repository.</p>
+
+<h2 id="simulation-scenarios" data-numberify>Simulation Scenarios<a class="anchor ms-1" href="#simulation-scenarios"></a></h2>
+<p>Using the NiceGUI Dashboard, you can actively manipulate the physical state of the Digital Twin to observe the Flink pipeline&rsquo;s reaction in real-time.</p>
+<p>Here is how the pipeline handles different industrial scenarios:</p>
+
+<h3 id="abrupt-drift-mechanical-shock" data-numberify>Abrupt Drift (Mechanical Shock)<a class="anchor ms-1" href="#abrupt-drift-mechanical-shock"></a></h3>
+<p>Simulates a sudden mechanical failure (e.g., a roller bearing breaking), instantly altering the physics of the mill.</p>
+<ul>
+<li><strong>Simulation Settings:</strong> Trigger Abrupt Shock (Wear Level: 60.0).</li>
+<li><strong>Observation:</strong> The pure physics baseline error instantly spikes and remains high (often &gt;10% APE) because the physical reality no longer matches the math. The <strong>AMRules</strong> model initially spikes alongside it, but its Page-Hinkley change detector immediately drops obsolete rules, allowing it to rapidly converge back to lower error as it learns the new broken state.</li>
+</ul>
+<p><picture><img class="img-fluid mx-auto d-block" alt="Abrupt Drift" src="/blog/2026-04-21-digital-twin-online-machine-learning/abrupt-drift.gif" loading="lazy" width="1770" height="1166" />
+</picture>
+
+</p>
+
+<h3 id="gradual-drift-standard-wear" data-numberify>Gradual Drift (Standard Wear)<a class="anchor ms-1" href="#gradual-drift-standard-wear"></a></h3>
+<p>Simulates the continuous, bi-directional cycle of slow roller degradation and subsequent maintenance recovery over hours of production.</p>
+<ul>
+<li><strong>Simulation Settings:</strong> Gradual Wear (Step Size: 5.0 units, Frequency: 30 seconds).</li>
+<li><strong>Observation:</strong> The physics baseline error slowly and persistently creeps upward/download over time (e.g. ranging from 2% to 7% APE) as the wear level drifts gradually. The <strong>AMRules</strong> model gracefully tracks this changing reality, updating its linear weights incrementally to maintain a smooth error rate.</li>
+</ul>
+<p><picture><img class="img-fluid mx-auto d-block" alt="Gradual Drift" src="/blog/2026-04-21-digital-twin-online-machine-learning/gradual-drift.gif" loading="lazy" width="1770" height="1166" />
+</picture>
+
+</p>
+
+<h3 id="no-drift-pristine-state" data-numberify>No Drift (Pristine State)<a class="anchor ms-1" href="#no-drift-pristine-state"></a></h3>
+<p>Simulates a pristine factory state, such as immediately after a maintenance shift replaces the rollers.</p>
+<ul>
+<li><strong>Simulation Settings:</strong> Wear Level: 0.0.</li>
+<li><strong>Observation:</strong> The physical reality of the factory floor perfectly aligns with the deterministic mathematical formulas. The physics baseline maintains a highly accurate, near-zero error rate (&lt; 0.3% APE). <strong>AMRules</strong> remains stable under this condition.</li>
+</ul>
+<p><picture><img class="img-fluid mx-auto d-block" alt="No Drift" src="/blog/2026-04-21-digital-twin-online-machine-learning/no-drift.gif" loading="lazy" width="1770" height="1166" />
+</picture>
+
+</p>
+
+<h2 id="conclusion" data-numberify>Conclusion<a class="anchor ms-1" href="#conclusion"></a></h2>
+<p>Combining Apache Flink with Online Machine Learning bridges the gap between theoretical physics and the harsh reality of a degrading factory floor. To make this safe and effective, the architecture relies on three core ideas: predicting residual errors instead of absolute forces, isolating models by product line to prevent forgetting, and enforcing strict safety guardrails. Together, these techniques ensure that heavy machinery operates optimally, even as it breaks down over time.</p>
+<p>You can explore the complete codebase, run the simulation locally, and dive deeper into the architecture on the project&rsquo;s <a href="https://github.com/jaehyeon-kim/oml-digital-twin-hotrolling" target="_blank" rel="noopener noreferrer">GitHub repository<i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
+
+      ]]></content:encoded></item><item><title>Building a Real-Time Recommender: Contextual Bandits & Event-Driven Architecture</title><link>https://jaehyeon.me/slides/2026-03-21-product-recommender/</link><guid>https://jaehyeon.me/slides/2026-03-21-product-recommender/</guid><pubDate>Sat, 21 Mar 2026 00:00:00 +0000</pubDate><description>
 Building a Real-Time Product Recommender Contextual Bandits &amp;amp; Event-Driven Architecture
 Why Contextual Bandits? Problem: Conventional recommenders (e.g., Collaborative Filtering) Ignore situational context (e.g., Time of Day, Location, Device). Struggle with &amp;ldquo;Cold Starts&amp;rdquo; for new items/users. Solution: Contextual Multi-Armed Bandits (CMAB). Exploitation: Maximize immediate reward using current knowledge. Exploration: Gather information on uncertain items to improve future performance. Part 1: Prototype | Part 2: Productionization
 Part 1: Prototype Prototype an online product recommender with Python</description><content:encoded><![CDATA[
@@ -3237,7 +3346,7 @@ The agent sends this stream of standardized JSON-formatted lineage events to a c
 </span></span><span class="line"><span class="ln"> 86</span><span class="cl">                        <span class="n">map</span><span class="p">[</span><span class="k">field</span><span class="p">.</span><span class="n">name</span><span class="p">()]</span> <span class="p">=</span> <span class="k">if</span> <span class="p">(</span><span class="k">value</span> <span class="k">is</span> <span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">avro</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">Utf8</span><span class="p">)</span> <span class="k">value</span><span class="p">.</span><span class="n">toString</span><span class="p">()</span> <span class="k">else</span> <span class="k">value</span>
 </span></span><span class="line"><span class="ln"> 87</span><span class="cl">                    <span class="p">}</span>
 </span></span><span class="line"><span class="ln"> 88</span><span class="cl">                    <span class="n">map</span> <span class="k">as</span> <span class="n">RecordMap</span> <span class="c1">// Cast to type alias
-</span></span></span><span class="line"><span class="ln"> 89</span><span class="cl"><span class="c1"></span>                <span class="p">}.</span><span class="n">name</span><span class="p">(</span><span class="s2">&#34;GenericRecordToMapConverter&#34;</span><span class="p">)</span>
+</span></span></span><span class="line"><span class="ln"> 89</span><span class="cl"><span class="c1"></span><span class="err"> </span>               <span class="p">}.</span><span class="n">name</span><span class="p">(</span><span class="s2">&#34;GenericRecordToMapConverter&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="ln"> 90</span><span class="cl">                <span class="p">.</span><span class="n">returns</span><span class="p">(</span><span class="nc">TypeInformation</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="k">object</span> <span class="err">: </span><span class="nc">TypeHint</span><span class="p">&lt;</span><span class="n">RecordMap</span><span class="p">&gt;()</span> <span class="p">{}))</span>
 </span></span><span class="line"><span class="ln"> 91</span><span class="cl">
 </span></span><span class="line"><span class="ln"> 92</span><span class="cl">        <span class="c1">// 3. Define OutputTag for late data (now carrying RecordMap)
@@ -7256,417 +7365,6 @@ The <code>avro</code> block in <code>build.gradle.kts</code> configures the Avro
 </span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>    --runner FlinkRunner --streaming --environment_type<span class="o">=</span>LOOPBACK <span class="se">\
 </span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>    --parallelism<span class="o">=</span><span class="m">3</span> --checkpointing_interval<span class="o">=</span><span class="m">10000</span>
 </span></span></code></pre></div><p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-12-19-beam-examples-10/streaming-reader-demo.gif" loading="lazy" width="3558" height="1924" />
-</picture>
-
-</p>
-      ]]></content:encoded></item><item><title>Apache Beam Python Examples - Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn</title><link>https://jaehyeon.me/blog/2024-12-05-beam-examples-9/</link><guid>https://jaehyeon.me/blog/2024-12-05-beam-examples-9/</guid><pubDate>Thu, 05 Dec 2024 00:00:00 +0000</pubDate><description><![CDATA[
-        <p>A <a href="https://beam.apache.org/documentation/programming-guide/#splittable-dofns" target="_blank" rel="noopener noreferrer"><em>Splittable DoFn (SDF)</em><i class="fas fa-external-link-square-alt ms-1"></i></a> is a generalization of a <em>DoFn</em> that enables Apache Beam developers to create modular and composable I/O components. Also, it can be applied in advanced non-I/O scenarios such as Monte Carlo simulation. In this post, we develop two Apache Beam pipelines. The first pipeline is an I/O connector, and it reads a list of files in a folder followed by processing each of the file objects in parallel. The second pipeline estimates the value of $\pi$ by performing Monte Carlo simulation.</p>
-      ]]></description><content:encoded><![CDATA[
-        <p>A <a href="https://beam.apache.org/documentation/programming-guide/#splittable-dofns" target="_blank" rel="noopener noreferrer"><em>Splittable DoFn (SDF)</em><i class="fas fa-external-link-square-alt ms-1"></i></a> is a generalization of a <em>DoFn</em> that enables Apache Beam developers to create modular and composable I/O components. Also, it can be applied in advanced non-I/O scenarios such as Monte Carlo simulation. In this post, we develop two Apache Beam pipelines. The first pipeline is an I/O connector, and it reads a list of files in a folder followed by processing each of the file objects in parallel. The second pipeline estimates the value of $\pi$ by performing Monte Carlo simulation.</p>
-<ul>
-<li><a href="/blog/2024-07-04-beam-examples-1">Part 1 Calculate K Most Frequent Words and Max Word Length</a></li>
-<li><a href="/blog/2024-07-18-beam-examples-2">Part 2 Calculate Average Word Length with/without Fixed Look back</a></li>
-<li><a href="/blog/2024-08-01-beam-examples-3">Part 3 Build Sport Activity Tracker with/without SQL</a></li>
-<li><a href="/blog/2024-08-15-beam-examples-4">Part 4 Call RPC Service for Data Augmentation</a></li>
-<li><a href="/blog/2024-09-18-beam-examples-5">Part 5 Call RPC Service in Batch using Stateless DoFn</a></li>
-<li><a href="/blog/2024-10-02-beam-examples-6">Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn</a></li>
-<li><a href="/blog/2024-10-24-beam-examples-7">Part 7 Separate Droppable Data into Side Output</a></li>
-<li><a href="/blog/2024-11-21-beam-examples-8">Part 8 Enhance Sport Activity Tracker with Runner Motivation</a></li>
-<li><a href="/blog/2024-12-05-beam-examples-9/#">Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn</a> (this post)</li>
-<li><a href="/blog/2024-12-19-beam-examples-10">Part 10 Develop Streaming File Reader using Splittable DoFn</a></li>
-</ul>
-
-<h2 id="splittable-dofn" data-numberify>Splittable DoFn<a class="anchor ms-1" href="#splittable-dofn"></a></h2>
-<p>A <a href="https://beam.apache.org/documentation/programming-guide/#splittable-dofns" target="_blank" rel="noopener noreferrer"><em>Splittable DoFn (SDF)</em><i class="fas fa-external-link-square-alt ms-1"></i></a> is a generalization of a <em>DoFn</em> that enables Apache Beam developers to create modular and composable I/O components. Also, it can be applied in advanced non-I/O scenarios such as Monte Carlo simulation.</p>
-<p>As described in the <a href="https://beam.apache.org/documentation/programming-guide/#splittable-dofns" target="_blank" rel="noopener noreferrer">Apache Beam Programming Guide<i class="fas fa-external-link-square-alt ms-1"></i></a>, an SDF is responsible for processing element and restriction pairs. A restriction represents a subset of work that would have been necessary to have been done when processing the element.</p>
-<p>Executing an SDF follows the following steps:</p>
-<ol>
-<li>Each element is paired with a restriction (e.g. filename is paired with offset range representing the whole file).</li>
-<li>Each element and restriction pair is split (e.g. offset ranges are broken up into smaller pieces).</li>
-<li>The runner redistributes the element and restriction pairs to several workers.</li>
-<li>Element and restriction pairs are processed in parallel (e.g. the file is read). Within this last step, the element and restriction pair can pause its own processing and/or be split into further element and restriction pairs.</li>
-</ol>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-12-05-beam-examples-9/sdf_high_level_overview.png" loading="lazy" width="2462" height="824" />
-</picture>
-
-</p>
-<p>A basic SDF is composed of three parts: a restriction, a restriction provider, and a restriction tracker.</p>
-<ul>
-<li>restriction
-<ul>
-<li>It represents a subset of work for a given element.</li>
-<li>No specific class needs to be implemented to represent a restriction.</li>
-</ul>
-</li>
-<li>restriction provider
-<ul>
-<li>It lets developers override default implementations used to generate and manipulate restrictions.</li>
-<li>It extends from the <code>RestrictionProvider</code> base class.</li>
-</ul>
-</li>
-<li>restriction tracker
-<ul>
-<li>It tracks for which parts of the restriction processing has been completed.</li>
-<li>It extends from the <code>RestrictionTracker</code> base class.</li>
-</ul>
-</li>
-</ul>
-<p>The Python SDK has a built-in restriction (<code>OffsetRange</code>) and restriction tracker (<code>OffsetRangeTracker</code>), and we will use them in this post.</p>
-<p>An advanced SDF has the following components for watermark estimation, and we will use them in the next post.</p>
-<ul>
-<li>watermark state
-<ul>
-<li>It is a user-defined object. In its simplest form it could just be a timestamp.</li>
-</ul>
-</li>
-<li>watermark estimator
-<ul>
-<li>It tracks the watermark state when the processing of an element and restriction pair is in progress.</li>
-<li>It extends from the <code>WatermarkEstimator</code> base class.</li>
-</ul>
-</li>
-<li>watermark estimator provider
-<ul>
-<li>It lets developers define how to initialize the watermark state and create a watermark estimator.</li>
-<li>It extends from the <code>WatermarkEstimatorProvider</code> base class.</li>
-</ul>
-</li>
-</ul>
-<p>For more details, visit <a href="https://2022.beamsummit.org/sessions/splittable-dofns-in-python/" target="_blank" rel="noopener noreferrer">Splittable DoFns in Python: a hands-on workshop<i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-
-<h2 id="batch-file-reader" data-numberify>Batch File Reader<a class="anchor ms-1" href="#batch-file-reader"></a></h2>
-<p>This Beam pipeline reads a list of files in a folder followed by processing each of the file objects in parallel. The pipeline is slightly modified from an example which was introduced in a <a href="https://2022.beamsummit.org/sessions/splittable-dofns-in-python/" target="_blank" rel="noopener noreferrer">workshop<i class="fas fa-external-link-square-alt ms-1"></i></a> at Beam Summit 2022. The source of this post can be found in this <a href="https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines" target="_blank" rel="noopener noreferrer"><strong>GitHub repository</strong><i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-
-<h3 id="file-generator" data-numberify>File Generator<a class="anchor ms-1" href="#file-generator"></a></h3>
-<p>The batch pipeline requires input files to process, and those files can be created using the file generator (<code>faker_file_gen.py</code>). It creates a configurable number of files (default <em>10</em>) in a specified folder (default <em>fake_files</em>). Each file includes zero to two hundreds lines of text, which is generated by the <a href="https://faker.readthedocs.io/en/master/" target="_blank" rel="noopener noreferrer">Faker package<i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># utils/faker_file_gen.py</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="kn">import</span> <span class="nn">shutil</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kn">import</span> <span class="nn">argparse</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kn">import</span> <span class="nn">logging</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kn">from</span> <span class="nn">faker</span> <span class="kn">import</span> <span class="n">Faker</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="k">def</span> <span class="nf">create_folder</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">
-</span></span><span class="line"><span class="ln">15</span><span class="cl">
-</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="n">fake</span><span class="p">:</span> <span class="n">Faker</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">),</span> <span class="s2">&#34;w&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">fake</span><span class="o">.</span><span class="n">texts</span><span class="p">(</span><span class="n">nb_texts</span><span class="o">=</span><span class="n">fake</span><span class="o">.</span><span class="n">random_int</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">200</span><span class="p">)))</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">
-</span></span><span class="line"><span class="ln">20</span><span class="cl">
-</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&#34;Fake Text File Generator&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="s2">&#34;-p&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">        <span class="s2">&#34;--file_path&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))),</span> <span class="s2">&#34;fake_files&#34;</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">        <span class="p">),</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;File path&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="s2">&#34;-m&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">        <span class="s2">&#34;--max_files&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;The amount of time that a record should be delayed.&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">        <span class="s2">&#34;-d&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">        <span class="s2">&#34;--delay_seconds&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">41</span><span class="cl">        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;The amount of time that a record should be delayed.&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">44</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">
-</span></span><span class="line"><span class="ln">46</span><span class="cl">    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">47</span><span class="cl">
-</span></span><span class="line"><span class="ln">48</span><span class="cl">    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">49</span><span class="cl">    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">50</span><span class="cl">        <span class="sa">f</span><span class="s2">&#34;Create files: max files </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">max_files</span><span class="si">}</span><span class="s2">, delay seconds </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">delay_seconds</span><span class="si">}</span><span class="s2">...&#34;</span>
-</span></span><span class="line"><span class="ln">51</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">52</span><span class="cl">
-</span></span><span class="line"><span class="ln">53</span><span class="cl">    <span class="n">fake</span> <span class="o">=</span> <span class="n">Faker</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">54</span><span class="cl">    <span class="n">Faker</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1237</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">55</span><span class="cl">
-</span></span><span class="line"><span class="ln">56</span><span class="cl">    <span class="n">create_folder</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">file_path</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">57</span><span class="cl">    <span class="n">current</span> <span class="o">=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="ln">58</span><span class="cl">    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">59</span><span class="cl">        <span class="n">write_to_file</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">60</span><span class="cl">            <span class="n">fake</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">61</span><span class="cl">            <span class="n">args</span><span class="o">.</span><span class="n">file_path</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">62</span><span class="cl">            <span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fake</span><span class="o">.</span><span class="n">random_letters</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">.txt&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">63</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">64</span><span class="cl">        <span class="n">current</span> <span class="o">+=</span> <span class="mi">1</span>
-</span></span><span class="line"><span class="ln">65</span><span class="cl">        <span class="k">if</span> <span class="n">current</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">66</span><span class="cl">            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Created </span><span class="si">{</span><span class="n">current</span><span class="si">}</span><span class="s2"> files so far...&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">67</span><span class="cl">        <span class="k">if</span> <span class="n">current</span> <span class="o">==</span> <span class="n">args</span><span class="o">.</span><span class="n">max_files</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">68</span><span class="cl">            <span class="k">break</span>
-</span></span><span class="line"><span class="ln">69</span><span class="cl">        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">)</span>
-</span></span></code></pre></div><p>Once executed, we can check input files are created in a specified folder.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl">$ python utils/faker_file_gen.py --file_path fake_files --max_files <span class="m">10</span> --delay_seconds 0.5
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">INFO:root:Create files: max files 10, delay seconds 0.5...
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">INFO:root:Created <span class="m">5</span> files so far...
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">INFO:root:Created <span class="m">10</span> files so far...
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">$ tree fake_files/
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">fake_files/
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">├── dhmfhxwbqd.txt
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">├── dzpjwroqdd.txt
-</span></span><span class="line"><span class="ln">10</span><span class="cl">├── humlastzob.txt
-</span></span><span class="line"><span class="ln">11</span><span class="cl">├── jfdlxdnsre.txt
-</span></span><span class="line"><span class="ln">12</span><span class="cl">├── qgtyykdzdk.txt
-</span></span><span class="line"><span class="ln">13</span><span class="cl">├── uxgrwaisgj.txt
-</span></span><span class="line"><span class="ln">14</span><span class="cl">├── vcqlxrcqnx.txt
-</span></span><span class="line"><span class="ln">15</span><span class="cl">├── ydlceysnkc.txt
-</span></span><span class="line"><span class="ln">16</span><span class="cl">├── ylgvjqjhrb.txt
-</span></span><span class="line"><span class="ln">17</span><span class="cl">└── zpjinqrdyw.txt
-</span></span><span class="line"><span class="ln">18</span><span class="cl">
-</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="m">1</span> directory, <span class="m">10</span> files
-</span></span></code></pre></div>
-<h3 id="sdf-for-file-processing" data-numberify>SDF for File Processing<a class="anchor ms-1" href="#sdf-for-file-processing"></a></h3>
-<p>The pipeline has two <em>DoFn</em> objects.</p>
-<ul>
-<li><code>GenerateFilesFn</code>
-<ul>
-<li>It reads each of the files in the input folder (<em>element</em>) followed by yielding a custom object (<code>MyFile</code>). The custom object keeps details of a file object that include the file name and start/end positions. As we use the default <code>OffsetRestrictionTracker</code> in the subsequent <em>DoFn</em>, it is necessary to keep the start and end positions because those are used to set up the initial offset range.</li>
-</ul>
-</li>
-<li><code>ProcessFilesFn</code>
-<ul>
-<li>It begins with recovering the current restriction using the parameter of type <code>RestrictionParam</code>, which is passed as argument. Then, it tries to claim/lock the position. Once claimed, it proceeds to processing the associated element and restriction pair, which is just yielding a text that keeps the file name and current position.</li>
-</ul>
-</li>
-</ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># chapter7/file_read.py</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="nn">typing</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="kn">import</span> <span class="nn">logging</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kn">import</span> <span class="nn">apache_beam</span> <span class="k">as</span> <span class="nn">beam</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam</span> <span class="kn">import</span> <span class="n">RestrictionProvider</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.io.restriction_trackers</span> <span class="kn">import</span> <span class="n">OffsetRange</span><span class="p">,</span> <span class="n">OffsetRestrictionTracker</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="k">class</span> <span class="nc">MyFile</span><span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">NamedTuple</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="n">start</span><span class="p">:</span> <span class="nb">int</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="n">end</span><span class="p">:</span> <span class="nb">int</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">
-</span></span><span class="line"><span class="ln">16</span><span class="cl">
-</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="k">class</span> <span class="nc">GenerateFilesFn</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">MyFile</span><span class="p">]:</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">element</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">file</span><span class="p">)):</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">                <span class="n">num_lines</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">file</span><span class="p">)))</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">                <span class="n">new_file</span> <span class="o">=</span> <span class="n">MyFile</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">num_lines</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">                <span class="k">yield</span> <span class="n">new_file</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">
-</span></span><span class="line"><span class="ln">25</span><span class="cl">
-</span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="k">class</span> <span class="nc">ProcessFilesFn</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="p">,</span> <span class="n">RestrictionProvider</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">        <span class="n">element</span><span class="p">:</span> <span class="n">MyFile</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">        <span class="n">tracker</span><span class="p">:</span> <span class="n">OffsetRestrictionTracker</span> <span class="o">=</span> <span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">RestrictionParam</span><span class="p">(),</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="p">):</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="n">restriction</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">current_restriction</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">        <span class="k">for</span> <span class="n">current_position</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">restriction</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">restriction</span><span class="o">.</span><span class="n">stop</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">            <span class="k">if</span> <span class="n">tracker</span><span class="o">.</span><span class="n">try_claim</span><span class="p">(</span><span class="n">current_position</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">                <span class="n">m</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&#34;file: </span><span class="si">{</span><span class="n">element</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, position: </span><span class="si">{</span><span class="n">current_position</span><span class="si">}</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">                <span class="k">yield</span> <span class="n">m</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">            <span class="k">else</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">                <span class="k">return</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">
-</span></span><span class="line"><span class="ln">41</span><span class="cl">    <span class="k">def</span> <span class="nf">create_tracker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">restriction</span><span class="p">:</span> <span class="n">OffsetRange</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OffsetRestrictionTracker</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl">        <span class="k">return</span> <span class="n">OffsetRestrictionTracker</span><span class="p">(</span><span class="n">restriction</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">
-</span></span><span class="line"><span class="ln">44</span><span class="cl">    <span class="k">def</span> <span class="nf">initial_restriction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">MyFile</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OffsetRange</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">        <span class="k">return</span> <span class="n">OffsetRange</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">element</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">element</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl">
-</span></span><span class="line"><span class="ln">47</span><span class="cl">    <span class="k">def</span> <span class="nf">restriction_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">MyFile</span><span class="p">,</span> <span class="n">restriction</span><span class="p">:</span> <span class="n">OffsetRange</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">48</span><span class="cl">        <span class="k">return</span> <span class="n">restriction</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-</span></span></code></pre></div>
-<h3 id="beam-pipeline" data-numberify>Beam Pipeline<a class="anchor ms-1" href="#beam-pipeline"></a></h3>
-<p>The pipeline begins with passing the input folder name to the <code>GenerateFilesFn</code> <em>DoFn</em>. Then, the <em>DoFn</em> yields the custom <code>MyFile</code> objects while reading the whole list of files in the input folder. Finally, the custom objects are processed by the <code>ProcessFilesFn</code> <em>DoFn</em>.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># chapter7/batch_file_read.py</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="nn">logging</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="kn">import</span> <span class="nn">argparse</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kn">import</span> <span class="nn">apache_beam</span> <span class="k">as</span> <span class="nn">beam</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.options.pipeline_options</span> <span class="kn">import</span> <span class="n">PipelineOptions</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.options.pipeline_options</span> <span class="kn">import</span> <span class="n">SetupOptions</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="kn">from</span> <span class="nn">file_read</span> <span class="kn">import</span> <span class="n">GenerateFilesFn</span><span class="p">,</span> <span class="n">ProcessFilesFn</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">
-</span></span><span class="line"><span class="ln">12</span><span class="cl">
-</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_main_session</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&#34;Beam pipeline arguments&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">        <span class="s2">&#34;-p&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">        <span class="s2">&#34;--file_path&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))),</span> <span class="s2">&#34;fake_files&#34;</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">        <span class="p">),</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;File path&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">
-</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="n">known_args</span><span class="p">,</span> <span class="n">pipeline_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">
-</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="c1"># # We use the save_main_session option because one or more DoFn&#39;s in this</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="c1"># # workflow rely on global context (e.g., a module imported at module level).</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="n">pipeline_options</span> <span class="o">=</span> <span class="n">PipelineOptions</span><span class="p">(</span><span class="n">pipeline_args</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="n">pipeline_options</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">SetupOptions</span><span class="p">)</span><span class="o">.</span><span class="n">save_main_session</span> <span class="o">=</span> <span class="n">save_main_session</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;known args - </span><span class="si">{</span><span class="n">known_args</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;pipeline options - </span><span class="si">{</span><span class="n">pipeline_options</span><span class="o">.</span><span class="n">display_data</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">
-</span></span><span class="line"><span class="ln">33</span><span class="cl">    <span class="k">with</span> <span class="n">beam</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">pipeline_options</span><span class="p">)</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">        <span class="p">(</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">            <span class="n">p</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">Create</span><span class="p">([</span><span class="n">known_args</span><span class="o">.</span><span class="n">file_path</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">ParDo</span><span class="p">(</span><span class="n">GenerateFilesFn</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">ParDo</span><span class="p">(</span><span class="n">ProcessFilesFn</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">
-</span></span><span class="line"><span class="ln">41</span><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&#34;Building pipeline ...&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">
-</span></span><span class="line"><span class="ln">44</span><span class="cl">
-</span></span><span class="line"><span class="ln">45</span><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl">    <span class="n">run</span><span class="p">()</span>
-</span></span></code></pre></div><p>We can create input files and run the pipeline using the <em>Direct Runner</em> as shown below.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">python utils/faker_file_gen.py -m <span class="m">1000</span> -d <span class="m">0</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl">python chapter7/batch_file_read.py <span class="se">\
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>    --direct_num_workers<span class="o">=</span><span class="m">3</span> --direct_running_mode<span class="o">=</span>multi_threading
-</span></span></code></pre></div><p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-12-05-beam-examples-9/batch-reader-demo.gif" loading="lazy" width="3210" height="1646" />
-</picture>
-
-</p>
-
-<h2 id="pi-sampler" data-numberify>PI Sampler<a class="anchor ms-1" href="#pi-sampler"></a></h2>
-<p>This pipeline performs a Monte Carlo simulation to estimate $\pi$. Let say we have a square that is centered at the origin of a two-dimensional space. If the length of its side is two, its area becomes four. Now we draw a circle of radius one, centered at the origin as well. Then, its area becomes $\pi$. In this circumstance, if we randomly place a dot within the square, the probability that we place the dot within the circle is $\pi$/4. To estimate this probability empirically, we can place many dots in the square. If we label the case as <em>positive</em> when a dot is placed within the circle and as <em>negative</em> otherwise, we have the following empirical relationship.</p>
-<ul>
-<li>$\pi$/4 $\approx$ <code># positive</code>/<code># total</code></li>
-</ul>
-<p>Therefore, we can estimate the value of $\pi$ with one of the following formulas.</p>
-<ul>
-<li>$\pi$ $\approx$ 4 x <code># positive</code>/<code># total</code> or 4 x (1 - <code># negative</code>/<code># total</code>)</li>
-</ul>
-<p>The pipeline has two <em>DoFn</em> objects as shown below.</p>
-<ul>
-<li><code>GenerateExperiments</code>
-<ul>
-<li>It yields a fixed number of samples (<code>num_samples</code>) to simulate in multiple experiments (<code>parallelism</code>). Therefore, it ends up creating <code>num_samples</code> * <code>parallelism</code> simulations in total.</li>
-</ul>
-</li>
-<li><code>PiSamplerDoFn</code>
-<ul>
-<li>Similar to the earlier pipeline, it begins with recovering the current restriction using the parameter of type <code>RestrictionParam</code>, which is passed as argument. Then, it tries to claim/lock the position. Once claimed, it generates two random numbers between zero and one followed by yielding one if their squired sum is greater than one. i.e. It tracks <em>negative</em> cases.</li>
-</ul>
-</li>
-</ul>
-<p>After completing all simulations, the resulting values are added, which calculates the number of all <em>negative</em> cases. Finally, the value of $\pi$ is estimated by applying the second formula mentioned above.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="kn">import</span> <span class="nn">random</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="nn">logging</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="nn">argparse</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kn">import</span> <span class="nn">apache_beam</span> <span class="k">as</span> <span class="nn">beam</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam</span> <span class="kn">import</span> <span class="n">RestrictionProvider</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.io.restriction_trackers</span> <span class="kn">import</span> <span class="n">OffsetRange</span><span class="p">,</span> <span class="n">OffsetRestrictionTracker</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.options.pipeline_options</span> <span class="kn">import</span> <span class="n">PipelineOptions</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.options.pipeline_options</span> <span class="kn">import</span> <span class="n">SetupOptions</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl">
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="k">class</span> <span class="nc">GenerateExperiments</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">parallelism</span> <span class="o">=</span> <span class="n">parallelism</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span> <span class="o">=</span> <span class="n">num_samples</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">
-</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ignored_element</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parallelism</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;sending </span><span class="si">{</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">th experiment&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">
-</span></span><span class="line"><span class="ln">23</span><span class="cl">
-</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="k">class</span> <span class="nc">PiSamplerDoFn</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="p">,</span> <span class="n">RestrictionProvider</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">        <span class="n">element</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">        <span class="n">tracker</span><span class="p">:</span> <span class="n">OffsetRestrictionTracker</span> <span class="o">=</span> <span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">RestrictionParam</span><span class="p">(),</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="p">):</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">        <span class="n">restriction</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">current_restriction</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">        <span class="k">for</span> <span class="n">current_position</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">restriction</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">restriction</span><span class="o">.</span><span class="n">stop</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">            <span class="k">if</span> <span class="n">tracker</span><span class="o">.</span><span class="n">try_claim</span><span class="p">(</span><span class="n">current_position</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">                <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">                <span class="k">if</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">                    <span class="k">yield</span> <span class="mi">1</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">            <span class="k">else</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">                <span class="k">return</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">
-</span></span><span class="line"><span class="ln">39</span><span class="cl">    <span class="k">def</span> <span class="nf">create_tracker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">restriction</span><span class="p">:</span> <span class="n">OffsetRange</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OffsetRestrictionTracker</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">        <span class="k">return</span> <span class="n">OffsetRestrictionTracker</span><span class="p">(</span><span class="n">restriction</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">41</span><span class="cl">
-</span></span><span class="line"><span class="ln">42</span><span class="cl">    <span class="k">def</span> <span class="nf">initial_restriction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OffsetRange</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">        <span class="k">return</span> <span class="n">OffsetRange</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">element</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">44</span><span class="cl">
-</span></span><span class="line"><span class="ln">45</span><span class="cl">    <span class="k">def</span> <span class="nf">restriction_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">restriction</span><span class="p">:</span> <span class="n">OffsetRange</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl">        <span class="k">return</span> <span class="n">restriction</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">47</span><span class="cl">
-</span></span><span class="line"><span class="ln">48</span><span class="cl">
-</span></span><span class="line"><span class="ln">49</span><span class="cl"><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_main_session</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">50</span><span class="cl">    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&#34;Beam pipeline arguments&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">51</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">52</span><span class="cl">        <span class="s2">&#34;-p&#34;</span><span class="p">,</span> <span class="s2">&#34;--parallelism&#34;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Number of parallelism&#34;</span>
-</span></span><span class="line"><span class="ln">53</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">54</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">55</span><span class="cl">        <span class="s2">&#34;-n&#34;</span><span class="p">,</span> <span class="s2">&#34;--num_samples&#34;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Number of samples&#34;</span>
-</span></span><span class="line"><span class="ln">56</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">57</span><span class="cl">
-</span></span><span class="line"><span class="ln">58</span><span class="cl">    <span class="n">known_args</span><span class="p">,</span> <span class="n">pipeline_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">59</span><span class="cl">
-</span></span><span class="line"><span class="ln">60</span><span class="cl">    <span class="c1"># # We use the save_main_session option because one or more DoFn&#39;s in this</span>
-</span></span><span class="line"><span class="ln">61</span><span class="cl">    <span class="c1"># # workflow rely on global context (e.g., a module imported at module level).</span>
-</span></span><span class="line"><span class="ln">62</span><span class="cl">    <span class="n">pipeline_options</span> <span class="o">=</span> <span class="n">PipelineOptions</span><span class="p">(</span><span class="n">pipeline_args</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">63</span><span class="cl">    <span class="n">pipeline_options</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">SetupOptions</span><span class="p">)</span><span class="o">.</span><span class="n">save_main_session</span> <span class="o">=</span> <span class="n">save_main_session</span>
-</span></span><span class="line"><span class="ln">64</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;known args - </span><span class="si">{</span><span class="n">known_args</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">65</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;pipeline options - </span><span class="si">{</span><span class="n">pipeline_options</span><span class="o">.</span><span class="n">display_data</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">66</span><span class="cl">
-</span></span><span class="line"><span class="ln">67</span><span class="cl">    <span class="k">with</span> <span class="n">beam</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">pipeline_options</span><span class="p">)</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">68</span><span class="cl">        <span class="p">(</span>
-</span></span><span class="line"><span class="ln">69</span><span class="cl">            <span class="n">p</span>
-</span></span><span class="line"><span class="ln">70</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">Create</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">71</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">ParDo</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">72</span><span class="cl">                <span class="n">GenerateExperiments</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">73</span><span class="cl">                    <span class="n">parallelism</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">parallelism</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">74</span><span class="cl">                    <span class="n">num_samples</span><span class="o">=</span><span class="n">known_args</span><span class="o">.</span><span class="n">num_samples</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">75</span><span class="cl">                <span class="p">)</span>
-</span></span><span class="line"><span class="ln">76</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">77</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">ParDo</span><span class="p">(</span><span class="n">PiSamplerDoFn</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">78</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">CombineGlobally</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">79</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">80</span><span class="cl">                <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="mi">4</span>
-</span></span><span class="line"><span class="ln">81</span><span class="cl">                <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">e</span> <span class="o">/</span> <span class="p">(</span><span class="n">known_args</span><span class="o">.</span><span class="n">num_samples</span> <span class="o">*</span> <span class="n">known_args</span><span class="o">.</span><span class="n">parallelism</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln">82</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln">83</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="nb">print</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">84</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">85</span><span class="cl">
-</span></span><span class="line"><span class="ln">86</span><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">87</span><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&#34;Building pipeline ...&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">88</span><span class="cl">
-</span></span><span class="line"><span class="ln">89</span><span class="cl">
-</span></span><span class="line"><span class="ln">90</span><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">91</span><span class="cl">    <span class="n">run</span><span class="p">()</span>
-</span></span></code></pre></div><p>In the following example, the value of $\pi$ is estimated by 6,000,000 simulations (<em>parallelism</em>: 200, <em>num_samples</em>: 30,000). We see that the pipeline estimates $\pi$ correctly to three decimal places.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">python chapter7/pi_sampler.py -p <span class="m">200</span> -n <span class="m">30000</span> <span class="se">\
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>    --direct_num_workers<span class="o">=</span><span class="m">3</span> --direct_running_mode<span class="o">=</span>multi_threading
-</span></span></code></pre></div><p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-12-05-beam-examples-9/pi-sampler-demo.gif" loading="lazy" width="3210" height="1646" />
 </picture>
 
 </p>
