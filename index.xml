@@ -37,7 +37,7 @@ Calculating the exact Rolling Force required to crush the steel is critical.</de
 <h3 id="challenge-1-asynchronous-industrial-streams" data-numberify>Challenge 1: Asynchronous Industrial Streams<a class="anchor ms-1" href="#challenge-1-asynchronous-industrial-streams"></a></h3>
 <p>Industrial data streams are inherently asynchronous. The factory floor requests a prediction <em>before</em> the steel enters the rolling stand (Event A), but the ground-truth sensor data confirming the actual required force arrives <em>after</em> the steel is crushed (Event B).</p>
 <p>To execute machine learning, these two events must be perfectly joined. However, network latency and partition skew in Kafka mean that these events might arrive out of order.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="Flink Application DAG" src="/blog/2026-04-21-digital-twin-online-machine-learning/stream-processing-flink.png" loading="lazy" width="1158" height="522" />
+<p><picture><img class="img-fluid mx-auto d-block" alt="Flink Application DAG" src="/blog/2026-04-21-digital-twin-online-machine-learning/stream-processing-flink.png" loading="lazy" width="1365" height="613" />
 </picture>
 
 </p>
