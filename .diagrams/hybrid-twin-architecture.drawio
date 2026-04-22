@@ -1,10 +1,10 @@
 <mxfile host="65bd71144e">
     <diagram id="diagram1" name="Hybrid Architecture">
-        <mxGraphModel dx="1117" dy="541" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+        <mxGraphModel dx="1200" dy="612" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="t1" value="&lt;b&gt;1. Traditional Simulation&lt;/b&gt;&lt;br&gt;(Sealed Box)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;sketch=1;fontSize=18;fontColor=#333333;fontFamily=Comic Sans MS;" parent="1" vertex="1">
+                <mxCell id="t1" value="&lt;b style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251);&quot;&gt;1. Traditional Simulation&lt;/b&gt;&lt;br style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251);&quot;&gt;&lt;span style=&quot;color: rgb(51, 51, 51);&quot;&gt;(Isolated Execution)&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;sketch=1;fontSize=18;fontColor=#333333;fontFamily=Comic Sans MS;" parent="1" vertex="1">
                     <mxGeometry x="81" y="88" width="280" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="2" value="Physical Factory" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;fontSize=14;fontStyle=1;fontFamily=Comic Sans MS;" parent="1" vertex="1">
@@ -18,59 +18,62 @@
                 </mxCell>
                 <mxCell id="5" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 4;strokeWidth=2;sketch=1;strokeColor=#CCCCCC;fontFamily=Comic Sans MS;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="341" y="490" as="sourcePoint"/>
-                        <mxPoint x="341" y="70" as="targetPoint"/>
+                        <mxPoint x="362" y="490" as="sourcePoint"/>
+                        <mxPoint x="362" y="70" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="6" value="&lt;b&gt;2. Operational Digital Twin&lt;/b&gt;&lt;br&gt;(Live Mirror)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;sketch=1;fontSize=18;fontColor=#333333;fontFamily=Comic Sans MS;" parent="1" vertex="1">
-                    <mxGeometry x="337" y="88" width="280" height="60" as="geometry"/>
+                <mxCell id="6" value="&lt;b style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251);&quot;&gt;2. Operational Digital Twin&lt;/b&gt;&lt;br style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251);&quot;&gt;&lt;span style=&quot;color: rgb(51, 51, 51);&quot;&gt;(State Synchronization)&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;sketch=1;fontSize=18;fontColor=#333333;fontFamily=Comic Sans MS;" parent="1" vertex="1">
+                    <mxGeometry x="368" y="88" width="280" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="7" value="Physical Asset" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;fontSize=14;fontStyle=1;fontFamily=Comic Sans MS;" parent="1" vertex="1">
-                    <mxGeometry x="376" y="188" width="220" height="80" as="geometry"/>
+                    <mxGeometry x="407" y="188" width="220" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="8" value="Cloud Replica" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=14;fontStyle=1;fontFamily=Comic Sans MS;" parent="1" vertex="1">
-                    <mxGeometry x="376" y="408" width="220" height="80" as="geometry"/>
+                    <mxGeometry x="407" y="408" width="220" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;sketch=1;strokeWidth=2;entryX=0.3;entryY=0;entryDx=0;entryDy=0;exitX=0.3;exitY=1;exitDx=0;exitDy=0;fontColor=#666666;fontFamily=Comic Sans MS;" parent="1" edge="1">
                     <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="416" y="268" as="sourcePoint"/>
-                        <mxPoint x="416" y="408" as="targetPoint"/>
+                        <mxPoint x="447" y="268" as="sourcePoint"/>
+                        <mxPoint x="447" y="408" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;sketch=1;strokeWidth=2;entryX=0.7;entryY=1;entryDx=0;entryDy=0;exitX=0.7;exitY=0;exitDx=0;exitDy=0;fontColor=#666666;fontFamily=Comic Sans MS;" parent="1" edge="1">
                     <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="555" y="408" as="sourcePoint"/>
-                        <mxPoint x="555" y="268" as="targetPoint"/>
+                        <mxPoint x="586" y="408" as="sourcePoint"/>
+                        <mxPoint x="586" y="268" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="12" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 4;strokeWidth=2;sketch=1;strokeColor=#CCCCCC;fontFamily=Comic Sans MS;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="622" y="484" as="sourcePoint"/>
-                        <mxPoint x="623" y="72" as="targetPoint"/>
+                        <mxPoint x="663" y="484" as="sourcePoint"/>
+                        <mxPoint x="664" y="72" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="13" value="&lt;b&gt;3. Hybrid Approach&lt;/b&gt;&lt;br&gt;(Dyamic Adaptation)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;sketch=1;fontSize=18;fontColor=#333333;fontFamily=Comic Sans MS;" parent="1" vertex="1">
-                    <mxGeometry x="602" y="88" width="280" height="60" as="geometry"/>
+                <mxCell id="13" value="&lt;b style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251);&quot;&gt;3. Hybrid Execution&lt;/b&gt;&lt;br style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251);&quot;&gt;&lt;span style=&quot;color: rgb(51, 51, 51);&quot;&gt;(Dynamic Adaptation)&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;sketch=1;fontSize=18;fontColor=#333333;fontFamily=Comic Sans MS;" parent="1" vertex="1">
+                    <mxGeometry x="643" y="88" width="280" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="14" value="Live Digital Twin State" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=14;fontStyle=1;fontFamily=Comic Sans MS;" parent="1" vertex="1">
-                    <mxGeometry x="642" y="188" width="200" height="80" as="geometry"/>
+                    <mxGeometry x="683" y="188" width="200" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="15" value="Simulation Engine&lt;div&gt;(&lt;span style=&quot;color: rgb(0, 0, 0); background-color: transparent;&quot;&gt;dynamic-des&lt;/span&gt;&lt;span style=&quot;color: rgb(63, 63, 63); background-color: transparent;&quot;&gt;)&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=14;fontStyle=1;fontFamily=Comic Sans MS;" parent="1" vertex="1">
-                    <mxGeometry x="642" y="408" width="200" height="80" as="geometry"/>
+                    <mxGeometry x="683" y="408" width="200" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="16" value="&lt;span style=&quot;color: rgb(102, 102, 102);&quot;&gt;Live Kafka Events &amp;amp;&lt;/span&gt;&lt;br style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251);&quot;&gt;&lt;span style=&quot;color: rgb(102, 102, 102);&quot;&gt;Parameter Updates&lt;/span&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;sketch=1;strokeWidth=2;fontSize=13;fontColor=#666666;fontFamily=Comic Sans MS;" parent="1" source="14" target="15" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="17" value="&lt;span style=&quot;color: rgb(102, 102, 102);&quot;&gt;Simulated&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(102, 102, 102);&quot;&gt;Telemetry&lt;/span&gt;&lt;br style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251);&quot;&gt;&lt;span style=&quot;color: rgb(102, 102, 102);&quot;&gt;&amp;amp; Event Logs&lt;/span&gt;&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;sketch=1;strokeWidth=2;fontSize=13;fontColor=#666666;fontFamily=Comic Sans MS;" parent="1" source="15" edge="1">
                     <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="995" y="448" as="targetPoint"/>
+                        <mxPoint x="1036" y="448" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="11" value="Continuous IoT Telemetry&lt;div&gt;&amp;amp; State Sync&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;sketch=1;fontSize=13;fontColor=#666666;fontFamily=Comic Sans MS;" parent="1" vertex="1">
-                    <mxGeometry x="421" y="312" width="130" height="60" as="geometry"/>
+                    <mxGeometry x="452" y="312" width="130" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="20" value="&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;&lt;font style=&quot;font-size: 22px;&quot;&gt;&lt;b&gt;Architectural Path to the Hybrid Digital Twin&lt;/b&gt;&lt;/font&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Comic Sans MS;" vertex="1" parent="1">
-                    <mxGeometry x="107" y="33" width="499" height="40" as="geometry"/>
+                <mxCell id="22" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="276" y="36" width="534" height="52" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;&lt;font style=&quot;font-size: 22px;&quot;&gt;&lt;b&gt;Architectural Path to the Hybrid Digital Twin&lt;/b&gt;&lt;/font&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Comic Sans MS;fontStyle=0;textShadow=0;shadow=0;" parent="1" vertex="1">
+                    <mxGeometry x="292" y="42" width="499" height="40" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
