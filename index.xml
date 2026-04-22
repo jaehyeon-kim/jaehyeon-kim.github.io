@@ -1,4 +1,67 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning</title><link>https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/</link><guid>https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/</guid><pubDate>Tue, 21 Apr 2026 00:00:00 +0000</pubDate><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Why Digital Twins Are Rewiring Industry 4.0</title><link>https://jaehyeon.me/blog/2026-04-23-digital-twin-industry-4-0/</link><guid>https://jaehyeon.me/blog/2026-04-23-digital-twin-industry-4-0/</guid><pubDate>Thu, 23 Apr 2026 00:00:00 +0000</pubDate><description>
+Beyond CAD Models There is a project by Dassault Systèmes called the Living Heart that illustrates the trajectory of this technology. Instead of relying on standard 2D scans, surgeons can pull up a 3D model of a patient&amp;rsquo;s heart that simulates blood flow, mechanics, and electricity based on real patient data. It allows doctors to test therapeutic interventions before surgery begins.
+This highlights what a modern digital twin looks like in practice.</description><content:encoded><![CDATA[
+        
+<h2 id="beyond-cad-models" data-numberify>Beyond CAD Models<a class="anchor ms-1" href="#beyond-cad-models"></a></h2>
+<p>There is a project by Dassault Systèmes called the <a href="https://www.3ds.com/3dexperiencelab/portfolio/living-heart" target="_blank" rel="noopener noreferrer"><strong>Living Heart</strong><i class="fas fa-external-link-square-alt ms-1"></i></a> that illustrates the trajectory of this technology. Instead of relying on standard 2D scans, surgeons can pull up a 3D model of a patient&rsquo;s heart that simulates blood flow, mechanics, and electricity based on real patient data. It allows doctors to test therapeutic interventions before surgery begins.</p>
+<p>This highlights what a modern digital twin looks like in practice. It has moved past being a static 3D CAD file and serves as a persistent link between physical and digital environments, updating continuously based on operational data.</p>
+
+<h2 id="industry-applications" data-numberify>Industry Applications<a class="anchor ms-1" href="#industry-applications"></a></h2>
+<p>While manufacturing initially drove this technology, digital twins are now expanding across a wider spectrum of advanced applications.</p>
+<ul>
+<li><strong>Smart Manufacturing:</strong> On automated factory floors, robotic arms stream live telemetry to virtual models. This allows plant managers to predict maintenance needs and test routing scenarios without halting physical production lines.</li>
+<li><strong>Supply Chain and Logistics:</strong> Global supply chains use digital twins to track everything from warehouse inventory levels to fleet movements, achieving end-to-end visibility. Operators can simulate supply chain shocks and dynamically resolve bottlenecks before they impact customers.</li>
+<li><strong>Cybersecurity and Infrastructure:</strong> Network digital twins are increasingly used to replicate API gateways and load balancers. Subjecting a live production server to a simulated DDoS attack carries unacceptable downtime risks. Instead, security teams use virtual replicas as isolated environments to safely test rate-limiting and AI behavioral rules.</li>
+<li><strong>Next-Generation Telecommunications:</strong> Modern 5G networks are incredibly complex. Telecom operators build digital twins of their networks to manage dynamic bandwidth allocation and network slicing, simulating massive traffic spikes across thousands of nodes before they cause cellular outages.</li>
+</ul>
+
+<h2 id="reality-gap-simulations-vs-digital-twins" data-numberify>Reality Gap: Simulations vs. Digital Twins<a class="anchor ms-1" href="#reality-gap-simulations-vs-digital-twins"></a></h2>
+<p>The tech industry frequently uses the terms &ldquo;simulation&rdquo; and &ldquo;digital twin&rdquo; interchangeably. Clarifying the technical difference between the two is critical for evaluating modern control architectures. To understand this difference practically, let&rsquo;s look at a factory floor where &ldquo;Machine B&rdquo; suddenly breaks down and its capacity drops to zero.</p>
+<p>Here is how three different architectural systems handle that exact event:</p>
+
+<h3 id="traditional-simulation-sealed-box" data-numberify>Traditional Simulation (Sealed Box)<a class="anchor ms-1" href="#traditional-simulation-sealed-box"></a></h3>
+<p>A <strong>simulation</strong> is a predictive model designed to explore &ldquo;what if&rdquo; scenarios within bounded parameters, relying heavily on static inputs and batch processing. Many traditional simulation environments, including standard <em>Discrete-Event Simulation (DES)</em> tools, were not designed for continuous live operational updates.</p>
+<ul>
+<li><strong>Scenario:</strong> On Monday morning, an engineer runs a DES model of the factory. On Tuesday, Machine B physically breaks. Because the traditional simulation operates as a sealed box, it is unaware of real-world changes once the mathematical execution begins. Unless an engineer manually stops the simulation, rewrites the parameters, and restarts it, the model will incorrectly continue assuming Machine B is running at full capacity.</li>
+</ul>
+
+<h3 id="operational-digital-twin-live-mirror" data-numberify>Operational Digital Twin (Live Mirror)<a class="anchor ms-1" href="#operational-digital-twin-live-mirror"></a></h3>
+<p>At the advanced end of the spectrum, an <strong>operational digital twin</strong> maintains a continuous, two-way connection to reality. Instead of relying on static snapshots, it utilizes distributed computing, time-series databases, and IoT connectivity to assess the exact current operational state.</p>
+<ul>
+<li><strong>Scenario:</strong> The moment Machine B breaks, sensors ping the cloud database. The digital twin dashboard immediately turns red, updating the machine&rsquo;s live status to &ldquo;Offline&rdquo; and its current capacity to zero. However, it only tells you what is happening <em>right now</em>. It does not automatically recalculate the mathematical impact to simulate the future consequences of that breakdown.</li>
+</ul>
+
+<h3 id="hybrid-execution-dynamic-adaptation" data-numberify>Hybrid Execution (Dynamic Adaptation)<a class="anchor ms-1" href="#hybrid-execution-dynamic-adaptation"></a></h3>
+<p>The <strong>hybrid approach</strong> bridges this gap by wiring the live state of the digital twin directly into a running simulation engine.</p>
+<ul>
+<li><strong>Scenario:</strong> The operational twin registers that Machine B is broken and emits a live Kafka event. A background hybrid simulation engine ingests that event <em>while it is still running</em>. It dynamically mutates Machine B&rsquo;s capacity parameter to zero and recalculates the logic on the fly. The system now automatically outputs simulated telemetry showing the immediate cascading consequences: &ldquo;Machine B&rsquo;s queue is backing up, routing logic must shift to Machine D, and a critical bottleneck will form at Machine C in exactly 45 minutes if no intervention is taken.&rdquo;</li>
+</ul>
+
+<h2 id="upgraded-simulation-fallacy" data-numberify>Upgraded Simulation Fallacy<a class="anchor ms-1" href="#upgraded-simulation-fallacy"></a></h2>
+<p>Because of this market confusion, organizations often fall into the &ldquo;Upgraded Simulation Fallacy.&rdquo; They purchase simulation software, attach a 3D dashboard, and classify the project as a digital twin. However, if the system cannot process continuous data streams or synchronize with live states, it fundamentally remains a static simulation.</p>
+<p>Transitioning to an operational digital twin introduces strict engineering realities:</p>
+<ul>
+<li><strong>Cost and Complexity:</strong> Building them requires heavy investments in sensors, edge computing, and complex system architectures.</li>
+<li><strong>Cybersecurity Risks:</strong> Connecting physical infrastructure to cloud-based models expands the attack surface.</li>
+<li><strong>Data Pipelines and Standardization:</strong> Getting disparate sensors to speak the same language and pipe into a central engine is an architectural challenge.</li>
+</ul>
+<p>This last point is where many projects stall. If you force real-time updates into a legacy simulation engine, the simulation clock often bottlenecks while waiting for network requests, or the system fails due to unpredictable data. To build a functional digital twin, your simulation engine must be designed to handle asynchronous network I/O so the underlying math model runs uninterrupted, while enforcing strict data schemas (like Pydantic or Avro) to maintain system stability.</p>
+
+<h2 id="taking-control-with-a-hybrid-approach" data-numberify>Taking Control with a Hybrid Approach<a class="anchor ms-1" href="#taking-control-with-a-hybrid-approach"></a></h2>
+<p>Ultimately, organizations shouldn&rsquo;t have to choose between a static simulation and a live twin. The future of Industry 4.0 is a hybrid approach: running &ldquo;what-if&rdquo; simulations against live digital twin states.</p>
+<p>By feeding the current, real-time state of a digital twin directly into a simulation engine, engineers can forecast the next four hours of production or network traffic based on exact current conditions.</p>
+<p>But this introduces a major architectural problem: How do you take a live digital twin state, ingest an asynchronous Kafka stream, and dynamically alter the capacity of a running virtual machine without lagging behind real-time?</p>
+<p>One approach to solving this class of problem is the <a href="https://github.com/jaehyeon-kim/dynamic-des" target="_blank" rel="noopener noreferrer"><strong><code>dynamic-des</code></strong><i class="fas fa-external-link-square-alt ms-1"></i></a> package. In Part 2 of this series, we will look at how the package&rsquo;s Switchboard pattern and dynamic resources can help turn a static mathematical model into a synchronized, event-driven digital twin.</p>
+<hr>
+
+<h3 id="references" data-numberify>References<a class="anchor ms-1" href="#references"></a></h3>
+<ol>
+<li>Attaran, M., &amp; Celik, B. G. (2023). Digital Twin: Benefits, use cases, challenges, and opportunities. <em>Decision Analytics Journal</em>, 6, 100165.</li>
+<li>Javaid, M., Haleem, A., &amp; Suman, R. (2023). Digital Twin applications toward Industry 4.0: A Review. <em>Cognitive Robotics</em>, 3, 71-92.</li>
+<li>Niantic Spatial. (2025). Simulations vs. Digital Twins. <em>Niantic Spatial Campaigns</em>.</li>
+</ol>
+
+      ]]></content:encoded></item><item><title>Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning</title><link>https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/</link><guid>https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/</guid><pubDate>Tue, 21 Apr 2026 00:00:00 +0000</pubDate><description>
 Overview Imagine using a rolling pin to flatten out a thick piece of dough. A Hot Strip Mill does the exact same thing, but with glowing red-hot steel slabs (often heated over 1000°C) and massive mechanical rollers. The steel is passed through a series of these rollers, crushing it down from a thick block into a long, thin sheet.
 Calculating the exact Rolling Force required to crush the steel is critical.</description><content:encoded><![CDATA[
         
@@ -6885,492 +6948,6 @@ The <code>avro</code> block in <code>build.gradle.kts</code> configures the Avro
 <h2 id="deploy-services" data-numberify>Deploy Services<a class="anchor ms-1" href="#deploy-services"></a></h2>
 <p>The Docker Compose services can be deployed using the command <code>docker-compose -f producer/docker-compose.yml up -d</code>. Once started, the server can be checked with a <a href="https://github.com/lewoudar/ws/" target="_blank" rel="noopener noreferrer">WebSocket client<i class="fas fa-external-link-square-alt ms-1"></i></a> by executing <code>ws listen ws://localhost:8000/ws</code>, and its logs can be monitored by running <code>docker logs -f producer</code>.</p>
 <p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2025-02-18-realtime-dashboard-1/featured.gif" loading="lazy" width="1835" height="776" />
-</picture>
-
-</p>
-      ]]></content:encoded></item><item><title>Apache Beam Python Examples - Part 10 Develop Streaming File Reader using Splittable DoFn</title><link>https://jaehyeon.me/blog/2024-12-19-beam-examples-10/</link><guid>https://jaehyeon.me/blog/2024-12-19-beam-examples-10/</guid><pubDate>Thu, 19 Dec 2024 00:00:00 +0000</pubDate><description><![CDATA[
-        <p>In <a href="/blog/2024-12-05-beam-examples-9">Part 9</a>, we developed two Apache Beam pipelines using <a href="https://beam.apache.org/documentation/programming-guide/#splittable-dofns" target="_blank" rel="noopener noreferrer"><em>Splittable DoFn (SDF)</em><i class="fas fa-external-link-square-alt ms-1"></i></a>. One of them is a batch file reader, which reads a list of files in an input folder followed by processing them in parallel. We can extend the I/O connector so that, instead of listing files once at the beginning, it scans an input folder periodically for new files and processes whenever new files are created in the folder. The techniques used in this post can be quite useful as they can be applied to developing I/O connectors that target other unbounded (or streaming) data sources (eg Kafka) using the Python SDK.</p>
-      ]]></description><content:encoded><![CDATA[
-        <p>In <a href="/blog/2024-12-05-beam-examples-9">Part 9</a>, we developed two Apache Beam pipelines using <a href="https://beam.apache.org/documentation/programming-guide/#splittable-dofns" target="_blank" rel="noopener noreferrer"><em>Splittable DoFn (SDF)</em><i class="fas fa-external-link-square-alt ms-1"></i></a>. One of them is a batch file reader, which reads a list of files in an input folder followed by processing them in parallel. We can extend the I/O connector so that, instead of listing files once at the beginning, it scans an input folder periodically for new files and processes whenever new files are created in the folder. The techniques used in this post can be quite useful as they can be applied to developing I/O connectors that target other unbounded (or streaming) data sources (eg Kafka) using the Python SDK.</p>
-<ul>
-<li><a href="/blog/2024-07-04-beam-examples-1">Part 1 Calculate K Most Frequent Words and Max Word Length</a></li>
-<li><a href="/blog/2024-07-18-beam-examples-2">Part 2 Calculate Average Word Length with/without Fixed Look back</a></li>
-<li><a href="/blog/2024-08-01-beam-examples-3">Part 3 Build Sport Activity Tracker with/without SQL</a></li>
-<li><a href="/blog/2024-08-15-beam-examples-4">Part 4 Call RPC Service for Data Augmentation</a></li>
-<li><a href="/blog/2024-09-18-beam-examples-5">Part 5 Call RPC Service in Batch using Stateless DoFn</a></li>
-<li><a href="/blog/2024-10-02-beam-examples-6">Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn</a></li>
-<li><a href="/blog/2024-10-24-beam-examples-7">Part 7 Separate Droppable Data into Side Output</a></li>
-<li><a href="/blog/2024-11-21-beam-examples-8">Part 8 Enhance Sport Activity Tracker with Runner Motivation</a></li>
-<li><a href="/blog/2024-12-05-beam-examples-9">Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn</a></li>
-<li><a href="/blog/2024-12-19-beam-examples-10/#">Part 10 Develop Streaming File Reader using Splittable DoFn</a> (this post)</li>
-</ul>
-
-<h2 id="splittable-dofn" data-numberify>Splittable DoFn<a class="anchor ms-1" href="#splittable-dofn"></a></h2>
-<p>A <a href="https://beam.apache.org/documentation/programming-guide/#splittable-dofns" target="_blank" rel="noopener noreferrer"><em>Splittable DoFn (SDF)</em><i class="fas fa-external-link-square-alt ms-1"></i></a> is a generalization of a <em>DoFn</em> that enables Apache Beam developers to create modular and composable I/O components. Also, it can be applied in advanced non-I/O scenarios such as Monte Carlo simulation.</p>
-<p>As described in the <a href="https://beam.apache.org/documentation/programming-guide/#splittable-dofns" target="_blank" rel="noopener noreferrer">Apache Beam Programming Guide<i class="fas fa-external-link-square-alt ms-1"></i></a>, an SDF is responsible for processing element and restriction pairs. A restriction represents a subset of work that would have been necessary to have been done when processing the element.</p>
-<p>Executing an SDF follows the following steps:</p>
-<ol>
-<li>Each element is paired with a restriction (e.g. filename is paired with offset range representing the whole file).</li>
-<li>Each element and restriction pair is split (e.g. offset ranges are broken up into smaller pieces).</li>
-<li>The runner redistributes the element and restriction pairs to several workers.</li>
-<li>Element and restriction pairs are processed in parallel (e.g. the file is read). Within this last step, the element and restriction pair can pause its own processing and/or be split into further element and restriction pairs.</li>
-</ol>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-12-19-beam-examples-10/sdf_high_level_overview.png" loading="lazy" width="2462" height="824" />
-</picture>
-
-</p>
-<p>A basic SDF is composed of three parts: a restriction, a restriction provider, and a restriction tracker.</p>
-<ul>
-<li>restriction
-<ul>
-<li>It represents a subset of work for a given element.</li>
-<li>No specific class needs to be implemented to represent a restriction.</li>
-</ul>
-</li>
-<li>restriction provider
-<ul>
-<li>It lets developers override default implementations used to generate and manipulate restrictions.</li>
-<li>It extends from the <code>RestrictionProvider</code> base class.</li>
-</ul>
-</li>
-<li>restriction tracker
-<ul>
-<li>It tracks for which parts of the restriction processing has been completed.</li>
-<li>It extends from the <code>RestrictionTracker</code> base class.</li>
-</ul>
-</li>
-</ul>
-<p>The Python SDK has a built-in restriction (<code>OffsetRange</code>) and restriction tracker (<code>OffsetRangeTracker</code>). We will use both the built-in and custom components in this post.</p>
-<p>An advanced SDF has the following components for watermark estimation, and we will use them in this post.</p>
-<ul>
-<li>watermark state
-<ul>
-<li>It is a user-defined object. In its simplest form it could just be a timestamp.</li>
-</ul>
-</li>
-<li>watermark estimator
-<ul>
-<li>It tracks the watermark state when the processing of an element and restriction pair is in progress.</li>
-<li>It extends from the <code>WatermarkEstimator</code> base class.</li>
-</ul>
-</li>
-<li>watermark estimator provider
-<ul>
-<li>It lets developers define how to initialize the watermark state and create a watermark estimator.</li>
-<li>It extends from the <code>WatermarkEstimatorProvider</code> base class.</li>
-</ul>
-</li>
-</ul>
-<p>For more details, visit <a href="https://2022.beamsummit.org/sessions/splittable-dofns-in-python/" target="_blank" rel="noopener noreferrer">Splittable DoFns in Python: a hands-on workshop<i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-
-<h2 id="streaming-file-reader" data-numberify>Streaming File Reader<a class="anchor ms-1" href="#streaming-file-reader"></a></h2>
-<p>The pipeline scans an input folder periodically for new files and processes whenever new files are created in the folder. The source of this post can be found in this <a href="https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines" target="_blank" rel="noopener noreferrer"><strong>GitHub repository</strong><i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-
-<h3 id="file-generator" data-numberify>File Generator<a class="anchor ms-1" href="#file-generator"></a></h3>
-<p>The pipeline requires input files to process, and those files can be created using the file generator (<code>faker_file_gen.py</code>). It creates a configurable number of files (default <em>10</em>) in a folder (default <em>fake_files</em>). Note that it generates files indefinitely if we specify the argument (<code>-m</code> or <code>--max_files</code>) to <em>-1</em>. Each file includes zero to two hundreds lines of text, which is generated by the <a href="https://faker.readthedocs.io/en/master/" target="_blank" rel="noopener noreferrer">Faker package<i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># utils/faker_file_gen.py</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="kn">import</span> <span class="nn">shutil</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kn">import</span> <span class="nn">argparse</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kn">import</span> <span class="nn">logging</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kn">from</span> <span class="nn">faker</span> <span class="kn">import</span> <span class="n">Faker</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="k">def</span> <span class="nf">create_folder</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">
-</span></span><span class="line"><span class="ln">15</span><span class="cl">
-</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="n">fake</span><span class="p">:</span> <span class="n">Faker</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">),</span> <span class="s2">&#34;w&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">fake</span><span class="o">.</span><span class="n">texts</span><span class="p">(</span><span class="n">nb_texts</span><span class="o">=</span><span class="n">fake</span><span class="o">.</span><span class="n">random_int</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">200</span><span class="p">)))</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">
-</span></span><span class="line"><span class="ln">20</span><span class="cl">
-</span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&#34;Fake Text File Generator&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">        <span class="s2">&#34;-p&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">        <span class="s2">&#34;--file_path&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))),</span> <span class="s2">&#34;fake_files&#34;</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">        <span class="p">),</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;File path&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="s2">&#34;-m&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">        <span class="s2">&#34;--max_files&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;The amount of time that a record should be delayed.&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">        <span class="s2">&#34;-d&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">        <span class="s2">&#34;--delay_seconds&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">41</span><span class="cl">        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;The amount of time that a record should be delayed.&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">44</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">
-</span></span><span class="line"><span class="ln">46</span><span class="cl">    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">47</span><span class="cl">
-</span></span><span class="line"><span class="ln">48</span><span class="cl">    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">49</span><span class="cl">    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">50</span><span class="cl">        <span class="sa">f</span><span class="s2">&#34;Create files: max files </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">max_files</span><span class="si">}</span><span class="s2">, delay seconds </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">delay_seconds</span><span class="si">}</span><span class="s2">...&#34;</span>
-</span></span><span class="line"><span class="ln">51</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">52</span><span class="cl">
-</span></span><span class="line"><span class="ln">53</span><span class="cl">    <span class="n">fake</span> <span class="o">=</span> <span class="n">Faker</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">54</span><span class="cl">    <span class="n">Faker</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1237</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">55</span><span class="cl">
-</span></span><span class="line"><span class="ln">56</span><span class="cl">    <span class="n">create_folder</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">file_path</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">57</span><span class="cl">    <span class="n">current</span> <span class="o">=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="ln">58</span><span class="cl">    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">59</span><span class="cl">        <span class="n">write_to_file</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">60</span><span class="cl">            <span class="n">fake</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">61</span><span class="cl">            <span class="n">args</span><span class="o">.</span><span class="n">file_path</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">62</span><span class="cl">            <span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fake</span><span class="o">.</span><span class="n">random_letters</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">.txt&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">63</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">64</span><span class="cl">        <span class="n">current</span> <span class="o">+=</span> <span class="mi">1</span>
-</span></span><span class="line"><span class="ln">65</span><span class="cl">        <span class="k">if</span> <span class="n">current</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">66</span><span class="cl">            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Created </span><span class="si">{</span><span class="n">current</span><span class="si">}</span><span class="s2"> files so far...&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">67</span><span class="cl">        <span class="k">if</span> <span class="n">current</span> <span class="o">==</span> <span class="n">args</span><span class="o">.</span><span class="n">max_files</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">68</span><span class="cl">            <span class="k">break</span>
-</span></span><span class="line"><span class="ln">69</span><span class="cl">        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">delay_seconds</span><span class="p">)</span>
-</span></span></code></pre></div><p>Once executed, we can check input files are created in a specified folder continuously.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl">$ python utils/faker_file_gen.py --max_files -1 --delay_seconds 0.5
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">INFO:root:Create files: max files -1, delay seconds 0.5...
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">INFO:root:Created <span class="m">5</span> files so far...
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">INFO:root:Created <span class="m">10</span> files so far...
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">INFO:root:Created <span class="m">15</span> files so far...
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">$ tree fake_files/
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">fake_files/
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">├── bcgmdarvkf.txt
-</span></span><span class="line"><span class="ln">10</span><span class="cl">├── dhmfhxwbqd.txt
-</span></span><span class="line"><span class="ln">11</span><span class="cl">├── dzpjwroqdd.txt
-</span></span><span class="line"><span class="ln">12</span><span class="cl">├── humlastzob.txt
-</span></span><span class="line"><span class="ln">13</span><span class="cl">├── jfdlxdnsre.txt
-</span></span><span class="line"><span class="ln">14</span><span class="cl">├── jpouwxftxk.txt
-</span></span><span class="line"><span class="ln">15</span><span class="cl">├── jxfgefbnsj.txt
-</span></span><span class="line"><span class="ln">16</span><span class="cl">├── lnazazhvpm.txt
-</span></span><span class="line"><span class="ln">17</span><span class="cl">├── qgtyykdzdk.txt
-</span></span><span class="line"><span class="ln">18</span><span class="cl">├── uxgrwaisgj.txt
-</span></span><span class="line"><span class="ln">19</span><span class="cl">├── vcqlxrcqnx.txt
-</span></span><span class="line"><span class="ln">20</span><span class="cl">├── ydlceysnkc.txt
-</span></span><span class="line"><span class="ln">21</span><span class="cl">├── ylgvjqjhrb.txt
-</span></span><span class="line"><span class="ln">22</span><span class="cl">├── ywwfbldecg.txt
-</span></span><span class="line"><span class="ln">23</span><span class="cl">└── zpjinqrdyw.txt
-</span></span><span class="line"><span class="ln">24</span><span class="cl">
-</span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="m">1</span> directory, <span class="m">15</span> files
-</span></span></code></pre></div>
-<h3 id="sdf-for-directory-watch" data-numberify>SDF for Directory Watch<a class="anchor ms-1" href="#sdf-for-directory-watch"></a></h3>
-<p>We use a custom restriction (<code>DirectoryWatchRestriction</code>) for the <code>DirectoryWatchFn</code> <em>DoFn</em> object. The details about the restriction and related components can be found below.</p>
-<ul>
-<li><code>DirectoryWatchRestriction</code>
-<ul>
-<li>It has two fields (<em>already_processed</em> and <em>finished</em>) where the former is used to hold the file names that have processed (i.e. <em>claimed</em>) already.</li>
-<li>To split the restriction into primary and residual, two methods are created - <code>as_primary</code> and <code>as_residual</code>. The <code>as_primary</code> returns itself after updating the <em>finished</em> field to <em>True</em>, and it makes the primary restriction to be <em>unclaimable</em> - see the associating tracker for details. On the other hand, the <code>as_residual</code> method returns a new instance of the restriction with the existing processed file names (<em>already_processed</em>) and the <em>finished</em> field to <em>False</em> for subsequent processing. As can be checked in the associating tracker, the residual restriction is updated by adding a new file to process, and the processed file names can be used to identify whether the new file has already been processed or not.</li>
-</ul>
-</li>
-<li><code>DirectoryWatchRestrictionCoder</code>
-<ul>
-<li>It provides a <em>coder</em> object for the custom restriction. Its <code>encode/decode</code> methods rely on the restriction&rsquo;s <code>to_json/from_json</code> methods.</li>
-</ul>
-</li>
-<li><code>DirectoryWatchRestrictionTracker</code>
-<ul>
-<li>It expects the custom restriction as an argument and returns it as the current restriction by the <code>current_restriction</code> method. Also, it splits the restriction into primary and residual using the <code>try_split</code> method. Once the restriction is split, it determines whether to claim it or not (<code>try_claim</code>). Specifically, it refuses to claim the restriction if it is already processed. Or it claims after adding a new file. The last part of the contract is the <code>is_bound</code> method, which signals if the current restriction represents a finite amount of work. Note that a restriction can turn from unbounded to bounded but can never turn from bounded to unbounded.</li>
-</ul>
-</li>
-<li><code>DirectoryWatchRestrictionProvider</code>
-<ul>
-<li>It intialises with the custom restriction where the <em>already_processed</em> and <em>finished</em> fields to an empty set and <em>False</em> respectively (<code>initial_restriction</code>). Also, the <code>create_tracker</code> method returns the custom restriction tracker, and the size of the restriction is returned by the <code>restriction_size</code> method.</li>
-</ul>
-</li>
-</ul>
-<p>We also employ a custom watermark estimator provider (<code>DirectoryWatchWatermarkEstimatorProvider</code>), and it tracks the progress in the event time. It uses <code>ManualWatermarkEstimator</code> to set the watermark manually from inside the <code>process</code> method of the <code>DirectoryWatchFn</code> <em>DoFn</em> object.</p>
-<p>The <code>process</code> method of the <code>DirectoryWatchFn</code> <em>DoFn</em> adds two new arguments (<em>tracker</em> and <em>watermark_estimator</em>), which utilised the SDF components defined earlier. Also, it is wrapped by a decorator that specifies an unbounded amount of work per input element is performed (<code>@beam.DoFn.unbounded_per_element()</code>). Within the function, it performs the following two tasks periodically, thanks to the tracker&rsquo;s <code>defer_remainder</code> method.</p>
-<ul>
-<li>Get new files if any
-<ul>
-<li>In the <code>_get_new_files_if_any</code> method, it creates a <em>MyFile</em> object for each of the files in the input folder if a file has not been processed already. A tuple of the file object and its last modified time is appended to a list named <em>new_files</em>, and the list is returned at the end.</li>
-</ul>
-</li>
-<li>Return file objects that can be processed
-<ul>
-<li>The <code>_check_processible</code> method tries to take all the newly discovered files and tries to claim them one by one in the restriction tracker object. If the claim fails, the method returns <em>False</em> and the <code>process</code> method immediately exits. Otherwise, it updates watermark if the last modified timestamp is larger than the current watermark.</li>
-<li>Once the <code>_check_processible</code> method returns <em>True</em>, individual file objects are returned.</li>
-</ul>
-</li>
-</ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln">  1</span><span class="cl"><span class="c1"># chapter7/directory_watch.py</span>
-</span></span><span class="line"><span class="ln">  2</span><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
-</span></span><span class="line"><span class="ln">  3</span><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
-</span></span><span class="line"><span class="ln">  4</span><span class="cl"><span class="kn">import</span> <span class="nn">typing</span>
-</span></span><span class="line"><span class="ln">  5</span><span class="cl">
-</span></span><span class="line"><span class="ln">  6</span><span class="cl"><span class="kn">import</span> <span class="nn">apache_beam</span> <span class="k">as</span> <span class="nn">beam</span>
-</span></span><span class="line"><span class="ln">  7</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam</span> <span class="kn">import</span> <span class="n">RestrictionProvider</span>
-</span></span><span class="line"><span class="ln">  8</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.utils.timestamp</span> <span class="kn">import</span> <span class="n">Duration</span>
-</span></span><span class="line"><span class="ln">  9</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.io.iobase</span> <span class="kn">import</span> <span class="n">RestrictionTracker</span>
-</span></span><span class="line"><span class="ln"> 10</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.io.watermark_estimators</span> <span class="kn">import</span> <span class="n">ManualWatermarkEstimator</span>
-</span></span><span class="line"><span class="ln"> 11</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.core</span> <span class="kn">import</span> <span class="n">WatermarkEstimatorProvider</span>
-</span></span><span class="line"><span class="ln"> 12</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.runners.sdf_utils</span> <span class="kn">import</span> <span class="n">RestrictionTrackerView</span>
-</span></span><span class="line"><span class="ln"> 13</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.utils.timestamp</span> <span class="kn">import</span> <span class="n">Timestamp</span><span class="p">,</span> <span class="n">MIN_TIMESTAMP</span><span class="p">,</span> <span class="n">MAX_TIMESTAMP</span>
-</span></span><span class="line"><span class="ln"> 14</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 15</span><span class="cl"><span class="kn">from</span> <span class="nn">file_read</span> <span class="kn">import</span> <span class="n">MyFile</span>
-</span></span><span class="line"><span class="ln"> 16</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 17</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 18</span><span class="cl"><span class="k">class</span> <span class="nc">DirectoryWatchRestriction</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 19</span><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">already_processed</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">finished</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 20</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">already_processed</span> <span class="o">=</span> <span class="n">already_processed</span>
-</span></span><span class="line"><span class="ln"> 21</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">finished</span> <span class="o">=</span> <span class="n">finished</span>
-</span></span><span class="line"><span class="ln"> 22</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 23</span><span class="cl">    <span class="k">def</span> <span class="nf">as_primary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 24</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">finished</span> <span class="o">=</span> <span class="kc">True</span>
-</span></span><span class="line"><span class="ln"> 25</span><span class="cl">        <span class="k">return</span> <span class="bp">self</span>
-</span></span><span class="line"><span class="ln"> 26</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 27</span><span class="cl">    <span class="k">def</span> <span class="nf">as_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 28</span><span class="cl">        <span class="k">return</span> <span class="n">DirectoryWatchRestriction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">already_processed</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 29</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 30</span><span class="cl">    <span class="k">def</span> <span class="nf">add_new</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 31</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">already_processed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 32</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 33</span><span class="cl">    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 34</span><span class="cl">        <span class="k">return</span> <span class="mi">1</span>
-</span></span><span class="line"><span class="ln"> 35</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 36</span><span class="cl">    <span class="nd">@classmethod</span>
-</span></span><span class="line"><span class="ln"> 37</span><span class="cl">    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 38</span><span class="cl">        <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 39</span><span class="cl">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 40</span><span class="cl">            <span class="n">already_processed</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&#34;already_processed&#34;</span><span class="p">]),</span> <span class="n">finished</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&#34;finished&#34;</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 41</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 42</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 43</span><span class="cl">    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 44</span><span class="cl">        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 45</span><span class="cl">            <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 46</span><span class="cl">                <span class="s2">&#34;already_processed&#34;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">already_processed</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln"> 47</span><span class="cl">                <span class="s2">&#34;finished&#34;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">finished</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 48</span><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 49</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 50</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 51</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 52</span><span class="cl"><span class="k">class</span> <span class="nc">DirectoryWatchRestrictionCoder</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">coders</span><span class="o">.</span><span class="n">Coder</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 53</span><span class="cl">    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">DirectoryWatchRestriction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 54</span><span class="cl">        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 55</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 56</span><span class="cl">    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoded</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DirectoryWatchRestriction</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 57</span><span class="cl">        <span class="k">return</span> <span class="n">DirectoryWatchRestriction</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">encoded</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln"> 58</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 59</span><span class="cl">    <span class="k">def</span> <span class="nf">is_deterministic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 60</span><span class="cl">        <span class="k">return</span> <span class="kc">True</span>
-</span></span><span class="line"><span class="ln"> 61</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 62</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 63</span><span class="cl"><span class="k">class</span> <span class="nc">DirectoryWatchRestrictionTracker</span><span class="p">(</span><span class="n">RestrictionTracker</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 64</span><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">restriction</span><span class="p">:</span> <span class="n">DirectoryWatchRestriction</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 65</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">restriction</span> <span class="o">=</span> <span class="n">restriction</span>
-</span></span><span class="line"><span class="ln"> 66</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 67</span><span class="cl">    <span class="k">def</span> <span class="nf">current_restriction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 68</span><span class="cl">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">restriction</span>
-</span></span><span class="line"><span class="ln"> 69</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 70</span><span class="cl">    <span class="k">def</span> <span class="nf">try_claim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 71</span><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">restriction</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 72</span><span class="cl">            <span class="k">return</span> <span class="kc">False</span>
-</span></span><span class="line"><span class="ln"> 73</span><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">restriction</span><span class="o">.</span><span class="n">add_new</span><span class="p">(</span><span class="n">new_file</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 74</span><span class="cl">        <span class="k">return</span> <span class="kc">True</span>
-</span></span><span class="line"><span class="ln"> 75</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 76</span><span class="cl">    <span class="k">def</span> <span class="nf">check_done</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 77</span><span class="cl">        <span class="k">return</span>
-</span></span><span class="line"><span class="ln"> 78</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 79</span><span class="cl">    <span class="k">def</span> <span class="nf">is_bounded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 80</span><span class="cl">        <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">restriction</span><span class="o">.</span><span class="n">finished</span> <span class="k">else</span> <span class="kc">False</span>
-</span></span><span class="line"><span class="ln"> 81</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 82</span><span class="cl">    <span class="k">def</span> <span class="nf">try_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fraction_of_remainder</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 83</span><span class="cl">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">restriction</span><span class="o">.</span><span class="n">as_primary</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">restriction</span><span class="o">.</span><span class="n">as_residual</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln"> 84</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 85</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 86</span><span class="cl"><span class="k">class</span> <span class="nc">DirectoryWatchRestrictionProvider</span><span class="p">(</span><span class="n">RestrictionProvider</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 87</span><span class="cl">    <span class="k">def</span> <span class="nf">initial_restriction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DirectoryWatchRestriction</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 88</span><span class="cl">        <span class="k">return</span> <span class="n">DirectoryWatchRestriction</span><span class="p">(</span><span class="nb">set</span><span class="p">(),</span> <span class="kc">False</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 89</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 90</span><span class="cl">    <span class="k">def</span> <span class="nf">create_tracker</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 91</span><span class="cl">        <span class="bp">self</span><span class="p">,</span> <span class="n">restriction</span><span class="p">:</span> <span class="n">DirectoryWatchRestriction</span>
-</span></span><span class="line"><span class="ln"> 92</span><span class="cl">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DirectoryWatchRestrictionTracker</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 93</span><span class="cl">        <span class="k">return</span> <span class="n">DirectoryWatchRestrictionTracker</span><span class="p">(</span><span class="n">restriction</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 94</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 95</span><span class="cl">    <span class="k">def</span> <span class="nf">restriction_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">restriction</span><span class="p">:</span> <span class="n">DirectoryWatchRestriction</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 96</span><span class="cl">        <span class="k">return</span> <span class="n">restriction</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln"> 97</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 98</span><span class="cl">    <span class="k">def</span> <span class="nf">restriction_coder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 99</span><span class="cl">        <span class="k">return</span> <span class="n">DirectoryWatchRestrictionCoder</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">100</span><span class="cl">
-</span></span><span class="line"><span class="ln">101</span><span class="cl">
-</span></span><span class="line"><span class="ln">102</span><span class="cl"><span class="k">class</span> <span class="nc">DirectoryWatchWatermarkEstimatorProvider</span><span class="p">(</span><span class="n">WatermarkEstimatorProvider</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">103</span><span class="cl">    <span class="k">def</span> <span class="nf">initial_estimator_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">restriction</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">104</span><span class="cl">        <span class="k">return</span> <span class="n">MIN_TIMESTAMP</span>
-</span></span><span class="line"><span class="ln">105</span><span class="cl">
-</span></span><span class="line"><span class="ln">106</span><span class="cl">    <span class="k">def</span> <span class="nf">create_watermark_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">watermark</span><span class="p">:</span> <span class="n">Timestamp</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">107</span><span class="cl">        <span class="k">return</span> <span class="n">ManualWatermarkEstimator</span><span class="p">(</span><span class="n">watermark</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">108</span><span class="cl">
-</span></span><span class="line"><span class="ln">109</span><span class="cl">    <span class="k">def</span> <span class="nf">estimator_state_coder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">110</span><span class="cl">        <span class="k">return</span> <span class="n">beam</span><span class="o">.</span><span class="n">coders</span><span class="o">.</span><span class="n">TimestampCoder</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">111</span><span class="cl">
-</span></span><span class="line"><span class="ln">112</span><span class="cl">
-</span></span><span class="line"><span class="ln">113</span><span class="cl"><span class="k">class</span> <span class="nc">DirectoryWatchFn</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">114</span><span class="cl">    <span class="c1"># TODO: add watermark_fn to completes the process function by advancing watermark to max timestamp</span>
-</span></span><span class="line"><span class="ln">115</span><span class="cl">    <span class="c1">#       without such a funcition, the pipeline never completes and we cannot perform unit testing</span>
-</span></span><span class="line"><span class="ln">116</span><span class="cl">    <span class="n">POLL_TIMEOUT</span> <span class="o">=</span> <span class="mi">1</span>
-</span></span><span class="line"><span class="ln">117</span><span class="cl">
-</span></span><span class="line"><span class="ln">118</span><span class="cl">    <span class="nd">@beam.DoFn.unbounded_per_element</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">119</span><span class="cl">    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">120</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">121</span><span class="cl">        <span class="n">element</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">122</span><span class="cl">        <span class="n">tracker</span><span class="p">:</span> <span class="n">RestrictionTrackerView</span> <span class="o">=</span> <span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">RestrictionParam</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">123</span><span class="cl">            <span class="n">DirectoryWatchRestrictionProvider</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">124</span><span class="cl">        <span class="p">),</span>
-</span></span><span class="line"><span class="ln">125</span><span class="cl">        <span class="n">watermark_estimater</span><span class="p">:</span> <span class="n">WatermarkEstimatorProvider</span> <span class="o">=</span> <span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">WatermarkEstimatorParam</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">126</span><span class="cl">            <span class="n">DirectoryWatchWatermarkEstimatorProvider</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">127</span><span class="cl">        <span class="p">),</span>
-</span></span><span class="line"><span class="ln">128</span><span class="cl">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">MyFile</span><span class="p">]:</span>
-</span></span><span class="line"><span class="ln">129</span><span class="cl">        <span class="n">new_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_new_files_if_any</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">tracker</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">130</span><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_processible</span><span class="p">(</span><span class="n">tracker</span><span class="p">,</span> <span class="n">watermark_estimater</span><span class="p">,</span> <span class="n">new_files</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">131</span><span class="cl">            <span class="k">for</span> <span class="n">new_file</span> <span class="ow">in</span> <span class="n">new_files</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">132</span><span class="cl">                <span class="k">yield</span> <span class="n">new_file</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">133</span><span class="cl">        <span class="k">else</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">134</span><span class="cl">            <span class="k">return</span>
-</span></span><span class="line"><span class="ln">135</span><span class="cl">        <span class="n">tracker</span><span class="o">.</span><span class="n">defer_remainder</span><span class="p">(</span><span class="n">Duration</span><span class="o">.</span><span class="n">of</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">POLL_TIMEOUT</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln">136</span><span class="cl">
-</span></span><span class="line"><span class="ln">137</span><span class="cl">    <span class="k">def</span> <span class="nf">_get_new_files_if_any</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">138</span><span class="cl">        <span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="n">DirectoryWatchRestrictionTracker</span>
-</span></span><span class="line"><span class="ln">139</span><span class="cl">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">MyFile</span><span class="p">,</span> <span class="n">Timestamp</span><span class="p">]]:</span>
-</span></span><span class="line"><span class="ln">140</span><span class="cl">        <span class="n">new_files</span> <span class="o">=</span> <span class="p">[]</span>
-</span></span><span class="line"><span class="ln">141</span><span class="cl">        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">element</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">142</span><span class="cl">            <span class="k">if</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">143</span><span class="cl">                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln">144</span><span class="cl">                <span class="ow">and</span> <span class="n">file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tracker</span><span class="o">.</span><span class="n">current_restriction</span><span class="p">()</span><span class="o">.</span><span class="n">already_processed</span>
-</span></span><span class="line"><span class="ln">145</span><span class="cl">            <span class="p">):</span>
-</span></span><span class="line"><span class="ln">146</span><span class="cl">                <span class="n">num_lines</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">file</span><span class="p">)))</span>
-</span></span><span class="line"><span class="ln">147</span><span class="cl">                <span class="n">new_file</span> <span class="o">=</span> <span class="n">MyFile</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">num_lines</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">148</span><span class="cl">                <span class="nb">print</span><span class="p">(</span><span class="n">new_file</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">149</span><span class="cl">                <span class="n">new_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">150</span><span class="cl">                    <span class="p">(</span>
-</span></span><span class="line"><span class="ln">151</span><span class="cl">                        <span class="n">new_file</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">152</span><span class="cl">                        <span class="n">Timestamp</span><span class="o">.</span><span class="n">of</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">file</span><span class="p">))),</span>
-</span></span><span class="line"><span class="ln">153</span><span class="cl">                    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">154</span><span class="cl">                <span class="p">)</span>
-</span></span><span class="line"><span class="ln">155</span><span class="cl">        <span class="k">return</span> <span class="n">new_files</span>
-</span></span><span class="line"><span class="ln">156</span><span class="cl">
-</span></span><span class="line"><span class="ln">157</span><span class="cl">    <span class="k">def</span> <span class="nf">_check_processible</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">158</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">159</span><span class="cl">        <span class="n">tracker</span><span class="p">:</span> <span class="n">DirectoryWatchRestrictionTracker</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">160</span><span class="cl">        <span class="n">watermark_estimater</span><span class="p">:</span> <span class="n">ManualWatermarkEstimator</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">161</span><span class="cl">        <span class="n">new_files</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">MyFile</span><span class="p">,</span> <span class="n">Timestamp</span><span class="p">]],</span>
-</span></span><span class="line"><span class="ln">162</span><span class="cl">    <span class="p">):</span>
-</span></span><span class="line"><span class="ln">163</span><span class="cl">        <span class="n">max_instance</span> <span class="o">=</span> <span class="n">watermark_estimater</span><span class="o">.</span><span class="n">current_watermark</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">164</span><span class="cl">        <span class="k">for</span> <span class="n">new_file</span> <span class="ow">in</span> <span class="n">new_files</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">165</span><span class="cl">            <span class="k">if</span> <span class="n">tracker</span><span class="o">.</span><span class="n">try_claim</span><span class="p">(</span><span class="n">new_file</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">166</span><span class="cl">                <span class="n">watermark_estimater</span><span class="o">.</span><span class="n">set_watermark</span><span class="p">(</span><span class="n">max_instance</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">167</span><span class="cl">                <span class="k">return</span> <span class="kc">False</span>
-</span></span><span class="line"><span class="ln">168</span><span class="cl">            <span class="k">if</span> <span class="n">max_instance</span> <span class="o">&lt;</span> <span class="n">new_file</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-</span></span><span class="line"><span class="ln">169</span><span class="cl">                <span class="n">max_instance</span> <span class="o">=</span> <span class="n">new_file</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">170</span><span class="cl">        <span class="n">watermark_estimater</span><span class="o">.</span><span class="n">set_watermark</span><span class="p">(</span><span class="n">max_instance</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">171</span><span class="cl">        <span class="k">return</span> <span class="n">max_instance</span> <span class="o">&lt;</span> <span class="n">MAX_TIMESTAMP</span>
-</span></span></code></pre></div>
-<h3 id="sdf-for-file-processing" data-numberify>SDF for File Processing<a class="anchor ms-1" href="#sdf-for-file-processing"></a></h3>
-<p>The <code>ProcessFilesFn</code> <em>DoFn</em> begins with recovering the current restriction using the parameter of type <code>RestrictionParam</code>, which is passed as argument. Then, it tries to claim/lock the position. Once claimed, it proceeds to processing the associated element and restriction pair, which is just yielding a text that keeps the file name and current position.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># chapter7/file_read.py</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="nn">typing</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="kn">import</span> <span class="nn">logging</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kn">import</span> <span class="nn">apache_beam</span> <span class="k">as</span> <span class="nn">beam</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam</span> <span class="kn">import</span> <span class="n">RestrictionProvider</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.io.restriction_trackers</span> <span class="kn">import</span> <span class="n">OffsetRange</span><span class="p">,</span> <span class="n">OffsetRestrictionTracker</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># ...</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="k">class</span> <span class="nc">ProcessFilesFn</span><span class="p">(</span><span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="p">,</span> <span class="n">RestrictionProvider</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">        <span class="bp">self</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">        <span class="n">element</span><span class="p">:</span> <span class="n">MyFile</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">        <span class="n">tracker</span><span class="p">:</span> <span class="n">OffsetRestrictionTracker</span> <span class="o">=</span> <span class="n">beam</span><span class="o">.</span><span class="n">DoFn</span><span class="o">.</span><span class="n">RestrictionParam</span><span class="p">(),</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="p">):</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="n">restriction</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">current_restriction</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">        <span class="k">for</span> <span class="n">current_position</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">restriction</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">restriction</span><span class="o">.</span><span class="n">stop</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">            <span class="k">if</span> <span class="n">tracker</span><span class="o">.</span><span class="n">try_claim</span><span class="p">(</span><span class="n">current_position</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">                <span class="n">m</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&#34;file: </span><span class="si">{</span><span class="n">element</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, position: </span><span class="si">{</span><span class="n">current_position</span><span class="si">}</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">                <span class="k">yield</span> <span class="n">m</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">            <span class="k">else</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">                <span class="k">return</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">
-</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="k">def</span> <span class="nf">create_tracker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">restriction</span><span class="p">:</span> <span class="n">OffsetRange</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OffsetRestrictionTracker</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">        <span class="k">return</span> <span class="n">OffsetRestrictionTracker</span><span class="p">(</span><span class="n">restriction</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">
-</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="k">def</span> <span class="nf">initial_restriction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">MyFile</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OffsetRange</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">        <span class="k">return</span> <span class="n">OffsetRange</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">element</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">element</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">
-</span></span><span class="line"><span class="ln">33</span><span class="cl">    <span class="k">def</span> <span class="nf">restriction_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">MyFile</span><span class="p">,</span> <span class="n">restriction</span><span class="p">:</span> <span class="n">OffsetRange</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">        <span class="k">return</span> <span class="n">restriction</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-</span></span></code></pre></div>
-<h3 id="beam-pipeline" data-numberify>Beam Pipeline<a class="anchor ms-1" href="#beam-pipeline"></a></h3>
-<p>The pipeline begins with passing the input folder name to the <code>DirectoryWatchFn</code> <em>DoFn</em>. Then, the <em>DoFn</em> yields the custom <code>MyFile</code> objects while scanning the input folder periodically for new files. Finally, the custom objects are processed by the <code>ProcessFilesFn</code> <em>DoFn</em>. Note that the output of the <code>DirectoryWatchFn</code> <em>DoFn</em> is shuffled using the <code>Reshuffle</code> transform to redistribute it to a random worker.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># chapter7/streaming_file_read.py</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="nn">logging</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="kn">import</span> <span class="nn">argparse</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kn">import</span> <span class="nn">apache_beam</span> <span class="k">as</span> <span class="nn">beam</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.transforms.util</span> <span class="kn">import</span> <span class="n">Reshuffle</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.options.pipeline_options</span> <span class="kn">import</span> <span class="n">PipelineOptions</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="kn">from</span> <span class="nn">apache_beam.options.pipeline_options</span> <span class="kn">import</span> <span class="n">SetupOptions</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="kn">from</span> <span class="nn">directory_watch</span> <span class="kn">import</span> <span class="n">DirectoryWatchFn</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="kn">from</span> <span class="nn">file_read</span> <span class="kn">import</span> <span class="n">ProcessFilesFn</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">
-</span></span><span class="line"><span class="ln">14</span><span class="cl">
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_main_session</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&#34;Beam pipeline arguments&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">        <span class="s2">&#34;-p&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">        <span class="s2">&#34;--file_path&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">        <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))),</span> <span class="s2">&#34;fake_files&#34;</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">        <span class="p">),</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">        <span class="n">help</span><span class="o">=</span><span class="s2">&#34;File path&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">
-</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="n">known_args</span><span class="p">,</span> <span class="n">pipeline_args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">
-</span></span><span class="line"><span class="ln">28</span><span class="cl">    <span class="c1"># # We use the save_main_session option because one or more DoFn&#39;s in this</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">    <span class="c1"># # workflow rely on global context (e.g., a module imported at module level).</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="n">pipeline_options</span> <span class="o">=</span> <span class="n">PipelineOptions</span><span class="p">(</span><span class="n">pipeline_args</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="n">pipeline_options</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">SetupOptions</span><span class="p">)</span><span class="o">.</span><span class="n">save_main_session</span> <span class="o">=</span> <span class="n">save_main_session</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;known args - </span><span class="si">{</span><span class="n">known_args</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;pipeline options - </span><span class="si">{</span><span class="n">pipeline_options</span><span class="o">.</span><span class="n">display_data</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">
-</span></span><span class="line"><span class="ln">35</span><span class="cl">    <span class="k">with</span> <span class="n">beam</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">pipeline_options</span><span class="p">)</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">        <span class="p">(</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">            <span class="n">p</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">Create</span><span class="p">([</span><span class="n">known_args</span><span class="o">.</span><span class="n">file_path</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">ParDo</span><span class="p">(</span><span class="n">DirectoryWatchFn</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">            <span class="o">|</span> <span class="n">Reshuffle</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">41</span><span class="cl">            <span class="o">|</span> <span class="n">beam</span><span class="o">.</span><span class="n">ParDo</span><span class="p">(</span><span class="n">ProcessFilesFn</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">
-</span></span><span class="line"><span class="ln">44</span><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&#34;Building pipeline ...&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl">
-</span></span><span class="line"><span class="ln">47</span><span class="cl">
-</span></span><span class="line"><span class="ln">48</span><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">49</span><span class="cl">    <span class="n">run</span><span class="p">()</span>
-</span></span></code></pre></div><p>We can create input files and run the pipeline using the embedded <em>Flink Runner</em> as shown below - it does not work with the Python <em>Direct Runner</em>.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">python utils/faker_file_gen.py --max_files -1 --delay_seconds 0.5
-</span></span><span class="line"><span class="ln">2</span><span class="cl">
-</span></span><span class="line"><span class="ln">3</span><span class="cl">python chapter7/streaming_file_read.py <span class="se">\
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="se"></span>    --runner FlinkRunner --streaming --environment_type<span class="o">=</span>LOOPBACK <span class="se">\
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>    --parallelism<span class="o">=</span><span class="m">3</span> --checkpointing_interval<span class="o">=</span><span class="m">10000</span>
-</span></span></code></pre></div><p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2024-12-19-beam-examples-10/streaming-reader-demo.gif" loading="lazy" width="3558" height="1924" />
 </picture>
 
 </p>
