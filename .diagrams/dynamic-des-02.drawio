@@ -1,0 +1,77 @@
+<mxfile host="65bd71144e">
+    <diagram id="refined-switchboard" name="Refined Switchboard Pattern">
+        <mxGraphModel dx="983" dy="555" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="bg_async" value="" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;fillColor=#fff5f5;strokeColor=#FF9999;strokeWidth=2;arcSize=10;fontFamily=Comic Sans MS;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="160" width="310" height="440" as="geometry"/>
+                </mxCell>
+                <mxCell id="lbl_async" value="ASYNCHRONOUS EVENT STREAM" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;sketch=1;fontFamily=Comic Sans MS;fontSize=14;fontStyle=1;fontColor=#c92a2a;" parent="1" vertex="1">
+                    <mxGeometry x="120" y="170" width="270" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="bg_bridge" value="" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;fillColor=#CCFFCC;strokeColor=#00CC00;strokeWidth=2;arcSize=10;fontFamily=Comic Sans MS;" parent="1" vertex="1">
+                    <mxGeometry x="428" y="160" width="310" height="440" as="geometry"/>
+                </mxCell>
+                <mxCell id="lbl_bridge" value="SWITCHBOARD INTERFACE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;sketch=1;fontFamily=Comic Sans MS;fontSize=14;fontStyle=1;fontColor=#495057;" parent="1" vertex="1">
+                    <mxGeometry x="428" y="170" width="300" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="bg_sim" value="" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;fillColor=#e7f5ff;strokeColor=#4dabf7;strokeWidth=2;arcSize=10;fontFamily=Comic Sans MS;" parent="1" vertex="1">
+                    <mxGeometry x="750" y="160" width="310" height="440" as="geometry"/>
+                </mxCell>
+                <mxCell id="lbl_sim" value="DETERMINISTIC SIMULATION CORE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;sketch=1;fontFamily=Comic Sans MS;fontSize=14;fontStyle=1;fontColor=#1971c2;" parent="1" vertex="1">
+                    <mxGeometry x="765" y="169" width="280" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="node_io" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;Event Broker&amp;nbsp;&lt;div&gt;(Kafka / Redis)&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;fillColor=#ffffff;strokeColor=#000000;fontFamily=Comic Sans MS;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="195" y="230" width="120" height="76" as="geometry"/>
+                </mxCell>
+                <mxCell id="node_ingress" value="Ingress Workers&lt;br&gt;(Async Tasks)" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;fillColor=#ffffff;strokeColor=#fa5252;fontFamily=Comic Sans MS;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="185" y="500" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="node_buffer" value="Thread-Safe&lt;br&gt;Event Buffer" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;sketch=1;curveFitting=1;jiggle=3;fillColor=#ffffff;strokeColor=#495057;fontFamily=Comic Sans MS;" parent="1" vertex="1">
+                    <mxGeometry x="508" y="230" width="150" height="66" as="geometry"/>
+                </mxCell>
+                <mxCell id="node_reg" value="STATE REGISTRY&lt;br&gt;(Reactive Bindings)" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;sketch=1;curveFitting=1;jiggle=2;fillColor=#ffffff;strokeColor=#000000;fontFamily=Comic Sans MS;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="503" y="480" width="160" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="node_simpy" value="SimPy Process Loop&lt;br&gt;(Logical Time)" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;fillColor=#ffffff;strokeColor=#228be6;fontFamily=Comic Sans MS;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="825" y="220" width="160" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="node_egress" value="Egress layer&lt;br&gt;(Serialization)" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;fillColor=#ffffff;strokeColor=#228be6;fontFamily=Comic Sans MS;" parent="1" vertex="1">
+                    <mxGeometry x="845" y="480" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="e1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;sketch=1;curveFitting=1;jiggle=2;strokeWidth=2;curved=1;strokeColor=#000000;fontFamily=Comic Sans MS;" parent="1" source="node_io" target="node_ingress" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e2" value="" style="endArrow=classic;html=1;strokeWidth=2;sketch=1;curveFitting=1;jiggle=2;strokeColor=#FF9999;entryX=0;entryY=0.5;fontFamily=Comic Sans MS;" parent="1" target="node_buffer" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="325" y="530" as="sourcePoint"/>
+                        <Array as="points">
+                            <mxPoint x="395" y="530"/>
+                            <mxPoint x="398" y="263"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;sketch=1;curveFitting=1;jiggle=2;strokeWidth=2;curved=1;strokeColor=#495057;fontFamily=Comic Sans MS;" parent="1" source="node_buffer" target="node_reg" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e4" value="" style="endArrow=classic;html=1;strokeWidth=2;sketch=1;curveFitting=1;jiggle=2;strokeColor=#00CC00;fontFamily=Comic Sans MS;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="655" y="520" as="sourcePoint"/>
+                        <mxPoint x="825" y="260" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="725" y="520"/>
+                            <mxPoint x="725" y="260"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;sketch=1;curveFitting=1;jiggle=2;strokeWidth=2;curved=1;strokeColor=#228be6;fontFamily=Comic Sans MS;" parent="1" source="node_simpy" target="node_egress" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="&lt;font face=&quot;Comic Sans MS&quot;&gt;&lt;span style=&quot;font-size: 16px;&quot;&gt;Decouples Network from Compute&lt;/span&gt;&lt;/font&gt;" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;sketch=1;curveFitting=1;jiggle=2;strokeColor=#FF8000;fillColor=#FFE6CC;" vertex="1" parent="1">
+                    <mxGeometry x="340" y="89" width="160" height="80" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
