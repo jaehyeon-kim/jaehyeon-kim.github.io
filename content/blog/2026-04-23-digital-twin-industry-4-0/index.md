@@ -86,4 +86,4 @@ Organizations shouldn't have to choose between an isolated simulation and an ope
 
 But if you want to implement an event-driven architecture where a running mathematical model ingests Kafka streams and alters its parameters on the fly without stopping, you face a complex I/O challenge.
 
-One purpose-built approach to solving this specific pattern is the [**`dynamic-des`**](https://github.com/jaehyeon-kim/dynamic-des) package. In Part 2 of this series, we will look at how this open-source tool uses a Switchboard pattern and dynamic mutable resources to turn a static SimPy script into a synchronized, event-driven engine.
+One purpose-built approach to solving this specific pattern is the [**`dynamic-des`**](https://github.com/jaehyeon-kim/dynamic-des) package. In [Part 2](/blog/2026-04-28-digital-twin-dynamic-des/) of this series, we will look at how this open-source tool uses a Switchboard pattern and dynamic mutable resources to turn a static SimPy script into a synchronized, event-driven engine.
