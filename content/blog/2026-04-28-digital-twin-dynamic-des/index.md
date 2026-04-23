@@ -144,7 +144,7 @@ Traditional Discrete-Event Simulation is strictly quantitative, focusing mostly 
 
 By utilizing the `variables` registry and the `wait_for_change()` observer pattern, developers can track arbitrary logical states. Instead of just yielding on time delays, simulation processes can yield on external network events. A Kafka payload no longer just updates a number. It acts as a state-transition trigger that dictates the logical flow of the entire application.
 
-This flexibility means digital twins can incorporate sophisticated modeling well beyond tracking discrete items in a queue. You can map real-time telemetry directly to custom mathematical logic. For a practical example, you can view the [**OML Digital Twin Hot Rolling**](https://github.com/jaehyeon-kim/oml-digital-twin-hotrolling) project, which demonstrates how to build a real-time tracking dashboard for steel manufacturing using advanced physical simulations.
+This flexibility means digital twins can incorporate sophisticated modeling well beyond tracking discrete items in a queue. You can map real-time telemetry directly to custom mathematical logic. For a practical example, you can view the [**Hot Strip Mill: Real-Time Online Machine Learning & Digital Twin**](https://github.com/jaehyeon-kim/oml-digital-twin-hotrolling) project, which demonstrates how to build a real-time tracking dashboard for steel manufacturing using advanced physical simulations.
 
 ### 💡 Domain-Agnostic Applications
 
