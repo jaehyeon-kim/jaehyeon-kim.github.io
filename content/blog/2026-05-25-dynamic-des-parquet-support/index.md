@@ -11,13 +11,13 @@ carousel: false
 featuredImage: false
 # series:
 categories:
-  - System Architecture
   - Data Engineering
+  - Machine Learning
 tags:
-  - Digital Twin
-  - Discrete Event Simulation
-  - IoT
+  - Parquet
+  - Data Lake
   - Kafka
+  - Discrete Event Simulation
   - dynamic-des
   - SimPy
   - Python
