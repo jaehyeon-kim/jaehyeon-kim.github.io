@@ -1,4 +1,36 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>Building an Event-Driven Hybrid Digital Twin with dynamic-des</title><link>https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des/</link><guid>https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des/</guid><pubDate>Wed, 29 Apr 2026 00:00:00 +0000</pubDate><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES v0.8.1</title><link>https://jaehyeon.me/blog/2026-05-25-dynamic-des-parquet-support/</link><guid>https://jaehyeon.me/blog/2026-05-25-dynamic-des-parquet-support/</guid><pubDate>Thu, 21 May 2026 00:00:00 +0000</pubDate><description>
+Training a machine learning model on simulated data is straightforward until you try to deploy it. The disconnect usually happens at the pipeline level: training requires massive, historical batch data (like Parquet files in an S3 bucket), but production inference requires real-time, event-driven streams (like Kafka or Redis).
+Maintaining two separate simulation codebases, one for generating training data and another for streaming live events, introduces friction, schema mismatches, and duplicated engineering effort.</description><content:encoded><![CDATA[
+        <p>Training a machine learning model on simulated data is straightforward until you try to deploy it. The disconnect usually happens at the pipeline level: training requires massive, historical batch data (like Parquet files in an S3 bucket), but production inference requires real-time, event-driven streams (like Kafka or Redis).</p>
+<p>Maintaining two separate simulation codebases, <em>one for generating training data and another for streaming live events</em>, introduces friction, schema mismatches, and duplicated engineering effort.</p>
+<p>Dynamic DES was originally designed to solve the real-time problem by acting as a control plane for SimPy models. With the release of <strong>v0.8.1</strong>, it now natively handles high-performance historical data generation, allowing you to use the <strong>exact same simulation code</strong> for both batch training and live inference.</p>
+
+<h3 id="step-1-batch-training-historical-fast-forward" data-numberify>Step 1: Batch Training (Historical Fast-Forward)<a class="anchor ms-1" href="#step-1-batch-training-historical-fast-forward"></a></h3>
+<p>To generate training data efficiently, the simulation must be decoupled from the real-world clock. By setting the environment&rsquo;s <code>factor</code> to <code>0.0</code>, the engine initiates a &ldquo;fast-forward,&rdquo; executing logical events as fast as the CPU allows.</p>
+<p>To capture this massive data throughput without exhausting memory or fragmenting storage, v0.8.1 introduces <strong><code>ParquetStorageEgress</code></strong> and <strong><code>JsonlStorageEgress</code></strong>. Built on PyArrow, these connectors handle the complexities of Data Lake ingestion natively:</p>
+<ul>
+<li><strong>Schema Drift Protection:</strong> The engine infers the schema from the initial data batch and strictly casts all subsequent records. This guarantees deterministic data types, preventing downstream ML pipelines from failing due to unexpected schema mutations.</li>
+<li><strong>Native Data Lake Integration:</strong> Data is automatically chunked, compressed, and written directly to local disk, AWS S3, or SeaweedFS clusters via PyArrow&rsquo;s virtual filesystem.</li>
+</ul>
+<p>You can simulate months of system operations in seconds, outputting optimized Parquet chunks ready for model training.</p>
+<p><picture><img class="img-fluid mx-auto d-block" alt="Data Generation Example" src="/blog/2026-05-25-dynamic-des-parquet-support/parquet-example.gif" loading="lazy" width="2062" height="1928" />
+</picture>
+
+</p>
+
+<h3 id="step-2-live-inference-production-streaming" data-numberify>Step 2: Live Inference (Production Streaming)<a class="anchor ms-1" href="#step-2-live-inference-production-streaming"></a></h3>
+<p>Once the model is trained on the historical Parquet data, transitioning to production testing requires zero changes to your core simulation logic.</p>
+<p>By changing the environment&rsquo;s <code>factor</code> from <code>0.0</code> to <code>1.0</code>, logical time synchronizes with wall-clock time. You simply swap the <code>ParquetStorageEgress</code> for a <code>KafkaEgress</code>. The simulation now runs in real-time, streaming the exact same schema to your message broker, providing a live data feed for your deployed ML model to consume.</p>
+<p>This provides an end-to-end data engineering toolkit for simulation-based Machine Learning, from historical batch generation to live streaming pipelines.</p>
+
+<h3 id="try-it-out" data-numberify>Try it out<a class="anchor ms-1" href="#try-it-out"></a></h3>
+<p>The v0.8.1 release and the new storage connectors are available now. You can view the source code and run the historical data generation example below.</p>
+<ul>
+<li><strong>GitHub Repository:</strong> <a href="https://github.com/jaehyeon-kim/dynamic-des" target="_blank" rel="noopener noreferrer">jaehyeon-kim/dynamic-des<i class="fas fa-external-link-square-alt ms-1"></i></a></li>
+<li><strong>Documentation &amp; Examples:</strong> <a href="https://jaehyeon.me/dynamic-des/latest/examples/history/">Historical Data Generation Guide</a></li>
+</ul>
+
+      ]]></content:encoded></item><item><title>Building an Event-Driven Hybrid Digital Twin with dynamic-des</title><link>https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des/</link><guid>https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des/</guid><pubDate>Wed, 29 Apr 2026 00:00:00 +0000</pubDate><description>
 Asynchronous Gap In Part 1, we established that a true Hybrid Digital Twin does more than just mirror reality. It actively forecasts the future by running a simulation against live operational states.
 If you have ever tried to build one of these systems from scratch, you immediately hit a fundamental architectural clash.
 Standard simulation clocks (like those in traditional SimPy implementations) are logically synchronous and not designed to handle high-frequency asynchronous I/O without explicit decoupling.</description><content:encoded><![CDATA[
@@ -6385,304 +6417,6 @@ The <code>avro</code> block in <code>build.gradle.kts</code> configures the Avro
 </span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1">## start the app</span>
 </span></span><span class="line"><span class="ln">8</span><span class="cl">$ pnpm dev
 </span></span></code></pre></div><p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2025-03-04-realtime-dashboard-3/featured.gif" loading="lazy" width="1573" height="753" />
-</picture>
-
-</p>
-      ]]></content:encoded></item><item><title>Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 2 Streamlit Dashboard</title><link>https://jaehyeon.me/blog/2025-02-25-realtime-dashboard-2/</link><guid>https://jaehyeon.me/blog/2025-02-25-realtime-dashboard-2/</guid><pubDate>Tue, 25 Feb 2025 00:00:00 +0000</pubDate><description><![CDATA[
-        <p>In this post, we develop a real-time monitoring dashboard using <a href="https://streamlit.io/" target="_blank" rel="noopener noreferrer">Streamlit<i class="fas fa-external-link-square-alt ms-1"></i></a>, an open-source Python framework that allows data scientists and AI/ML engineers to create interactive data apps. The app connects to the WebSocket server we developed in <a href="/blog/2025-02-18-realtime-dashboard-1">Part 1</a> and continuously fetches data to visualize key metrics such as <strong>order counts</strong>, <strong>sales data</strong>, and <strong>revenue by traffic source and country</strong>. With interactive bar charts and dynamic metrics, users can monitor sales trends and other important business KPIs in real-time.</p>
-      ]]></description><content:encoded><![CDATA[
-        <p>In this post, we develop a real-time monitoring dashboard using <a href="https://streamlit.io/" target="_blank" rel="noopener noreferrer">Streamlit<i class="fas fa-external-link-square-alt ms-1"></i></a>, an open-source Python framework that allows data scientists and AI/ML engineers to create interactive data apps. The app connects to the WebSocket server we developed in <a href="/blog/2025-02-18-realtime-dashboard-1">Part 1</a> and continuously fetches data to visualize key metrics such as <strong>order counts</strong>, <strong>sales data</strong>, and <strong>revenue by traffic source and country</strong>. With interactive bar charts and dynamic metrics, users can monitor sales trends and other important business KPIs in real-time.</p>
-<ul>
-<li><a href="/blog/2025-02-18-realtime-dashboard-1">Part 1 Data Producer</a></li>
-<li><a href="/blog/2025-02-25-realtime-dashboard-2/#">Part 2 Streamlit Dashboard</a> (this post)</li>
-<li><a href="/blog/2025-03-04-realtime-dashboard-3">Part 3 Next.js Dashboard</a></li>
-</ul>
-
-<h2 id="streamlit-frontend" data-numberify>Streamlit Frontend<a class="anchor ms-1" href="#streamlit-frontend"></a></h2>
-<p>This Streamlit dashboard is designed to process and display real-time <em>theLook eCommerce data</em> using <em>pandas</em> for data manipulation, Streamlit&rsquo;s built-in <em>metric</em> component for KPIs, and <em>Apache ECharts</em> for visualizations. The source code for this post can be found in this <a href="https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos" target="_blank" rel="noopener noreferrer"><strong>GitHub repository</strong><i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-
-<h3 id="components" data-numberify>Components<a class="anchor ms-1" href="#components"></a></h3>
-<p>The dashboard components and data processing logic are managed by functions in <code>streamlit/utils.py</code>. Below are the details of those functions.</p>
-<ol>
-<li>
-<p>Loading Records:</p>
-<ul>
-<li>The <code>load_records()</code> function accepts a list of records, converts them into a <strong>pandas DataFrame</strong>, and ensures that the necessary columns are present.</li>
-<li>It then processes data by converting the <strong>age</strong> column to integers and the <strong>cost</strong> and <strong>sale_price</strong> columns to floating-point values, rounding the sale price to one decimal place.</li>
-<li>Key metrics like the <strong>number of orders</strong>, <strong>number of order items</strong>, and <strong>total sales</strong> are calculated from the DataFrame and returned for display.</li>
-</ul>
-</li>
-<li>
-<p>Generating Metrics:</p>
-<ul>
-<li>The <code>create_metric_items()</code> function creates a list of dictionaries containing metrics and their respective changes (<code>delta</code>), comparing the current and previous values of <strong>orders</strong>, <strong>order items</strong>, and <strong>total sales</strong>.</li>
-<li>The <code>generate_metrics()</code> function takes the calculated metrics and displays them in Streamlit’s <strong>metric components</strong> within the <code>placeholder</code> container. It uses a column layout to show the metrics side-by-side.</li>
-</ul>
-</li>
-<li>
-<p>Creating Chart Options:</p>
-<ul>
-<li>The <code>create_options_items()</code> function generates configuration data for bar charts that display <strong>revenue by country</strong> and <strong>revenue by traffic source</strong>.</li>
-<li>It groups the data by <strong>country</strong> and <strong>traffic source</strong>, sums the <strong>sale_price</strong> for each, and sorts it in descending order.</li>
-<li><strong>ECharts options</strong> are defined for each chart with custom colors, titles, and axis settings. The charts are configured to show <strong>tooltips</strong> when hovering over the bars.</li>
-</ul>
-</li>
-<li>
-<p>Displaying Charts:</p>
-<ul>
-<li>The <code>generate_charts()</code> function takes the <strong>ECharts options</strong> and renders each chart within a container using the <code>st_echarts</code> component of the <a href="https://pypi.org/project/streamlit-echarts/" target="_blank" rel="noopener noreferrer">streamlit-echarts<i class="fas fa-external-link-square-alt ms-1"></i></a> package.</li>
-<li>Each chart is placed in its own column, with dynamic layout adjustments based on the number of charts being displayed. The charts are rendered with a fixed height of <strong>500px</strong>.</li>
-</ul>
-</li>
-</ol>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln">  1</span><span class="cl"><span class="c1">## producer/streamlit/utils.py</span>
-</span></span><span class="line"><span class="ln">  2</span><span class="cl"><span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span>
-</span></span><span class="line"><span class="ln">  3</span><span class="cl">
-</span></span><span class="line"><span class="ln">  4</span><span class="cl"><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-</span></span><span class="line"><span class="ln">  5</span><span class="cl"><span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
-</span></span><span class="line"><span class="ln">  6</span><span class="cl"><span class="kn">from</span> <span class="nn">streamlit.delta_generator</span> <span class="kn">import</span> <span class="n">DeltaGenerator</span>
-</span></span><span class="line"><span class="ln">  7</span><span class="cl"><span class="kn">from</span> <span class="nn">streamlit_echarts</span> <span class="kn">import</span> <span class="n">st_echarts</span>
-</span></span><span class="line"><span class="ln">  8</span><span class="cl">
-</span></span><span class="line"><span class="ln">  9</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 10</span><span class="cl"><span class="k">def</span> <span class="nf">load_records</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 11</span><span class="cl">    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 12</span><span class="cl">    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 13</span><span class="cl">        <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 14</span><span class="cl">            <span class="s2">&#34;order_id&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 15</span><span class="cl">            <span class="s2">&#34;item_id&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 16</span><span class="cl">            <span class="s2">&#34;country&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 17</span><span class="cl">            <span class="s2">&#34;traffic_source&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 18</span><span class="cl">            <span class="s2">&#34;age&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 19</span><span class="cl">            <span class="s2">&#34;cost&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 20</span><span class="cl">            <span class="s2">&#34;sale_price&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 21</span><span class="cl">        <span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 22</span><span class="cl">    <span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 23</span><span class="cl">    <span class="n">df</span><span class="p">[</span><span class="s2">&#34;age&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&#34;age&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 24</span><span class="cl">    <span class="n">df</span><span class="p">[</span><span class="s2">&#34;cost&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&#34;cost&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 25</span><span class="cl">    <span class="n">df</span><span class="p">[</span><span class="s2">&#34;sale_price&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&#34;sale_price&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 26</span><span class="cl">    <span class="n">metric_values</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 27</span><span class="cl">        <span class="s2">&#34;num_orders&#34;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s2">&#34;order_id&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">(),</span>
-</span></span><span class="line"><span class="ln"> 28</span><span class="cl">        <span class="s2">&#34;num_order_items&#34;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s2">&#34;item_id&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">(),</span>
-</span></span><span class="line"><span class="ln"> 29</span><span class="cl">        <span class="s2">&#34;total_sales&#34;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&#34;sale_price&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span>
-</span></span><span class="line"><span class="ln"> 30</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 31</span><span class="cl">    <span class="k">return</span> <span class="n">metric_values</span><span class="p">,</span> <span class="n">df</span>
-</span></span><span class="line"><span class="ln"> 32</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 33</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 34</span><span class="cl"><span class="k">def</span> <span class="nf">create_metric_items</span><span class="p">(</span><span class="n">metric_values</span><span class="p">,</span> <span class="n">prev_values</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 35</span><span class="cl">    <span class="k">return</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 36</span><span class="cl">        <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 37</span><span class="cl">            <span class="s2">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;Number of Orders&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 38</span><span class="cl">            <span class="s2">&#34;value&#34;</span><span class="p">:</span> <span class="n">metric_values</span><span class="p">[</span><span class="s2">&#34;num_orders&#34;</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln"> 39</span><span class="cl">            <span class="s2">&#34;delta&#34;</span><span class="p">:</span> <span class="p">(</span><span class="n">metric_values</span><span class="p">[</span><span class="s2">&#34;num_orders&#34;</span><span class="p">]</span> <span class="o">-</span> <span class="n">prev_values</span><span class="p">[</span><span class="s2">&#34;num_orders&#34;</span><span class="p">]),</span>
-</span></span><span class="line"><span class="ln"> 40</span><span class="cl">        <span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 41</span><span class="cl">        <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 42</span><span class="cl">            <span class="s2">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;Number of Order Items&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 43</span><span class="cl">            <span class="s2">&#34;value&#34;</span><span class="p">:</span> <span class="n">metric_values</span><span class="p">[</span><span class="s2">&#34;num_order_items&#34;</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln"> 44</span><span class="cl">            <span class="s2">&#34;delta&#34;</span><span class="p">:</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 45</span><span class="cl">                <span class="n">metric_values</span><span class="p">[</span><span class="s2">&#34;num_order_items&#34;</span><span class="p">]</span> <span class="o">-</span> <span class="n">prev_values</span><span class="p">[</span><span class="s2">&#34;num_order_items&#34;</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 46</span><span class="cl">            <span class="p">),</span>
-</span></span><span class="line"><span class="ln"> 47</span><span class="cl">        <span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 48</span><span class="cl">        <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 49</span><span class="cl">            <span class="s2">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;Total Sales&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 50</span><span class="cl">            <span class="s2">&#34;value&#34;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&#34;$ </span><span class="si">{</span><span class="n">metric_values</span><span class="p">[</span><span class="s1">&#39;total_sales&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 51</span><span class="cl">            <span class="s2">&#34;delta&#34;</span><span class="p">:</span> <span class="p">(</span><span class="n">metric_values</span><span class="p">[</span><span class="s2">&#34;total_sales&#34;</span><span class="p">]</span> <span class="o">-</span> <span class="n">prev_values</span><span class="p">[</span><span class="s2">&#34;total_sales&#34;</span><span class="p">]),</span>
-</span></span><span class="line"><span class="ln"> 52</span><span class="cl">        <span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 53</span><span class="cl">    <span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 54</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 55</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 56</span><span class="cl"><span class="k">def</span> <span class="nf">generate_metrics</span><span class="p">(</span><span class="n">placeholder</span><span class="p">:</span> <span class="n">DeltaGenerator</span><span class="p">,</span> <span class="n">metric_items</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 57</span><span class="cl">    <span class="k">if</span> <span class="n">metric_items</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 58</span><span class="cl">        <span class="n">metric_items</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 59</span><span class="cl">            <span class="p">{</span><span class="s2">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;Number of Orders&#34;</span><span class="p">,</span> <span class="s2">&#34;value&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&#34;delta&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 60</span><span class="cl">            <span class="p">{</span><span class="s2">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;Number of Order Items&#34;</span><span class="p">,</span> <span class="s2">&#34;value&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&#34;delta&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 61</span><span class="cl">            <span class="p">{</span><span class="s2">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;Total Sales&#34;</span><span class="p">,</span> <span class="s2">&#34;value&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&#34;delta&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 62</span><span class="cl">        <span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 63</span><span class="cl">    <span class="k">with</span> <span class="n">placeholder</span><span class="o">.</span><span class="n">container</span><span class="p">():</span>
-</span></span><span class="line"><span class="ln"> 64</span><span class="cl">        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">columns</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">metric_items</span><span class="p">))):</span>
-</span></span><span class="line"><span class="ln"> 65</span><span class="cl">            <span class="n">metric</span> <span class="o">=</span> <span class="n">metric_items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 66</span><span class="cl">            <span class="n">col</span><span class="o">.</span><span class="n">metric</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 67</span><span class="cl">                <span class="n">label</span><span class="o">=</span><span class="n">metric</span><span class="p">[</span><span class="s2">&#34;label&#34;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="n">metric</span><span class="p">[</span><span class="s2">&#34;value&#34;</span><span class="p">],</span> <span class="n">delta</span><span class="o">=</span><span class="n">metric</span><span class="p">[</span><span class="s2">&#34;delta&#34;</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 68</span><span class="cl">            <span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 69</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 70</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 71</span><span class="cl"><span class="k">def</span> <span class="nf">create_options_items</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln"> 72</span><span class="cl">    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 73</span><span class="cl">        <span class="s2">&#34;#00008b&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 74</span><span class="cl">        <span class="s2">&#34;#b22234&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 75</span><span class="cl">        <span class="s2">&#34;#00247d&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 76</span><span class="cl">        <span class="s2">&#34;#f00&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 77</span><span class="cl">        <span class="s2">&#34;#ffde00&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 78</span><span class="cl">        <span class="s2">&#34;#002a8f&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 79</span><span class="cl">        <span class="s2">&#34;#000&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 80</span><span class="cl">        <span class="s2">&#34;#003580&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 81</span><span class="cl">        <span class="s2">&#34;#ed2939&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 82</span><span class="cl">        <span class="s2">&#34;#003897&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 83</span><span class="cl">        <span class="s2">&#34;#f93&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 84</span><span class="cl">        <span class="s2">&#34;#bc002d&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 85</span><span class="cl">        <span class="s2">&#34;#024fa2&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 86</span><span class="cl">        <span class="s2">&#34;#000&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 87</span><span class="cl">        <span class="s2">&#34;#00247d&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 88</span><span class="cl">        <span class="s2">&#34;#ef2b2d&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 89</span><span class="cl">        <span class="s2">&#34;#dc143c&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 90</span><span class="cl">        <span class="s2">&#34;#d52b1e&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 91</span><span class="cl">        <span class="s2">&#34;#e30a17&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 92</span><span class="cl">    <span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 93</span><span class="cl">    <span class="n">chart_cols</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 94</span><span class="cl">        <span class="p">{</span><span class="s2">&#34;x&#34;</span><span class="p">:</span> <span class="s2">&#34;country&#34;</span><span class="p">,</span> <span class="s2">&#34;y&#34;</span><span class="p">:</span> <span class="s2">&#34;sale_price&#34;</span><span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 95</span><span class="cl">        <span class="p">{</span><span class="s2">&#34;x&#34;</span><span class="p">:</span> <span class="s2">&#34;traffic_source&#34;</span><span class="p">,</span> <span class="s2">&#34;y&#34;</span><span class="p">:</span> <span class="s2">&#34;sale_price&#34;</span><span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 96</span><span class="cl">    <span class="p">]</span>
-</span></span><span class="line"><span class="ln"> 97</span><span class="cl">    <span class="n">option_items</span> <span class="o">=</span> <span class="p">[]</span>
-</span></span><span class="line"><span class="ln"> 98</span><span class="cl">    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">chart_cols</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln"> 99</span><span class="cl">        <span class="n">data</span> <span class="o">=</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">100</span><span class="cl">            <span class="n">df</span><span class="p">[[</span><span class="n">col</span><span class="p">[</span><span class="s2">&#34;x&#34;</span><span class="p">],</span> <span class="n">col</span><span class="p">[</span><span class="s2">&#34;y&#34;</span><span class="p">]]]</span>
-</span></span><span class="line"><span class="ln">101</span><span class="cl">            <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">col</span><span class="p">[</span><span class="s2">&#34;x&#34;</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln">102</span><span class="cl">            <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">103</span><span class="cl">            <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">104</span><span class="cl">            <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">col</span><span class="p">[</span><span class="s2">&#34;y&#34;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">105</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">106</span><span class="cl">        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">107</span><span class="cl">            <span class="s2">&#34;title&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;text&#34;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&#34;Revenue by </span><span class="si">{</span><span class="n">col</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">},</span>
-</span></span><span class="line"><span class="ln">108</span><span class="cl">            <span class="s2">&#34;xAxis&#34;</span><span class="p">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">109</span><span class="cl">                <span class="s2">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;category&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">110</span><span class="cl">                <span class="s2">&#34;data&#34;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">[</span><span class="s2">&#34;x&#34;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
-</span></span><span class="line"><span class="ln">111</span><span class="cl">                <span class="s2">&#34;axisLabel&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;show&#34;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&#34;rotate&#34;</span><span class="p">:</span> <span class="mi">75</span><span class="p">},</span>
-</span></span><span class="line"><span class="ln">112</span><span class="cl">            <span class="p">},</span>
-</span></span><span class="line"><span class="ln">113</span><span class="cl">            <span class="s2">&#34;yAxis&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;value&#34;</span><span class="p">},</span>
-</span></span><span class="line"><span class="ln">114</span><span class="cl">            <span class="s2">&#34;series&#34;</span><span class="p">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">115</span><span class="cl">                <span class="p">{</span>
-</span></span><span class="line"><span class="ln">116</span><span class="cl">                    <span class="s2">&#34;data&#34;</span><span class="p">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">117</span><span class="cl">                        <span class="p">{</span><span class="s2">&#34;value&#34;</span><span class="p">:</span> <span class="n">d</span><span class="p">,</span> <span class="s2">&#34;itemStyle&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;color&#34;</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">]}}</span>
-</span></span><span class="line"><span class="ln">118</span><span class="cl">                        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">[</span><span class="s2">&#34;y&#34;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_list</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">119</span><span class="cl">                    <span class="p">],</span>
-</span></span><span class="line"><span class="ln">120</span><span class="cl">                    <span class="s2">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;bar&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">121</span><span class="cl">                <span class="p">}</span>
-</span></span><span class="line"><span class="ln">122</span><span class="cl">            <span class="p">],</span>
-</span></span><span class="line"><span class="ln">123</span><span class="cl">            <span class="s2">&#34;tooltip&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;trigger&#34;</span><span class="p">:</span> <span class="s2">&#34;axis&#34;</span><span class="p">,</span> <span class="s2">&#34;axisPointer&#34;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;shadow&#34;</span><span class="p">}},</span>
-</span></span><span class="line"><span class="ln">124</span><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="ln">125</span><span class="cl">        <span class="n">option_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">126</span><span class="cl">    <span class="k">return</span> <span class="n">option_items</span>
-</span></span><span class="line"><span class="ln">127</span><span class="cl">
-</span></span><span class="line"><span class="ln">128</span><span class="cl">
-</span></span><span class="line"><span class="ln">129</span><span class="cl"><span class="k">def</span> <span class="nf">generate_charts</span><span class="p">(</span><span class="n">placeholder</span><span class="p">:</span> <span class="n">DeltaGenerator</span><span class="p">,</span> <span class="n">option_items</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
-</span></span><span class="line"><span class="ln">130</span><span class="cl">    <span class="k">with</span> <span class="n">placeholder</span><span class="o">.</span><span class="n">container</span><span class="p">():</span>
-</span></span><span class="line"><span class="ln">131</span><span class="cl">        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">columns</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">option_items</span><span class="p">))):</span>
-</span></span><span class="line"><span class="ln">132</span><span class="cl">            <span class="n">options</span> <span class="o">=</span> <span class="n">option_items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-</span></span><span class="line"><span class="ln">133</span><span class="cl">            <span class="k">with</span> <span class="n">col</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">134</span><span class="cl">                <span class="n">st_echarts</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&#34;500px&#34;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
-</span></span></code></pre></div>
-<h3 id="application" data-numberify>Application<a class="anchor ms-1" href="#application"></a></h3>
-<p>The dashboard connects to the <strong>WebSocket server</strong> to fetch and display real-time <em>theLook eCommerce</em> data. Here&rsquo;s a detailed breakdown of its functionality:</p>
-<ol>
-<li>
-<p>WebSocket Connection:</p>
-<ul>
-<li>The <code>generate()</code> function is an <strong>asynchronous</strong> task that establishes a connection to a WebSocket server (<code>ws://localhost:8000/ws</code>) using an asynchronous HTTP client by the <a href="https://pypi.org/project/aiohttp/" target="_blank" rel="noopener noreferrer">aiohttp<i class="fas fa-external-link-square-alt ms-1"></i></a> package. It listens for incoming messages from the server, which contain the eCommerce data.</li>
-<li>As each message is received, the function loads the data using the <code>load_records()</code> function, which processes the data into <strong>pandas DataFrame</strong> format and computes key metrics.</li>
-</ul>
-</li>
-<li>
-<p>Generating and Displaying Metrics:</p>
-<ul>
-<li>The <code>create_metric_items()</code> function calculates and prepares key metrics (such as <strong>number of orders</strong>, <strong>order items</strong>, and <strong>total sales</strong>) along with the delta (changes) from the previous values.</li>
-<li>The <code>generate_metrics()</code> function updates the Streamlit dashboard by displaying these metrics in the <code>metric_placeholder</code>.</li>
-</ul>
-</li>
-<li>
-<p>Creating and Displaying Charts:</p>
-<ul>
-<li>The <code>create_options_items()</code> function processes the data and generates configuration options for bar charts, displaying <strong>revenue by country</strong> and <strong>traffic source</strong>.</li>
-<li>The <code>generate_charts()</code> function renders the charts in the <code>chart_placeholder</code> container, using <strong>ECharts</strong> for interactive data visualizations.</li>
-</ul>
-</li>
-<li>
-<p>Real-time Updates:</p>
-<ul>
-<li>The loop continuously listens for new data from the WebSocket server. As data is received, it updates both the metrics and charts in real-time.</li>
-</ul>
-</li>
-<li>
-<p>User Interface:</p>
-<ul>
-<li>The app sets a wide layout with the title <strong>&ldquo;theLook eCommerce Dashboard&rdquo;</strong>.</li>
-<li>A checkbox (<code>Connect to WS Server</code>) lets the user choose whether to connect to the WebSocket server. When checked, the dashboard fetches data live and updates metrics and charts accordingly.</li>
-<li>If the checkbox is unchecked, only the static metrics are displayed.</li>
-</ul>
-</li>
-</ol>
-<p>This setup provides a <strong>dynamic dashboard</strong> that pulls and visualizes real-time eCommerce data, making it interactive and responsive for monitoring sales and performance metrics.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">## producer/streamlit/app.py</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="kn">import</span> <span class="nn">asyncio</span>
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kn">import</span> <span class="nn">aiohttp</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="kn">from</span> <span class="nn">streamlit.delta_generator</span> <span class="kn">import</span> <span class="n">DeltaGenerator</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl">    <span class="n">load_records</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">    <span class="n">create_metric_items</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">    <span class="n">generate_metrics</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">    <span class="n">create_options_items</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="n">generate_charts</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">
-</span></span><span class="line"><span class="ln">17</span><span class="cl">
-</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="k">async</span> <span class="k">def</span> <span class="nf">generate</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">    <span class="n">metric_placeholder</span><span class="p">:</span> <span class="n">DeltaGenerator</span><span class="p">,</span> <span class="n">chart_placeholder</span><span class="p">:</span> <span class="n">DeltaGenerator</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="p">):</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">    <span class="n">prev_values</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;num_orders&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&#34;num_order_items&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&#34;total_sales&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">    <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">        <span class="k">async</span> <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">ws_connect</span><span class="p">(</span><span class="s2">&#34;ws://localhost:8000/ws&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ws</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">            <span class="k">async</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">ws</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">                <span class="n">metric_values</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="n">load_records</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">json</span><span class="p">()))</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">                <span class="n">generate_metrics</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">                    <span class="n">metric_placeholder</span><span class="p">,</span> <span class="n">create_metric_items</span><span class="p">(</span><span class="n">metric_values</span><span class="p">,</span> <span class="n">prev_values</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">                <span class="p">)</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">                <span class="n">generate_charts</span><span class="p">(</span><span class="n">chart_placeholder</span><span class="p">,</span> <span class="n">create_options_items</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">                <span class="n">prev_values</span> <span class="o">=</span> <span class="n">metric_values</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">
-</span></span><span class="line"><span class="ln">32</span><span class="cl">
-</span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="n">st</span><span class="o">.</span><span class="n">set_page_config</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">    <span class="n">page_title</span><span class="o">=</span><span class="s2">&#34;theLook eCommerce&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">    <span class="n">page_icon</span><span class="o">=</span><span class="s2">&#34;✅&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">    <span class="n">layout</span><span class="o">=</span><span class="s2">&#34;wide&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="p">)</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">
-</span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&#34;theLook eCommerce Dashboard&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">
-</span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="n">connect</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">checkbox</span><span class="p">(</span><span class="s2">&#34;Connect to WS Server&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="n">metric_placeholder</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl"><span class="n">chart_placeholder</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
-</span></span><span class="line"><span class="ln">44</span><span class="cl">
-</span></span><span class="line"><span class="ln">45</span><span class="cl"><span class="k">if</span> <span class="n">connect</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl">    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">47</span><span class="cl">        <span class="n">generate</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">48</span><span class="cl">            <span class="n">metric_placeholder</span><span class="o">=</span><span class="n">metric_placeholder</span><span class="p">,</span> <span class="n">chart_placeholder</span><span class="o">=</span><span class="n">chart_placeholder</span>
-</span></span><span class="line"><span class="ln">49</span><span class="cl">        <span class="p">)</span>
-</span></span><span class="line"><span class="ln">50</span><span class="cl">    <span class="p">)</span>
-</span></span><span class="line"><span class="ln">51</span><span class="cl"><span class="k">else</span><span class="p">:</span>
-</span></span><span class="line"><span class="ln">52</span><span class="cl">    <span class="n">generate_metrics</span><span class="p">(</span><span class="n">metric_placeholder</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span></span></code></pre></div>
-<h2 id="deployment" data-numberify>Deployment<a class="anchor ms-1" href="#deployment"></a></h2>
-
-<h3 id="data-producer-and-websocket-server" data-numberify>Data Producer and WebSocket Server<a class="anchor ms-1" href="#data-producer-and-websocket-server"></a></h3>
-<p>As discussed in <a href="/blog/2025-02-18-realtime-dashboard-1">Part 1</a>, the data generator and WebSocket server can be deployed using Docker Compose with the command <code>docker-compose -f producer/docker-compose.yml up -d</code>. Once started, the server can be checked with a <a href="https://github.com/lewoudar/ws/" target="_blank" rel="noopener noreferrer">WebSocket client<i class="fas fa-external-link-square-alt ms-1"></i></a> by executing <code>ws listen ws://localhost:8000/ws</code>, and its logs can be monitored by running <code>docker logs -f producer</code>.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2025-02-25-realtime-dashboard-2/backend.gif" loading="lazy" width="1835" height="776" />
-</picture>
-
-</p>
-
-<h3 id="frontend-dashboard" data-numberify>Frontend Dashboard<a class="anchor ms-1" href="#frontend-dashboard"></a></h3>
-<p>The dashboard can be started by running the Streamlit app as shown below. Once started, it can be accessed in a browser at <em>http://localhost:8501</em>.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">## create and activate a virtual environment</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"># https://docs.python.org/3/library/venv.html</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">
-</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1">## install pip packages</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl">$ pip install -r requirements.txt
-</span></span><span class="line"><span class="ln">6</span><span class="cl">
-</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1">## start the app</span>
-</span></span><span class="line"><span class="ln">8</span><span class="cl">$ streamlit run streamlit/app.py
-</span></span></code></pre></div><p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2025-02-25-realtime-dashboard-2/featured.gif" loading="lazy" width="1573" height="753" />
 </picture>
 
 </p>
