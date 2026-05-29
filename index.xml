@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES v0.8.1</title><link>https://jaehyeon.me/blog/2026-05-25-dynamic-des-parquet-support/</link><guid>https://jaehyeon.me/blog/2026-05-25-dynamic-des-parquet-support/</guid><pubDate>Thu, 21 May 2026 00:00:00 +0000</pubDate><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Developer Experience at Factor House</description><language>en</language><item><title>One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES v0.8.1</title><link>https://jaehyeon.me/blog/2026-05-25-dynamic-des-parquet-support/</link><guid>https://jaehyeon.me/blog/2026-05-25-dynamic-des-parquet-support/</guid><pubDate>Mon, 25 May 2026 00:00:00 +0000</pubDate><description>
 Training a machine learning model on simulated data is straightforward until you try to deploy it. The disconnect usually happens at the pipeline level: training requires massive, historical batch data (like Parquet files in an S3 bucket), but production inference requires real-time, event-driven streams (like Kafka or Redis).
 Maintaining two separate simulation codebases, one for generating training data and another for streaming live events, introduces friction, schema mismatches, and duplicated engineering effort.</description><content:encoded><![CDATA[
         <p>Training a machine learning model on simulated data is straightforward until you try to deploy it. The disconnect usually happens at the pipeline level: training requires massive, historical batch data (like Parquet files in an S3 bucket), but production inference requires real-time, event-driven streams (like Kafka or Redis).</p>
@@ -29,6 +29,196 @@ Maintaining two separate simulation codebases, one for generating training data 
 <li><strong>GitHub Repository:</strong> <a href="https://github.com/jaehyeon-kim/dynamic-des" target="_blank" rel="noopener noreferrer">jaehyeon-kim/dynamic-des<i class="fas fa-external-link-square-alt ms-1"></i></a></li>
 <li><strong>Documentation &amp; Examples:</strong> <a href="https://jaehyeon.me/dynamic-des/latest/examples/history/">Historical Data Generation Guide</a></li>
 </ul>
+
+      ]]></content:encoded></item><item><title>Building End-to-End Data Lineage with Kafka, Flink, and Spark</title><link>https://jaehyeon.me/slides/2026-05-22-end-to-end-data-lineage/</link><guid>https://jaehyeon.me/slides/2026-05-22-end-to-end-data-lineage/</guid><pubDate>Fri, 22 May 2026 00:00:00 +0000</pubDate><description><![CDATA[
+        Building End-to-End Data Lineage With Kafka, Flink, and Spark What is Data Lineage? The journey of data - where it comes from, how it’s transformed, and where it ends up.
+Why Data Lineage Matters Debugging &amp; Root Cause Analysis: Quickly trace production bugs back to the source. Impact Analysis &amp; Governance: See downstream dependencies before changing schemas. Compliance &amp; Audit: Document data provenance for strict regulatory requirements. Trust &amp; Reliability: Increase stakeholder confidence in data products.
+      ]]></description><content:encoded><![CDATA[
+        <!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+
+<h2 id="building-end-to-end-data-lineage" data-numberify>Building End-to-End Data Lineage<a class="anchor ms-1" href="#building-end-to-end-data-lineage"></a></h2>
+
+<h4 id="with-kafka-flink-and-spark" data-numberify>With Kafka, Flink, and Spark<a class="anchor ms-1" href="#with-kafka-flink-and-spark"></a></h4>
+<hr>
+
+<h2 id="what-is-data-lineage" data-numberify>What is Data Lineage?<a class="anchor ms-1" href="#what-is-data-lineage"></a></h2>
+<p>The journey of data - where it comes from, how it’s transformed, and where it ends up.</p>
+
+<h3 id="why-data-lineage-matters" data-numberify>Why Data Lineage Matters<a class="anchor ms-1" href="#why-data-lineage-matters"></a></h3>
+<ul>
+<li><strong>Debugging &amp; Root Cause Analysis:</strong> Quickly trace production bugs back to the source.</li>
+<li><strong>Impact Analysis &amp; Governance:</strong> See downstream dependencies before changing schemas.</li>
+<li><strong>Compliance &amp; Audit:</strong> Document data provenance for strict regulatory requirements.</li>
+<li><strong>Trust &amp; Reliability:</strong> Increase stakeholder confidence in data products.</li>
+</ul>
+<hr>
+
+<h2 id="what-is-openlineage" data-numberify>What is OpenLineage?<a class="anchor ms-1" href="#what-is-openlineage"></a></h2>
+<p>An open standard for capturing lineage metadata from jobs in execution.</p>
+<!-- raw HTML omitted -->
+<hr>
+
+<h2 id="two-lineage-paradigms" data-numberify>Two Lineage Paradigms<a class="anchor ms-1" href="#two-lineage-paradigms"></a></h2>
+<!-- raw HTML omitted -->
+
+<h3 id="batch-lineage-retrospective" data-numberify>Batch Lineage (Retrospective)<a class="anchor ms-1" href="#batch-lineage-retrospective"></a></h3>
+<ul>
+<li><strong>Data:</strong> Bounded Sets</li>
+<li><strong>Lifecycle:</strong> Finite, Scheduled</li>
+<li><strong>Capture:</strong> At Job Completion</li>
+<li><strong>Result:</strong> Historical Audit Trail
+<!-- raw HTML omitted -->
+</li>
+</ul>
+
+<h3 id="streaming-lineage-operational" data-numberify>Streaming Lineage (Operational)<a class="anchor ms-1" href="#streaming-lineage-operational"></a></h3>
+<ul>
+<li><strong>Challenge:</strong> Unbounded Streams</li>
+<li><strong>Challenge:</strong> Continuous Jobs</li>
+<li><strong>Opportunity:</strong> Capture <strong>During</strong> Execution</li>
+<li><strong>Opportunity:</strong> A <strong>Live, Observable System</strong>
+<!-- raw HTML omitted -->
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<hr>
+
+<h2 id="kafka-lineage-with-connect" data-numberify>Kafka: Lineage with Connect<a class="anchor ms-1" href="#kafka-lineage-with-connect"></a></h2>
+<p>Use a custom <strong>Single Message Transform (SMT)</strong> as a &ldquo;pass-through&rdquo; lineage agent.</p>
+<ul>
+<li><strong>Lifecycle Hook:</strong> Intercepts connector states (<code>RUNNING</code>, <code>FAIL</code>, <code>COMPLETE</code>) without altering records.</li>
+<li><strong>Column-Level Depth:</strong> Resolves fields via Avro schemas in the Schema Registry.</li>
+<li><strong>Consistent Namespacing:</strong> Normalizes physical dataset naming (e.g., <code>kafka://...</code>, <code>s3://...</code>) for job linking.</li>
+</ul>
+<hr>
+
+<h2 id="kafka-pipeline-mapping" data-numberify>Kafka Pipeline Mapping<a class="anchor ms-1" href="#kafka-pipeline-mapping"></a></h2>
+<p>One lineage job tracking data flow per active connector.</p>
+<!-- raw HTML omitted -->
+<hr>
+
+<h2 id="flink-integration-patterns" data-numberify>Flink: Integration Patterns<a class="anchor ms-1" href="#flink-integration-patterns"></a></h2>
+<!-- raw HTML omitted -->
+
+<h3 id="native-joblistenerbrdatastream-api" data-numberify>Native JobListener(DataStream API)<a class="anchor ms-1" href="#native-joblistenerbrdatastream-api"></a></h3>
+<ul>
+<li><strong>Method:</strong> <code>OpenLineageFlinkJobListener</code>.</li>
+<li><strong>Pros:</strong> Simple, out-of-the-box.</li>
+<li><strong>Cons:</strong> Fails to capture final <code>ABORT</code> transition.
+<!-- raw HTML omitted -->
+</li>
+</ul>
+
+<h3 id="manual-orchestrationbrtable-api--sql" data-numberify>Manual Orchestration(Table API / SQL)<a class="anchor ms-1" href="#manual-orchestrationbrtable-api--sql"></a></h3>
+<ul>
+<li><strong>Method:</strong> OpenLineage Java client.</li>
+<li><strong>Pros:</strong> Full lifecycle event tracking.</li>
+<li><strong>Cons:</strong> Requires custom wrapper code.
+<!-- raw HTML omitted -->
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<hr>
+
+<h2 id="flink-pipeline-mapping" data-numberify>Flink Pipeline Mapping<a class="anchor ms-1" href="#flink-pipeline-mapping"></a></h2>
+<p>One lineage job mapped directly per active Flink application cluster.</p>
+<!-- raw HTML omitted -->
+<hr>
+
+<h2 id="spark-final-picture" data-numberify>Spark: Final Picture<a class="anchor ms-1" href="#spark-final-picture"></a></h2>
+<p>Batch Spark job reading from Flink-written Iceberg tables.</p>
+<ul>
+<li><strong>Agent:</strong> Tracked via OpenLineage Java agent in <code>spark.extraListeners</code>.</li>
+<li><strong>Query Plan:</strong> Auto-detects inputs/outputs from Logical/Physical plans.</li>
+<li><strong>Granular Actions:</strong> Parent job with child jobs per Spark action.</li>
+<li>💡 <strong>Namespace Alignment:</strong> Engines must agree on the same physical root namespace (e.g., <code>s3://warehouse</code>).</li>
+</ul>
+<hr>
+
+<h2 id="spark-pipeline-mapping" data-numberify>Spark Pipeline Mapping<a class="anchor ms-1" href="#spark-pipeline-mapping"></a></h2>
+<p>One lineage job registered for each execution action block.</p>
+<!-- raw HTML omitted -->
+<hr>
+
+<h2 id="conclusion-key-takeaways" data-numberify>Conclusion: Key Takeaways<a class="anchor ms-1" href="#conclusion-key-takeaways"></a></h2>
+<p>Bridging real-time events and historical batch processing.</p>
+<ul>
+<li><strong>Choose the Right Pattern</strong>
+<ul>
+<li><strong>Trade-off:</strong> Simplicity vs. Tracing Durability.</li>
+<li><strong>Standard:</strong> Use Native Listeners.</li>
+<li><strong>Critical:</strong> Use Manual Orchestration for strict lifecycle tracking.</li>
+</ul>
+</li>
+<li><strong>Align Namespaces</strong>
+<ul>
+<li>Essential for cross-tech lineage.</li>
+</ul>
+</li>
+<li><strong>Start Small</strong>
+<ul>
+<li>Instrument one critical pipeline first.</li>
+<li>Establish metadata visibility, then scale outward.</li>
+</ul>
+</li>
+</ul>
+<hr>
+
+<h2 id="project-repositories--guides" data-numberify>Project Repositories & Guides<a class="anchor ms-1" href="#project-repositories--guides"></a></h2>
+<ul>
+<li><a href="https://openlineage.io/" target="_blank" rel="noopener noreferrer">OpenLineage Project<i class="fas fa-external-link-square-alt ms-1"></i></a></li>
+<li><a href="https://github.com/factorhouse/examples/tree/main/projects/data-lineage-labs" target="_blank" rel="noopener noreferrer">Data Linage Lab<i class="fas fa-external-link-square-alt ms-1"></i></a></li>
+</ul>
+
+      ]]></content:encoded></item><item><title>Current London 2026: Building End-to-End Data Lineage</title><link>https://jaehyeon.me/blog/2026-05-22-end-to-end-data-lineage/</link><guid>https://jaehyeon.me/blog/2026-05-22-end-to-end-data-lineage/</guid><pubDate>Fri, 22 May 2026 00:00:00 +0000</pubDate><description>
+This week, I traveled to London to speak at Current 2026. In addition to connecting with fellow data practitioners, I presented a session on a common architectural challenge: tracking the complete lifecycle of data.
+In modern data ecosystems, understanding data provenance, transformation steps, and final destinations is necessary for governance and root-cause analysis. My session, Building End-to-End Data Lineage with Kafka, Flink, and Spark, detailed a way to capture this metadata across parallel pipelines using OpenLineage.</description><content:encoded><![CDATA[
+        <p>This week, I traveled to London to speak at Current 2026. In addition to connecting with fellow data practitioners, I presented a session on a common architectural challenge: tracking the complete lifecycle of data.</p>
+<p>In modern data ecosystems, understanding data provenance, transformation steps, and final destinations is necessary for governance and root-cause analysis. My session, <a href="https://current.confluent.io/london/sessions#session-SESS-70" target="_blank" rel="noopener noreferrer"><strong>Building End-to-End Data Lineage with Kafka, Flink, and Spark</strong><i class="fas fa-external-link-square-alt ms-1"></i></a>, detailed a way to capture this metadata across parallel pipelines using <a href="https://openlineage.io/" target="_blank" rel="noopener noreferrer">OpenLineage<i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
+
+<h2 id="presentation-slides" data-numberify>Presentation Slides<a class="anchor ms-1" href="#presentation-slides"></a></h2>
+<p>Below are the slides from my session, rendered natively here on the blog.</p>
+<div class="ratio ratio-16x9 my-4 shadow-sm rounded overflow-hidden">
+  <iframe 
+    src="/slides/2026-05-22-end-to-end-data-lineage/" 
+    title="Presentation" 
+    allowfullscreen="true" 
+    style="border: 0;">
+  </iframe>
+</div>
+<div class="text-center mb-4">
+    <a href="/slides/2026-05-22-end-to-end-data-lineage/" target="_blank" class="btn btn-sm btn-outline-primary">
+        <i class="fas fa-external-link-alt"></i> View Full Screen
+    </a>
+</div>
+<p><em>You can use your arrow keys to navigate the slides above, or click the &ldquo;View Full Screen&rdquo; button for the complete experience.</em></p>
+
+<h2 id="session-breakdown-tracking-the-data-lifecycle" data-numberify>Session Breakdown: Tracking the Data Lifecycle<a class="anchor ms-1" href="#session-breakdown-tracking-the-data-lifecycle"></a></h2>
+<p>The presentation focused on tracking data from a single Kafka topic as it distributed across concurrent architectural paths. To demonstrate the lineage graph, we analyzed a standard production stack.</p>
+
+<h3 id="1-real-time--archival-fan-out" data-numberify>1. Real-Time & Archival Fan-Out<a class="anchor ms-1" href="#1-real-time--archival-fan-out"></a></h3>
+<p>The architecture begins with a primary Kafka topic. From there, the data splits into distinct operational domains:</p>
+<ul>
+<li><strong>Archival:</strong> A Kafka S3 Sink Connector handling raw data offloading to object storage.</li>
+<li><strong>Live Analytics:</strong> A real-time Flink DataStream job consuming events for stateful processing.</li>
+<li><strong>Data Lakehouse:</strong> A Flink Table API job ingesting the continuous stream into an Apache Iceberg table for query engines.</li>
+</ul>
+
+<h3 id="2-completing-the-picture-with-spark" data-numberify>2. Completing the Picture with Spark<a class="anchor ms-1" href="#2-completing-the-picture-with-spark"></a></h3>
+<p>To demonstrate a complete end-to-end lifecycle, the session traced the lineage as a batch Apache Spark job consumed from the populated Iceberg table to generate downstream aggregations.</p>
+
+<h3 id="3-instrumenting-with-openlineage" data-numberify>3. Instrumenting with OpenLineage<a class="anchor ms-1" href="#3-instrumenting-with-openlineage"></a></h3>
+<p>Visualizing this multi-path journey, including column-level details, was achieved using <strong>Marquez</strong> as the lineage repository and visualization layer. The metadata extraction was handled through <strong>OpenLineage</strong>. Integrating these systems to output a unified lineage graph requires specific strategies:</p>
+<ul>
+<li><strong>Kafka Connect:</strong> Lineage is established at the connector level using a custom Single Message Transform (SMT) to capture operational state without altering the payload.</li>
+<li><strong>Apache Flink:</strong> Two distinct patterns were evaluated: a low-overhead listener-based approach, and a manual orchestration method necessary for capturing application cancellations.</li>
+<li><strong>Apache Spark:</strong> Spark&rsquo;s <code>extraListeners</code> were configured to auto-detect inputs and outputs, linking the batch jobs to upstream Flink outputs via aligned physical namespaces.</li>
+</ul>
+
+<h2 id="moving-forward" data-numberify>Moving Forward<a class="anchor ms-1" href="#moving-forward"></a></h2>
+<p>By instrumenting event streams, streaming compute, and batch processing engines with a unified standard like OpenLineage, organizations can establish observable and reliable data architectures.</p>
+<p>Thank you to everyone who attended the session at Current London. For those unable to attend, the slides are provided above for reference.</p>
 
       ]]></content:encoded></item><item><title>Building an Event-Driven Hybrid Digital Twin with dynamic-des</title><link>https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des/</link><guid>https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des/</guid><pubDate>Wed, 29 Apr 2026 00:00:00 +0000</pubDate><description>
 Asynchronous Gap In Part 1, we established that a true Hybrid Digital Twin does more than just mirror reality. It actively forecasts the future by running a simulation against live operational states.
@@ -5909,515 +6099,4 @@ The <code>avro</code> block in <code>build.gradle.kts</code> configures the Avro
 
 <h3 id="conclusion" data-numberify>Conclusion<a class="anchor ms-1" href="#conclusion"></a></h3>
 <p>The Streamhouse concept, powered by technologies like Paimon, Fluss, and Iceberg, represents a significant step towards truly unified data architectures. By leveraging the specific strengths of each component - Fluss for speed, Paimon for unified transactional tables, and Iceberg for scalable batch analytics and archival – organizations can build platforms that are performant, flexible, and ready for both real-time demands and deep historical insights. This tiered approach, already common in large tech companies, is now becoming accessible to a wider audience through these powerful open-source projects.</p>
-      ]]></content:encoded></item><item><title>Run Flink SQL Cookbook in Docker</title><link>https://jaehyeon.me/blog/2025-04-15-sql-cookbook/</link><guid>https://jaehyeon.me/blog/2025-04-15-sql-cookbook/</guid><pubDate>Tue, 15 Apr 2025 00:00:00 +0000</pubDate><description><![CDATA[
-        <p>The <a href="https://github.com/ververica/flink-sql-cookbook" target="_blank" rel="noopener noreferrer">Flink SQL Cookbook<i class="fas fa-external-link-square-alt ms-1"></i></a> by Ververica is a hands-on, example-rich guide to mastering <a href="https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/sql/overview/" target="_blank" rel="noopener noreferrer">Apache Flink SQL<i class="fas fa-external-link-square-alt ms-1"></i></a> for real-time stream processing. It offers a wide range of self-contained recipes, from basic queries and table operations to more advanced use cases like windowed aggregations, complex joins, user-defined functions (UDFs), and pattern detection. These examples are designed to be run on the Ververica Platform, and as such, the cookbook doesn&rsquo;t include instructions for setting up a Flink cluster.</p>
-<p>To help you run these recipes locally and explore Flink SQL without external dependencies, this post walks through setting up a fully functional local Flink cluster using Docker Compose. With this setup, you can experiment with the cookbook examples right on your machine.</p>
-      ]]></description><content:encoded><![CDATA[
-        <p>The <a href="https://github.com/ververica/flink-sql-cookbook" target="_blank" rel="noopener noreferrer">Flink SQL Cookbook<i class="fas fa-external-link-square-alt ms-1"></i></a> by Ververica is a hands-on, example-rich guide to mastering <a href="https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/sql/overview/" target="_blank" rel="noopener noreferrer">Apache Flink SQL<i class="fas fa-external-link-square-alt ms-1"></i></a> for real-time stream processing. It offers a wide range of self-contained recipes, from basic queries and table operations to more advanced use cases like windowed aggregations, complex joins, user-defined functions (UDFs), and pattern detection. These examples are designed to be run on the Ververica Platform, and as such, the cookbook doesn&rsquo;t include instructions for setting up a Flink cluster.</p>
-<p>To help you run these recipes locally and explore Flink SQL without external dependencies, this post walks through setting up a fully functional local Flink cluster using Docker Compose. With this setup, you can experiment with the cookbook examples right on your machine.</p>
-<h2 id="flink-cluster-on-docker" data-numberify>Flink Cluster on Docker<a class="anchor ms-1" href="#flink-cluster-on-docker"></a></h2>
-<p>The cookbook generates sample data using the <a href="https://github.com/knaufk/flink-faker" target="_blank" rel="noopener noreferrer">Flink SQL Faker Connector<i class="fas fa-external-link-square-alt ms-1"></i></a>, which allows for realistic, randomized record generation. To streamline the setup, we use a custom Docker image where the connector&rsquo;s JAR file is downloaded into the <code>/opt/flink/lib/</code> directory. This approach eliminates the need to manually register the connector each time we launch the <a href="https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/sqlclient/" target="_blank" rel="noopener noreferrer">Flink SQL client<i class="fas fa-external-link-square-alt ms-1"></i></a>, making it easier to jump straight into experimenting with the cookbook&rsquo;s examples. The source for this post is available in this <a href="https://github.com/jaehyeon-kim/flink-demos/tree/master/flink-sql-cookbook" target="_blank" rel="noopener noreferrer"><strong>GitHub repository</strong><i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="line"><span class="ln">1</span><span class="cl"><span class="k">FROM</span><span class="s"> flink:1.20.1</span><span class="err">
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="err"></span><span class="c"># add faker connector</span><span class="err">
-</span></span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="err"></span><span class="k">RUN</span> wget -P /opt/flink/lib/ <span class="se">\
-</span></span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="se"></span>  https://github.com/knaufk/flink-faker/releases/download/v0.5.3/flink-faker-0.5.3.jar<span class="err">
-</span></span></span></code></pre></div><p>We deploy a local Apache Flink cluster using Docker Compose. It defines one <code>JobManager</code> and three <code>TaskManagers</code>, all using the custom image. The <code>JobManager</code> handles coordination and exposes the Flink web UI on port 8081, while each <code>TaskManager</code> provides 10 task slots for parallel processing. All components share a custom network and use a filesystem-based state backend with checkpointing and savepoint directories configured for local testing. A health check ensures the <code>JobManager</code> is ready before <code>TaskManagers</code> start.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;3&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w"></span><span class="nt">services</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">  </span><span class="nt">jobmanager</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">flink-sql-cookbook</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l">.</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l">jobmanager</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l">jobmanager</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">      </span>- <span class="s2">&#34;8081:8081&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">    </span><span class="nt">networks</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">      </span>- <span class="l">cookbook</span><span class="w">
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">      </span>- <span class="p">|</span><span class="sd">
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="sd">        FLINK_PROPERTIES=
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="sd">        jobmanager.rpc.address: jobmanager
-</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="sd">        state.backend: filesystem
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="sd">        state.checkpoints.dir: file:///tmp/flink-checkpoints
-</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="sd">        state.savepoints.dir: file:///tmp/flink-savepoints
-</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="sd">        heartbeat.interval: 1000
-</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="sd">        heartbeat.timeout: 5000
-</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="sd">        rest.flamegraph.enabled: true
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="sd">        web.backpressure.refresh-interval: 10000</span><span class="w">        
-</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="w">    </span><span class="nt">healthcheck</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="w">      </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;CMD&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;curl&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;-f&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;http://localhost:8081/config&#34;</span><span class="p">]</span><span class="w">
-</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l">5s</span><span class="w">
-</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l">5s</span><span class="w">
-</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="w">      </span><span class="nt">retries</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
-</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">30</span><span class="cl"><span class="w">  </span><span class="nt">taskmanager-1</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">31</span><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">flink-sql-cookbook</span><span class="w">
-</span></span></span><span class="line"><span class="ln">32</span><span class="cl"><span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l">.</span><span class="w">
-</span></span></span><span class="line"><span class="ln">33</span><span class="cl"><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l">taskmanager</span><span class="w">
-</span></span></span><span class="line"><span class="ln">34</span><span class="cl"><span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l">taskmanager-1</span><span class="w">
-</span></span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="w">    </span><span class="nt">networks</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">36</span><span class="cl"><span class="w">      </span>- <span class="l">cookbook</span><span class="w">
-</span></span></span><span class="line"><span class="ln">37</span><span class="cl"><span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">38</span><span class="cl"><span class="w">      </span><span class="nt">jobmanager</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">39</span><span class="cl"><span class="w">        </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l">service_healthy</span><span class="w">
-</span></span></span><span class="line"><span class="ln">40</span><span class="cl"><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">41</span><span class="cl"><span class="w">      </span>- <span class="p">|</span><span class="sd">
-</span></span></span><span class="line"><span class="ln">42</span><span class="cl"><span class="sd">        FLINK_PROPERTIES=
-</span></span></span><span class="line"><span class="ln">43</span><span class="cl"><span class="sd">        jobmanager.rpc.address: jobmanager
-</span></span></span><span class="line"><span class="ln">44</span><span class="cl"><span class="sd">        taskmanager.numberOfTaskSlots: 10
-</span></span></span><span class="line"><span class="ln">45</span><span class="cl"><span class="sd">        state.backend: filesystem
-</span></span></span><span class="line"><span class="ln">46</span><span class="cl"><span class="sd">        state.checkpoints.dir: file:///tmp/flink-checkpoints
-</span></span></span><span class="line"><span class="ln">47</span><span class="cl"><span class="sd">        state.savepoints.dir: file:///tmp/flink-savepoints
-</span></span></span><span class="line"><span class="ln">48</span><span class="cl"><span class="sd">        heartbeat.interval: 1000
-</span></span></span><span class="line"><span class="ln">49</span><span class="cl"><span class="sd">        heartbeat.timeout: 5000</span><span class="w">        
-</span></span></span><span class="line"><span class="ln">50</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">51</span><span class="cl"><span class="w">  </span><span class="nt">taskmanager-2</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">52</span><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">flink-sql-cookbook</span><span class="w">
-</span></span></span><span class="line"><span class="ln">53</span><span class="cl"><span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l">.</span><span class="w">
-</span></span></span><span class="line"><span class="ln">54</span><span class="cl"><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l">taskmanager</span><span class="w">
-</span></span></span><span class="line"><span class="ln">55</span><span class="cl"><span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l">taskmanager-2</span><span class="w">
-</span></span></span><span class="line"><span class="ln">56</span><span class="cl"><span class="w">    </span><span class="nt">networks</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">57</span><span class="cl"><span class="w">      </span>- <span class="l">cookbook</span><span class="w">
-</span></span></span><span class="line"><span class="ln">58</span><span class="cl"><span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">59</span><span class="cl"><span class="w">      </span><span class="nt">jobmanager</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">60</span><span class="cl"><span class="w">        </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l">service_healthy</span><span class="w">
-</span></span></span><span class="line"><span class="ln">61</span><span class="cl"><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">62</span><span class="cl"><span class="w">      </span>- <span class="p">|</span><span class="sd">
-</span></span></span><span class="line"><span class="ln">63</span><span class="cl"><span class="sd">        FLINK_PROPERTIES=
-</span></span></span><span class="line"><span class="ln">64</span><span class="cl"><span class="sd">        jobmanager.rpc.address: jobmanager
-</span></span></span><span class="line"><span class="ln">65</span><span class="cl"><span class="sd">        taskmanager.numberOfTaskSlots: 10
-</span></span></span><span class="line"><span class="ln">66</span><span class="cl"><span class="sd">        state.backend: filesystem
-</span></span></span><span class="line"><span class="ln">67</span><span class="cl"><span class="sd">        state.checkpoints.dir: file:///tmp/flink-checkpoints
-</span></span></span><span class="line"><span class="ln">68</span><span class="cl"><span class="sd">        state.savepoints.dir: file:///tmp/flink-savepoints
-</span></span></span><span class="line"><span class="ln">69</span><span class="cl"><span class="sd">        heartbeat.interval: 1000
-</span></span></span><span class="line"><span class="ln">70</span><span class="cl"><span class="sd">        heartbeat.timeout: 5000</span><span class="w">        
-</span></span></span><span class="line"><span class="ln">71</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">72</span><span class="cl"><span class="w">  </span><span class="nt">taskmanager-3</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">73</span><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">flink-sql-cookbook</span><span class="w">
-</span></span></span><span class="line"><span class="ln">74</span><span class="cl"><span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l">.</span><span class="w">
-</span></span></span><span class="line"><span class="ln">75</span><span class="cl"><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l">taskmanager</span><span class="w">
-</span></span></span><span class="line"><span class="ln">76</span><span class="cl"><span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l">taskmanager-3</span><span class="w">
-</span></span></span><span class="line"><span class="ln">77</span><span class="cl"><span class="w">    </span><span class="nt">networks</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">78</span><span class="cl"><span class="w">      </span>- <span class="l">cookbook</span><span class="w">
-</span></span></span><span class="line"><span class="ln">79</span><span class="cl"><span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">80</span><span class="cl"><span class="w">      </span><span class="nt">jobmanager</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">81</span><span class="cl"><span class="w">        </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l">service_healthy</span><span class="w">
-</span></span></span><span class="line"><span class="ln">82</span><span class="cl"><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">83</span><span class="cl"><span class="w">      </span>- <span class="p">|</span><span class="sd">
-</span></span></span><span class="line"><span class="ln">84</span><span class="cl"><span class="sd">        FLINK_PROPERTIES=
-</span></span></span><span class="line"><span class="ln">85</span><span class="cl"><span class="sd">        jobmanager.rpc.address: jobmanager
-</span></span></span><span class="line"><span class="ln">86</span><span class="cl"><span class="sd">        taskmanager.numberOfTaskSlots: 10
-</span></span></span><span class="line"><span class="ln">87</span><span class="cl"><span class="sd">        state.backend: filesystem
-</span></span></span><span class="line"><span class="ln">88</span><span class="cl"><span class="sd">        state.checkpoints.dir: file:///tmp/flink-checkpoints
-</span></span></span><span class="line"><span class="ln">89</span><span class="cl"><span class="sd">        state.savepoints.dir: file:///tmp/flink-savepoints
-</span></span></span><span class="line"><span class="ln">90</span><span class="cl"><span class="sd">        heartbeat.interval: 1000
-</span></span></span><span class="line"><span class="ln">91</span><span class="cl"><span class="sd">        heartbeat.timeout: 5000</span><span class="w">        
-</span></span></span><span class="line"><span class="ln">92</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">93</span><span class="cl"><span class="w"></span><span class="nt">networks</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">94</span><span class="cl"><span class="w">  </span><span class="nt">cookbook</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="ln">95</span><span class="cl"><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">flink-sql-cookbook</span><span class="w">
-</span></span></span></code></pre></div><p>The Flink cluster can be deployed as follows.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># start containers</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">$ docker compose up -d
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># list containers</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">$ docker-compose ps
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="c1"># NAME                COMMAND                  SERVICE             STATUS              PORTS</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># jobmanager          &#34;/docker-entrypoint.…&#34;   jobmanager          running (healthy)   6123/tcp, 0.0.0.0:8081-&gt;8081/tcp, :::8081-&gt;8081/tcp</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"># taskmanager-1       &#34;/docker-entrypoint.…&#34;   taskmanager-1       running             6123/tcp, 8081/tcp</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"># taskmanager-2       &#34;/docker-entrypoint.…&#34;   taskmanager-2       running             6123/tcp, 8081/tcp</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># taskmanager-3       &#34;/docker-entrypoint.…&#34;   taskmanager-3       running             6123/tcp, 8081/tcp</span>
-</span></span></code></pre></div>
-<h2 id="flink-sql-client" data-numberify>Flink SQL Client<a class="anchor ms-1" href="#flink-sql-client"></a></h2>
-<p>We can start the SQL client from the <code>JobManager</code> container as shown below.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">$ docker <span class="nb">exec</span> -it jobmanager /opt/flink/bin/sql-client.sh
-</span></span></code></pre></div><p>On the SQL shell, we can execute Flink SQL statements.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">-- // create a temporary table
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TEMPORARY</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">heros</span><span class="w"> </span><span class="p">(</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">  </span><span class="o">`</span><span class="n">name</span><span class="o">`</span><span class="w"> </span><span class="n">STRING</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">  </span><span class="o">`</span><span class="n">power</span><span class="o">`</span><span class="w"> </span><span class="n">STRING</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">  </span><span class="o">`</span><span class="n">age</span><span class="o">`</span><span class="w"> </span><span class="nb">INT</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">  </span><span class="s1">&#39;connector&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;faker&#39;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">  </span><span class="s1">&#39;fields.name.expression&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;#{superhero.name}&#39;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">  </span><span class="s1">&#39;fields.power.expression&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;#{superhero.power}&#39;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w">  </span><span class="s1">&#39;fields.power.null-rate&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;0.05&#39;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">  </span><span class="s1">&#39;fields.age.expression&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;#{number.numberBetween &#39;&#39;0&#39;&#39;,&#39;&#39;1000&#39;&#39;}&#39;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w"></span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w"></span><span class="c1">-- [INFO] Execute statement succeeded.
-</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"></span><span class="w">
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w"></span><span class="c1">-- list tables
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"></span><span class="k">SHOW</span><span class="w"> </span><span class="n">TABLES</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w"></span><span class="c1">-- +------------+
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="c1">-- | table name |
-</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="c1">-- +------------+
-</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="c1">-- |      heros |
-</span></span></span><span class="line"><span class="ln">21</span><span class="cl"><span class="c1">-- +------------+
-</span></span></span><span class="line"><span class="ln">22</span><span class="cl"><span class="c1">-- 1 row in set
-</span></span></span><span class="line"><span class="ln">23</span><span class="cl"><span class="c1"></span><span class="w">
-</span></span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="w"></span><span class="c1">-- query records from the heros table
-</span></span></span><span class="line"><span class="ln">25</span><span class="cl"><span class="c1">-- hit &#39;q&#39; to exit the record view
-</span></span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1"></span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">heros</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="w"></span><span class="c1">-- quit sql shell
-</span></span></span><span class="line"><span class="ln">29</span><span class="cl"><span class="c1"></span><span class="n">quit</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2025-04-15-sql-cookbook/featured.gif" loading="lazy" width="1811" height="826" />
-</picture>
-
-</p>
-<p>The associating Flink job of the SELECT query can be found on the Flink Web UI at <code>http://localhost:8081</code>.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2025-04-15-sql-cookbook/web-ui.png" loading="lazy" width="1179" height="492" />
-</picture>
-
-</p>
-
-<h2 id="caveat" data-numberify>Caveat<a class="anchor ms-1" href="#caveat"></a></h2>
-<p>Some examples in the cookbook rely on an older version of the Faker connector, and as a result, certain directives used in the queries are no longer supported in the latest version—leading to runtime errors. For instance, the following query fails because the <code>#{Internet.userAgentAny}</code> directive has been removed. To resolve this, you can either remove the <code>user_agent</code> field from the query or replace the outdated directive with a supported one, such as using <code>regexify</code> to generate similar values.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">server_logs</span><span class="w"> </span><span class="p">(</span><span class="w"> 
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="w">    </span><span class="n">client_ip</span><span class="w"> </span><span class="n">STRING</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="w">    </span><span class="n">client_identity</span><span class="w"> </span><span class="n">STRING</span><span class="p">,</span><span class="w"> 
-</span></span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="w">    </span><span class="n">userid</span><span class="w"> </span><span class="n">STRING</span><span class="p">,</span><span class="w"> 
-</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="w">    </span><span class="n">user_agent</span><span class="w"> </span><span class="n">STRING</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="w">    </span><span class="n">log_time</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w">
-</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="w">    </span><span class="n">request_line</span><span class="w"> </span><span class="n">STRING</span><span class="p">,</span><span class="w"> 
-</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="w">    </span><span class="n">status_code</span><span class="w"> </span><span class="n">STRING</span><span class="p">,</span><span class="w"> 
-</span></span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="w">    </span><span class="k">size</span><span class="w"> </span><span class="nb">INT</span><span class="w">
-</span></span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span><span class="w">
-</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="w">  </span><span class="s1">&#39;connector&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;faker&#39;</span><span class="p">,</span><span class="w"> 
-</span></span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="w">  </span><span class="s1">&#39;fields.client_ip.expression&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;#{Internet.publicIpV4Address}&#39;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="w">  </span><span class="s1">&#39;fields.client_identity.expression&#39;</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="w">  </span><span class="s1">&#39;fields.userid.expression&#39;</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="w">  </span><span class="s1">&#39;fields.user_agent.expression&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;#{Internet.userAgentAny}&#39;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="w">  </span><span class="s1">&#39;fields.log_time.expression&#39;</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="s1">&#39;#{date.past &#39;&#39;15&#39;&#39;,&#39;&#39;5&#39;&#39;,&#39;&#39;SECONDS&#39;&#39;}&#39;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="w">  </span><span class="s1">&#39;fields.request_line.expression&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;#{regexify &#39;&#39;(GET|POST|PUT|PATCH){1}&#39;&#39;} #{regexify &#39;&#39;(/search\.html|/login\.html|/prod\.html|cart\.html|/order\.html){1}&#39;&#39;} #{regexify &#39;&#39;(HTTP/1\.1|HTTP/2|/HTTP/1\.0){1}&#39;&#39;}&#39;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="w">  </span><span class="s1">&#39;fields.status_code.expression&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;#{regexify &#39;&#39;(200|201|204|400|401|403|301){1}&#39;&#39;}&#39;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="w">  </span><span class="s1">&#39;fields.size.expression&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;#{number.numberBetween &#39;&#39;100&#39;&#39;,&#39;&#39;10000000&#39;&#39;}&#39;</span><span class="w">
-</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="w"></span><span class="p">);</span><span class="w">
-</span></span></span></code></pre></div><p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2025-04-15-sql-cookbook/sql-error.gif" loading="lazy" width="1811" height="826" />
-</picture>
-
-</p>
-      ]]></content:encoded></item><item><title>Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 3 Next.js Dashboard</title><link>https://jaehyeon.me/blog/2025-03-04-realtime-dashboard-3/</link><guid>https://jaehyeon.me/blog/2025-03-04-realtime-dashboard-3/</guid><pubDate>Tue, 04 Mar 2025 00:00:00 +0000</pubDate><description><![CDATA[
-        <p>In this post, we build a real-time monitoring dashboard using <a href="https://nextjs.org/" target="_blank" rel="noopener noreferrer">Next.js<i class="fas fa-external-link-square-alt ms-1"></i></a>, a React framework that supports server-side rendering, static site generation, and full-stack capabilities with built-in performance optimizations. Similar to the <em>Streamlit</em> app we developed in <a href="/blog/2025-02-25-realtime-dashboard-2">Part 2</a>, this dashboard connects to the WebSocket server from <a href="/blog/2025-02-18-realtime-dashboard-1">Part 1</a> to continuously fetch and visualize key metrics such as <strong>order counts</strong>, <strong>sales data</strong>, and <strong>revenue by traffic source and country</strong>. With interactive bar charts and dynamic metrics, users can monitor sales trends and other critical business KPIs in real-time.</p>
-      ]]></description><content:encoded><![CDATA[
-        <p>In this post, we build a real-time monitoring dashboard using <a href="https://nextjs.org/" target="_blank" rel="noopener noreferrer">Next.js<i class="fas fa-external-link-square-alt ms-1"></i></a>, a React framework that supports server-side rendering, static site generation, and full-stack capabilities with built-in performance optimizations. Similar to the <em>Streamlit</em> app we developed in <a href="/blog/2025-02-25-realtime-dashboard-2">Part 2</a>, this dashboard connects to the WebSocket server from <a href="/blog/2025-02-18-realtime-dashboard-1">Part 1</a> to continuously fetch and visualize key metrics such as <strong>order counts</strong>, <strong>sales data</strong>, and <strong>revenue by traffic source and country</strong>. With interactive bar charts and dynamic metrics, users can monitor sales trends and other critical business KPIs in real-time.</p>
-<ul>
-<li><a href="/blog/2025-02-18-realtime-dashboard-1">Part 1 Data Producer</a></li>
-<li><a href="/blog/2025-02-25-realtime-dashboard-2">Part 2 Streamlit Dashboard</a></li>
-<li><a href="/blog/2025-03-04-realtime-dashboard-3/#">Part 3 Next.js Dashboard</a> (this post)</li>
-</ul>
-
-<h2 id="nextjs-frontend" data-numberify>Next.js Frontend<a class="anchor ms-1" href="#nextjs-frontend"></a></h2>
-<p>The Next.js dashboard processes and displays real-time <em>theLook eCommerce data</em>. It connects to the WebSocket server using the <a href="https://github.com/robtaussig/react-use-websocket" target="_blank" rel="noopener noreferrer"><em>React useWebSocket</em><i class="fas fa-external-link-square-alt ms-1"></i></a> package, while the UI is styled with <a href="https://www.heroui.com/" target="_blank" rel="noopener noreferrer">HeroUI (formerly NextUI)<i class="fas fa-external-link-square-alt ms-1"></i></a> and <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer">Tailwind CSS<i class="fas fa-external-link-square-alt ms-1"></i></a>. Visualizations are powered by <a href="https://github.com/hustcc/echarts-for-react" target="_blank" rel="noopener noreferrer">Apache ECharts<i class="fas fa-external-link-square-alt ms-1"></i></a>. The source code for this post is available in this <a href="https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos" target="_blank" rel="noopener noreferrer"><strong>GitHub repository</strong><i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-
-<h3 id="metric-component" data-numberify>Metric Component<a class="anchor ms-1" href="#metric-component"></a></h3>
-<p>We use a React component called <code>Metric</code> that displays a metric card with the following props:</p>
-<ul>
-<li><code>label</code>: The title or name of the metric.</li>
-<li><code>value</code>: The value of the metric (could represent a number or currency).</li>
-<li><code>delta</code>: The change in the metric value (used to indicate increase or decrease).</li>
-<li><code>is_currency</code>: A boolean flag to indicate whether the value should be formatted as a currency.</li>
-</ul>
-<p>The card&rsquo;s visual layout includes the label at the top, the formatted value in large text, and the delta change with an arrow beneath it.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// nextjs/src/components/metric.tsx
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="s2">&#34;use client&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="kr">import</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="nx">Card</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="nx">CardHeader</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="nx">CardBody</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">  <span class="nx">Divider</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="nx">CardFooter</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="p">}</span> <span class="nx">from</span> <span class="s2">&#34;@nextui-org/react&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">MetricProps</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="nx">label</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">  <span class="nx">value</span><span class="o">:</span> <span class="nx">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">  <span class="nx">delta</span><span class="o">:</span> <span class="nx">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl">  <span class="nx">is_currency</span><span class="o">:</span> <span class="kr">boolean</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">18</span><span class="cl">
-</span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="kr">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="nx">Metric</span><span class="p">({</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">  <span class="nx">label</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">  <span class="nx">value</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">  <span class="nx">delta</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">  <span class="nx">is_currency</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="p">}</span><span class="o">:</span> <span class="nx">MetricProps</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">25</span><span class="cl">  <span class="kr">const</span> <span class="nx">formatted_value</span> <span class="o">=</span> <span class="nx">is_currency</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="o">?</span> <span class="s2">&#34;$ &#34;</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">value</span><span class="p">.</span><span class="nx">toLocaleString</span><span class="p">())</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="o">:</span> <span class="nx">value</span><span class="p">.</span><span class="nx">toLocaleString</span><span class="p">();</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">  <span class="kr">const</span> <span class="nx">arrowColor</span> <span class="o">=</span> <span class="nx">delta</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">?</span> <span class="s2">&#34;black&#34;</span> <span class="o">:</span> <span class="nx">delta</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="s2">&#34;green&#34;</span> <span class="o">:</span> <span class="s2">&#34;red&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">  <span class="k">return</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;col-span-12 md:col-span-4&#34;</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">      <span class="p">&lt;</span><span class="nt">Card</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">        <span class="p">&lt;</span><span class="nt">CardHeader</span><span class="p">&gt;{</span><span class="nx">label</span><span class="p">}&lt;/</span><span class="nt">CardHeader</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">        <span class="p">&lt;</span><span class="nt">CardBody</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">34</span><span class="cl">          <span class="p">&lt;</span><span class="nt">h1</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;text-4xl font-bold&#34;</span><span class="p">&gt;{</span><span class="nx">formatted_value</span><span class="p">}&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">        <span class="p">&lt;/</span><span class="nt">CardBody</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">        <span class="p">&lt;</span><span class="nt">Divider</span> <span class="p">/&gt;</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">        <span class="p">&lt;</span><span class="nt">CardFooter</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">          <span class="p">&lt;</span><span class="nt">svg</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">            <span class="na">height</span><span class="o">=</span><span class="p">{</span><span class="mi">25</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">            <span class="na">viewBox</span><span class="o">=</span><span class="s">&#34;0 0 24 24&#34;</span>
-</span></span><span class="line"><span class="ln">41</span><span class="cl">            <span class="na">aria</span><span class="err">-</span><span class="na">hidden</span><span class="o">=</span><span class="s">&#34;true&#34;</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl">            <span class="na">focusable</span><span class="o">=</span><span class="s">&#34;false&#34;</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">            <span class="na">fill</span><span class="o">=</span><span class="p">{</span><span class="nx">arrowColor</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">44</span><span class="cl">            <span class="na">xmlns</span><span class="o">=</span><span class="s">&#34;http://www.w3.org/2000/svg&#34;</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">            <span class="na">color</span><span class="o">=</span><span class="s">&#34;inherit&#34;</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl">            <span class="na">data</span><span class="err">-</span><span class="na">testid</span><span class="o">=</span><span class="s">&#34;stMetricDeltaIcon-Up&#34;</span>
-</span></span><span class="line"><span class="ln">47</span><span class="cl">            <span class="na">className</span><span class="o">=</span><span class="s">&#34;e14lo1l1 st-emotion-cache-1ksdj5j ex0cdmw0&#34;</span>
-</span></span><span class="line"><span class="ln">48</span><span class="cl">          <span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">49</span><span class="cl">            <span class="p">&lt;</span><span class="nt">path</span> <span class="na">fill</span><span class="o">=</span><span class="s">&#34;none&#34;</span> <span class="na">d</span><span class="o">=</span><span class="s">&#34;M0 0h24v24H0V0z&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">path</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">50</span><span class="cl">            <span class="p">&lt;</span><span class="nt">path</span> <span class="na">d</span><span class="o">=</span><span class="s">&#34;M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">path</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">51</span><span class="cl">          <span class="p">&lt;/</span><span class="nt">svg</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">52</span><span class="cl">          <span class="p">&lt;</span><span class="nt">h1</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;text-xl&#34;</span><span class="p">&gt;{</span><span class="nx">delta</span><span class="p">.</span><span class="nx">toLocaleString</span><span class="p">()}&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">53</span><span class="cl">        <span class="p">&lt;/</span><span class="nt">CardFooter</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">54</span><span class="cl">      <span class="p">&lt;/</span><span class="nt">Card</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">55</span><span class="cl">    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">56</span><span class="cl">  <span class="p">);</span>
-</span></span><span class="line"><span class="ln">57</span><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div>
-<h3 id="data-processing-utility" data-numberify>Data Processing Utility<a class="anchor ms-1" href="#data-processing-utility"></a></h3>
-<p>Since I have yet to find an effective data manipulation library comparable to Python&rsquo;s Pandas, data processing is handled using custom objects and functions. The code primarily operates on arrays of <code>Record</code>s to compute sales metrics and generate visual representations. The <code>getMetrics</code> and <code>createMetricItems</code> functions are used to calculate current/delta metrics and construct an array of <code>MetricProp</code>s that can be added to the <em>Metric</em> component. Also, the <code>createOptionsItems</code> function is responsible for generating data visualizations, specifically bar charts that show revenue by categories such as country and traffic source.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="line"><span class="ln">  1</span><span class="cl"><span class="c1">// nextjs/src/lib/processing.tsx
-</span></span></span><span class="line"><span class="ln">  2</span><span class="cl"><span class="c1"></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">MetricProps</span> <span class="p">}</span> <span class="nx">from</span> <span class="s2">&#34;@/components/metric&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">  3</span><span class="cl">
-</span></span><span class="line"><span class="ln">  4</span><span class="cl"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Metrics</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">  5</span><span class="cl">  <span class="nx">num_orders</span><span class="o">:</span> <span class="nx">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">  6</span><span class="cl">  <span class="nx">num_order_items</span><span class="o">:</span> <span class="nx">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">  7</span><span class="cl">  <span class="nx">total_sales</span><span class="o">:</span> <span class="nx">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">  8</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln">  9</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 10</span><span class="cl"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Record</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 11</span><span class="cl">  <span class="nx">user_id</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 12</span><span class="cl">  <span class="nx">age</span><span class="o">:</span> <span class="nx">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 13</span><span class="cl">  <span class="nx">gender</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 14</span><span class="cl">  <span class="nx">country</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 15</span><span class="cl">  <span class="nx">traffic_source</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 16</span><span class="cl">  <span class="nx">order_id</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 17</span><span class="cl">  <span class="nx">item_id</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 18</span><span class="cl">  <span class="nx">category</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 19</span><span class="cl">  <span class="nx">item_status</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 20</span><span class="cl">  <span class="nx">sale_price</span><span class="o">:</span> <span class="nx">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 21</span><span class="cl">  <span class="nx">created_at</span><span class="o">:</span> <span class="nx">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 22</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 23</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 24</span><span class="cl"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">defaultMetrics</span><span class="o">:</span> <span class="nx">Metrics</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 25</span><span class="cl">  <span class="nx">num_orders</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 26</span><span class="cl">  <span class="nx">num_order_items</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 27</span><span class="cl">  <span class="nx">total_sales</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 28</span><span class="cl"><span class="p">};</span>
-</span></span><span class="line"><span class="ln"> 29</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 30</span><span class="cl"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">defaultMetricItems</span><span class="o">:</span> <span class="nx">MetricProps</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 31</span><span class="cl">  <span class="p">{</span> <span class="nx">label</span><span class="o">:</span> <span class="s2">&#34;Number of Orders&#34;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">delta</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">is_currency</span><span class="o">:</span> <span class="kc">false</span> <span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 32</span><span class="cl">  <span class="p">{</span> <span class="nx">label</span><span class="o">:</span> <span class="s2">&#34;Number of Order Items&#34;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">delta</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">is_currency</span><span class="o">:</span> <span class="kc">false</span> <span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 33</span><span class="cl">  <span class="p">{</span> <span class="nx">label</span><span class="o">:</span> <span class="s2">&#34;Total Sales&#34;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">delta</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">is_currency</span><span class="o">:</span> <span class="kc">true</span> <span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 34</span><span class="cl"><span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 35</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 36</span><span class="cl"><span class="kr">export</span> <span class="kd">function</span> <span class="nx">getMetrics</span><span class="p">(</span><span class="nx">records</span><span class="o">:</span> <span class="nx">Record</span><span class="p">[])</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 37</span><span class="cl">  <span class="kr">const</span> <span class="nx">num_orders</span> <span class="o">=</span> <span class="p">[...</span><span class="k">new</span> <span class="nx">Set</span><span class="p">(</span><span class="nx">records</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">r</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">order_id</span><span class="p">))].</span><span class="nx">length</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 38</span><span class="cl">  <span class="kr">const</span> <span class="nx">num_order_items</span> <span class="o">=</span> <span class="p">[...</span><span class="k">new</span> <span class="nx">Set</span><span class="p">(</span><span class="nx">records</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">r</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">item_id</span><span class="p">))].</span><span class="nx">length</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 39</span><span class="cl">  <span class="kr">const</span> <span class="nx">total_sales</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 40</span><span class="cl">    <span class="nx">records</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">r</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nb">Number</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">sale_price</span><span class="p">)).</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 41</span><span class="cl">  <span class="p">);</span>
-</span></span><span class="line"><span class="ln"> 42</span><span class="cl">  <span class="k">return</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 43</span><span class="cl">    <span class="nx">num_orders</span><span class="o">:</span> <span class="nx">num_orders</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 44</span><span class="cl">    <span class="nx">num_order_items</span><span class="o">:</span> <span class="nx">num_order_items</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 45</span><span class="cl">    <span class="nx">total_sales</span><span class="o">:</span> <span class="nx">total_sales</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 46</span><span class="cl">  <span class="p">};</span>
-</span></span><span class="line"><span class="ln"> 47</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 48</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 49</span><span class="cl"><span class="kr">export</span> <span class="kd">function</span> <span class="nx">createMetricItems</span><span class="p">(</span><span class="nx">currMetrics</span><span class="o">:</span> <span class="nx">Metrics</span><span class="p">,</span> <span class="nx">prevMetrics</span><span class="o">:</span> <span class="nx">Metrics</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 50</span><span class="cl">  <span class="kr">const</span> <span class="nx">labels</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 51</span><span class="cl">    <span class="p">{</span> <span class="nx">label</span><span class="o">:</span> <span class="s2">&#34;Number of Orders&#34;</span><span class="p">,</span> <span class="nx">metric</span><span class="o">:</span> <span class="s2">&#34;num_orders&#34;</span><span class="p">,</span> <span class="nx">is_currency</span><span class="o">:</span> <span class="kc">false</span> <span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 52</span><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 53</span><span class="cl">      <span class="nx">label</span><span class="o">:</span> <span class="s2">&#34;Number of Order Items&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 54</span><span class="cl">      <span class="nx">metric</span><span class="o">:</span> <span class="s2">&#34;num_order_items&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 55</span><span class="cl">      <span class="nx">is_currency</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 56</span><span class="cl">    <span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 57</span><span class="cl">    <span class="p">{</span> <span class="nx">label</span><span class="o">:</span> <span class="s2">&#34;Total Sales&#34;</span><span class="p">,</span> <span class="nx">metric</span><span class="o">:</span> <span class="s2">&#34;total_sales&#34;</span><span class="p">,</span> <span class="nx">is_currency</span><span class="o">:</span> <span class="kc">true</span> <span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 58</span><span class="cl">  <span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 59</span><span class="cl">  <span class="k">return</span> <span class="nx">labels</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">obj</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 60</span><span class="cl">    <span class="kr">const</span> <span class="nx">label</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">label</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 61</span><span class="cl">    <span class="kr">const</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">currMetrics</span><span class="p">[</span><span class="nx">obj</span><span class="p">.</span><span class="nx">metric</span> <span class="nx">as</span> <span class="nx">keyof</span> <span class="nx">Metrics</span><span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 62</span><span class="cl">    <span class="kr">const</span> <span class="nx">delta</span> <span class="o">=</span>
-</span></span><span class="line"><span class="ln"> 63</span><span class="cl">      <span class="nx">currMetrics</span><span class="p">[</span><span class="nx">obj</span><span class="p">.</span><span class="nx">metric</span> <span class="nx">as</span> <span class="nx">keyof</span> <span class="nx">Metrics</span><span class="p">]</span> <span class="o">-</span>
-</span></span><span class="line"><span class="ln"> 64</span><span class="cl">      <span class="nx">prevMetrics</span><span class="p">[</span><span class="nx">obj</span><span class="p">.</span><span class="nx">metric</span> <span class="nx">as</span> <span class="nx">keyof</span> <span class="nx">Metrics</span><span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 65</span><span class="cl">    <span class="kr">const</span> <span class="nx">is_currency</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">is_currency</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 66</span><span class="cl">    <span class="k">return</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 67</span><span class="cl">      <span class="nx">label</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 68</span><span class="cl">      <span class="nx">value</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 69</span><span class="cl">      <span class="nx">delta</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 70</span><span class="cl">      <span class="nx">is_currency</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln"> 71</span><span class="cl">    <span class="p">};</span>
-</span></span><span class="line"><span class="ln"> 72</span><span class="cl">  <span class="p">});</span>
-</span></span><span class="line"><span class="ln"> 73</span><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 74</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 75</span><span class="cl"><span class="kr">export</span> <span class="kd">function</span> <span class="nx">createOptionsItems</span><span class="p">(</span><span class="nx">records</span><span class="o">:</span> <span class="nx">Record</span><span class="p">[])</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 76</span><span class="cl">  <span class="kr">const</span> <span class="nx">chartCols</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln"> 77</span><span class="cl">    <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="s2">&#34;country&#34;</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="s2">&#34;sale_price&#34;</span> <span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 78</span><span class="cl">    <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="s2">&#34;traffic_source&#34;</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="s2">&#34;sale_price&#34;</span> <span class="p">},</span>
-</span></span><span class="line"><span class="ln"> 79</span><span class="cl">  <span class="p">];</span>
-</span></span><span class="line"><span class="ln"> 80</span><span class="cl">  <span class="k">return</span> <span class="nx">chartCols</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">col</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 81</span><span class="cl">    <span class="c1">// key is string but it throws the following error. Change the type to &#39;string | number&#39;.
-</span></span></span><span class="line"><span class="ln"> 82</span><span class="cl"><span class="c1"></span>    <span class="c1">// Argument of type &#39;string | number&#39; is not assignable to parameter of type &#39;string&#39;.
-</span></span></span><span class="line"><span class="ln"> 83</span><span class="cl"><span class="c1"></span>    <span class="c1">// Type &#39;number&#39; is not assignable to type &#39;string&#39;.ts(2345)
-</span></span></span><span class="line"><span class="ln"> 84</span><span class="cl"><span class="c1"></span>    <span class="kr">const</span> <span class="nx">recordsMap</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Map</span><span class="p">&lt;</span><span class="nt">string</span> <span class="err">|</span> <span class="na">number</span><span class="err">,</span> <span class="na">number</span><span class="p">&gt;();</span>
-</span></span><span class="line"><span class="ln"> 85</span><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">r</span> <span class="k">of</span> <span class="nx">records</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln"> 86</span><span class="cl">      <span class="nx">recordsMap</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 87</span><span class="cl">        <span class="nx">r</span><span class="p">[</span><span class="nx">col</span><span class="p">.</span><span class="nx">x</span> <span class="nx">as</span> <span class="nx">keyof</span> <span class="nx">Record</span><span class="p">],</span>
-</span></span><span class="line"><span class="ln"> 88</span><span class="cl">        <span class="p">(</span><span class="nx">recordsMap</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">r</span><span class="p">[</span><span class="nx">col</span><span class="p">.</span><span class="nx">x</span> <span class="nx">as</span> <span class="nx">keyof</span> <span class="nx">Record</span><span class="p">])</span> <span class="o">||</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span>
-</span></span><span class="line"><span class="ln"> 89</span><span class="cl">          <span class="nb">Number</span><span class="p">(</span><span class="nx">r</span><span class="p">[</span><span class="nx">col</span><span class="p">.</span><span class="nx">y</span> <span class="nx">as</span> <span class="nx">keyof</span> <span class="nx">Record</span><span class="p">])</span>
-</span></span><span class="line"><span class="ln"> 90</span><span class="cl">      <span class="p">);</span>
-</span></span><span class="line"><span class="ln"> 91</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln"> 92</span><span class="cl">    <span class="kr">const</span> <span class="nx">recordsItems</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">from</span><span class="p">(</span><span class="nx">recordsMap</span><span class="p">,</span> <span class="p">([</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">])</span> <span class="p">=&gt;</span> <span class="p">({</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">})).</span><span class="nx">sort</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln"> 93</span><span class="cl">      <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">y</span> <span class="o">&gt;</span> <span class="nx">b</span><span class="p">.</span><span class="nx">y</span> <span class="o">?</span> <span class="o">-</span><span class="mi">1</span> <span class="o">:</span> <span class="mi">1</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 94</span><span class="cl">    <span class="p">);</span>
-</span></span><span class="line"><span class="ln"> 95</span><span class="cl">    <span class="kr">const</span> <span class="nx">suffix</span> <span class="o">=</span> <span class="nx">col</span><span class="p">.</span><span class="nx">x</span>
-</span></span><span class="line"><span class="ln"> 96</span><span class="cl">      <span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&#34;_&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="ln"> 97</span><span class="cl">      <span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">w</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">w</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="nx">toUpperCase</span><span class="p">()</span> <span class="o">+</span> <span class="nx">w</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-</span></span><span class="line"><span class="ln"> 98</span><span class="cl">      <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s2">&#34; &#34;</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln"> 99</span><span class="cl">    <span class="k">return</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">100</span><span class="cl">      <span class="nx">title</span><span class="o">:</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="s2">&#34;Revenue by &#34;</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">suffix</span><span class="p">)</span> <span class="p">},</span>
-</span></span><span class="line"><span class="ln">101</span><span class="cl">      <span class="nx">yAxis</span><span class="o">:</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s2">&#34;value&#34;</span> <span class="p">},</span>
-</span></span><span class="line"><span class="ln">102</span><span class="cl">      <span class="nx">xAxis</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">103</span><span class="cl">        <span class="nx">type</span><span class="o">:</span> <span class="s2">&#34;category&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">104</span><span class="cl">        <span class="nx">data</span><span class="o">:</span> <span class="nx">recordsItems</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">r</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">x</span><span class="p">),</span>
-</span></span><span class="line"><span class="ln">105</span><span class="cl">        <span class="nx">axisLabel</span><span class="o">:</span> <span class="p">{</span> <span class="nx">show</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">rotate</span><span class="o">:</span> <span class="mi">75</span> <span class="p">},</span>
-</span></span><span class="line"><span class="ln">106</span><span class="cl">      <span class="p">},</span>
-</span></span><span class="line"><span class="ln">107</span><span class="cl">      <span class="nx">series</span><span class="o">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="ln">108</span><span class="cl">        <span class="p">{</span>
-</span></span><span class="line"><span class="ln">109</span><span class="cl">          <span class="nx">data</span><span class="o">:</span> <span class="nx">recordsItems</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">r</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">y</span><span class="p">)),</span>
-</span></span><span class="line"><span class="ln">110</span><span class="cl">          <span class="nx">type</span><span class="o">:</span> <span class="s2">&#34;bar&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">111</span><span class="cl">          <span class="nx">colorBy</span><span class="o">:</span> <span class="s2">&#34;data&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">112</span><span class="cl">        <span class="p">},</span>
-</span></span><span class="line"><span class="ln">113</span><span class="cl">      <span class="p">],</span>
-</span></span><span class="line"><span class="ln">114</span><span class="cl">      <span class="nx">tooltip</span><span class="o">:</span> <span class="p">{</span> <span class="nx">trigger</span><span class="o">:</span> <span class="s2">&#34;axis&#34;</span><span class="p">,</span> <span class="nx">axisPointer</span><span class="o">:</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s2">&#34;shadow&#34;</span> <span class="p">}</span> <span class="p">},</span>
-</span></span><span class="line"><span class="ln">115</span><span class="cl">    <span class="p">};</span>
-</span></span><span class="line"><span class="ln">116</span><span class="cl">  <span class="p">});</span>
-</span></span><span class="line"><span class="ln">117</span><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div>
-<h3 id="application" data-numberify>Application<a class="anchor ms-1" href="#application"></a></h3>
-<p>The main component builds a real-time eCommerce dashboard that connects to a WebSocket server at <code>ws://localhost:8000/ws</code> to fetch and display live data. It uses the <em>React useWebSocket</em> package (<code>react-use-websocket</code>) to manage the WebSocket connection, and whenever new data is received, it updates the state with the latest metrics and chart options. The data processing is handled by helper functions (<code>getMetrics</code>, <code>createMetricItems</code>, and <code>createOptionsItems</code>), which compute summary metrics and prepare visualization data. The UI dynamically updates to display key business metrics using the <em>Metric</em> component and interactive bar charts powered by <em>Apache ECharts</em> (<code>echarts-for-react</code>). A checkbox allows users to toggle the WebSocket connection on or off, giving them control over real-time updates.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1">// nextjs/src/app/page.tsx
-</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="c1"></span><span class="s2">&#34;use client&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">useEffect</span><span class="p">,</span> <span class="nx">useState</span> <span class="p">}</span> <span class="nx">from</span> <span class="s2">&#34;react&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Checkbox</span> <span class="p">}</span> <span class="nx">from</span> <span class="s2">&#34;@nextui-org/react&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="kr">import</span> <span class="nx">ReactECharts</span><span class="p">,</span> <span class="p">{</span> <span class="nx">EChartsOption</span> <span class="p">}</span> <span class="nx">from</span> <span class="s2">&#34;echarts-for-react&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="kr">import</span> <span class="nx">useWebSocket</span> <span class="nx">from</span> <span class="s2">&#34;react-use-websocket&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="kr">import</span> <span class="nx">Metric</span><span class="p">,</span> <span class="p">{</span> <span class="nx">MetricProps</span> <span class="p">}</span> <span class="nx">from</span> <span class="s2">&#34;@/components/metric&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="kr">import</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="nx">getMetrics</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="nx">createMetricItems</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="nx">defaultMetrics</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl">  <span class="nx">defaultMetricItems</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl">  <span class="nx">createOptionsItems</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="p">}</span> <span class="nx">from</span> <span class="s2">&#34;@/lib/processing&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="ln">17</span><span class="cl">
-</span></span><span class="line"><span class="ln">18</span><span class="cl"><span class="kr">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="nx">Home</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">19</span><span class="cl">  <span class="kr">const</span> <span class="p">[</span><span class="nx">toConnect</span><span class="p">,</span> <span class="nx">toggleToConnect</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln">20</span><span class="cl">  <span class="kr">const</span> <span class="p">[</span><span class="nx">currMetrics</span><span class="p">,</span> <span class="nx">setCurrMetrics</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="nx">defaultMetrics</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln">21</span><span class="cl">  <span class="kr">const</span> <span class="p">[</span><span class="nx">prevMetrics</span><span class="p">,</span> <span class="nx">setPrevMetrics</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="nx">defaultMetrics</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln">22</span><span class="cl">  <span class="kr">const</span> <span class="p">[</span><span class="nx">metricItems</span><span class="p">,</span> <span class="nx">setMetricItems</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="nx">defaultMetricItems</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln">23</span><span class="cl">  <span class="kr">const</span> <span class="p">[</span><span class="nx">chartOptions</span><span class="p">,</span> <span class="nx">setChartOptions</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">([]</span> <span class="nx">as</span> <span class="nx">EChartsOption</span><span class="p">[]);</span>
-</span></span><span class="line"><span class="ln">24</span><span class="cl">
-</span></span><span class="line"><span class="ln">25</span><span class="cl">  <span class="kr">const</span> <span class="p">{</span> <span class="nx">lastJsonMessage</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">useWebSocket</span><span class="p">(</span>
-</span></span><span class="line"><span class="ln">26</span><span class="cl">    <span class="s2">&#34;ws://localhost:8000/ws&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">27</span><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="ln">28</span><span class="cl">      <span class="nx">share</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">29</span><span class="cl">      <span class="nx">shouldReconnect</span><span class="o">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="kc">true</span><span class="p">,</span>
-</span></span><span class="line"><span class="ln">30</span><span class="cl">    <span class="p">},</span>
-</span></span><span class="line"><span class="ln">31</span><span class="cl">    <span class="nx">toConnect</span>
-</span></span><span class="line"><span class="ln">32</span><span class="cl">  <span class="p">);</span>
-</span></span><span class="line"><span class="ln">33</span><span class="cl">
-</span></span><span class="line"><span class="ln">34</span><span class="cl">  <span class="nx">useEffect</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">35</span><span class="cl">    <span class="kr">const</span> <span class="nx">records</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">lastJsonMessage</span> <span class="nx">as</span> <span class="nx">string</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln">36</span><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!!</span><span class="nx">records</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">37</span><span class="cl">      <span class="nx">setPrevMetrics</span><span class="p">(</span><span class="nx">currMetrics</span><span class="p">);</span>
-</span></span><span class="line"><span class="ln">38</span><span class="cl">      <span class="nx">setCurrMetrics</span><span class="p">(</span><span class="nx">getMetrics</span><span class="p">(</span><span class="nx">records</span><span class="p">));</span>
-</span></span><span class="line"><span class="ln">39</span><span class="cl">      <span class="nx">setMetricItems</span><span class="p">(</span><span class="nx">createMetricItems</span><span class="p">(</span><span class="nx">currMetrics</span><span class="p">,</span> <span class="nx">prevMetrics</span><span class="p">));</span>
-</span></span><span class="line"><span class="ln">40</span><span class="cl">      <span class="nx">setChartOptions</span><span class="p">(</span><span class="nx">createOptionsItems</span><span class="p">(</span><span class="nx">records</span><span class="p">));</span>
-</span></span><span class="line"><span class="ln">41</span><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="ln">42</span><span class="cl">  <span class="p">},</span> <span class="p">[</span><span class="nx">lastJsonMessage</span><span class="p">]);</span>
-</span></span><span class="line"><span class="ln">43</span><span class="cl">
-</span></span><span class="line"><span class="ln">44</span><span class="cl">  <span class="kr">const</span> <span class="nx">createMetrics</span> <span class="o">=</span> <span class="p">(</span><span class="nx">metricItems</span><span class="o">:</span> <span class="nx">MetricProps</span><span class="p">[])</span> <span class="p">=&gt;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">45</span><span class="cl">    <span class="k">return</span> <span class="nx">metricItems</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">item</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">46</span><span class="cl">      <span class="k">return</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">47</span><span class="cl">        <span class="p">&lt;</span><span class="nt">Metric</span>
-</span></span><span class="line"><span class="ln">48</span><span class="cl">          <span class="na">key</span><span class="o">=</span><span class="p">{</span><span class="nx">i</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">49</span><span class="cl">          <span class="na">label</span><span class="o">=</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">label</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">50</span><span class="cl">          <span class="na">value</span><span class="o">=</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">value</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">51</span><span class="cl">          <span class="na">delta</span><span class="o">=</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">delta</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">52</span><span class="cl">          <span class="na">is_currency</span><span class="o">=</span><span class="p">{</span><span class="nx">item</span><span class="p">.</span><span class="nx">is_currency</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">53</span><span class="cl">        <span class="p">&gt;&lt;/</span><span class="nt">Metric</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">54</span><span class="cl">      <span class="p">);</span>
-</span></span><span class="line"><span class="ln">55</span><span class="cl">    <span class="p">});</span>
-</span></span><span class="line"><span class="ln">56</span><span class="cl">  <span class="p">};</span>
-</span></span><span class="line"><span class="ln">57</span><span class="cl">
-</span></span><span class="line"><span class="ln">58</span><span class="cl">  <span class="kr">const</span> <span class="nx">createCharts</span> <span class="o">=</span> <span class="p">(</span><span class="nx">chartOptions</span><span class="o">:</span> <span class="nx">EChartsOption</span><span class="p">[])</span> <span class="p">=&gt;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">59</span><span class="cl">    <span class="k">return</span> <span class="nx">chartOptions</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">option</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="ln">60</span><span class="cl">      <span class="k">return</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">61</span><span class="cl">        <span class="p">&lt;</span><span class="nt">ReactECharts</span>
-</span></span><span class="line"><span class="ln">62</span><span class="cl">          <span class="na">key</span><span class="o">=</span><span class="p">{</span><span class="nx">i</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">63</span><span class="cl">          <span class="na">className</span><span class="o">=</span><span class="s">&#34;col-span-12 md:col-span-6&#34;</span>
-</span></span><span class="line"><span class="ln">64</span><span class="cl">          <span class="na">option</span><span class="o">=</span><span class="p">{</span><span class="nx">option</span><span class="p">}</span>
-</span></span><span class="line"><span class="ln">65</span><span class="cl">          <span class="na">style</span><span class="o">=</span><span class="p">{{</span> <span class="nx">height</span><span class="o">:</span> <span class="s2">&#34;500px&#34;</span> <span class="p">}}</span>
-</span></span><span class="line"><span class="ln">66</span><span class="cl">        <span class="p">/&gt;</span>
-</span></span><span class="line"><span class="ln">67</span><span class="cl">      <span class="p">);</span>
-</span></span><span class="line"><span class="ln">68</span><span class="cl">    <span class="p">});</span>
-</span></span><span class="line"><span class="ln">69</span><span class="cl">  <span class="p">};</span>
-</span></span><span class="line"><span class="ln">70</span><span class="cl">
-</span></span><span class="line"><span class="ln">71</span><span class="cl">  <span class="k">return</span> <span class="p">(</span>
-</span></span><span class="line"><span class="ln">72</span><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">73</span><span class="cl">      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;mt-20&#34;</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">74</span><span class="cl">        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;flex m-2 justify-between items-center&#34;</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">75</span><span class="cl">          <span class="p">&lt;</span><span class="nt">h1</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;text-4xl font-bold&#34;</span><span class="p">&gt;</span><span class="nx">theLook</span> <span class="nx">eCommerce</span> <span class="nx">Dashboard</span><span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">76</span><span class="cl">        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">77</span><span class="cl">        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;flex m-2 mt-5 justify-between items-center mt-5&#34;</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">78</span><span class="cl">          <span class="p">&lt;</span><span class="nt">Checkbox</span>
-</span></span><span class="line"><span class="ln">79</span><span class="cl">            <span class="na">color</span><span class="o">=</span><span class="s">&#34;primary&#34;</span>
-</span></span><span class="line"><span class="ln">80</span><span class="cl">            <span class="na">onChange</span><span class="o">=</span><span class="p">{()</span> <span class="p">=&gt;</span> <span class="nx">toggleToConnect</span><span class="p">(</span><span class="o">!</span><span class="nx">toConnect</span><span class="p">)}</span>
-</span></span><span class="line"><span class="ln">81</span><span class="cl">          <span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">82</span><span class="cl">            <span class="nx">Connect</span> <span class="nx">to</span> <span class="nx">WS</span> <span class="nx">Server</span>
-</span></span><span class="line"><span class="ln">83</span><span class="cl">          <span class="p">&lt;/</span><span class="nt">Checkbox</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">84</span><span class="cl">          <span class="p">;</span>
-</span></span><span class="line"><span class="ln">85</span><span class="cl">        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">86</span><span class="cl">      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">87</span><span class="cl">      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;grid grid-cols-12 gap-4 mt-5&#34;</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">88</span><span class="cl">        <span class="p">{</span><span class="nx">createMetrics</span><span class="p">(</span><span class="nx">metricItems</span><span class="p">)}</span>
-</span></span><span class="line"><span class="ln">89</span><span class="cl">      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">90</span><span class="cl">      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;grid grid-cols-12 gap-4 mt-5&#34;</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">91</span><span class="cl">        <span class="p">{</span><span class="nx">createCharts</span><span class="p">(</span><span class="nx">chartOptions</span><span class="p">)}</span>
-</span></span><span class="line"><span class="ln">92</span><span class="cl">      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">93</span><span class="cl">    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="ln">94</span><span class="cl">  <span class="p">);</span>
-</span></span><span class="line"><span class="ln">95</span><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div>
-<h2 id="deployment" data-numberify>Deployment<a class="anchor ms-1" href="#deployment"></a></h2>
-
-<h3 id="data-producer-and-websocket-server" data-numberify>Data Producer and WebSocket Server<a class="anchor ms-1" href="#data-producer-and-websocket-server"></a></h3>
-<p>As discussed in <a href="/blog/2025-02-18-realtime-dashboard-1">Part 1</a>, the data generator and WebSocket server can be deployed using Docker Compose with the command <code>docker-compose -f producer/docker-compose.yml up -d</code>. Once started, the server can be checked with a <a href="https://github.com/lewoudar/ws/" target="_blank" rel="noopener noreferrer">WebSocket client<i class="fas fa-external-link-square-alt ms-1"></i></a> by executing <code>ws listen ws://localhost:8000/ws</code>, and its logs can be monitored by running <code>docker logs -f producer</code>.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2025-03-04-realtime-dashboard-3/backend.gif" loading="lazy" width="1835" height="776" />
-</picture>
-
-</p>
-
-<h3 id="frontend-dashboard" data-numberify>Frontend Dashboard<a class="anchor ms-1" href="#frontend-dashboard"></a></h3>
-<p>The dashboard can be started in development mode as shown below. Once started, it can be accessed in a browser at <em>http://localhost:3000</em>.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">## install pnpm if not done</span>
-</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1"># https://pnpm.io/installation</span>
-</span></span><span class="line"><span class="ln">3</span><span class="cl">
-</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1">## install dependent packages</span>
-</span></span><span class="line"><span class="ln">5</span><span class="cl">$ pnpm install
-</span></span><span class="line"><span class="ln">6</span><span class="cl">
-</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1">## start the app</span>
-</span></span><span class="line"><span class="ln">8</span><span class="cl">$ pnpm dev
-</span></span></code></pre></div><p><picture><img class="img-fluid mx-auto d-block" alt="" src="/blog/2025-03-04-realtime-dashboard-3/featured.gif" loading="lazy" width="1573" height="753" />
-</picture>
-
-</p>
       ]]></content:encoded></item></channel></rss>

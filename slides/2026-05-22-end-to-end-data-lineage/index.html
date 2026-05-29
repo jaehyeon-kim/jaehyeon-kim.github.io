@@ -1,0 +1,210 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Building End-to-End Data Lineage with Kafka, Flink, and Spark | Jaehyeon Kim</title>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/black.css id=theme><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css></head><body><div class=reveal><div class=slides><section data-markdown data-separator=^--- data-separator-vertical=^--><textarea data-template>
+
+&lt;style&gt;
+  /* Global text sizing and layout tuning */
+  .reveal section {
+    padding: 20px !important;
+  }
+  .reveal p, .reveal li {
+    font-size: 0.65em; 
+    line-height: 1.4;
+    margin-bottom: 0.4em;
+    text-align: left;
+  }
+  .reveal h2 {
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .reveal h3 {
+    font-size: 1.1em;
+    margin-top: 0.6em;
+    margin-bottom: 0.2em;
+    color: #42affa;
+    text-align: left;
+  }
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    text-align: left;
+    align-items: center;
+  }
+  .columns h3 {
+    margin-top: 0;
+  }
+  .center {
+    text-align: center;
+  }
+  /* Ensure images fit the viewport */
+  .reveal img {
+    max-height: 45vh !important;
+    max-width: 100%;
+    margin: 10px auto !important;
+    display: block;
+    border: 1px solid #333;
+    border-radius: 4px;
+    object-fit: contain;
+  }
+  /* Fix for wide bullet margins */
+  .reveal ul {
+    display: block;
+    margin-left: 0 !important;
+    padding-left: 1.2em !important; /* Pulls bullets much closer to the left edge */
+  }
+&lt;/style&gt;
+
+## Building End-to-End Data Lineage
+#### With Kafka, Flink, and Spark
+
+---
+
+## What is Data Lineage?
+
+The journey of data - where it comes from, how it’s transformed, and where it ends up.
+
+### Why Data Lineage Matters
+
+- **Debugging &amp; Root Cause Analysis:** Quickly trace production bugs back to the source.
+- **Impact Analysis &amp; Governance:** See downstream dependencies before changing schemas.
+- **Compliance &amp; Audit:** Document data provenance for strict regulatory requirements.
+- **Trust &amp; Reliability:** Increase stakeholder confidence in data products.
+
+---
+
+## What is OpenLineage?
+
+An open standard for capturing lineage metadata from jobs in execution.
+
+&lt;div class=&#34;columns&#34;&gt;
+  &lt;div&gt;
+    &lt;p&gt;Supports seamless collection across popular tools:&lt;/p&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;strong&gt;Orchestration:&lt;/strong&gt; Airflow, dbt&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;Compute Engines:&lt;/strong&gt; Flink, Spark, Trino&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;Backend:&lt;/strong&gt; Marquez (visualization)&lt;/li&gt;
+      &lt;li&gt;⚠️ &lt;strong&gt;Gap:&lt;/strong&gt; Kafka is not an official, out-of-the-box source.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+  &lt;div class=&#34;center&#34;&gt;
+    &lt;img src=&#34;openlineage-model.png&#34; alt=&#34;OpenLineage Model&#34;&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+---
+
+## Two Lineage Paradigms
+
+&lt;div class=&#34;columns&#34; style=&#34;align-items: start;&#34;&gt;
+  &lt;div&gt;
+
+### Batch Lineage (Retrospective)
+
+- **Data:** Bounded Sets
+- **Lifecycle:** Finite, Scheduled
+- **Capture:** At Job Completion
+- **Result:** Historical Audit Trail
+  &lt;/div&gt;
+  &lt;div&gt;
+
+### Streaming Lineage (Operational)
+
+- **Challenge:** Unbounded Streams
+- **Challenge:** Continuous Jobs
+- **Opportunity:** Capture **During** Execution
+- **Opportunity:** A **Live, Observable System**
+  &lt;/div&gt;
+&lt;/div&gt;
+
+---
+
+## Kafka: Lineage with Connect
+
+Use a custom **Single Message Transform (SMT)** as a &#34;pass-through&#34; lineage agent.
+
+- **Lifecycle Hook:** Intercepts connector states (`RUNNING`, `FAIL`, `COMPLETE`) without altering records.
+- **Column-Level Depth:** Resolves fields via Avro schemas in the Schema Registry.
+- **Consistent Namespacing:** Normalizes physical dataset naming (e.g., `kafka://...`, `s3://...`) for job linking.
+
+---
+
+## Kafka Pipeline Mapping
+
+One lineage job tracking data flow per active connector.
+
+&lt;img src=&#34;data-lineage-kafka.gif&#34; alt=&#34;Kafka Lineage Flow&#34;&gt;
+
+---
+
+## Flink: Integration Patterns
+
+&lt;div class=&#34;columns&#34; style=&#34;align-items: start;&#34;&gt;
+  &lt;div&gt;
+
+### Native `JobListener`&lt;br&gt;*(DataStream API)*
+
+- **Method:** `OpenLineageFlinkJobListener`.
+- **Pros:** Simple, out-of-the-box.
+- **Cons:** Fails to capture final `ABORT` transition.
+  &lt;/div&gt;
+  &lt;div&gt;
+
+### Manual Orchestration&lt;br&gt;*(Table API / SQL)*
+
+- **Method:** OpenLineage Java client.
+- **Pros:** Full lifecycle event tracking.
+- **Cons:** Requires custom wrapper code.
+  &lt;/div&gt;
+&lt;/div&gt;
+
+---
+
+## Flink Pipeline Mapping
+
+One lineage job mapped directly per active Flink application cluster.
+
+&lt;img src=&#34;data-lineage-flink.gif&#34; alt=&#34;Flink Lineage Flow&#34;&gt;
+
+---
+
+## Spark: Final Picture
+
+Batch Spark job reading from Flink-written Iceberg tables.
+
+- **Agent:** Tracked via OpenLineage Java agent in `spark.extraListeners`.
+- **Query Plan:** Auto-detects inputs/outputs from Logical/Physical plans.
+- **Granular Actions:** Parent job with child jobs per Spark action.
+- 💡 **Namespace Alignment:** Engines must agree on the same physical root namespace (e.g., `s3://warehouse`).
+
+---
+
+## Spark Pipeline Mapping
+
+One lineage job registered for each execution action block.
+
+&lt;img src=&#34;data-lineage-spark.gif&#34; alt=&#34;Spark Lineage Flow&#34;&gt;
+
+---
+
+## Conclusion: Key Takeaways
+
+Bridging real-time events and historical batch processing.
+
+- **Choose the Right Pattern**
+  - **Trade-off:** Simplicity vs. Tracing Durability.
+  - **Standard:** Use Native Listeners.
+  - **Critical:** Use Manual Orchestration for strict lifecycle tracking.
+- **Align Namespaces**
+  - Essential for cross-tech lineage.
+- **Start Small**
+  - Instrument one critical pipeline first.
+  - Establish metadata visibility, then scale outward.
+
+---
+
+## Project Repositories &amp; Guides
+
+- [OpenLineage Project](https://openlineage.io/)
+- [Data Linage Lab](https://github.com/factorhouse/examples/tree/main/projects/data-lineage-labs)
+
+                </textarea></section></div></div><script src=https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js></script><script src=https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.js></script><script src=https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js></script><script src=https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/math/math.js></script><script src=https://cdn.jsdelivr.net/npm/reveal.js-mermaid-plugin@1.1.0/plugin/mermaid/mermaid.js></script><script>Reveal.initialize({plugins:[RevealMarkdown,RevealHighlight,RevealMath.MathJax3,RevealMermaid],hash:!0,slideNumber:"c/t",transition:"convex",mermaid:{flowchart:{curve:"linear"},theme:"dark"}})</script></body></html>
