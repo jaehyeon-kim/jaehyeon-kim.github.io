@@ -1,6 +1,6 @@
 ---
 title: "One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES v0.8.1"
-date: 2026-05-21
+date: 2026-05-25
 draft: false
 featured: true
 comment: true
