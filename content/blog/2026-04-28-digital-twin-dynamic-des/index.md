@@ -14,6 +14,7 @@ series:
 categories:
   - System Architecture
   - Data Engineering
+  - Open Source
 tags:
   - Digital Twin
   - Discrete Event Simulation

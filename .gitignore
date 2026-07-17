@@ -8,3 +8,6 @@ venv
 !/public/site-feature-image.png
 .hugo_build.lock
 hugo_stats.json
+
+# macOS
+.DS_Store

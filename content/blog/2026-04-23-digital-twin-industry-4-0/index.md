@@ -14,6 +14,7 @@ series:
 categories:
   - System Architecture
   - Industry 4.0
+  - Open Source
 tags:
   - Digital Twin
   - Discrete Event Simulation

@@ -13,6 +13,7 @@ featuredImage: false
 categories:
   - Data Engineering
   - Machine Learning
+  - Open Source
 tags:
   - Parquet
   - Data Lake

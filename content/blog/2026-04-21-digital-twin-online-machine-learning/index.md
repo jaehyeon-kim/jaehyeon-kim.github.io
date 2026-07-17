@@ -12,6 +12,7 @@ featuredImage: false
 categories:
   - Stream Processing
   - Machine Learning
+  - Open Source
 tags:
   - Apache Flink
   - Apache Kafka
@@ -21,6 +22,7 @@ tags:
   - Adaptive Model Rules (AMRules)
   - Digital Twin
   - Discrete Event Simulation
+  - dynamic-des
 authors:
   - JaehyeonKim
 images: []
