@@ -47,6 +47,10 @@ I evaluated several options (WrenAI, Vanna AI, Nao, and MetricFlow) and selected
 
 The stack is fully decoupled. An AI orchestrator interprets requests and talks to the semantic engine over the Model Context Protocol (MCP). The semantic engine plans deterministic queries from its business models and vector memory, and those queries execute against the physical lakehouse.
 
+![Agentic Analytics System architecture: a Strands orchestrator coordinates the WrenAI semantic engine, LanceDB retrieval, and Mem0 memory over MCP, with queries executing against Trino, Iceberg, and SeaweedFS.](featured.png#center)
+
+The diagram above traces a request end to end, and the table below maps each component to its role.
+
 | Component | Technology | Role |
 |:---|:---|:---|
 | Agent Orchestrator | Strands SDK | Interprets natural language, plans multi-step tool calls, coordinates the pipeline over MCP |
