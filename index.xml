@@ -10,6 +10,11 @@
 
 <h2 id="architecture" data-numberify>Architecture<a class="anchor ms-1" href="#architecture"></a></h2>
 <p>The stack is fully decoupled. An AI orchestrator interprets requests and talks to the semantic engine over the Model Context Protocol (MCP). The semantic engine plans deterministic queries from its business models and vector memory, and those queries execute against the physical lakehouse.</p>
+<p><picture><img class="img-fluid mx-auto d-block" alt="Agentic Analytics System architecture: a Strands orchestrator coordinates the WrenAI semantic engine, LanceDB retrieval, and Mem0 memory over MCP, with queries executing against Trino, Iceberg, and SeaweedFS." src="/blog/2026-07-18-agentic-analytics-system/featured.png" loading="lazy" width="929" height="626" />
+</picture>
+
+</p>
+<p>The diagram above traces a request end to end, and the table below maps each component to its role.</p>
 <table>
 <thead>
 <tr>
