@@ -601,7 +601,7 @@ java -jar build/libs/orders-avro-clients-1.0.jar consumer
 
 For this post, we demonstrate starting the applications in development mode using Gradle. Once started, we see logs from both the producer sending messages and the consumer receiving them.
 
-![](kafka-avro-apps.gif#center)
+![](kafka-avro-apps.webp#center)
 
 Within the Kpow interface, we can check that a new schema, `orders-avro-value`, is now registered with the *Local Schema Registry*.
 

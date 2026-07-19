@@ -141,7 +141,7 @@ The repository provides a complete user and item management application that sho
 
 *   **Superuser:** A superuser has elevated privileges. In addition to managing their own items, they can also create new user accounts. Crucially, they have a global view of the system and can manage the items belonging to any user, making this role suitable for administrative purposes.
 
-![](featured.gif#center)
+![](demo.webp#center)
 
 The demo showcases these distinct workflows, illustrating how the NiceGUI frontend dynamically adapts to the user's permissions, which are enforced by the FastAPI backend.
 

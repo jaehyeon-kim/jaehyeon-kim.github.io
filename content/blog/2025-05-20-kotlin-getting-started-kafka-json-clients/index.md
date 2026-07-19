@@ -562,7 +562,7 @@ java -jar build/libs/orders-json-clients-1.0.jar consumer
 
 For this post, we demonstrate starting the applications in development mode using Gradle. Once started, we see logs from both the producer sending messages and the consumer receiving them.
 
-![](kafka-json-apps.gif#center)
+![](kafka-json-apps.webp#center)
 
 With the applications running and producing/consuming data, we can inspect the messages flowing through our `orders-json` topic using Kpow. In the Kpow UI, navigate to your topic. To correctly view the messages, we should configure the deserializers: set the **Key Deserializer** to *String* and the **Value Deserializer** to *JSON*. After applying these settings, click the *Search* button to view the messages.
 

@@ -46,7 +46,7 @@ To capture this massive data throughput without exhausting memory or fragmenting
 
 You can simulate months of system operations in seconds, outputting optimized Parquet chunks ready for model training.
 
-![Data Generation Example](parquet-example.gif#center)
+![Data Generation Example](parquet-example.webp#center)
 
 ### Step 2: Live Inference (Production Streaming)
 

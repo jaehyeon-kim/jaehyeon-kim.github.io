@@ -306,7 +306,7 @@ python chapter7/batch_file_read.py \
     --direct_num_workers=3 --direct_running_mode=multi_threading
 ```
 
-![](batch-reader-demo.gif#center)
+![](batch-reader-demo.webp#center)
 
 ## PI Sampler
 

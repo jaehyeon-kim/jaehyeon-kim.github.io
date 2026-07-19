@@ -496,4 +496,4 @@ python chapter7/streaming_file_read.py \
     --parallelism=3 --checkpointing_interval=10000
 ```
 
-![](streaming-reader-demo.gif#center)
+![](streaming-reader-demo.webp#center)
