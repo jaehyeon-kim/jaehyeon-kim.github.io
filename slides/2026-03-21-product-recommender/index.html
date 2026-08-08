@@ -162,7 +162,7 @@ $$ \text{LinUCB: Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{&#
   - **Fast Path:** Updates $A$ and $b$.
     - ($A \leftarrow A &#43; x x^T, b \leftarrow b &#43; r x$)
   - **Slow Path:** Every 5s, computes $A^{-1}$.
-- **Sync to Redis:** Emits $A^{-1}$ and $b$.
+- **Sync to Valkey:** Emits $A^{-1}$ and $b$.
     &lt;/div&gt;
   &lt;/div&gt;
 
@@ -175,7 +175,7 @@ $$ \text{LinUCB: Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{&#
 
 &lt;!-- .slide: id=&#34;eda-slide&#34; --&gt;
 ## Architecture
-### Serving (Python &amp; Redis)
+### Serving (Python &amp; Valkey)
 
 &lt;div style=&#34;display: grid; grid-template-columns: 42% 58%; gap: 10px; align-items: center; width: 106%; margin-left: -3%;&#34;&gt;
   &lt;!-- Left Column: Centered block, left-aligned text --&gt;
@@ -185,7 +185,8 @@ $$ \text{LinUCB: Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{&#
 - **Stateless Inference:**
   - The client does *not* train. 
 - **Low Latency:**
-  - Fetches pre-computed LinUCB parameters from Redis.
+  - Fetches pre-computed LinUCB parameters from Valkey.
+  - Valkey is a Redis fork on the same protocol (diagram label unchanged).
 - **Action:** 
   - Calculates scores,
   - Ranks items, and 
@@ -223,6 +224,28 @@ $$ \text{LinUCB: Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{&#
 
 --
 
+## Running It Locally
+
+The whole stack comes up with [`odctl`](https://github.com/jaehyeon-kim/odctl) &lt;!-- .element: target=&#34;_blank&#34; --&gt;, a CLI for the Open Data Stack.
+
+```bash
+# all from the repo root
+odctl init
+odctl up kafka-lite flink-full valkey     # Kafka, Flink, Valkey (&#43; deps)
+./product-recommender/submit-job.sh       # upload CSV, ship JAR, flink run
+python product-recommender/recsys-engine/eda_recommender.py
+```
+&lt;!-- .element: style=&#34;font-size: 0.45em;&#34; --&gt;
+
+&lt;div style=&#34;text-align: left; font-size: 0.8em;&#34;&gt;
+
+- Dependencies resolve themselves: `flink-full` also starts Postgres, S3, catalog.
+- Flink UI on `:8082`, Kafka UI on `:8086`.
+
+&lt;/div&gt;
+
+--
+
 ## Live Demo &amp; Walkthrough
 
 Let&#39;s dive into the code.
@@ -248,7 +271,7 @@ Bridging the gap between Data Science and Data Engineering.
 ## Decouple to Scale
 
 - A monolithic architecture forces a trade-off between model accuracy and user latency.
-- **Event-Driven Architecture (EDA)** solves this by separating high-speed inference (Redis) from heavy stateful training (Flink).
+- **Event-Driven Architecture (EDA)** solves this by separating high-speed inference (Valkey) from heavy stateful training (Flink).
 
 --
 

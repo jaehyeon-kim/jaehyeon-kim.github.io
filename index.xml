@@ -991,7 +991,7 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 </ul>
 </li>
 <li>
-<p><strong>Sync to Redis:</strong> Emits $A^{-1}$ and $b$.</p>
+<p><strong>Sync to Valkey:</strong> Emits $A^{-1}$ and $b$.</p>
 <!-- raw HTML omitted -->
 <!-- raw HTML omitted -->
 </li>
@@ -1002,7 +1002,7 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 
 <h2 id="architecture-1" data-numberify>Architecture<a class="anchor ms-1" href="#architecture-1"></a></h2>
 
-<h3 id="serving-python--redis" data-numberify>Serving (Python & Redis)<a class="anchor ms-1" href="#serving-python--redis"></a></h3>
+<h3 id="serving-python--valkey" data-numberify>Serving (Python & Valkey)<a class="anchor ms-1" href="#serving-python--valkey"></a></h3>
 <!-- raw HTML omitted -->
 <ul>
 <li>
@@ -1014,7 +1014,8 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 <li>
 <p><strong>Low Latency:</strong></p>
 <ul>
-<li>Fetches pre-computed LinUCB parameters from Redis.</li>
+<li>Fetches pre-computed LinUCB parameters from Valkey.</li>
+<li>Valkey is a Redis fork on the same protocol (diagram label unchanged).</li>
 </ul>
 </li>
 <li>
@@ -1060,6 +1061,22 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 <!-- raw HTML omitted -->
 <p>&ndash;</p>
 
+<h2 id="running-it-locally" data-numberify>Running It Locally<a class="anchor ms-1" href="#running-it-locally"></a></h2>
+<p>The whole stack comes up with <a href="https://github.com/jaehyeon-kim/odctl" target="_blank" rel="noopener noreferrer"><code>odctl</code><i class="fas fa-external-link-square-alt ms-1"></i></a> <!-- raw HTML omitted -->, a CLI for the Open Data Stack.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># all from the repo root</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">odctl init
+</span></span><span class="line"><span class="ln">3</span><span class="cl">odctl up kafka-lite flink-full valkey     <span class="c1"># Kafka, Flink, Valkey (+ deps)</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl">./product-recommender/submit-job.sh       <span class="c1"># upload CSV, ship JAR, flink run</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">python product-recommender/recsys-engine/eda_recommender.py
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<ul>
+<li>Dependencies resolve themselves: <code>flink-full</code> also starts Postgres, S3, catalog.</li>
+<li>Flink UI on <code>:8082</code>, Kafka UI on <code>:8086</code>.</li>
+</ul>
+<!-- raw HTML omitted -->
+<p>&ndash;</p>
+
 <h2 id="live-demo--walkthrough-1" data-numberify>Live Demo & Walkthrough<a class="anchor ms-1" href="#live-demo--walkthrough-1"></a></h2>
 <p>Let&rsquo;s dive into the code.</p>
 <p><a href="/slides/2026-03-21-product-recommender/#/">Back to Start</a> | <strong><a href="/slides/2026-03-21-product-recommender/#takeaways">Jump to Takeaways</a></strong></p>
@@ -1080,7 +1097,7 @@ Part 1: Prototype Prototype an online product recommender with Python</descripti
 <h2 id="decouple-to-scale" data-numberify>Decouple to Scale<a class="anchor ms-1" href="#decouple-to-scale"></a></h2>
 <ul>
 <li>A monolithic architecture forces a trade-off between model accuracy and user latency.</li>
-<li><strong>Event-Driven Architecture (EDA)</strong> solves this by separating high-speed inference (Redis) from heavy stateful training (Flink).</li>
+<li><strong>Event-Driven Architecture (EDA)</strong> solves this by separating high-speed inference (Valkey) from heavy stateful training (Flink).</li>
 </ul>
 <p>&ndash;</p>
 
@@ -1290,21 +1307,25 @@ $$</p>
 <p>You can check out my latest presentations in the <a href="/slides/">Slides</a> section!</p>
       ]]></content:encoded></item><item><title>Productionizing an Online Product Recommender using Event Driven Architecture</title><link>https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/</link><guid>https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/</guid><pubDate>Mon, 23 Feb 2026 00:00:00 +0000</pubDate><description><![CDATA[
         <p>In <a href="/blog/2026-01-29-prototype-recommender-with-python/"><strong>Part 1</strong></a>, we built a contextual bandit prototype using Python and <a href="https://github.com/fidelity/mab2rec" target="_blank" rel="noopener noreferrer"><code>Mab2Rec</code><i class="fas fa-external-link-square-alt ms-1"></i></a>. While effective for testing algorithms locally, a monolithic script cannot handle production scale. Real-world recommendation systems require low-latency inference for users and high-throughput training for model updates.</p>
-<p>This post demonstrates how to decouple these concerns using an event-driven architecture with Apache Flink, Kafka, and Redis.</p>
+<p>This post demonstrates how to decouple these concerns using an event-driven architecture with Apache Flink, Kafka, and Valkey.</p>
       ]]></description><content:encoded><![CDATA[
         <p>In <a href="/blog/2026-01-29-prototype-recommender-with-python/"><strong>Part 1</strong></a>, we built a contextual bandit prototype using Python and <a href="https://github.com/fidelity/mab2rec" target="_blank" rel="noopener noreferrer"><code>Mab2Rec</code><i class="fas fa-external-link-square-alt ms-1"></i></a>. While effective for testing algorithms locally, a monolithic script cannot handle production scale. Real-world recommendation systems require low-latency inference for users and high-throughput training for model updates.</p>
-<p>This post demonstrates how to decouple these concerns using an event-driven architecture with Apache Flink, Kafka, and Redis.</p>
+<p>This post demonstrates how to decouple these concerns using an event-driven architecture with Apache Flink, Kafka, and Valkey.</p>
 <h2 id="system-architecture" data-numberify>System Architecture<a class="anchor ms-1" href="#system-architecture"></a></h2>
 <p>To move from prototype to production, we split the application into two distinct layers: Serving and Training.</p>
 <ul>
-<li><strong>Python Client (Serving):</strong> A lightweight, stateless client responsible for inference. It fetches pre-calculated model parameters from Redis, computes scores locally to make product recommendations, and captures user feedback.</li>
+<li><strong>Python Client (Serving):</strong> A lightweight, stateless client responsible for inference. It fetches pre-calculated model parameters from Valkey, computes scores locally to make product recommendations, and captures user feedback.</li>
 <li><strong>Kafka (Transport):</strong> Buffers feedback events asynchronously, decoupling the speed of serving from the speed of training.</li>
-<li><strong>Flink (Training):</strong> A stateful streaming application. It consumes feedback events, updates the model parameters (LinUCB matrices $A$ and $b$), and pushes the inverted matrices back to Redis.
+<li><strong>Flink (Training):</strong> A stateful streaming application. It consumes feedback events, updates the model parameters (LinUCB matrices $A$ and $b$), and pushes the inverted matrices back to Valkey.
 <ul>
 <li>❗ Unlike <em>Part 1</em>, where training relied on <a href="https://github.com/fidelity/mabwiser" target="_blank" rel="noopener noreferrer"><code>MABWiser</code><i class="fas fa-external-link-square-alt ms-1"></i></a>, here it is performed via explicit matrix operations.</li>
 </ul>
 </li>
-<li><strong>Redis (Model Store):</strong> Stores the latest model parameters ($A^{-1}$ and $b$) for low-latency access by the client.</li>
+<li><strong>Valkey (Model Store):</strong> Stores the latest model parameters ($A^{-1}$ and $b$) for low-latency access by the client.
+<ul>
+<li>❗ Valkey is a fork of Redis and speaks the same wire protocol, so the client still uses <code>redis-py</code> and the Flink sink still uses Jedis. The architecture diagram below labels this component <em>Redis</em> for that reason; the two are interchangeable here.</li>
+</ul>
+</li>
 </ul>
 <blockquote>
 <p><strong>📂 Source Code for the Post</strong></p>
@@ -1334,10 +1355,10 @@ $$</p>
 </ul>
 <p>The updated $A$ and $b$ are stored immediately in <strong>Flink keyed state (backed by RocksDB)</strong>. With checkpointing enabled, this state is durably persisted and recovered in case of failure.</p>
 <p><strong>Optimization 1: Inversion on Write</strong></p>
-<p>To generate a score, we need the inverse matrix $A^{-1}$, which is computationally expensive. If we performed this inversion inside the Python client for every recommendation request, latency would increase significantly. Instead, the Flink training job periodically loads $A$ from state, factorizes it using <strong>LU decomposition</strong>, computes $A^{-1}$, and stores the inverse in Redis. Because the contextual feature dimension in this demo is small, recomputing the inverse periodically remains efficient while keeping the serving layer lightweight.</p>
+<p>To generate a score, we need the inverse matrix $A^{-1}$, which is computationally expensive. If we performed this inversion inside the Python client for every recommendation request, latency would increase significantly. Instead, the Flink training job periodically loads $A$ from state, factorizes it using <strong>LU decomposition</strong>, computes $A^{-1}$, and stores the inverse in Valkey. Because the contextual feature dimension in this demo is small, recomputing the inverse periodically remains efficient while keeping the serving layer lightweight.</p>
 <p><strong>Optimization 2: Batched Updates</strong></p>
-<p>In a high-traffic environment, a popular product might receive thousands of clicks per second. Inverting the matrix and writing to Redis for <em>every single click</em> would be inefficient.</p>
-<p>To solve this, we use Flink timers to buffer updates. The model state ($A$ and $b$) is updated immediately for every event, while the expensive inversion and Redis write are triggered periodically (e.g., every 5 seconds). This drastically reduces CPU load and network traffic while keeping the model fresh.</p>
+<p>In a high-traffic environment, a popular product might receive thousands of clicks per second. Inverting the matrix and writing to Valkey for <em>every single click</em> would be inefficient.</p>
+<p>To solve this, we use Flink timers to buffer updates. The model state ($A$ and $b$) is updated immediately for every event, while the expensive inversion and Valkey write are triggered periodically (e.g., every 5 seconds). This drastically reduces CPU load and network traffic while keeping the model fresh.</p>
 
 <h3 id="scalable-inference-logic" data-numberify>Scalable Inference Logic<a class="anchor ms-1" href="#scalable-inference-logic"></a></h3>
 <p>The Python client (<a href="https://github.com/jaehyeon-kim/streaming-demos/blob/main/product-recommender/recsys-engine/eda_recommender.py" target="_blank" rel="noopener noreferrer"><code>eda_recommender.py</code><i class="fas fa-external-link-square-alt ms-1"></i></a>) is responsible for ranking items. It uses the <strong>Upper Confidence Bound (UCB)</strong> formula to balance exploiting known good items and exploring uncertain ones.</p>
@@ -1359,8 +1380,8 @@ This is the standard Linear Regression prediction. It asks: <em>&ldquo;Based on 
 <li><strong>Kafka Source:</strong> Automatically switches to the live <code>feedback-events</code> topic once the historical data is processed.</li>
 </ol>
 
-<h3 id="custom-redis-sink" data-numberify>Custom Redis Sink<a class="anchor ms-1" href="#custom-redis-sink"></a></h3>
-<p>We implement a custom Sink using the Sink V2 API and Jedis. This allows us to perform efficient <code>SET</code> operations to update the model parameters in Redis directly from the Flink stream. Because each update overwrites the full parameter vector, repeated writes remain logically safe under at-least-once delivery semantics. Besides, because the upstream <code>LinUCBUpdater</code> batches the emissions, this sink receives highly aggregated model updates, preventing Redis from being overwhelmed by write operations.</p>
+<h3 id="custom-valkey-sink" data-numberify>Custom Valkey Sink<a class="anchor ms-1" href="#custom-valkey-sink"></a></h3>
+<p>We implement a custom Sink using the Sink V2 API and Jedis. This allows us to perform efficient <code>SET</code> operations to update the model parameters in Valkey directly from the Flink stream. Because each update overwrites the full parameter vector, repeated writes remain logically safe under at-least-once delivery semantics. Besides, because the upstream <code>LinUCBUpdater</code> batches the emissions, this sink receives highly aggregated model updates, preventing Valkey from being overwhelmed by write operations.</p>
 
 <h2 id="recommender-simulation-design" data-numberify>Recommender Simulation Design<a class="anchor ms-1" href="#recommender-simulation-design"></a></h2>
 <p>To validate the architecture without live user traffic, we designed a Python client (<code>eda_recommender.py</code>) that simulates the entire lifecycle of a recommendation request. This script plays two roles simultaneously: it acts as the <strong>Recommendation Service</strong> (serving predictions) and the <strong>User</strong> (providing feedback).</p>
@@ -1369,7 +1390,7 @@ This is the standard Linear Regression prediction. It asks: <em>&ldquo;Based on 
 <p>In a production environment, this logic would live in a high-performance API. For this simulation, the Python client:</p>
 <ol>
 <li><strong>Context Generation:</strong> Creates a synthetic user profile (Age, Gender) and derives key temporal features (e.g., <em>Morning</em>, <em>Weekend</em>) from a simulated timestamp to form the full context.</li>
-<li><strong>Model Retrieval:</strong> Fetches the latest LinUCB parameters ($A^{-1}$ and $b$) for all active products directly from Redis.</li>
+<li><strong>Model Retrieval:</strong> Fetches the latest LinUCB parameters ($A^{-1}$ and $b$) for all active products directly from Valkey.</li>
 <li><strong>Scoring and Ranking:</strong> Calculates the UCB score for every product, ranks them in descending order, and returns the <strong>top 5 highest-scoring items</strong> as the recommendation set.</li>
 </ol>
 
@@ -1383,78 +1404,99 @@ This is the standard Linear Regression prediction. It asks: <em>&ldquo;Based on 
 <p>If any of the recommended top 5 items matches the user&rsquo;s current context (e.g., showing a Latte on a Tuesday morning), the script generates a Reward (1). Otherwise, it generates no reward (0). This feedback is serialized to Avro and produced to Kafka, completing the loop.</p>
 
 <h2 id="environment-setup" data-numberify>Environment Setup<a class="anchor ms-1" href="#environment-setup"></a></h2>
-<p>We use Docker Compose to orchestrate the infrastructure (Kafka, Flink, Redis) and Gradle to build the Kotlin application.</p>
+<p>We use <a href="https://github.com/jaehyeon-kim/odctl" target="_blank" rel="noopener noreferrer"><strong>odctl</strong><i class="fas fa-external-link-square-alt ms-1"></i></a> to orchestrate the infrastructure (Kafka, Flink, Valkey) and Gradle to build the Kotlin application. <code>odctl</code> is a CLI that launches a local open data stack from a single command, resolving the dependency, networking, and connector wiring between engines on our behalf.</p>
 
 <h3 id="prerequisites" data-numberify>Prerequisites<a class="anchor ms-1" href="#prerequisites"></a></h3>
-<p>Clone the repository and infrastructure utilities, then download the required connectors (Kafka, Flink, Avro).</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl">git clone https://github.com/jaehyeon-kim/streaming-demos.git
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="nb">cd</span> streaming-demos
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1"># Clone Factor House Local for infrastructure definitions</span>
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">git clone https://github.com/factorhouse/factorhouse-local.git
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># Download Kafka/Flink Dependencies</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">./factorhouse-local/resources/setup-env.sh
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="nb">cd</span> product-recommender
-</span></span></code></pre></div>
+<p><code>odctl</code> is installed alongside the other Python dependencies in <code>requirements.txt</code>, so the <em>Part 1</em> environment already covers it. It needs Docker running, ideally with 8GB or more allocated.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">git clone https://github.com/jaehyeon-kim/streaming-demos.git
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="nb">cd</span> streaming-demos
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl">uv python install 3.11
+</span></span><span class="line"><span class="ln">5</span><span class="cl">uv venv --python 3.11 venv
+</span></span><span class="line"><span class="ln">6</span><span class="cl"><span class="nb">source</span> venv/bin/activate
+</span></span><span class="line"><span class="ln">7</span><span class="cl">uv pip install -r product-recommender/requirements.txt
+</span></span></code></pre></div><p>Every command from here on runs from the repository root, as in <em>Part 1</em>.</p>
+
 <h3 id="build-and-launch" data-numberify>Build and Launch<a class="anchor ms-1" href="#build-and-launch"></a></h3>
-<p>We bootstrap the environment by generating training data, building the Flink JAR, and launching the cluster. We use Kpow and Flex to monitor the Kafka and Flink clusters; these tools require a Factor House community license. Visit the <a href="https://account.factorhouse.io/auth/getting_started" target="_blank" rel="noopener noreferrer">Factor House License Portal<i class="fas fa-external-link-square-alt ms-1"></i></a> to generate your license, save the details in a file (e.g., <code>license.env</code>), and export the associated environment variables (<code>KPOW_LICENSE</code> and <code>FLEX_LICENSE</code>).</p>
-<p>With the license configured, launch the Docker Compose services as shown below.</p>
-<p><em>❗ You do not need Kotlin or Gradle installed locally. The <code>./gradlew</code> script handles all build dependencies.</em></p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="c1"># Setup Python and Generate Bootstrap Data</span>
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">python3 -m venv venv
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl"><span class="nb">source</span> venv/bin/activate
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">pip install -r requirements.txt
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">python recsys-engine/prepare_data.py
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="c1"># Build Flink Application (Shadow Jar)</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="nb">cd</span> recsys-trainer
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">./gradlew shadowJar
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="nb">cd</span> ..
-</span></span><span class="line"><span class="ln">11</span><span class="cl">
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"># Launch Infrastructure (Kafka, Flink, Redis, Kpow)</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="nb">export</span> <span class="nv">KPOW_SUFFIX</span><span class="o">=</span><span class="s2">&#34;-ce&#34;</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="nb">export</span> <span class="nv">FLEX_SUFFIX</span><span class="o">=</span><span class="s2">&#34;-ce&#34;</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="nb">export</span> <span class="nv">KPOW_LICENSE</span><span class="o">=</span>&lt;path-to-license-file&gt;
-</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="nb">export</span> <span class="nv">FLEX_LICENSE</span><span class="o">=</span>&lt;path-to-license-file&gt;
-</span></span><span class="line"><span class="ln">17</span><span class="cl">
-</span></span><span class="line"><span class="ln">18</span><span class="cl">docker compose -p kpow -f ../factorhouse-local/compose-kpow.yml up -d <span class="se">\
-</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="se"></span>  <span class="o">&amp;&amp;</span> docker compose -p stripped -f ./compose-stripped.yml up -d <span class="se">\
-</span></span></span><span class="line"><span class="ln">20</span><span class="cl"><span class="se"></span>  <span class="o">&amp;&amp;</span> docker compose -p flex -f ./compose-flex.yml up -d
-</span></span></code></pre></div>
+<p>We bootstrap the environment by generating training data, building the Flink JAR, and launching the cluster.</p>
+<p><em>❗ You do not need Kotlin or Gradle installed locally. The <code>./gradlew</code> script handles all build dependencies, though it does require a <strong>JDK 17</strong> toolchain.</em></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1"># Generate Bootstrap Data (skip if already done in Part 1)</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl">python product-recommender/recsys-engine/prepare_data.py
+</span></span><span class="line"><span class="ln">3</span><span class="cl">
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1"># Build Flink Application (Shadow Jar)</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl"><span class="o">(</span><span class="nb">cd</span> product-recommender/recsys-trainer <span class="o">&amp;&amp;</span> ./gradlew shadowJar<span class="o">)</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">
+</span></span><span class="line"><span class="ln">7</span><span class="cl"><span class="c1"># Launch Kafka, Flink and Valkey</span>
+</span></span><span class="line"><span class="ln">8</span><span class="cl">odctl init
+</span></span><span class="line"><span class="ln">9</span><span class="cl">odctl up kafka-lite flink-full valkey
+</span></span></code></pre></div><p><code>odctl init</code> copies the Compose files and configuration into a local <code>.odctl/</code> folder, which you can edit to customise the stack. Dependencies then resolve themselves: <code>flink-full</code> quietly pulls in PostgreSQL, SeaweedFS (S3), and the Iceberg REST catalog before starting the compute engines. Run <code>odctl ps --all</code> to see everything that came up.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Service</th>
+<th style="text-align:left">URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Flink JobManager UI</td>
+<td style="text-align:left"><a href="http://localhost:8082" target="_blank" rel="noopener noreferrer">http://localhost:8082<i class="fas fa-external-link-square-alt ms-1"></i></a></td>
+</tr>
+<tr>
+<td style="text-align:left">Kafka UI</td>
+<td style="text-align:left"><a href="http://localhost:8086" target="_blank" rel="noopener noreferrer">http://localhost:8086<i class="fas fa-external-link-square-alt ms-1"></i></a></td>
+</tr>
+<tr>
+<td style="text-align:left">SeaweedFS (S3) file browser</td>
+<td style="text-align:left"><a href="http://localhost:8889" target="_blank" rel="noopener noreferrer">http://localhost:8889<i class="fas fa-external-link-square-alt ms-1"></i></a></td>
+</tr>
+<tr>
+<td style="text-align:left">Schema Registry (Karapace)</td>
+<td style="text-align:left"><code>http://localhost:8081</code> (REST API, no UI)</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="submitting-the-flink-job" data-numberify>Submitting the Flink Job<a class="anchor ms-1" href="#submitting-the-flink-job"></a></h3>
+<p><code>odctl</code> provides a Flink <strong>session cluster</strong> rather than running the job in application mode, so the JAR is submitted to the already-running cluster:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">./product-recommender/submit-job.sh
+</span></span></code></pre></div><p>The script does three things: it uploads <code>training_log.csv</code> to SeaweedFS, copies the fat JAR into the JobManager container, and calls <code>flink run -d</code>.</p>
+<p>The bootstrap CSV goes to object storage rather than a bind mount because Flink&rsquo;s split enumerator runs on the JobManager while the readers run on the TaskManagers. With three TaskManagers, a local file path would need to exist in four separate containers.</p>
+
 <h2 id="live-recommender-simulation" data-numberify>Live Recommender Simulation<a class="anchor ms-1" href="#live-recommender-simulation"></a></h2>
 <p>Once the infrastructure is running, Flink will first process the historical events to warm up. Once the historical processing is complete, we can run the Python client to simulate live traffic.</p>
 <p>To visualize the system in action, open two terminals.</p>
 <p><strong>Terminal 1: Client</strong></p>
 <p>Run the Python script. It acts as the user, receiving recommendations and sending feedback (clicks) to Kafka.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">python recsys-engine/eda_recommender.py
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">python product-recommender/recsys-engine/eda_recommender.py
 </span></span></code></pre></div><p><strong>Terminal 2: Trainer</strong></p>
 <p>Watch the Flink TaskManager logs. You will see the application reacting to the events sent to the <code>feedback-events</code> topic in real-time.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker logs taskmanager -f
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker logs flink-taskmanager-a -f
 </span></span></code></pre></div><p><strong>Result</strong></p>
-<p>You will see a series of feedback events generated by users on the left-hand side. On the right-hand side, you can see the logs confirming that model parameters are being sent to Redis in batches.</p>
-<p>This confirms the closed loop: <strong>Read (Redis) -&gt; Act (Kafka) -&gt; Learn (Flink) -&gt; Write (Redis)</strong>.</p>
+<p>You will see a series of feedback events generated by users on the left-hand side. On the right-hand side, you can see the logs confirming that model parameters are being sent to Valkey in batches.</p>
+<p>This confirms the closed loop: <strong>Read (Valkey) -&gt; Act (Kafka) -&gt; Learn (Flink) -&gt; Write (Valkey)</strong>.</p>
 <p><picture><img class="img-fluid mx-auto d-block" alt="Live Simulation Result" src="/blog/2026-02-23-productionize-recommender-with-eda/recommender-output.webp" loading="lazy" width="1665" height="1476" />
 </picture>
 
 </p>
-<p>You can inspect feedback events on Kpow at <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer">http://localhost:3000<i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
-<p><picture><img class="img-fluid mx-auto d-block" alt="Feedback Events" src="/blog/2026-02-23-productionize-recommender-with-eda/feedback-events.png" loading="lazy" width="981" height="1123" />
+<p>You can inspect feedback events on Kafka UI at <a href="http://localhost:8086" target="_blank" rel="noopener noreferrer">http://localhost:8086<i class="fas fa-external-link-square-alt ms-1"></i></a>.</p>
+<p><picture><img class="img-fluid mx-auto d-block" alt="Feedback Events" src="/blog/2026-02-23-productionize-recommender-with-eda/feedback-events.png" loading="lazy" width="1010" height="842" />
 </picture>
 
 </p>
+<blockquote>
+<p><strong>Troubleshooting:</strong> the client defaults to <code>127.0.0.1</code> rather than <code>localhost</code>. On an IPv6-first host, <code>localhost</code> resolves to <code>::1</code> first, and the schema registry client fails outright with a connection reset instead of falling back to IPv4 the way the Kafka and Valkey clients do.</p>
+</blockquote>
 
 <h2 id="teardown" data-numberify>Teardown<a class="anchor ms-1" href="#teardown"></a></h2>
 <p>To stop the cluster and remove resources:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">docker compose -p flex -f ./compose-flex.yml down <span class="se">\
-</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="se"></span>  <span class="o">&amp;&amp;</span> docker compose -p stripped -f ./compose-stripped.yml down <span class="se">\
-</span></span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="se"></span>  <span class="o">&amp;&amp;</span> docker compose -p kpow -f ../factorhouse-local/compose-kpow.yml down
-</span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="ln">1</span><span class="cl">odctl down kafka-lite flink-full valkey
+</span></span></code></pre></div><p>Add <code>--volumes</code> to also remove <code>odctl-shared-deps</code>, the named volume holding the downloaded connector JARs. The next <code>odctl up</code> then re-runs the init container to repopulate it.</p>
+
 <h2 id="conclusion" data-numberify>Conclusion<a class="anchor ms-1" href="#conclusion"></a></h2>
 <p>Traditional recommendation systems such as Collaborative Filtering rely on long-term interaction history and often treat user preferences as static. As a result, they struggle to incorporate <strong>immediate context</strong>, missing situational shifts like a user preferring <strong>coffee in the morning but pizza in the evening</strong>.</p>
 <p>To overcome this, we use <strong>Contextual Multi-Armed Bandits (CMAB)</strong>, an online learning approach that balances <strong>exploitation</strong> and <strong>exploration</strong> using real-time contextual signals. While our Python prototype in <em>Part 1</em> validated the concept, it was not built for scale.</p>
-<p>We then evolved it into a production-ready <strong>event-driven architecture</strong>: <strong>Kafka</strong> streams feedback events, <strong>Flink</strong> handles distributed stateful training, and <strong>Redis</strong> serves precomputed parameters for low-latency inference. This design enables horizontal scalability and real-time adaptation to user behavior.</p>
+<p>We then evolved it into a production-ready <strong>event-driven architecture</strong>: <strong>Kafka</strong> streams feedback events, <strong>Flink</strong> handles distributed stateful training, and <strong>Valkey</strong> serves precomputed parameters for low-latency inference. This design enables horizontal scalability and real-time adaptation to user behavior.</p>
       ]]></content:encoded></item><item><title>Prototyping an Online Product Recommender in Python</title><link>https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/</link><guid>https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/</guid><pubDate>Tue, 27 Jan 2026 00:00:00 +0000</pubDate><description>
 Overview Traditional recommendation approaches such as Collaborative Filtering remain widely adopted, yet they come with notable constraints. They are particularly vulnerable to the cold-start problem, where new users lack sufficient interaction history, and they depend heavily on long-term behavioral data. As a result, they frequently overlook real-time contextual signals, including time of day, device type, location, or session intent. This can prevent them from capturing situational preferences, such as someone preferring coffee in the morning but pizza in the evening.</description><content:encoded><![CDATA[
         
@@ -1487,6 +1529,7 @@ Overview Traditional recommendation approaches such as Collaborative Filtering r
 <p>We are building this prototype using <strong>Python 3.11</strong>.</p>
 <blockquote>
 <p><strong>Engineering Note:</strong> We explicitly chose Python 3.11 because parts of our stack (specifically <code>mabwiser</code> dependencies) rely on older versions of <code>pandas</code> (&lt; 2.0). On Python 3.12+, installing these dependencies often triggers long compilation times or failures due to missing binary wheels.</p>
+<p>For the same reason, <code>requirements.txt</code> floors <code>flair</code> at 0.12. <code>TextWiser</code> only asks for <code>flair&gt;=0.9</code>, and with <code>pandas</code>/<code>numpy</code> held below 2.0 the resolver otherwise backtracks to <code>flair</code> 0.11.3, which hard-pins <code>sentencepiece==0.1.95</code>. That release predates Python 3.11 and has no matching wheel, so the install dies trying to build it from source.</p>
 </blockquote>
 <p>We use <a href="https://docs.astral.sh/uv/" target="_blank" rel="noopener noreferrer"><strong>uv</strong><i class="fas fa-external-link-square-alt ms-1"></i></a> for Python environment management. The core libraries include:</p>
 <ul>
@@ -1503,15 +1546,16 @@ Overview Traditional recommendation approaches such as Collaborative Filtering r
 </span></span><span class="line"><span class="ln"> 4</span><span class="cl">$ uv venv --python 3.11 venv
 </span></span><span class="line"><span class="ln"> 5</span><span class="cl">$ <span class="nb">source</span> venv/bin/activate
 </span></span><span class="line"><span class="ln"> 6</span><span class="cl"><span class="o">(</span>venv<span class="o">)</span> $ uv pip install -r product-recommender/requirements.txt
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="o">(</span>venv<span class="o">)</span> $ uv pip list <span class="p">|</span> grep -E <span class="s2">&#34;mab|wiser|panda|numpy|scikit|faker&#34;</span>
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"># Using Python 3.11.14 environment at: venv</span>
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"># faker                              40.1.2</span>
-</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># mab2rec                            1.3.1</span>
-</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1"># mabwiser                           2.7.4</span>
-</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"># numpy                              1.26.4</span>
-</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"># pandas                             1.5.3</span>
-</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"># scikit-learn                       1.8.0</span>
-</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"># textwiser                          2.0.2</span>
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl"><span class="o">(</span>venv<span class="o">)</span> $ uv pip list <span class="p">|</span> grep -E <span class="s2">&#34;mab|wiser|flair|panda|numpy|scikit|faker&#34;</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl"><span class="c1"># Using Python 3.11.15 environment at: venv</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl"><span class="c1"># faker                              40.36.0</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl"><span class="c1"># flair                              0.15.1</span>
+</span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="c1"># mab2rec                            1.3.1</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl"><span class="c1"># mabwiser                           2.7.4</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="c1"># numpy                              1.26.4</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl"><span class="c1"># pandas                             1.5.3</span>
+</span></span><span class="line"><span class="ln">15</span><span class="cl"><span class="c1"># scikit-learn                       1.9.0</span>
+</span></span><span class="line"><span class="ln">16</span><span class="cl"><span class="c1"># textwiser                          2.0.3</span>
 </span></span></code></pre></div><blockquote>
 <p><strong>📂 Source Code for the Post</strong></p>
 <p>The source code for this post is available in the <strong>product-recommender</strong> folder of the <a href="https://github.com/jaehyeon-kim/streaming-demos" target="_blank" rel="noopener noreferrer">streaming-demos<i class="fas fa-external-link-square-alt ms-1"></i></a> GitHub repository.</p>
@@ -1985,7 +2029,7 @@ Overview Traditional recommendation approaches such as Collaborative Filtering r
 <h2 id="offline-policy-evaluation" data-numberify>Offline Policy Evaluation<a class="anchor ms-1" href="#offline-policy-evaluation"></a></h2>
 <p>We benchmarked several policies using <code>Mab2Rec</code> on the 10,000 historical events.</p>
 
-<h3 id="the-candidates" data-numberify>The Candidates<a class="anchor ms-1" href="#the-candidates"></a></h3>
+<h3 id="candidate-policies" data-numberify>Candidate Policies<a class="anchor ms-1" href="#candidate-policies"></a></h3>
 <ul>
 <li><strong>Random:</strong> The baseline. Recommends items blindly.</li>
 <li><strong>Popularity:</strong> Recommends items with the highest <em>global</em> click rate.
@@ -2111,7 +2155,7 @@ Overview Traditional recommendation approaches such as Collaborative Filtering r
 <h3 id="evaluation-of-simulation" data-numberify>Evaluation of Simulation<a class="anchor ms-1" href="#evaluation-of-simulation"></a></h3>
 <p>The system is behaving exactly as a Contextual Bandit should. It is aggressively exploiting known high-probability zones while struggling (realistically) in neutral zones.</p>
 
-<h4 id="the-weekend-pizza-strategy-is-dominant" data-numberify>The &ldquo;Weekend Pizza&rdquo; Strategy is Dominant<a class="anchor ms-1" href="#the-weekend-pizza-strategy-is-dominant"></a></h4>
+<h4 id="weekend-pizza-strategy-dominates" data-numberify>&ldquo;Weekend Pizza&rdquo; Strategy Dominates<a class="anchor ms-1" href="#weekend-pizza-strategy-dominates"></a></h4>
 <p>The model has learned that Weekends (Sat/Sun) are for <strong>Pizzas (Category 40s)</strong>.</p>
 <ul>
 <li><strong>User 0360 (Sat 20:23):</strong> Recommended <code>[..., 042 (Aussie Pizza), ...]</code> $\to$ Clicked ✅.</li>
@@ -2120,7 +2164,7 @@ Overview Traditional recommendation approaches such as Collaborative Filtering r
 <li><strong>Insight:</strong> The model pushes Pizzas hard on weekends regardless of the specific hour, resulting in a very high conversion rate for these users.</li>
 </ul>
 
-<h4 id="the-morning-coffee-precision" data-numberify>The &ldquo;Morning Coffee&rdquo; Precision<a class="anchor ms-1" href="#the-morning-coffee-precision"></a></h4>
+<h4 id="morning-coffee-precision" data-numberify>&ldquo;Morning Coffee&rdquo; Precision<a class="anchor ms-1" href="#morning-coffee-precision"></a></h4>
 <p>The model correctly switches strategies based on the hour, even distinguishing &ldquo;Weekend Morning&rdquo; from &ldquo;Weekend Night&rdquo;.</p>
 <ul>
 <li><strong>User 0552 (Tue 11:33):</strong> It is a Weekday Morning. The model recommended <strong>5 Coffees</strong> <code>[192, 190, 189, 194, 193]</code>. The user clicked <code>192</code> (Long Black). ✅</li>
