@@ -61,6 +61,8 @@ In this series, **Part 1** (*this post*) builds a complete **Python prototype** 
 We are building this prototype using **Python 3.11**.
 
 > **Engineering Note:** We explicitly chose Python 3.11 because parts of our stack (specifically `mabwiser` dependencies) rely on older versions of `pandas` (< 2.0). On Python 3.12+, installing these dependencies often triggers long compilation times or failures due to missing binary wheels.
+>
+> For the same reason, `requirements.txt` floors `flair` at 0.12. `TextWiser` only asks for `flair>=0.9`, and with `pandas`/`numpy` held below 2.0 the resolver otherwise backtracks to `flair` 0.11.3, which hard-pins `sentencepiece==0.1.95`. That release predates Python 3.11 and has no matching wheel, so the install dies trying to build it from source.
 
 We use [**uv**](https://docs.astral.sh/uv/) for Python environment management. The core libraries include:
 
@@ -79,15 +81,16 @@ $ uv python install 3.11
 $ uv venv --python 3.11 venv
 $ source venv/bin/activate
 (venv) $ uv pip install -r product-recommender/requirements.txt
-(venv) $ uv pip list | grep -E "mab|wiser|panda|numpy|scikit|faker"
-# Using Python 3.11.14 environment at: venv
-# faker                              40.1.2
+(venv) $ uv pip list | grep -E "mab|wiser|flair|panda|numpy|scikit|faker"
+# Using Python 3.11.15 environment at: venv
+# faker                              40.36.0
+# flair                              0.15.1
 # mab2rec                            1.3.1
 # mabwiser                           2.7.4
 # numpy                              1.26.4
 # pandas                             1.5.3
-# scikit-learn                       1.8.0
-# textwiser                          2.0.2
+# scikit-learn                       1.9.0
+# textwiser                          2.0.3
 ```
 
 > **📂 Source Code for the Post**
@@ -263,7 +266,7 @@ The main dataset (`training_log.csv`) combines *user features*, *dynamic context
 
 We benchmarked several policies using `Mab2Rec` on the 10,000 historical events.
 
-### The Candidates
+### Candidate Policies
 
 *   **Random:** The baseline. Recommends items blindly.
 *   **Popularity:** Recommends items with the highest *global* click rate.
@@ -388,7 +391,7 @@ User 0508 (64 yo) @ Tue 12:41 -> Recs: [165, 087, 026, 171, 037] -> Clicked: 165
 
 The system is behaving exactly as a Contextual Bandit should. It is aggressively exploiting known high-probability zones while struggling (realistically) in neutral zones.
 
-#### The "Weekend Pizza" Strategy is Dominant
+#### "Weekend Pizza" Strategy Dominates
 
 The model has learned that Weekends (Sat/Sun) are for **Pizzas (Category 40s)**.
 *   **User 0360 (Sat 20:23):** Recommended `[..., 042 (Aussie Pizza), ...]` $\to$ Clicked ✅.
@@ -396,7 +399,7 @@ The model has learned that Weekends (Sat/Sun) are for **Pizzas (Category 40s)**.
 *   **User 0834 (Sat 22:58):** Recommended `[051 (Buffalo Pizza)... 042 (Aussie Pizza)]` $\to$ Clicked ✅.
 *   **Insight:** The model pushes Pizzas hard on weekends regardless of the specific hour, resulting in a very high conversion rate for these users.
 
-#### The "Morning Coffee" Precision
+#### "Morning Coffee" Precision
 
 The model correctly switches strategies based on the hour, even distinguishing "Weekend Morning" from "Weekend Night".
 

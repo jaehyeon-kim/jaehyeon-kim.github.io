@@ -17,9 +17,8 @@ tags:
   - Python
   - Apache Kafka
   - Apache Flink
-  - Redis
-  - Kpow
-  - Flex
+  - Valkey
+  - Open Data Stack
   - Contextual Bandits
   - Reinforcement Learning
   - Machine Learning
@@ -34,7 +33,7 @@ description:
 
 In [**Part 1**](/blog/2026-01-29-prototype-recommender-with-python/), we built a contextual bandit prototype using Python and [`Mab2Rec`](https://github.com/fidelity/mab2rec). While effective for testing algorithms locally, a monolithic script cannot handle production scale. Real-world recommendation systems require low-latency inference for users and high-throughput training for model updates.
 
-This post demonstrates how to decouple these concerns using an event-driven architecture with Apache Flink, Kafka, and Redis.
+This post demonstrates how to decouple these concerns using an event-driven architecture with Apache Flink, Kafka, and Valkey.
 
 <!--more-->
 
@@ -42,11 +41,12 @@ This post demonstrates how to decouple these concerns using an event-driven arch
 
 To move from prototype to production, we split the application into two distinct layers: Serving and Training.
 
-*   **Python Client (Serving):** A lightweight, stateless client responsible for inference. It fetches pre-calculated model parameters from Redis, computes scores locally to make product recommendations, and captures user feedback.
+*   **Python Client (Serving):** A lightweight, stateless client responsible for inference. It fetches pre-calculated model parameters from Valkey, computes scores locally to make product recommendations, and captures user feedback.
 *   **Kafka (Transport):** Buffers feedback events asynchronously, decoupling the speed of serving from the speed of training.
-*   **Flink (Training):** A stateful streaming application. It consumes feedback events, updates the model parameters (LinUCB matrices $A$ and $b$), and pushes the inverted matrices back to Redis.
+*   **Flink (Training):** A stateful streaming application. It consumes feedback events, updates the model parameters (LinUCB matrices $A$ and $b$), and pushes the inverted matrices back to Valkey.
     *   ❗ Unlike *Part 1*, where training relied on [`MABWiser`](https://github.com/fidelity/mabwiser), here it is performed via explicit matrix operations.
-*   **Redis (Model Store):** Stores the latest model parameters ($A^{-1}$ and $b$) for low-latency access by the client.
+*   **Valkey (Model Store):** Stores the latest model parameters ($A^{-1}$ and $b$) for low-latency access by the client.
+    *   ❗ Valkey is a fork of Redis and speaks the same wire protocol, so the client still uses `redis-py` and the Flink sink still uses Jedis. The architecture diagram below labels this component *Redis* for that reason; the two are interchangeable here.
 
 > **📂 Source Code for the Post**
 > 
@@ -80,13 +80,13 @@ The updated $A$ and $b$ are stored immediately in **Flink keyed state (backed by
 
 **Optimization 1: Inversion on Write**
 
-To generate a score, we need the inverse matrix $A^{-1}$, which is computationally expensive. If we performed this inversion inside the Python client for every recommendation request, latency would increase significantly. Instead, the Flink training job periodically loads $A$ from state, factorizes it using **LU decomposition**, computes $A^{-1}$, and stores the inverse in Redis. Because the contextual feature dimension in this demo is small, recomputing the inverse periodically remains efficient while keeping the serving layer lightweight.
+To generate a score, we need the inverse matrix $A^{-1}$, which is computationally expensive. If we performed this inversion inside the Python client for every recommendation request, latency would increase significantly. Instead, the Flink training job periodically loads $A$ from state, factorizes it using **LU decomposition**, computes $A^{-1}$, and stores the inverse in Valkey. Because the contextual feature dimension in this demo is small, recomputing the inverse periodically remains efficient while keeping the serving layer lightweight.
 
 **Optimization 2: Batched Updates**
 
-In a high-traffic environment, a popular product might receive thousands of clicks per second. Inverting the matrix and writing to Redis for *every single click* would be inefficient.
+In a high-traffic environment, a popular product might receive thousands of clicks per second. Inverting the matrix and writing to Valkey for *every single click* would be inefficient.
 
-To solve this, we use Flink timers to buffer updates. The model state ($A$ and $b$) is updated immediately for every event, while the expensive inversion and Redis write are triggered periodically (e.g., every 5 seconds). This drastically reduces CPU load and network traffic while keeping the model fresh.
+To solve this, we use Flink timers to buffer updates. The model state ($A$ and $b$) is updated immediately for every event, while the expensive inversion and Valkey write are triggered periodically (e.g., every 5 seconds). This drastically reduces CPU load and network traffic while keeping the model fresh.
 
 ### Scalable Inference Logic
 
@@ -111,9 +111,9 @@ Contextual bandits suffer from the "Cold Start" problem. To mitigate this, we im
 1.  **File Source:** Reads the historical CSV (`training_log.csv`) generated in *Part 1* to bootstrap the model state.
 2.  **Kafka Source:** Automatically switches to the live `feedback-events` topic once the historical data is processed.
 
-### Custom Redis Sink
+### Custom Valkey Sink
 
-We implement a custom Sink using the Sink V2 API and Jedis. This allows us to perform efficient `SET` operations to update the model parameters in Redis directly from the Flink stream. Because each update overwrites the full parameter vector, repeated writes remain logically safe under at-least-once delivery semantics. Besides, because the upstream `LinUCBUpdater` batches the emissions, this sink receives highly aggregated model updates, preventing Redis from being overwhelmed by write operations.
+We implement a custom Sink using the Sink V2 API and Jedis. This allows us to perform efficient `SET` operations to update the model parameters in Valkey directly from the Flink stream. Because each update overwrites the full parameter vector, repeated writes remain logically safe under at-least-once delivery semantics. Besides, because the upstream `LinUCBUpdater` batches the emissions, this sink receives highly aggregated model updates, preventing Valkey from being overwhelmed by write operations.
 
 ## Recommender Simulation Design
 
@@ -124,7 +124,7 @@ To validate the architecture without live user traffic, we designed a Python cli
 In a production environment, this logic would live in a high-performance API. For this simulation, the Python client:
 
 1.  **Context Generation:** Creates a synthetic user profile (Age, Gender) and derives key temporal features (e.g., *Morning*, *Weekend*) from a simulated timestamp to form the full context.
-2.  **Model Retrieval:** Fetches the latest LinUCB parameters ($A^{-1}$ and $b$) for all active products directly from Redis.
+2.  **Model Retrieval:** Fetches the latest LinUCB parameters ($A^{-1}$ and $b$) for all active products directly from Valkey.
 3.  **Scoring and Ranking:** Calculates the UCB score for every product, ranks them in descending order, and returns the **top 5 highest-scoring items** as the recommendation set.
 
 ### Feedback Generation
@@ -139,55 +139,62 @@ If any of the recommended top 5 items matches the user's current context (e.g., 
 
 ## Environment Setup
 
-We use Docker Compose to orchestrate the infrastructure (Kafka, Flink, Redis) and Gradle to build the Kotlin application.
+We use [**odctl**](https://github.com/jaehyeon-kim/odctl) to orchestrate the infrastructure (Kafka, Flink, Valkey) and Gradle to build the Kotlin application. `odctl` is a CLI that launches a local open data stack from a single command, resolving the dependency, networking, and connector wiring between engines on our behalf.
 
 ### Prerequisites
 
-Clone the repository and infrastructure utilities, then download the required connectors (Kafka, Flink, Avro).
+`odctl` is installed alongside the other Python dependencies in `requirements.txt`, so the *Part 1* environment already covers it. It needs Docker running, ideally with 8GB or more allocated.
 
 ```bash
 git clone https://github.com/jaehyeon-kim/streaming-demos.git
 cd streaming-demos
 
-# Clone Factor House Local for infrastructure definitions
-git clone https://github.com/factorhouse/factorhouse-local.git
-
-# Download Kafka/Flink Dependencies
-./factorhouse-local/resources/setup-env.sh
-
-cd product-recommender
+uv python install 3.11
+uv venv --python 3.11 venv
+source venv/bin/activate
+uv pip install -r product-recommender/requirements.txt
 ```
+
+Every command from here on runs from the repository root, as in *Part 1*.
 
 ### Build and Launch
 
-We bootstrap the environment by generating training data, building the Flink JAR, and launching the cluster. We use Kpow and Flex to monitor the Kafka and Flink clusters; these tools require a Factor House community license. Visit the [Factor House License Portal](https://account.factorhouse.io/auth/getting_started) to generate your license, save the details in a file (e.g., `license.env`), and export the associated environment variables (`KPOW_LICENSE` and `FLEX_LICENSE`).
+We bootstrap the environment by generating training data, building the Flink JAR, and launching the cluster.
 
-With the license configured, launch the Docker Compose services as shown below.
-
-*❗ You do not need Kotlin or Gradle installed locally. The `./gradlew` script handles all build dependencies.*
+*❗ You do not need Kotlin or Gradle installed locally. The `./gradlew` script handles all build dependencies, though it does require a **JDK 17** toolchain.*
 
 ```bash
-# Setup Python and Generate Bootstrap Data
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python recsys-engine/prepare_data.py
+# Generate Bootstrap Data (skip if already done in Part 1)
+python product-recommender/recsys-engine/prepare_data.py
 
 # Build Flink Application (Shadow Jar)
-cd recsys-trainer
-./gradlew shadowJar
-cd ..
+(cd product-recommender/recsys-trainer && ./gradlew shadowJar)
 
-# Launch Infrastructure (Kafka, Flink, Redis, Kpow)
-export KPOW_SUFFIX="-ce"
-export FLEX_SUFFIX="-ce"
-export KPOW_LICENSE=<path-to-license-file>
-export FLEX_LICENSE=<path-to-license-file>
-
-docker compose -p kpow -f ../factorhouse-local/compose-kpow.yml up -d \
-  && docker compose -p stripped -f ./compose-stripped.yml up -d \
-  && docker compose -p flex -f ./compose-flex.yml up -d
+# Launch Kafka, Flink and Valkey
+odctl init
+odctl up kafka-lite flink-full valkey
 ```
+
+`odctl init` copies the Compose files and configuration into a local `.odctl/` folder, which you can edit to customise the stack. Dependencies then resolve themselves: `flink-full` quietly pulls in PostgreSQL, SeaweedFS (S3), and the Iceberg REST catalog before starting the compute engines. Run `odctl ps --all` to see everything that came up.
+
+| Service | URL |
+| :--- | :--- |
+| Flink JobManager UI | [http://localhost:8082](http://localhost:8082) |
+| Kafka UI | [http://localhost:8086](http://localhost:8086) |
+| SeaweedFS (S3) file browser | [http://localhost:8889](http://localhost:8889) |
+| Schema Registry (Karapace) | `http://localhost:8081` (REST API, no UI) |
+
+### Submitting the Flink Job
+
+`odctl` provides a Flink **session cluster** rather than running the job in application mode, so the JAR is submitted to the already-running cluster:
+
+```bash
+./product-recommender/submit-job.sh
+```
+
+The script does three things: it uploads `training_log.csv` to SeaweedFS, copies the fat JAR into the JobManager container, and calls `flink run -d`.
+
+The bootstrap CSV goes to object storage rather than a bind mount because Flink's split enumerator runs on the JobManager while the readers run on the TaskManagers. With three TaskManagers, a local file path would need to exist in four separate containers.
 
 ## Live Recommender Simulation
 
@@ -200,7 +207,7 @@ To visualize the system in action, open two terminals.
 Run the Python script. It acts as the user, receiving recommendations and sending feedback (clicks) to Kafka.
 
 ```bash
-python recsys-engine/eda_recommender.py
+python product-recommender/recsys-engine/eda_recommender.py
 ```
 
 **Terminal 2: Trainer**
@@ -208,30 +215,32 @@ python recsys-engine/eda_recommender.py
 Watch the Flink TaskManager logs. You will see the application reacting to the events sent to the `feedback-events` topic in real-time.
 
 ```bash
-docker logs taskmanager -f
+docker logs flink-taskmanager-a -f
 ```
 
 **Result**
 
-You will see a series of feedback events generated by users on the left-hand side. On the right-hand side, you can see the logs confirming that model parameters are being sent to Redis in batches.
+You will see a series of feedback events generated by users on the left-hand side. On the right-hand side, you can see the logs confirming that model parameters are being sent to Valkey in batches.
 
-This confirms the closed loop: **Read (Redis) -> Act (Kafka) -> Learn (Flink) -> Write (Redis)**.
+This confirms the closed loop: **Read (Valkey) -> Act (Kafka) -> Learn (Flink) -> Write (Valkey)**.
 
 ![Live Simulation Result](recommender-output.webp#center)
 
-You can inspect feedback events on Kpow at [http://localhost:3000](http://localhost:3000).
+You can inspect feedback events on Kafka UI at [http://localhost:8086](http://localhost:8086).
 
 ![Feedback Events](feedback-events.png#center)
+
+> **Troubleshooting:** the client defaults to `127.0.0.1` rather than `localhost`. On an IPv6-first host, `localhost` resolves to `::1` first, and the schema registry client fails outright with a connection reset instead of falling back to IPv4 the way the Kafka and Valkey clients do.
 
 ## Teardown
 
 To stop the cluster and remove resources:
 
 ```bash
-docker compose -p flex -f ./compose-flex.yml down \
-  && docker compose -p stripped -f ./compose-stripped.yml down \
-  && docker compose -p kpow -f ../factorhouse-local/compose-kpow.yml down
+odctl down kafka-lite flink-full valkey
 ```
+
+Add `--volumes` to also remove `odctl-shared-deps`, the named volume holding the downloaded connector JARs. The next `odctl up` then re-runs the init container to repopulate it.
 
 ## Conclusion
 
@@ -239,4 +248,4 @@ Traditional recommendation systems such as Collaborative Filtering rely on long-
 
 To overcome this, we use **Contextual Multi-Armed Bandits (CMAB)**, an online learning approach that balances **exploitation** and **exploration** using real-time contextual signals. While our Python prototype in *Part 1* validated the concept, it was not built for scale.
 
-We then evolved it into a production-ready **event-driven architecture**: **Kafka** streams feedback events, **Flink** handles distributed stateful training, and **Redis** serves precomputed parameters for low-latency inference. This design enables horizontal scalability and real-time adaptation to user behavior.
+We then evolved it into a production-ready **event-driven architecture**: **Kafka** streams feedback events, **Flink** handles distributed stateful training, and **Valkey** serves precomputed parameters for low-latency inference. This design enables horizontal scalability and real-time adaptation to user behavior.

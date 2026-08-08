@@ -168,7 +168,7 @@ $$ \text{LinUCB: Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{+}
   - **Fast Path:** Updates $A$ and $b$.
     - ($A \leftarrow A + x x^T, b \leftarrow b + r x$)
   - **Slow Path:** Every 5s, computes $A^{-1}$.
-- **Sync to Redis:** Emits $A^{-1}$ and $b$.
+- **Sync to Valkey:** Emits $A^{-1}$ and $b$.
     </div>
   </div>
 
@@ -181,7 +181,7 @@ $$ \text{LinUCB: Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{+}
 
 <!-- .slide: id="eda-slide" -->
 ## Architecture
-### Serving (Python & Redis)
+### Serving (Python & Valkey)
 
 <div style="display: grid; grid-template-columns: 42% 58%; gap: 10px; align-items: center; width: 106%; margin-left: -3%;">
   <!-- Left Column: Centered block, left-aligned text -->
@@ -191,7 +191,8 @@ $$ \text{LinUCB: Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{+}
 - **Stateless Inference:**
   - The client does *not* train. 
 - **Low Latency:**
-  - Fetches pre-computed LinUCB parameters from Redis.
+  - Fetches pre-computed LinUCB parameters from Valkey.
+  - Valkey is a Redis fork on the same protocol (diagram label unchanged).
 - **Action:** 
   - Calculates scores,
   - Ranks items, and 
@@ -229,6 +230,28 @@ $$ \text{LinUCB: Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{+}
 
 --
 
+## Running It Locally
+
+The whole stack comes up with [`odctl`](https://github.com/jaehyeon-kim/odctl) <!-- .element: target="_blank" -->, a CLI for the Open Data Stack.
+
+```bash
+# all from the repo root
+odctl init
+odctl up kafka-lite flink-full valkey     # Kafka, Flink, Valkey (+ deps)
+./product-recommender/submit-job.sh       # upload CSV, ship JAR, flink run
+python product-recommender/recsys-engine/eda_recommender.py
+```
+<!-- .element: style="font-size: 0.45em;" -->
+
+<div style="text-align: left; font-size: 0.8em;">
+
+- Dependencies resolve themselves: `flink-full` also starts Postgres, S3, catalog.
+- Flink UI on `:8082`, Kafka UI on `:8086`.
+
+</div>
+
+--
+
 ## Live Demo & Walkthrough
 
 Let's dive into the code.
@@ -254,7 +277,7 @@ Bridging the gap between Data Science and Data Engineering.
 ## Decouple to Scale
 
 - A monolithic architecture forces a trade-off between model accuracy and user latency.
-- **Event-Driven Architecture (EDA)** solves this by separating high-speed inference (Redis) from heavy stateful training (Flink).
+- **Event-Driven Architecture (EDA)** solves this by separating high-speed inference (Valkey) from heavy stateful training (Flink).
 
 --
 
