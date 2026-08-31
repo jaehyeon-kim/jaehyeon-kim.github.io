@@ -79,7 +79,7 @@ customJS:
 
 tocWordCount: 1 # TOC is displayed only if the post's word count exceeds this value.
 
-titleCase: true # Capitalized title.
+titleCase: false # Show titles exactly as written in front matter.
 
 viewer: true # Image Viewer
 
