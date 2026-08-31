@@ -67,7 +67,7 @@ outputs:
 
 outputFormats:
   RSS:
-    mediatype: "application/rss+xml"
+    mediaType: "application/rss+xml"
     baseName: "index"
-    isPlainText: true
+    isPlainText: false
     notAlternative: true
