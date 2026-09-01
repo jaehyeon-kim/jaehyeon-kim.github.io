@@ -61,4 +61,4 @@ This provides an end-to-end data engineering toolkit for simulation-based Machin
 The v0.8.1 release and the new storage connectors are available now. You can view the source code and run the historical data generation example below.
 
 * **GitHub Repository:** [jaehyeon-kim/dynamic-des](https://github.com/jaehyeon-kim/dynamic-des)
-* **Documentation & Examples:** [Historical Data Generation Guide](https://jaehyeon.me/dynamic-des/latest/examples/history/)
+* **Documentation & Examples:** [Historical Data Generation Guide](https://jaehyeon.me/dynamic-des/latest/examples/imperative/history/)
