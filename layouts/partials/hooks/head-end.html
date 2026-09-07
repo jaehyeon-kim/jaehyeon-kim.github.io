@@ -1,0 +1,15 @@
+{{- /*
+  Canonical URL. The theme emits none at v1.5.4, checked across a full build, so the 35
+  posts republished on Cevo and any future copy on dev.to or Hashnode have nothing
+  saying which URL is the original. Called from the theme's _default/baseof.html, so it
+  reaches every page that uses it.
+
+  .Permalink rather than a computed value. Alias stubs inherit the target page's
+  context, so an alias correctly points at what it redirects to rather than at itself.
+  Paginated pages inherit the list page's permalink, so /blog/page/5/ points at /blog/;
+  those pages are absent from the sitemap, so they are not competing for a query.
+
+  layouts/slides/single.html has its own <head> and never calls baseof, so it carries
+  its own copy of this line.
+*/ -}}
+<link rel="canonical" href="{{ .Permalink }}">

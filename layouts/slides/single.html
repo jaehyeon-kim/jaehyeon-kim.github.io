@@ -3,6 +3,10 @@
 <head>
     <meta charset="utf-8">
     <title>{{ .Title }} | {{ .Site.Title }}</title>
+    {{/* This template has its own head and never calls baseof, so the canonical
+         from partials/hooks/head-end.html does not reach it. These pages are in
+         the sitemap, so they need one. */}}
+    <link rel="canonical" href="{{ .Permalink }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/{{ .Params.reveal_theme | default "black" }}.css" id="theme">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">
