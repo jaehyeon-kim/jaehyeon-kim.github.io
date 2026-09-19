@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Serverless Data Product
 categories:
@@ -19,11 +15,10 @@ tags:
   - Amazon API Gateway
   - Python
   - R
-authors:
-  - JaehyeonKim
-images: []
 description: In this post, I'll demonstrate how to test and develop a logistic regression model developed in R. Also the model will be packaged for AWS Lambda.
 ---
+
+> **Status, September 2026.** The AWS Lambda Python 2.7 runtime used here is past end of support, and the console blueprint flow the packaging steps follow has been retired. Use a supported Python runtime and a current packaging approach instead.
 
 Let say you've got a prediction model built in R and you'd like to *productionize* it, for example, by serving it in a web application. One way is exposing the model through an API that returns the predicted result as a web service. However there are many issues. Firstly R is not a language for API development although there may be some ways - eg the [plumber](https://github.com/trestletech/plumber) package. More importantly developing an API is not the end of the story as the API can't be served in a production system if it is not *deployed/managed/upgraded/patched/...* appropriately in a server or if it is not *scalable*, *protected via authentication/authorization* and so on. Therefore it requires quite a vast range of skill sets that cover both development and DevOps (engineering). 
 
@@ -336,3 +331,7 @@ OK
 ```
 
 This is all that I've prepared for this post and I hope you don't feel bored. The next posts will be much more interesting as this package will be exposed via an API.
+
+## Related posts
+
+* [Serverless Application Model (SAM) for Data Professionals](/blog/2022-07-18-sam-for-data-professionals) - a current way to package and deploy a Lambda based data application, with third party packages in a layer.

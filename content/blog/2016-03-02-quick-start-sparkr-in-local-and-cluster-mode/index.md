@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -17,13 +13,12 @@ tags:
   - Apache Spark
   - SparkR
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: In this post, we discuss how to execute SparkR in a local and cluster mode.
+description: Run SparkR in local and cluster mode from an R project, setting environment variables and the library path, then reading JSON and CSV files.
 ---
 
-In the [previous post](/blog/2016-02-22-spark-cluster-setup-on-virtualbox), a Spark cluster is set up using 2 VirtualBox Ubuntu guests. While this is a viable option for many, it is not always for others. For those who find setting-up such a cluster is not convenient, there's still another option, which is relying on the local mode of Spark. In this post, a [**BitBucket repository**](https://bitbucket.org/jaehyeon/sparkr-test) is introduced, which is a R project that includes *Spark 1.6.0 Pre-built for Hadoop 2.0 and later* and *hadoop-common 2.2.0* - the latter is necessary if it is tested on Windows. Then several initialization steps are discussed such as setting-up environment variables and library path as well as including the [spark-csv package](https://github.com/databricks/spark-csv) and a JDBC driver. Finally it shows some examples of reading JSON and CSV files in the cluster mode.
+> **Status, September 2026.** This post targets Spark 1.6.0 and the SparkR build shipped with it, and the download and setup steps no longer match a supported Spark release. Install a current Spark release and follow its own SparkR documentation instead.
+
+A [**BitBucket repository**](https://bitbucket.org/jaehyeon/sparkr-test) is introduced, which is a R project that includes *Spark 1.6.0 Pre-built for Hadoop 2.0 and later* and *hadoop-common 2.2.0* - the latter is necessary if it is tested on Windows. In the [previous post](/blog/2016-02-22-spark-cluster-setup-on-virtualbox), a Spark cluster is set up using 2 VirtualBox Ubuntu guests. While this is a viable option for many, it is not always for others. For those who find setting-up such a cluster is not convenient, there's still another option, which is relying on the local mode of Spark. Several initialization steps are then discussed such as setting-up environment variables and library path as well as including the [spark-csv package](https://github.com/databricks/spark-csv) and a JDBC driver. Finally it shows some examples of reading JSON and CSV files in the cluster mode.
 
 ## [sparkr-test](https://bitbucket.org/jaehyeon/sparkr-test) repo
 
@@ -37,7 +32,7 @@ log4j.rootCategory=WARN, console
 
 The spark folder in the repository is shown below.
 
-![](01_spark_foler.png#center)
+![GitHub listing of the spark folder, with R/lib, bin, conf and hadoop/bin underlined among the subfolders](01_spark_foler.png#center "Contents of the spark folder in the repository")
 
 There are 2 data files. *iris.json* is the popular iris data set in JSON format. *iris_up.csv* is the same data set in CSV format with 3 extra columns - 1 integer, 1 date and 1 integer column with NA values - how to read them will be discussed shortly. *postgresql-9.3-1103.jdbc3.jar* is a JDBC driver to connect *PostgreSQL*-like database servers such as PostgreSQL server or Amazon Redshift - you may add another driver for your own DB server.
 

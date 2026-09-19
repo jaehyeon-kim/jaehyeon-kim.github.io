@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -19,17 +15,14 @@ tags:
   - Docker
   - PySpark
   - Python
-authors:
-  - JaehyeonKim
-images: []
 cevo: 4
-description: Recently AWS Glue 3.0 was released but a docker image for this version is not published. In this post, I’ll illustrate how to create a development environment for AWS Glue 3.0 (and later versions) by building a custom docker image.
+description: Create a development environment for AWS Glue 3.0 and later by building a custom Docker image, because AWS publishes no image for those versions.
 ---
 
 In an [earlier post](/blog/2021-08-20-glue-local-development), I demonstrated how to set up a local development environment for AWS Glue 1.0 and 2.0 using a [docker image that is published by the AWS Glue team](https://aws.amazon.com/blogs/big-data/developing-aws-glue-etl-jobs-locally-using-a-container/) and the [Visual Studio Code Remote – Containers](https://code.visualstudio.com/docs/remote/containers) extension. Recently [AWS Glue 3.0 was released](https://aws.amazon.com/about-aws/whats-new/2021/08/spark-3-1-runtime-aws-glue-3-0/), but a docker image for this version is not published. In this post, I'll illustrate how to create a development environment for AWS Glue 3.0 (and later versions) by building a custom docker image.
 
 
-# Glue Base Docker Image
+## Glue Base Docker Image
 
 The Glue base images are built while referring to the [official AWS Glue Python local development documentation](https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-libraries.html#develop-local-python). For example, the latest image that targets Glue 3.0 is built on top of the official Python image on the [latest stable Debian version](https://www.debian.org/releases/bullseye/) (_python:3.7.12-bullseye_). After installing utilities (zip and AWS CLI V2), Open JDK 8 is installed. Then Maven, Spark and Glue Python libraries ([aws-glue-libs](https://github.com/awslabs/aws-glue-libs)) are added to the _/opt_ directory and Glue dependencies are downloaded by sourcing _glue-setup.sh_. It ends up downloading [default Python packages](https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-python-libraries.html) and updating the _GLUE_HOME _and `PYTHONPATH` environment variables. The Dockerfile can be shown below, and it can also be found in the [project **GitHub repository**](https://github.com/jaehyeon-kim/glue-vscode).
 
@@ -107,7 +100,7 @@ docker run --rm -it \
 
 
 
-# Extend Glue Base Image
+## Extend Glue Base Image
 
 We can extend the Glue base image using the [Visual Studio Code Dev Containers extension](https://code.visualstudio.com/docs/devcontainers/containers). The configuration for the extension can be found in the `.devcontainer` folder. The folder includes the Dockerfile for the development docker image and remote container configuration file (`devcontainer.json`). The other contents include the source for the Glue base image and materials for Pyspark, spark-submit and Pytest demonstrations. These will be illustrated below.
 
@@ -224,13 +217,13 @@ The development container can be run by executing the following command in the c
 
 * _Remote-Containers: Open Folder in Container..._
 
-![](glue-open-container-01-3.0.png#center)
+![VS Code command palette with Remote-Containers Open Folder in Container highlighted](glue-open-container-01-3.0.png#center "Opening the folder in a container")
 
 Once the development container is ready, the workspace folder will be open within the container. 
 
-![](glue-open-container-02-3.0.png#center)
+![VS Code running inside the dev container with execute.sh open and a bash terminal](glue-open-container-02-3.0.png#center "Workspace open in the development container")
 
-# Examples
+## Examples
 
 I've created a script (`execute.sh`) to run the executables easily. The main command indicates which executable to run and possible values are `pyspark`, `spark-submit` and `pytest`. Below shows some example commands.
 
@@ -273,7 +266,7 @@ Using the script above, we can launch PySpark. A screenshot of the PySpark shell
 ./execute.sh pyspark
 ```
 
-![](glue-pyspark-3.0.png#center)
+![Terminal showing the Glue PySpark shell starting with Spark version 3.1.1 and Python 3.7.12](glue-pyspark-3.0.png#center "PySpark shell in the container")
 
 ## Spark Submit
 
@@ -337,11 +330,11 @@ glueContext.write_dynamic_frame.from_options(
 
 When the execution completes, we can see the joined data set is stored as a parquet file in the output S3 bucket.
 
-![](glue-spark-submit-3.0.png#center)
+![S3 console listing the legislator_history output folder with a snappy parquet file and _SUCCESS](glue-spark-submit-3.0.png#center "Job output written to S3")
 
 Note that we can monitor and inspect Spark job executions in the Spark UI on port 4040.
 
-![](glue-spark-ui-3.0.png#center)
+![Spark UI jobs page at localhost port 4040 listing four completed jobs with their durations](glue-spark-ui-3.0.png#center "Spark UI on port 4040")
 
 ## Pytest
 
@@ -407,8 +400,8 @@ def test_filter_dynamic_frame_by_value(glueContext):
     )
 ```
 
-![](glue-pytest-3.0.png#center)
+![Terminal output from pytest collecting one test of test_utils.py and reporting PASSED](glue-pytest-3.0.png#center "Unit test run in the container")
 
-# Conclusion
+## Conclusion
 
 In this post, I demonstrated how to build local development environments for AWS Glue 3.0 and later using a custom docker image and the Visual Studio Code Remote - Containers extension. Then examples of launching Pyspark shells, submitting an application and running a test are shown. I hope this post is useful to develop and test Glue ETL scripts locally.

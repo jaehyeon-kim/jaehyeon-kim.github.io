@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -18,11 +14,10 @@ tags:
   - RServe
   - R Shiny
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: In this post, it'll be demonstrated how to implement the async feature of Shiny. Then its limitation will be discussed with an alternative app, which is built by JavaScript for the frontend and RServe for the backend.
+description: Implement the async feature of R Shiny and find its limits, measured against an alternative app with a JavaScript frontend and an RServe backend.
 ---
+
+> **Status, September 2026.** The async setup here works around the single process limit of Shiny Open Source, and it installs packages from 2018 development branches such as `rstudio/DT@async`, so the versions and install steps are historical. [Shiny to Vue.js](/blog/2018-05-26-shiny-to-vue.js) covers the JavaScript frontend alternative this post argues for.
 
 A Shiny app is served by one (*single-threaded blocking*) process by [Open Source Shiny Server](https://docs.posit.co/shiny-server/). This causes a scalability issue because all requests are handled one by one in a queue. Recently the creator of *Shiny* introduced the [promises](https://rstudio.github.io/promises/) package, which brings *asynchronous programming capabilities to R*. This is a remarkable step forward to web development in R.
 
@@ -136,7 +131,7 @@ For deployment, a Docker image is created that includes the *async-compatible* p
 
 A screen shot of the Shiny app is seen below. It is possible to check the async feature by opening the app in 2 different browsers and hit buttons multiple times across.
 
-![](shiny.png#center)
+![Async Shiny demo with update buttons for an iris data table and an Iris Scatter highchart](shiny.png#center "Async Shiny demo with update buttons for an iris data table and an Iris Scatter highchart")
 
 ### Limitation
 You may notice the htmlwidgets are rendered without delay across browsers but it's not the case in the same browser. This is due to the way how [Shiny's flush cycle](https://rstudio.github.io/promises/articles/shiny.html#the-flush-cycle) is implemented. Simply put, a user (or session) is not affected by other users (or sessions) for their async requests. However the async feature of Shiny is of little help for multiple async requests by a single user because all requests are processed one by one as its sync version.

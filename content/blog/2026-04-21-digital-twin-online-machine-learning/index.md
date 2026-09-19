@@ -5,14 +5,10 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Building Real-Time Digital Twins with dynamic-des
 categories:
-  - Stream Processing
+  - Data Streaming
   - Machine Learning
   - Open Source
 tags:
@@ -21,13 +17,9 @@ tags:
   - Kotlin
   - Python
   - Online Machine Learning
-  - Adaptive Model Rules (AMRules)
   - Digital Twin
   - Discrete Event Simulation
   - dynamic-des
-authors:
-  - JaehyeonKim
-images: []
 description: |
   An Apache Flink and Kotlin streaming architecture where online machine learning detects concept drift from machinery wear, controlled by a shadow mode router.
 ---
@@ -37,13 +29,13 @@ Imagine using a rolling pin to flatten out a thick piece of dough. A Hot Strip M
 
 Calculating the exact **Rolling Force** required to crush the steel is critical. If the machine pushes too hard, it can severely damage the rollers; if it doesn't push hard enough, the steel doesn't reach the target thickness. Because the rollers are constantly grinding against raw steel, their physical shape slowly degrades over time. As the machinery wears down, the legacy mathematical formulas used to predict that perfect force slowly become inaccurate. This physical degradation is the root of the **Concept Drift** our real-time ML pipeline is solving.
 
-![Hot Rolling Process](hot-rolling-process.png#center)
+![Hot strip rolling line from slab furnace through descaler, roughing mill, transfer bar, runout table and downcoiler](hot-rolling-process.png#center "Hot Rolling Process")
 
 In heavy industrial manufacturing, such as steel hot strip rolling, deterministic physics formulas are the traditional standard for calculating the exact force required to deform a slab of steel. However, these pure physics models share a fatal flaw: they assume a pristine factory state. As physical rollers grind against red-hot steel over hours of production, they experience mechanical wear. 
 
 As the machinery degrades, the actual physical force required drifts away from the theoretical prediction. In data science, this is a classic manifestation of **Concept Drift**.
 
-![Drift and Convergence Lifecycle](drift-convergence-lifecycle.png#center)
+![Error chart where the physics baseline jumps at a wear shock while the AMRules model recovers](drift-convergence-lifecycle.png#center "Drift and Convergence Lifecycle")
 
 To tackle this, I recently built a real-time, fault-tolerant Online Machine Learning (OML) pipeline and Digital Twin. By combining Apache Kafka, Apache Flink (written in Kotlin), and the Massive Online Analysis (MOA) framework, the system learns the *new* physical reality of the worn machinery on the fly, autonomously correcting the physics baseline safely behind a deterministic Shadow Mode router. 
 
@@ -70,7 +62,7 @@ Industrial data streams are inherently asynchronous. The factory floor requests 
 
 To execute machine learning, these two events must be perfectly joined. However, network latency and partition skew in Kafka mean that these events might arrive out of order. 
 
-![Flink Application DAG](stream-processing-flink.png#center)
+![Kafka topics joined, keyed by steel grade, then a stateful operator trains AMRules and writes to ClickHouse](stream-processing-flink.png#center "Flink Application DAG")
 
 In Flink, this is solved using a `KeyedCoProcessFunction`. By keying the streams on a composite `Slab ID` + `Pass Number`, Flink guarantees both events route to the exact same TaskManager. The `EventMatchProcessFunction` utilizes Flink's `ValueState` to buffer whichever event arrives first. It then registers a processing-time timer (Time-To-Live). If the matching event arrives, they are joined and emitted. If the timer expires (e.g., a physical sensor failure), the orphaned state is safely purged to prevent memory leaks.
 
@@ -88,7 +80,7 @@ Unlike static models, AMRules runs an internal Page-Hinkley test to detect sudde
 
 Industrial Machine Learning cannot operate without strict safety boundaries. A model error that generates excessive rolling force could severely damage a multi-million-dollar rolling stand or create a major production bottleneck in the factory.
 
-![Shadow Mode Router Decision Logic](shadow-mode-router.png#center)
+![Decision flow where two guardrails approve the model prediction or reject it back to the physics baseline](shadow-mode-router.png#center "Shadow Mode Router Decision Logic")
 
 Before any ML-adjusted prediction is allowed to influence the factory floor, it must pass through a deterministic **Shadow Mode Router** consisting of two guardrails:
 
@@ -126,7 +118,7 @@ Simulates a sudden mechanical failure (e.g., a roller bearing breaking), instant
 - **Simulation Settings:** Trigger Abrupt Shock (Wear Level: 60.0).
 - **Observation:** The pure physics baseline error instantly spikes and remains high (often \>10% APE) because the physical reality no longer matches the math. The **AMRules** model initially spikes alongside it, but its Page-Hinkley change detector immediately drops obsolete rules, allowing it to rapidly converge back to lower error as it learns the new broken state.
 
-![Abrupt Drift](abrupt-drift.gif#center)
+![Control plane dashboard on the structural tab at wear 60, baseline error running above both AMRules lines](abrupt-drift.gif#center "Abrupt Drift")
 
 ### Gradual Drift (Standard Wear)
 
@@ -135,7 +127,7 @@ Simulates the continuous, bi-directional cycle of slow roller degradation and su
 - **Simulation Settings:** Gradual Wear (Step Size: 5.0 units, Frequency: 30 seconds).
 - **Observation:** The physics baseline error slowly and persistently creeps upward/download over time (e.g. ranging from 2% to 7% APE) as the wear level drifts gradually. The **AMRules** model gracefully tracks this changing reality, updating its linear weights incrementally to maintain a smooth error rate.
 
-![Gradual Drift](gradual-drift.gif#center)
+![Control plane dashboard on the microalloyed tab under gradual drift, baseline error above the AMRules lines](gradual-drift.gif#center "Gradual Drift")
 
 ### No Drift (Pristine State)
 
@@ -144,7 +136,14 @@ Simulates a pristine factory state, such as immediately after a maintenance shif
 - **Simulation Settings:** Wear Level: 0.0.
 - **Observation:** The physical reality of the factory floor perfectly aligns with the deterministic mathematical formulas. The physics baseline maintains a highly accurate, near-zero error rate (\< 0.3% APE). **AMRules** remains stable under this condition.
 
-![No Drift](no-drift.gif#center)
+![Control plane dashboard on the high alloy tab at zero wear, baseline and AMRules errors overlapping below 0.3 percent](no-drift.gif#center "No Drift")
+
+## Related posts
+
+* [Building an Event-Driven Hybrid Digital Twin with dynamic-des](/blog/2026-04-28-digital-twin-dynamic-des) - the simulation package behind the twin, built on the Switchboard pattern and dynamic topic routing.
+* [Dynamic DES v0.11.1: A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors) - the later release that adds a declarative API and native Postgres and Redis connectors.
+* [Why Digital Twins Are Rewiring Industry 4.0](/blog/2026-04-23-digital-twin-industry-4-0) - the architectural layers that separate a traditional simulation from an event-driven hybrid pipeline.
+* [Stream Processing with Flink in Kotlin](/blog/2025-12-10-streaming-processing-with-flink-in-kotlin) - more Flink examples in Kotlin, the language this pipeline is written in.
 
 ## Conclusion
 

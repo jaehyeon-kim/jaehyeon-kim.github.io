@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Python Examples
 categories:
@@ -18,9 +14,6 @@ tags:
   - Apache Flink
   - Apache Kafka
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Late droppable elements are detected by a timer in a stateful DoFn and sent to a Beam side output instead of being discarded without notice.
 ---
 
@@ -224,7 +217,7 @@ text - Drive., ts - 1729476957, shift - 0 secs - shifted ts 1729476957
 
 We develop an Apache Beam pipeline that separates *droppable *elements from the rest of the data. *Droppable* elements are those that come later when the watermark passes the window max timestamp plus allowed lateness. Using a timer in a *Stateful* DoFn, *droppable* data is separated from normal data and dispatched into a side output rather than being discarded silently, which is the default behaviour. Note that this pipeline works in a situation where *droppable* elements do not appear often, and thus the chance that a *droppable* element is delivered as the first element in a particular window is low.
 
-![](droppable.png#center)
+![A bar of element event time split into on time elements below the watermark, late data within the allowed lateness, and droppable data above the window max timestamp](droppable.png#center "When an element becomes droppable")
 
 ### Shared Source
 
@@ -328,7 +321,7 @@ Once messages are read from Kafka and assigned into a fixed window, the main tra
 
 Below shows the sequence of transforms of the main transform.
 
-![](pipeline.png#center)
+![Transform sequence from Reify.windows through Window.into a global window, a splitting ParDo that forks drop and main outputs, then Window.into to restore the original window](pipeline.png#center "Sequence of transforms in the main transform")
 
 ```python
 # chapter3/droppable_data_filter.py
@@ -732,7 +725,7 @@ cat /etc/hosts | grep host.docker.internal
 
 We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - `python utils/faker_shifted_gen.py`.
 
-![](input-messages.png#center)
+![Kafka UI messages view of input-topic, one record expanded to show the text value Church, with 20 messages consumed](input-messages.png#center "Input messages sent by the text producer")
 
 When executing the pipeline, we specify only a single known argument that enables to use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments (`bootstrap_servers`, `input_topic` ...). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
 
@@ -746,8 +739,8 @@ python chapter3/droppable_data_filter.py --deprecated_read \
 
 On Flink UI, we see the pipeline has two tasks. The first task is until windowing elements in a fixed window while the latter executes the main transform and sends the normal and *droppable* elements into output topics respectively.
 
-![](pipeline-dag.png#center)
+![Flink job droppable-data-filter running for 1 minute 6 seconds, a Kafka read task feeding a split task that writes to the droppable and main topics](pipeline-dag.png#center "The pipeline shown as two Flink tasks")
 
 On Kafka UI, we can check messages are sent to the normal and *droppable* output topics.
 
-![](all-topics.png#center)
+![Kafka UI topics list with input-topic at 85 messages, output-normal-topic at 90 and output-droppable-topic at 10](all-topics.png#center "Messages split between the normal and droppable topics")

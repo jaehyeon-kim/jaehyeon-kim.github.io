@@ -5,23 +5,20 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Tree based methods in R
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: This post is a slight extension of the previous two articles - Download Stock Data - Part I and Download Stock Data - Part II. We discuss how to produce gross returns, standard deviation and correlation of multiple shares.
+description: Produce gross returns, standard deviation and correlation for several shares in R by reading and combining multiple downloaded stock price files.
 ---
 
-This post is a slight extension of the previous two articles ([Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1), [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2)) and we discuss how to produce gross returns, standard deviation and correlation of multiple shares.
+> **Status, September 2026.** Google retired the `finance/historical` CSV endpoint that the download step uses, so the price files this post summarises can no longer be fetched. The return, standard deviation and correlation steps still hold for any price files that carry Date, Close and Code columns.
+
+Gross returns, standard deviation and correlation of multiple shares are produced here. This post is a slight extension of the previous two articles ([Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1), [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2)).
+
+## R Packages Used
 
 The following packages are used.
 
@@ -34,6 +31,8 @@ library(reshape2)
 library(plyr)
 library(dplyr)
 ```
+
+## Download Data Files
 
 The script begins with creating a data folder in the format of *data_YYYY-MM-DD*.
 
@@ -77,6 +76,8 @@ downloadFile <- function(url, path, ...) {
 # wrapper of mapply
 Map(downloadFile, urls, paths)
 ```
+
+## Merge Files into a Single Data Frame
 
 Once the files are downloaded, they are read back to combine using `rbind_all`. Some more details about this step is listed below.
 
@@ -156,6 +157,8 @@ kable(head(data))
 |2013-12-04 | 38.94| 13.71|
 |2013-12-05 | 38.00| 13.55|
 |2013-12-06 | 38.36| 13.95|
+
+## Compute Returns, Standard Deviation and Correlation
 
 The remaining steps are just differencing close price values after taking log and applying `sum`, `sd`, and `cor`.
 

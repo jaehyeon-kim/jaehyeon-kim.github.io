@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 categories: 
   - Development
@@ -16,18 +12,11 @@ tags:
   - FastAPI
   - NiceGUI
   - Python
-  - Full-Stack
-  - Web Development
   - Software Architecture
-  - UI Development
-  - Internal Tools
   - Docker
   - Pydantic
   - PostgreSQL
   - SQLModel
-authors:
-  - JaehyeonKim
-images: []
 description: FastAPI and NiceGUI served from one Python process give a backend API and a web UI in a single codebase, compared here with React and with Streamlit.
 ---
 
@@ -141,7 +130,7 @@ The repository provides a complete user and item management application that sho
 
 *   **Superuser:** A superuser has elevated privileges. In addition to managing their own items, they can also create new user accounts. Crucially, they have a global view of the system and can manage the items belonging to any user, making this role suitable for administrative purposes.
 
-![](demo.webp#center)
+![Login screen, then an item card grid and a Create New Item dialog confirming the item was created](demo.webp#center "Logging in, then creating and managing items")
 
 The demo showcases these distinct workflows, illustrating how the NiceGUI frontend dynamically adapts to the user's permissions, which are enforced by the FastAPI backend.
 
@@ -151,13 +140,19 @@ One of the most powerful features of FastAPI is its ability to automatically gen
 
 *   **Swagger UI (`/docs`)**: A feature-rich, interactive interface that allows developers to not only view the API endpoints but also test them directly from the browser by sending live requests.
 
-![](docs.png#center)
+![Swagger UI listing login, users and items endpoints with GET, POST, PUT and DELETE routes](docs.png#center "Interactive API documentation served at /docs")
 
 *   **ReDoc (`/redoc`)**: A clean, read-only documentation page that presents the API in a more traditional, hierarchical format. It is excellent for quickly referencing endpoints and their schemas.
 
-![](redoc.png#center)
+![ReDoc page for Login Access Token, with its request body fields and a 200 response sample](redoc.png#center "Read-only API reference served at /redoc")
 
 These auto-generated documents are invaluable for development, testing, and collaboration, and they are created without any extra effort, thanks to FastAPI's adherence to the OpenAPI standard.
+
+## Related posts
+
+* [Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1 Data Producer](/blog/2025-02-18-realtime-dashboard-1) - a FastAPI WebSocket server that queries PostgreSQL on a timer to serve live dashboards
+* [Dynamic Routing and Centralized Auth with Traefik](/blog/2019-11-29-traefik-example) - puts Traefik in front of Python and R services for path-based routing and shared authentication
+* [dbt Pizza Shop Demo - Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1) - models data on PostgreSQL with dbt, a source such an application can read from
 
 ## Summary and Use Cases
 

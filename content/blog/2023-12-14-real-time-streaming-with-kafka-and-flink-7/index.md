@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Real Time Streaming with Kafka and Flink
 categories:
@@ -20,9 +16,6 @@ tags:
   - Apache Kafka
   - Python
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 description: Consume Kafka messages with an AWS Lambda function, using Amazon MSK as an event source so that Lambda polls the topic and invokes the function.
 ---
 Amazon MSK can be configured as an [event source](https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html) of a Lambda function. Lambda internally polls for new messages from the event source and then synchronously invokes the target Lambda function. With this feature, we can develop a Kafka consumer application in serverless environment where developers can focus on application logic. In this lab, we will discuss how to create a Kafka consumer using a Lambda function.
@@ -256,7 +249,7 @@ terraform apply -auto-approve=true -var 'producer_to_create=true' -var 'consumer
 
 Once the resources are deployed, we can check the Lambda function on AWS Console. Note that the MSK cluster is configured as the Lambda trigger as expected.
 
-![](lambda-trigger.png#center)
+![Lambda console for kafka_consumer, with the MSK cluster listed as an enabled trigger reading the taxi-rides topic in batches of 100](lambda-trigger.png#center "MSK cluster configured as the Lambda trigger")
 
 
 ## Application Result
@@ -265,13 +258,13 @@ Once the resources are deployed, we can check the Lambda function on AWS Console
 
 We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using [*compose-ui.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-ui.yml) - see [this post](/blog/2023-10-23-kafka-connect-for-aws-part-4) for details about *kpow* configuration.
 
-![](kafka-topic.png#center)
+![Kpow topic details for taxi-rides, 5 partitions holding about 35000 messages each and 177000 in total](kafka-topic.png#center "The taxi-rides topic in Kpow")
 
 ### Consumer Output
 
 We can check the outputs of the Lambda function on CloudWatch Logs. As expected, the message key and value are decoded properly.
 
-![](cloudwatch-log.png#center)
+![CloudWatch log event from the consumer function, holding a decoded taxi ride with topic, partition, offset, key and the ride fields](cloudwatch-log.png#center "Decoded message key and value in the function log")
 
 ## Summary
 

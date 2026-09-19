@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Getting Started with PyFlink on AWS
 categories:
@@ -20,9 +16,6 @@ tags:
   - PyFlink
   - Python
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 description: Develop a PyFlink app against a Kafka cluster on Docker, running it both in a virtual environment and in a local Flink cluster for better monitoring.
 ---
 
@@ -54,7 +47,7 @@ In this series of posts, we will update one of the examples of the guide by chan
 
 The Python source data generator (*producer.py*) sends random stock price records into a Kafka topic. The messages in the source topic are consumed by a Flink application, and it just writes those messages into a different sink topic. This is the simplest application of the AWS guide, and you may try [other examples](https://github.com/aws-samples/pyflink-getting-started/tree/main/pyflink-examples) if interested.
 
-![](featured.png#center)
+![Python generator filling a source topic, a Flink app copying records to a sink topic](featured.png#center "Python generator filling a source topic, a Flink app copying records to a sink topic")
 
 ## Infrastructure
 
@@ -89,7 +82,7 @@ zip -r kda-package.zip processor.py package/lib package/site_packages
 
 Once downloaded, the Kafka SQL artifact and python package can be found in the *lib* and *site_packages* folders respectively as shown below.
 
-![](source-folders.png#center)
+![Package folders with the Kafka SQL jar in lib and Python packages in site_packages](source-folders.png#center "Package folders with the Kafka SQL jar in lib and Python packages in site_packages")
 
 ### Kafka Cluster
 
@@ -383,7 +376,7 @@ if __name__ == "__main__":
 
 Once we start the app, we can check the topic for the source data is created and messages are ingested in *Kpow*.
 
-![](source-topic.png#center)
+![Source topic in Kpow holding the stock price messages sent by the producer](source-topic.png#center "Source topic in Kpow holding the stock price messages sent by the producer")
 
 ### Process Data
 
@@ -592,11 +585,11 @@ if __name__ == "__main__":
 
 We can run the app locally as following - `RUNTIME_ENV=LOCAL python processor.py`. The terminal on the right-hand side shows the output records of the Flink app while the left-hand side records logs of the producer app. We can see that the print output from the Flink app gets updated when new source records are sent into the source topic by the producer app.
 
-![](terminal-result.png#center)
+![Two terminals, producer logs on the left and Flink app output records on the right](terminal-result.png#center "Two terminals, producer logs on the left and Flink app output records on the right")
 
 We can also see details of all the topics in *Kpow* as shown below. The total number of messages matches between the source and output topics but not within partitions.
 
-![](all-topics.png#center)
+![Topic list in Kpow where source and output topics hold the same message count](all-topics.png#center "Topic list in Kpow where source and output topics hold the same message count")
 
 #### Run in Flink Cluster
 
@@ -665,11 +658,11 @@ No scheduled jobs.
 
 The Flink Web UI can be accessed on port 8081. In the Overview section, it shows the available task slots, running jobs and completed jobs.
 
-![](cluster-dashboard-01.png#center)
+![Flink web UI overview with available task slots, running jobs and completed jobs](cluster-dashboard-01.png#center "Flink web UI overview with available task slots, running jobs and completed jobs")
 
 We can inspect an individual job in the Jobs menu. It shows key details about a job execution in *Overview*, *Exceptions*, *TimeLine*, *Checkpoints* and *Configuration* tabs.
 
-![](cluster-dashboard-02.png#center)
+![Flink job page with Overview, Exceptions, TimeLine, Checkpoints and Configuration tabs](cluster-dashboard-02.png#center "Flink job page with Overview, Exceptions, TimeLine, Checkpoints and Configuration tabs")
 
 We can cancel a job on the web UI or using the CLI. Below shows how to cancel the job we submitted earlier using the CLI.
 

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Development with Docker
 categories:
@@ -17,9 +13,6 @@ tags:
   - Apache Kafka
   - Docker
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Kafka producer and consumer applications written in Python with kafka-python, one of several open source alternatives to the Java clients.
 ---
 
@@ -293,7 +286,11 @@ INFO:root:key={"order_id": "fce38c6b-4806-4579-b11e-8eac24b5166b"}, value={"orde
 
 We can also check the consumers with management apps. For example, the 3 running consumers can be seen in the *Consumers* menu of *kafka-ui*. As expected, each consumer subscribes to its own topic partition. We can run the management apps by `docker-compose -f compose-ui.yml up -d`.
 
-![](consumers.png#center)
+![Consumers menu of kafka-ui with three consumers, each on its own topic partition](consumers.png#center "Consumers menu of kafka-ui with three consumers, each on its own topic partition")
+
+## Related posts
+
+* [How to configure Kafka consumers to seek offsets by timestamp](/blog/2023-01-10-kafka-consumer-seek-offsets) - starting a consumer of this kind from a timestamp while partitions are assigned by subscription.
 
 ## Summary
 

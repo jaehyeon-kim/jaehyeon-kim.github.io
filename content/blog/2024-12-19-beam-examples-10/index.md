@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Python Examples
 categories:
@@ -18,13 +14,10 @@ tags:
   - Apache Flink
   - Python
   - Splittable DoFn
-authors:
-  - JaehyeonKim
-images: []
 description: A streaming file reader built with Splittable DoFn scans an input folder for new files repeatedly, a pattern for unbounded sources in the Python SDK.
 ---
 
-In [Part 9](/blog/2024-12-05-beam-examples-9), we developed two Apache Beam pipelines using [*Splittable DoFn (SDF)*](https://beam.apache.org/documentation/programming-guide/#splittable-dofns). One of them is a batch file reader, which reads a list of files in an input folder followed by processing them in parallel. We can extend the I/O connector so that, instead of listing files once at the beginning, it scans an input folder periodically for new files and processes whenever new files are created in the folder. The techniques used in this post can be quite useful as they can be applied to developing I/O connectors that target other unbounded (or streaming) data sources (eg Kafka) using the Python SDK.
+We can extend a batch file reader so that, instead of listing files once at the beginning, it scans an input folder periodically for new files and processes whenever new files are created in the folder. In [Part 9](/blog/2024-12-05-beam-examples-9), we developed two Apache Beam pipelines using [*Splittable DoFn (SDF)*](https://beam.apache.org/documentation/programming-guide/#splittable-dofns), and one of them is that batch file reader, which reads a list of files in an input folder followed by processing them in parallel. The techniques used here can be quite useful as they can be applied to developing I/O connectors that target other unbounded (or streaming) data sources (eg Kafka) using the Python SDK.
 
 <!--more-->
 
@@ -52,7 +45,7 @@ Executing an SDF follows the following steps:
 3. The runner redistributes the element and restriction pairs to several workers.
 4. Element and restriction pairs are processed in parallel (e.g. the file is read). Within this last step, the element and restriction pair can pause its own processing and/or be split into further element and restriction pairs.
 
-![](sdf_high_level_overview.png#center)
+![Diagram of three boxes: pair each element with a restriction, split the restriction, then process each pair](sdf_high_level_overview.png#center "Splittable DoFn processing, from the Apache Beam programming guide")
 
 A basic SDF is composed of three parts: a restriction, a restriction provider, and a restriction tracker.
 
@@ -496,4 +489,4 @@ python chapter7/streaming_file_read.py \
     --parallelism=3 --checkpointing_interval=10000
 ```
 
-![](streaming-reader-demo.webp#center)
+![Two terminals, the upper one creating files every half second, the lower one logging each file name and read position](streaming-reader-demo.webp#center "Reader picking up new files as they are created")

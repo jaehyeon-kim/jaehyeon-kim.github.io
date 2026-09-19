@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt Pizza Shop Demo
 categories:
@@ -20,13 +16,10 @@ tags:
   - Docker
   - Python
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 description: Orchestrate the BigQuery pizza shop dbt project with Apache Airflow, running the SCD type 2 dimension tables and the denormalised fact table.
 ---
 
-In [Part 3](/blog/2024-02-08-dbt-pizza-shop-3), we developed a [dbt](https://docs.getdbt.com/docs/introduction) project that targets Google BigQuery with fictional pizza shop data. Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. The fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested) for improving query performance. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.
+An ETL process is set up with Apache Airflow on a [dbt](https://docs.getdbt.com/docs/introduction) project that targets Google BigQuery with fictional pizza shop data. We developed that project in [Part 3](/blog/2024-02-08-dbt-pizza-shop-3). Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. The fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested) for improving query performance.
 
 * [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1)
 * [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2)
@@ -168,7 +161,7 @@ $ AIRFLOW_UID=$(id -u) GCP_PROJECT=<gcp-project-id> docker-compose up -d
 
 Once started, we can visit the Airflow web server on *http://localhost:8080*.
 
-![](airflow-home.png#center)
+![Airflow DAGs page listing one paused DAG, demo_etl, owned by airflow and tagged pizza](airflow-home.png#center "Airflow web server with the demo_etl DAG")
 
 ## ETL Job
 
@@ -414,7 +407,7 @@ def main():
 
 The details of the ETL job can be found on the Airflow web server as shown below.
 
-![](airflow-dag.png#center)
+![Airflow graph of demo_etl with update_records, dbt_run and dbt_test tasks all succeeded](airflow-dag.png#center "ETL job run seen in the Airflow graph view")
 
 ## Run ETL
 

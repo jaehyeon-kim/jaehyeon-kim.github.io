@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Building Real-Time Digital Twins with dynamic-des
 categories:
@@ -19,20 +15,16 @@ tags:
   - Digital Twin
   - Discrete Event Simulation
   - IoT
-  - Kafka
+  - Apache Kafka
   - dynamic-des
   - SimPy
   - Python
-authors:
-  - JaehyeonKim
-images: []
-description: |
-  In Part 2 of our series, we dive into the code and architecture of dynamic-des. Learn how to use the Switchboard pattern, mutable resources, and dynamic topic routing to transform a static model into a synchronized forecasting engine.
+description: Turn a static model into a synchronized forecasting engine with dynamic-des, using the Switchboard pattern, mutable resources and dynamic topic routing.
 ---
 
 ## Asynchronous Gap
 
-In [Part 1](/blog/2026-04-23-digital-twin-industry-4-0/), we established that a true Hybrid Digital Twin does more than just mirror reality. It actively forecasts the future by running a simulation against live operational states.
+A true Hybrid Digital Twin does more than just mirror reality. It actively forecasts the future by running a simulation against live operational states. We established this in [Part 1](/blog/2026-04-23-digital-twin-industry-4-0/).
 
 If you have ever tried to build one of these systems from scratch, you immediately hit a fundamental architectural clash.
 
@@ -40,7 +32,7 @@ Standard simulation clocks (like those in traditional SimPy implementations) are
 
 To solve this, the compute layer must be explicitly decoupled from the network layer. This is the exact design problem the open-source [**`dynamic-des`**](https://github.com/jaehyeon-kim/dynamic-des) package addresses.
 
-# Core Architecture: Switchboard Pattern
+## Core Architecture: Switchboard Pattern
 
 `dynamic-des` operates as a real-time control plane wrapped around a discrete-event simulation core. It bridges the asynchronous gap using the Switchboard Pattern, which isolates the network from the math:
 

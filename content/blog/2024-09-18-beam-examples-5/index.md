@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Python Examples
 categories:
@@ -19,13 +15,10 @@ tags:
   - Apache Kafka
   - Python
   - gRPC
-authors:
-  - JaehyeonKim
-images: []
 description: Batching gRPC calls in a stateless DoFn so one request covers a whole bundle, cutting the time a Beam Python pipeline spends on enrichment.
 ---
 
-In the [previous post](/blog/2024-08-15-beam-examples-4), we developed an Apache Beam pipeline where the input data is augmented by a **Remote Procedure Call (RPC)** service. Each input element performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element. In this post, we discuss how to enhance the pipeline so that a single RPC call is made for a bundle of elements, which can save a significant amount time compared to making a call for each element.
+We enhance the pipeline so that a single RPC call is made for a bundle of elements, which can save a significant amount time compared to making a call for each element. In the [previous post](/blog/2024-08-15-beam-examples-4), we developed an Apache Beam pipeline where the input data is augmented by a **Remote Procedure Call (RPC)** service. Each input element performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element.
 
 <!--more-->
 
@@ -108,7 +101,7 @@ tree -P "serv*|proto" -I "*pycache*"
 
 We can check the client and server applications as Python scripts. If we select 1, the next prompt requires to enter a word. Upon entering a word, it returns a tuple of the word and its length as an output. We can make an RPC request with a text if we select 2. Similar to the earlier call, it returns enriched outputs as multiple tuples.
 
-![](rpc-demo.png#center)
+![Terminal RPC client returning a word with its length, then several tuples for a text](rpc-demo.png#center "Terminal RPC client returning a word with its length, then several tuples for a text")
 
 ## Beam Pipeline
 
@@ -459,7 +452,7 @@ cat /etc/hosts | grep host.docker.internal
 
 We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - `python utils/faker_gen.py`. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about the Kafka producer.
 
-![](input-messages.png#center)
+![Input text messages of the Kafka topic listed in Kafka UI](input-messages.png#center "Input text messages of the Kafka topic listed in Kafka UI")
 
 When executing the pipeline, we specify only a single known argument that enables to use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments (`bootstrap_servers`, `input_topic` ...). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
 
@@ -473,8 +466,8 @@ python chapter3/rpc_pardo_batch.py --deprecated_read \
 
 On Flink UI, we see the pipeline only has a single task.
 
-![](pipeline-dag.png#center)
+![Flink UI showing the pipeline as a single task](pipeline-dag.png#center "Flink UI showing the pipeline as a single task")
 
 On Kafka UI, we can check the output message is a dictionary of a word and its length.
 
-![](output-messages.png#center)
+![Kafka UI output message holding a dictionary of a word and its length](output-messages.png#center "Kafka UI output message holding a dictionary of a word and its length")

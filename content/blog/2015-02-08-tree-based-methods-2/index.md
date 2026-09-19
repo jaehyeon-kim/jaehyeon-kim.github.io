@@ -5,20 +5,13 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Tree Based Methods in R
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: Part II of tree based methods in R series. Cost-sensitive classification is implemented, assuming that misclassifying the High class is twice as expensive, both by altering the priors and by adjusting the loss matrix.
+description: Cost-sensitive classification with rpart and caret in R, treating a missed High class as twice as expensive by altering the priors and the loss matrix.
 ---
 
 * [Part I](/blog/2015-02-01-tree-based-methods-1)
@@ -36,13 +29,15 @@ A comprehensive summary of this topic, as illustrated in [Berk (2008)](https://w
 
 In this article, cost-sensitive classification is implemented, assuming that misclassifying the *High* class is twice as expensive, both by altering the priors and by adjusting the loss matrix.
 
+## Loss Matrix and Altered Priors
+
 The following loss matrix is implemented.
 
-![](latex-l.png#center)
+![Two by two loss matrix holding zero and two on the first row, one and zero on the second](latex-l.png#center "Loss matrix")
 
 The corresponding altered priors can be obtained by
 
-![](latex-pi.png#center)
+![Equation defining the altered prior as a ratio over the weighted losses of both classes](latex-pi.png#center "Altered priors")
 
 The bold-cased sections of the [tutorial](https://topepo.github.io/caret/index.html) of the caret package are covered in this article.
 
@@ -57,6 +52,8 @@ The bold-cased sections of the [tutorial](https://topepo.github.io/caret/index.h
 - Other Functions
 - Parallel Processing
 - Adaptive Resampling
+
+## Packages and Carseats Data
 
 Let's get started.
 
@@ -128,6 +125,8 @@ testData = subset(Carseats, select=c(-Sales))[-trainIndex,]
 train.res.summary = with(trainData,rbind(table(High),table(High)/length(High)))
 test.res.summary = with(testData,rbind(table(High),table(High)/length(High)))
 ```
+
+## Fit with Equal Costs
 
 5 repeats of 10-fold cross validation is set up.
 
@@ -232,6 +231,8 @@ pred.cm.eq.cost
 ## Actual: No         4.00     43.0        0.09
 ## Use Error          0.16      0.2        0.19
 ```
+
+## Fit with Cost Adjustment
 
 As mentioned earlier, either althered priors or a loss matrix can be entered into `rpart()`. They are created below.
 

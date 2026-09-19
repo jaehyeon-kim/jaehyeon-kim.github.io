@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt Guide for Production
 categories:
@@ -19,13 +15,10 @@ tags:
   - Continuous Integration
   - GitHub Actions
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 description: Deploying a dbt project to dev and prod on BigQuery, covering slim CI, unit tests and a write audit publish step that builds on a cloned dataset.
 ---
 
-In the [previous post](/blog/2024-09-05-dbt-cicd-demo), we started discussing a *continuous integration/continuous delivery (CI/CD)* process of a *dbt* project by introducing two GitHub Actions workflows - `slim-ci` and `deploy`. The former is triggered when a pull request is created to the main branch, and it builds only modified models and its first-order children in a *ci* dataset, followed by performing tests on them. The second workflow gets triggered once a pull request is merged. Beginning with running unit tests, it packages the *dbt* project as a Docker container and publishes to *Artifact Registry*. In this post, we focus on how to deploy a *dbt* project in multiple environments while walking through the entire CI/CD process step-by-step.
+Deploying a *dbt* project in multiple environments is the focus here, and we walk through the entire CI/CD process step-by-step. In the [previous post](/blog/2024-09-05-dbt-cicd-demo), we started discussing a *continuous integration/continuous delivery (CI/CD)* process of a *dbt* project by introducing two GitHub Actions workflows - `slim-ci` and `deploy`. The former is triggered when a pull request is created to the main branch, and it builds only modified models and its first-order children in a *ci* dataset, followed by performing tests on them. The second workflow gets triggered once a pull request is merged. Beginning with running unit tests, it packages the *dbt* project as a Docker container and publishes to *Artifact Registry*.
 
 <!--more-->
 
@@ -311,7 +304,7 @@ dbt build --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET 
 
 We can see a table named *fct_top_customers* is created in the *ci* dataset on BigQuery Console.
 
-![](slim-ci.png#center)
+![BigQuery explorer with the fct_top_customers table under a ci dataset, its schema listing user_id, first_name, last_name, total_quantity and total_price](slim-ci.png#center "Only the modified model is built into the ci dataset")
 
 To complete *dbt slim ci*, the *ci* dataset can be deleted by executing the `bq rm` command.
 
@@ -380,7 +373,7 @@ dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
 
 We can see the tables for the two models are created on BigQuery Console. Note that, as we executed the `dbt run` command with the `--empty` flag, the tables do not have records.
 
-![](unit-test.png#center)
+![BigQuery explorer with dim_users and src_users under a unit test dataset, the preview showing no data to display](unit-test.png#center "Tables built with the empty flag hold no records")
 
 Same to *dbt slim ci*, the *ci* dataset can be deleted as shown below.
 
@@ -582,7 +575,7 @@ dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET \
 
 On BigQuery Console, we see the audit dataset includes the table for the new model while the prod datasets misses it.
 
-![](audit.png#center)
+![BigQuery explorer comparing the clone dataset, which holds fct_top_customers boxed in red, with the prod dataset, which does not](audit.png#center "The new model exists in the audit clone but not in production")
 
 To complete testing, we can delete the audit dataset as shown below.
 
@@ -667,7 +660,7 @@ dbt test --profiles-dir=dbt_profiles --project-dir=pizza_shop --target $TARGET -
 
 Now we can see the table for the new model is created on BigQuery Console.
 
-![](deploy.png#center)
+![BigQuery explorer with fct_top_customers boxed in red under the prod dataset, its schema listing the five columns](deploy.png#center "The new model deployed to production")
 
 Finally, do not forget to upload the latest artifacts to be used for subsequent deployment.
 

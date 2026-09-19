@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Data Lake Demo Using Change Data Capture
 categories:
@@ -20,9 +16,6 @@ tags:
   - EMR on EKS
   - Apache Spark
   - Kubernetes
-authors:
-  - JaehyeonKim
-images: []
 cevo: 8
 description: Run Spark jobs on EMR on EKS, the EMR deployment option that provisions and manages open source big data frameworks, with simple and extended examples.
 ---
@@ -343,7 +336,7 @@ aws emr-containers list-virtual-clusters --query "sort_by(virtualClusters, &crea
 
 We can also check the virtual cluster on the EMR console.
 
-![](virtual-cluster.png#center)
+![EMR console virtual clusters list with one running cluster named emr-eks-example on the spark namespace](virtual-cluster.png#center "Virtual cluster registered on the EMR console")
 
 ## Examples
 
@@ -401,19 +394,19 @@ aws emr-containers start-job-run \
 
 Once a job run is started, it can be checked under the virtual cluster section of the EMR console.
 
-![](history-server-01.png#center)
+![Job runs list for the virtual cluster, showing the health-violations job completed in one minute with a View logs link](history-server-01.png#center "Job run under the virtual cluster")
 
 When we click the _View logs_ link, it launches the Spark History Server on a new tab. 
 
-![](history-server-02.png#center)
+![Spark History Server jobs page for the Calculate Red Health Violations application, listing three completed jobs and 23 seconds of uptime](history-server-02.png#center "Spark History Server opened from the View logs link")
 
 As configured, the container logs of the job can be found in CloudWatch. 
 
-![](log-cloudwatch.png#center)
+![CloudWatch log group emr-eks-example filtered on the job id, listing one control-logs stream and five container streams](log-cloudwatch.png#center "Container logs delivered to CloudWatch")
 
 Also, the logs for the containers (spark driver and executor) and control-logs (job runner) can be found in S3.
 
-![](log-s3.png#center)
+![S3 console at the job id prefix, holding a containers folder and a control-logs folder](log-s3.png#center "Job logs written to S3")
 
 Once the job completes, we can check the output from S3 as shown below.
 
@@ -656,7 +649,7 @@ aws glue get-table --database-name datalake --name cdc_events \
 
 Finally, the details of the table can be queried in Athena.
 
-![](table-info.png#center)
+![Athena result of DESCRIBE datalake.cdc_events, listing the Hudi metadata columns, the order columns and customer_id and order_id as partitions](table-info.png#center "Table details queried in Athena")
 
 ## Clean up
 

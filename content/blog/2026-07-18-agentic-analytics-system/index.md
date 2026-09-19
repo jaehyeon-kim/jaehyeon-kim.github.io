@@ -5,28 +5,19 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 categories:
   - Data Engineering
-  - Artificial Intelligence
+  - Machine Learning
   - Open Source
 tags:
   - Agentic AI
-  - Semantic Layer
   - WrenAI
   - Strands
   - Trino
   - Apache Iceberg
-  - Text-to-SQL
   - Mem0
   - dynamic-des
   - odctl
-authors:
-  - JaehyeonKim
-images: []
 description: |
   A local open source proof of concept that puts a semantic layer between a language model and an Iceberg lakehouse, using Strands, WrenAI and Trino.
 ---
@@ -89,6 +80,12 @@ On top of that, Mem0 gives the agent long-term memory for subjective business lo
 ## Evaluation
 
 Measuring an agent means judging both its decision-making and its safety. The repository includes a golden test suite and an automated harness that spins up an isolated agent per case and grades the output with an LLM-as-a-judge, covering three things: cube discovery (does it route governed questions to governed metrics), raw table navigation (can it handle joins and aggregations when no cube fits), and hallucination prevention (does it refuse gracefully when asked for data that does not exist, such as a missing `return_reason` column, rather than fabricating it).
+
+## Related posts
+
+* [Introducing odctl: One CLI for a Local Open Data Stack](/blog/2026-07-16-odctl-open-data-stack) - the CLI that starts the local open source stack this system runs on
+* [One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES v0.8.1](/blog/2026-05-25-dynamic-des-parquet-support) - generating the batch Parquet and live streaming data such a stack reads
+* [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning) - the real-time side that this batch-only phase leaves for later
 
 ## Where This Is Going
 

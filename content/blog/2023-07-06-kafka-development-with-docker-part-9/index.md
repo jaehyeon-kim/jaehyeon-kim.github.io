@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Development with Docker
 categories:
@@ -18,10 +14,7 @@ tags:
   - Apache Kafka
   - Docker
   - Python
-  - SSL/TLS
-authors:
-  - JaehyeonKim
-images: []
+  - SSL and TLS
 description: Enforce two-way TLS verification so Kafka brokers check the client certificate, with Java and Python client examples of SSL authentication.
 ---
 
@@ -55,7 +48,7 @@ In the previous post, we discussed how to configure TLS (SSL or TLS/SSL) encrypt
 
 Below shows an overview of certificate setup and SSL authentication. Compared to SSL encryption, we need an additional Keystore for the client and the client certificate should be verified by Kafka brokers. It is from *Apache Kafka Series - Kafka Security | SSL SASL Kerberos ACL by Stephane Maarek and Gerd Koenig* ([LINK](https://www.udemy.com/course/apache-kafka-security/)).
 
-![](setup.png#center)
+![Client and server keystores each hold a certificate signed by the same certificate authority, then client and broker check each other in a two-way handshake](setup.png#center "Certificate setup and SSL authentication between client and broker")
 
 SSL authentication is a two-way verification process where both the server and client verify the certificate of their counterpart via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). The following components are required for setting-up certificates.
 
@@ -569,7 +562,7 @@ networks:
     name: kafka-network
 ```
 
-![](messages.png#center)
+![Kafka UI messages view of the orders topic with one record expanded, showing order_id, ordered_at, user_id and order_items](messages.png#center "Order messages browsed in Kafka UI")
 
 ## Summary
 

@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Integrate Schema Registry with MSK Connect
 categories:
@@ -21,9 +17,6 @@ tags:
   - Apache Spark
   - Karpenter
   - Terraform
-authors:
-  - JaehyeonKim
-images: []
 cevo: 16
 description: Provision EMR on EKS with Terraform and EKS Blueprints, then compare two Spark jobs with and without Dynamic Resource Allocation under Karpenter.
 ---
@@ -443,17 +436,17 @@ aws emr-containers start-job-run \
 
 As indicated earlier, Karpenter can provide just-in-time compute resources to meet the Spark job's requirements, and we see that 3 new nodes are added accordingly. Note that, unlike cluster autoscaler, Karpenter provision nodes without creating a node group.
 
-![](karpenter-groupless-02.png#center)
+![EKS console lists four Ready nodes, three of them with no node group](karpenter-groupless-02.png#center "Karpenter adds three nodes outside the managed node group")
 
 
 Once the job completes, the new nodes are terminated as expected.
 
-![](karpenter-groupless-03.png#center)
+![EKS console shows a single m5.xlarge node left in the managed node group](karpenter-groupless-03.png#center "New nodes are terminated once the job completes")
 
 
 Below shows the event timeline of the Spark job. It adds all the 15 executors regardless of whether there are pending tasks or not. The DRA feature of Spark can be beneficial in this situation, and it’ll be discussed in the next section.
 
-![](event-timeline-wo-dra.png#center)
+![Spark event timeline adds all 15 executors at once and keeps them for the whole job](event-timeline-wo-dra.png#center "Event timeline without dynamic resource allocation")
 
 
 ### With Dynamic Resource Allocation (DRA)
@@ -503,8 +496,14 @@ aws emr-containers start-job-run \
 
 As expected, the executors are added dynamically and removed subsequently as they are not needed.
 
-![](event-timeline-w-dra.png#center)
+![Spark event timeline adds four executors one by one, then removes three of them](event-timeline-w-dra.png#center "Event timeline with dynamic resource allocation")
 
+
+## Related posts
+
+* [EMR on EKS by Example](/blog/2022-01-17-emr-on-eks-by-example) - the same platform set up by hand, which shows what the Terraform modules provision
+* [EMR on EKS - Data Build Tool (dbt) for Effective Data Transformation on AWS Part 4](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks) - runs dbt transformation pipelines on an EMR on EKS virtual cluster
+* [Develop and Test Apache Spark Apps for EMR Locally Using Docker](/blog/2022-05-08-emr-local-dev) - develops the Spark jobs on a laptop before they are submitted to a cluster
 
 ## Summary
 

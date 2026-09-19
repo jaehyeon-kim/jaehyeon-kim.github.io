@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Integrate Schema Registry with MSK Connect
 categories:
@@ -18,9 +14,6 @@ tags:
   - Amazon EMR
   - Apache Spark
   - PySpark
-authors:
-  - JaehyeonKim
-images: []
 cevo: 17
 description: Develop Spark apps on an EMR cluster in a private subnet over VPN and the VS Code remote SSH extension, with the cluster shared by several users.
 ---
@@ -207,7 +200,7 @@ module "vpn" {
 
 After deploying all the resources, it is good to go to the next section if we're able to connect to the VPN server as shown below.
 
-![](01-vpn-connection.png#center)
+![VPN client connected to the server, ready to reach the private subnet](01-vpn-connection.png#center "VPN client connected to the server, ready to reach the private subnet")
 
 ## Preparation
 
@@ -353,42 +346,42 @@ Host emr-jaehyeon
 
 Then we can see the connection details in the remote explorer menu of VS Code. Note the [remote SSH extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) should be installed for it. On right-clicking the mouse on the emr-hadoop connection, we can select the option to connect to the host in a new window.
 
-![](02-01-ssh-connect.png#center)
+![VSCode remote explorer with the emr-hadoop target and the connect option](02-01-ssh-connect.png#center "VSCode remote explorer with the emr-hadoop target and the connect option")
 
 
 In a new window, a menu pops up to select the platform of the remote host.
 
-![](02-02-ssh-connect.png#center)
+![VSCode menu to select the platform of the remote host](02-02-ssh-connect.png#center "VSCode menu to select the platform of the remote host")
 
 
 If it's the first time connecting to the server, it requests to confirm whether you trust and want to continue connecting to the host. We can hit Continue.
 
-![](02-03-ssh-connect.png#center)
+![Prompt to confirm the host before connecting for the first time](02-03-ssh-connect.png#center "Prompt to confirm the host before connecting for the first time")
 
 
 Once we are connected, we can open a folder in the server. On selecting _File > Open Folder…_ menu, we can see a list of folders that we can open. Let's open the repository folder we cloned earlier.
 
-![](02-04-ssh-connect.png#center)
+![Open Folder list on the remote host with the cloned repository folder](02-04-ssh-connect.png#center "Open Folder list on the remote host with the cloned repository folder")
 
 
 VS Code asks whether we trust the authors of the files in this folder and we can hit Yes.
 
-![](02-05-ssh-connect.png#center)
+![VSCode prompt asking whether the authors of the folder are trusted](02-05-ssh-connect.png#center "VSCode prompt asking whether the authors of the folder are trusted")
 
 
 Now access to the server with the remote SSH extension is complete and we can check it by opening a terminal where it shows the typical EMR shell.
 
-![](02-06-ssh-connect.png#center)
+![VSCode terminal on the master node showing the EMR shell](02-06-ssh-connect.png#center "VSCode terminal on the master node showing the EMR shell")
 
 ### Python Configuration
 
 We can install the Python extension at minimum and it indicates the extension will be installed in the remote server (_emr-hadoop_).
 
-![](03-01-python-config.png#center)
+![Python extension page with the option to install it on the remote host emr-hadoop](03-01-python-config.png#center "Python extension page with the option to install it on the remote host emr-hadoop")
 
 We'll use the Pyspark and py4j packages that are included in the existing spark distribution. It can be done simply by creating an [.env file](https://code.visualstudio.com/docs/python/environments#_use-of-the-pythonpath-variable) that adds the relevant paths to the *PYTHONPATH* variable. In the following screenshot, you see that there is no warning to import *SparkSession*.
 
-![](03-02-python-config.png#center)
+![Env file in VSCode adding the Spark and py4j paths to PYTHONPATH](03-02-python-config.png#center "Env file in VSCode adding the Spark and py4j paths to PYTHONPATH")
 
 
 ## Remote Development
@@ -478,13 +471,13 @@ The app can be submitted by specifying the HDFS locations of the app and source 
 
 Once the app completes, we can see that a Glue database named _tripdata_ is created, and it includes a table named _ny_taxi_.
 
-![](04-data-write.png#center)
+![Glue database tripdata holding the ny_taxi table written by the Spark app](04-data-write.png#center "Glue database tripdata holding the ny_taxi table written by the Spark app")
 
 ### Read Data
 
 We can connect to the cluster with the other user account as well. Below shows an example of the PySpark shell that reads data from the table created earlier. It just reads the Glue table and adds a column of trip duration followed by showing the summary statistics of key columns.
 
-![](05-data-read.png#center)
+![PySpark shell reading the Glue table and printing summary statistics of key columns](05-data-read.png#center "PySpark shell reading the Glue table and printing summary statistics of key columns")
 
 ### Unit Test
 
@@ -548,7 +541,7 @@ def test_to_timestamp_bad_format(spark):
 
 For unit testing, we need to install the Pytest package and export the *PYTHONPATH* variable that can be found in the .env file. Note, as testing can be run with a local Spark session, the testing package can only be installed in the master node. Below shows an example test run output.
 
-![](06-data-test.png#center)
+![Pytest output for the timestamp conversion function run on the master node](06-data-test.png#center "Pytest output for the timestamp conversion function run on the master node")
 
 ## Summary
 

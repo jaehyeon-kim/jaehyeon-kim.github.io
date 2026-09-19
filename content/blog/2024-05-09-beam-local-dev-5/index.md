@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Local Development with Python
 categories:
@@ -17,9 +13,6 @@ categories:
 tags: 
   - Apache Beam
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Unit test batch and streaming Apache Beam pipelines in Python, using TestStream to advance watermarks and processing time across scenarios.
 ---
 

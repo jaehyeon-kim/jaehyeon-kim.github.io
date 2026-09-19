@@ -5,15 +5,10 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Building Real-Time Digital Twins with dynamic-des
 categories:
   - System Architecture
-  - Industry 4.0
   - Open Source
 tags:
   - Digital Twin
@@ -22,11 +17,7 @@ tags:
   - dynamic-des
   - SimPy
   - Python
-authors:
-  - JaehyeonKim
-images: []
-description: |
-  Many systems marketed as digital twins exist in an ambiguous middle ground. We look at the architectural layers separating traditional simulations, operational twins, and event-driven hybrid pipelines.
+description: Compare the architectural layers that separate a traditional simulation, an operational digital twin and an event-driven hybrid pipeline.
 ---
 
 ## Beyond CAD Models

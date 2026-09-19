@@ -5,35 +5,21 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 categories:
   - Data Architecture
   - Data Engineering
   - Big Data
   - Data Streaming
-  - Data Platform
 tags: 
   - Apache Kyuubi
-  - Self-Service Analytics
   - SQL Gateway
-  - Data Governance
-  - Multi-tenancy
-  - Data Lineage
   - Apache Spark
   - Apache Flink
   - Trino
-  - Data Lakehouse
   - OpenLineage
   - Marquez
-  - Apache Langer
-  - Hive Metastore
-authors:
-  - JaehyeonKim
-images: []
+  - Apache Ranger
 description: Apache Kyuubi as a multi-tenant SQL gateway that provisions on-demand Spark, Flink and Trino engines, giving self-service analytics with central governance.
 ---
 In the modern data stack, providing direct access to powerful engines like Apache Spark and Flink is a double-edged sword. While it empowers users, it often leads to chaos: resource contention from "noisy neighbors," inconsistent security enforcement, and operational fragility. The core problem is the lack of a robust control plane between users and the raw compute power. The solution, therefore, isn't to take power away from users, but to manage it through an intelligent intermediary.
@@ -225,6 +211,13 @@ GROUP BY
 4.  Flink's SQL engine parses the query. It uses its Kafka connector to connect to the `clickstream_events` topic and begins consuming the JSON data stream.
 5.  The `SELECT` query runs continuously. As new data arrives in Kafka, Flink processes it, calculates the tumbling window aggregates, and streams the updated results back *through the Kyuubi gateway to the analyst's SQL client*.
 6.  Simultaneously, the **OpenLineage** agent reports to **Marquez** that a new data flow has been established, drawing a lineage graph from the Kafka topic to this Flink SQL job.
+
+## Related posts
+
+* [Building End-to-End Data Lineage](/blog/2026-05-22-end-to-end-data-lineage) - captures and visualises lineage across a production-style data stack, the governance piece this design depends on
+* [Introducing odctl: One CLI for a Local Open Data Stack](/blog/2026-07-16-odctl-open-data-stack) - a CLI that brings up Kafka, Flink, Spark, Iceberg and Trino locally so you can try an architecture like this
+* [Setup Local Development Environment for Apache Flink and Spark Using EMR Container Images](/blog/2023-12-07-flink-spark-local-dev) - a local Flink and Spark environment where Flink ingests data and Spark queries it through the Glue Data Catalog
+* [Meet the Streamhouse Trio](/blog/2025-05-06-streamhouse-trio) - compares Paimon, Fluss and Iceberg as the table layer that sits under a gateway like this
 
 ## Conclusion: The Power of a Gateway-Centric Design
 

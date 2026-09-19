@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Python Examples
 categories:
@@ -19,13 +15,10 @@ tags:
   - Apache Kafka
   - Python
   - gRPC
-authors:
-  - JaehyeonKim
-images: []
 description: A stateful DoFn with Beam state and timers fixes the gRPC batch size and maximum wait time instead of leaving the bundle size to the runner.
 ---
 
-In the [previous post](/blog/2024-09-18-beam-examples-5), we continued discussing an Apache Beam pipeline that arguments input data by calling a **Remote Procedure Call (RPC)** service. A pipeline was developed that makes a single RPC call for a bundle of elements. The bundle size is determined by the runner, however, we may encounter an issue e.g. if an RPC service becomes quite slower if many elements are included in a single request. We can improve the pipeline using stateful `DoFn` where the number elements to process and maximum wait seconds can be controlled by *state* and *timers*. Note that, although the stateful `DoFn` used in this post solves the data augmentation task well, in practice, we should use the built-in transforms such as [BatchElements](https://beam.apache.org/documentation/transforms/python/aggregation/batchelements/) and [GroupIntoBatches](https://beam.apache.org/documentation/transforms/python/aggregation/groupintobatches/) whenever possible. 
+A stateful `DoFn` improves the pipeline so that the number elements to process and maximum wait seconds can be controlled by *state* and *timers*. In the [previous post](/blog/2024-09-18-beam-examples-5), we continued discussing an Apache Beam pipeline that arguments input data by calling a **Remote Procedure Call (RPC)** service. A pipeline was developed that makes a single RPC call for a bundle of elements. The bundle size is determined by the runner, however, we may encounter an issue e.g. if an RPC service becomes quite slower if many elements are included in a single request. Note that, although the stateful `DoFn` used in this post solves the data augmentation task well, in practice, we should use the built-in transforms such as [BatchElements](https://beam.apache.org/documentation/transforms/python/aggregation/batchelements/) and [GroupIntoBatches](https://beam.apache.org/documentation/transforms/python/aggregation/groupintobatches/) whenever possible. 
 
 <!--more-->
 
@@ -108,7 +101,7 @@ tree -P "serv*|proto" -I "*pycache*"
 
 We can check the client and server applications as Python scripts. If we select 1, the next prompt requires to enter a word. Upon entering a word, it returns a tuple of the word and its length as an output. We can make an RPC request with a text if we select 2. Similar to the earlier call, it returns enriched outputs as multiple tuples.
 
-![](rpc-demo.png#center)
+![Terminal running server_client.py, Resolve returning a word and length, ResolveBatch returning several pairs](rpc-demo.png#center "Unary and batch RPC calls against the local server")
 
 ## Beam Pipeline
 
@@ -591,7 +584,7 @@ cat /etc/hosts | grep host.docker.internal
 
 We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - `python utils/faker_shifted_gen.py`.
 
-![](input-messages.png#center)
+![Kafka UI input-topic with 17 messages, one expanded to show a sentence of random words](input-messages.png#center "Input messages sent by the Kafka text producer")
 
 When executing the pipeline, we specify only a single known argument that enables to use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments (`bootstrap_servers`, `input_topic` ...). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
 
@@ -605,8 +598,8 @@ python chapter3/rpc_pardo_stateful.py --deprecated_read \
 
 On Flink UI, we see the pipeline has two tasks. The first task is until converting words into key-value pairs while the latter executes the main transform and sends output messages to the Kafka topic.
 
-![](pipeline-dag.png#center)
+![Flink job rpc-pardo-stateful with a Kafka source task and an RPC task connected by HASH](pipeline-dag.png#center "Two tasks of the pipeline on the Flink UI")
 
 On Kafka UI, we can check the output message is a dictionary of a word and its length.
 
-![](output-messages.png#center)
+![Kafka UI output topic with records keyed by word and values giving the word and its length](output-messages.png#center "Output messages produced by the pipeline")

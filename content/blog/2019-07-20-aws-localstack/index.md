@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -20,11 +16,10 @@ tags:
   - Flask
   - LocalStack
   - Python
-authors:
-  - JaehyeonKim
-images: []
-description: LocalStack provides an easy-to-use test/mocking framework for developing AWS applications. In this post, I'll demonstrate how to utilize LocalStack for development using a web service.
+description: Develop and test AWS applications against LocalStack, a mocking framework that runs AWS services on a local machine, demonstrated with a web service.
 ---
+
+> **Status, September 2026.** The Lambda function below is created with the `python3.6` runtime, which AWS stopped supporting, so the deployment commands fail as written. Use a currently supported Python runtime and a current LocalStack release, whose service endpoints also differ from the per-service ports used here.
 
 [LocalStack](https://github.com/localstack/localstack) provides an easy-to-use test/mocking framework for developing AWS applications. In this post, I'll demonstrate how to utilize LocalStack for development using a web service.
 
@@ -284,7 +279,7 @@ aws --endpoint-url http://localhost:4576 sqs send-message \
 
 As shown in the image below, LocalStack invokes the Lambda function in a separate Docker container.
 
-![](send-message.png#center)
+![LocalStack container log with the Lambda output boxed in red, showing a database connection, the message body and a 27 ms duration](send-message.png#center "LocalStack log of the Lambda function run in its own container")
 
 The web service can be started as following.
 
@@ -322,3 +317,9 @@ http http://localhost:5000/api/records/4
     "message": "test put"
 }
 ```
+
+## Related posts
+
+* [Thoughts on Apache Airflow AWS Lambda Operator](/blog/2020-04-13-airflow-lambda-operator) - a custom Airflow operator that invokes Lambda, for scheduling the functions you test here
+* [Revisit AWS Lambda Invoke Function Operator of Apache Airflow](/blog/2022-08-06-revisit-lambda-operator) - extends that operator with a correlation ID so it reports the exact error message
+* [Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1) - another Lambda project, packaging a logistic regression model written in R

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt for Effective Data Transformation on AWS
 categories:
@@ -19,9 +15,6 @@ tags:
   - Amazon QuickSight
   - Apache Spark
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 cevo: 20
 description: Amazon EMR on EC2 data transformation pipelines with dbt. Subsets of IMDb data feed models developed in multiple layers following dbt best practices.
 ---
@@ -157,7 +150,7 @@ $ aws secretsmanager get-secret-value --secret-id emr-ec2-all-secrets --query "S
 
 The [previous post](/blog/2022-02-06-dev-infra-terraform) demonstrates how to create a VPN user and to establish connection in detail. An example of a successful connection is shown below.
 
-![](emr-ec2-vpn.png#center)
+![SoftEther VPN Client Manager listing the CEVO connection as Connected to 3.24.195.81 on hub DEFAULT](emr-ec2-vpn.png#center "VPN connection to the development environment")
 
 ### Glue Databases
 
@@ -517,7 +510,7 @@ tblproperties ('skip.header.line.count'='1')
 
 Interestingly the header rows of the source tables are not skipped when they are queried by spark while they are skipped by Athena. They have to be filtered out in the stage models of the dbt project as spark is the query engine.
 
-![](emr-ec2-source-show.png#center)
+![Spark SQL output for imdb.title_basics where the first data row repeats the column names](emr-ec2-source-show.png#center "Spark does not skip the header row of the source table")
 
 #### Staging
 
@@ -603,7 +596,7 @@ $ aws glue get-tables --database imdb \
 
 Instead we can use spark sql to query the tables as shown below.
 
-![](emr-ec2-staging-show.png#center)
+![Spark SQL output of stg_imdb__title_basics with renamed columns, boolean is_adult and null end_year values](emr-ec2-staging-show.png#center "Staging model with the header row filtered out")
 
 #### Intermediate
 
@@ -640,7 +633,7 @@ order by id
 
 The intermediate models are also materialised as views and we can check the array columns are flattened as expected.
 
-![](emr-ec2-intremediate-show.png#center)
+![Query output of int_genres_flattened_from_title_basics with one row per title id and genre](emr-ec2-intremediate-show.png#center "Genre array flattened into separate rows")
 
 Below shows the file tree of the intermediate models. Similar to the staging models, the intermediate models can be executed by `dbt run --select intermediate`.
 
@@ -827,7 +820,7 @@ emr-ec2/emr_ec2/models/marts/
 
 The models of the marts layer can be consumed by external tools such as [Amazon QuickSight](https://aws.amazon.com/quicksight/). Below shows an example dashboard. The pie chart on the left shows the proportion of titles by genre while the box plot on the right shows the dispersion of average rating by title type.
 
-![](emr-ec2-quicksight.png#center)
+![QuickSight dashboard with a pie chart of title share by genre and box plots of average rating by title type](emr-ec2-quicksight.png#center "Marts models consumed in Amazon QuickSight")
 
 ### Generate dbt Documentation
 
@@ -839,11 +832,11 @@ $ dbt docs generate
 $ dbt docs serve
 ```
 
-![](emr-ec2-doc-01.png#center)
+![dbt documentation site with the imdb sources and the emr_ec2 model folders listed beside the welcome page](emr-ec2-doc-01.png#center "Generated dbt project documentation")
 
 A very useful element of dbt documentation is [data lineage](https://docs.getdbt.com/terms/data-lineage), which provides an overall view about how data is transformed and consumed. Below we can see that the final titles model consumes all title-related stating models and an intermediate model from the name basics staging model.
 
-![](emr-ec2-doc-02.png#center)
+![Lineage graph linking seven imdb source tables through staging and intermediate models into titles and names](emr-ec2-doc-02.png#center "Data lineage of the dbt project")
 
 ## Summary
 

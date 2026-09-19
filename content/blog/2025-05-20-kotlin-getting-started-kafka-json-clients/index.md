@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Getting Started with Real-Time Streaming in Kotlin
 categories:
@@ -19,13 +15,10 @@ tags:
   - Docker
   - Kpow
   - Factor House Local
-authors:
-  - JaehyeonKim
-images: []
 description: A Kotlin Kafka producer and consumer for order events, with custom JSON serialisers, admin helpers and a Gradle build, run on Factor House Local.
 ---
 
-This post explores a Kotlin-based Kafka project, meticulously detailing the construction and operation of both a Kafka producer application, responsible for generating and sending order data, and a Kafka consumer application, designed to receive and process these orders. We'll delve into each component, from build configuration to message handling, to understand how they work together in an event-driven system.
+A Kafka producer application generates and sends order data, and a Kafka consumer application receives and processes those orders. This post explores that Kotlin-based Kafka project, detailing the construction and operation of both applications. We'll go through each component, from build configuration to message handling, to understand how they work together in an event-driven system.
 
 <!--more-->
 
@@ -533,7 +526,7 @@ docker compose -f compose-kpow-community.yml up -d
 
 Once the services are initialized, we can access the Kpow user interface by navigating to `http://localhost:3000` in the web browser, where we observe the provisioned environment, including three Kafka brokers, one schema registry, and one Kafka Connect instance.
 
-![](kpow-overview.png#center)
+![Kpow overview shows three brokers, five topics, 82 partitions and one schema registry](kpow-overview.png#center "Kpow overview of the local Kafka cluster")
 
 ### Launch Applications
 
@@ -562,12 +555,12 @@ java -jar build/libs/orders-json-clients-1.0.jar consumer
 
 For this post, we demonstrate starting the applications in development mode using Gradle. Once started, we see logs from both the producer sending messages and the consumer receiving them.
 
-![](kafka-json-apps.webp#center)
+![Two terminal panes run the Gradle producer and consumer tasks of the project](kafka-json-apps.webp#center "Producer and consumer applications started in development mode")
 
 With the applications running and producing/consuming data, we can inspect the messages flowing through our `orders-json` topic using Kpow. In the Kpow UI, navigate to your topic. To correctly view the messages, we should configure the deserializers: set the **Key Deserializer** to *String* and the **Value Deserializer** to *JSON*. After applying these settings, click the *Search* button to view the messages.
 
-![](message-view-01.png#center)
-![](message-view-02.png#center)
+![Kpow data inspect form set to the orders-json topic with String key and JSON value](message-view-01.png#center "Inspecting the orders-json topic in Kpow")
+![Kpow lists orders-json records showing order_id, bid_time, price, item and supplier](message-view-02.png#center "Order messages returned from the orders-json topic")
 
 ## Conclusion
 

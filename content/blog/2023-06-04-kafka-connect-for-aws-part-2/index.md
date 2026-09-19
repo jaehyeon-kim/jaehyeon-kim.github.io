@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Connect for AWS Services Integration
 categories:
@@ -20,9 +16,6 @@ tags:
   - Apache Kafka
   - Docker
   - Kafka Connect
-authors:
-  - JaehyeonKim
-images: []
 cevo: 29
 description: Develop the Camel DynamoDB sink connector on Docker, consuming fake order records from a Kafka topic and writing them into a DynamoDB table.
 ---
@@ -433,17 +426,17 @@ $ curl http://localhost:8083/connectors/order-source/status
 
 As we've added the connector URL, the *Kafka Connect* menu appears on *kafka-ui*. We can check the details of the connector on the app as well. 
 
-![](source-connector.png#center)
+![kafka-ui shows the order-source connector running the MSK data generator class, one task](source-connector.png#center "Source connector details on kafka-ui")
 
 ### Kafka Topics
 
 As configured, the source connector ingests messages to the *order* topic.
 
-![](topic-01.png#center)
+![kafka-ui topic list shows the order topic with 3 partitions and 559 messages](topic-01.png#center "Kafka topics after the source connector starts")
 
 We can browse individual messages in the *Messages* tab of the topic.
 
-![](topic-02.png#center)
+![Messages tab of the order topic with one record expanded into its JSON order fields](topic-02.png#center "Browsing individual messages of the order topic")
 
 ## Data Ingestion to DynamoDB
 ### Table Creation
@@ -535,17 +528,17 @@ Although the destination table has *ordered_at* as the range key, it is not crea
 
 Below shows the sink connector details on *kafka-ui*.
 
-![](sink-connector.png#center)
+![kafka-ui shows the order-sink connector running the Camel DynamoDB sink class, one task](sink-connector.png#center "Sink connector details on kafka-ui")
 
 ### DynamoDB Destination
 
 We can check the ingested records on the DynamoDB table items view. Below shows a list of scanned records. As expected, it has the *order_id*, *ordered_at* and other attributes.
 
-![](ddb-01.png#center)
+![DynamoDB console scan of the orders table returns 50 items with order and customer columns](ddb-01.png#center "Scanned records on the DynamoDB orders table")
 
 We can also obtain an individual Json record by clicking an *order_id* value as shown below.
 
-![](ddb-02.png#center)
+![DynamoDB item view shows one order as JSON with six attributes](ddb-02.png#center "An individual order record in JSON view")
 
 ## Summary
 

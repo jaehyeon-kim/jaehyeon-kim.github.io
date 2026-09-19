@@ -5,20 +5,13 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Tree based methods in R
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: We discuss how to loop without for in R.
+description: Replace for-loops in R with the apply family of functions and the plyr package, using two worked examples that make the code shorter and easier to debug.
 ---
 
 Purely programming point of view, I consider **for-loops** would be better to be avoided in R as 
@@ -172,3 +165,9 @@ kable(subset(exDf, subset = Date %in% dateFilter & BPM %in% numFilter, select = 
 |3  |2014-12-03 |   1|
 |4  |2014-12-03 |   1|
 |5  |2014-12-03 |   1|
+
+## Related posts
+
+* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1) - downloads price files with `Map` and merges them with `llply`, the looping functions described here
+* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2) - the same job done in memory, reading and combining files from URLs with `llply`
+* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files) - uses `llply` and `apply` to turn several price files into returns and correlation

@@ -5,20 +5,13 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Parallel processing on single machine
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: Part I that demonstrates how to implement parallem processing on single machine in R
+description: Run parallel tasks on one machine in R with the snow and parallel packages, comparing clusterApply, clusterApplyLB, parLapply and parLapplyLB.
 ---
 
 Lack of multi-threading and memory limitation are two outstanding weaknesses of base R. In fact, however, if the size of data is not so large that it can be read in RAM, the former would be relatively easily handled by parallel processing, provided that multiple processors are equipped. This article introduces to a way of implementing parallel processing on a single machine using the **snow** and **parallel** packages - the examples are largely based on [McCallum and Weston (2012)](https://shop.oreilly.com/product/0636920021421.do).
@@ -101,7 +94,7 @@ plot(stLB, title="clusterApplyLB")
 plot(stPL, title="parLapply")
 ```
 
-![](case_I_snow-1.png#center) 
+![Three worker timelines, clusterApply finishing at 26 seconds while clusterApplyLB and parLapply finish near 16](case_I_snow-1.png#center "Worker activity for clusterApply, clusterApplyLB and parLapply") 
 
 Both `clusterApplyLB()` and `parLapply()` takes shorter than `clusterApply()`. The efficiency of the former is due to *load balancing (pulling a task when necessary)* while that of the latter is because of a *lower number of I/O operations* thanks to task scheduling, which allows a single I/O operation in a chunk (or split) - its benefit is more outstanding when one or more arguments are sent to workers as shown in the next example. The scheduling can be checked by `clusterSplit()`.
 
@@ -166,7 +159,7 @@ ggplot(data=sysTime, aes(x=fun,y=elapsed,fill=fun)) +
   geom_bar(stat="identity") + ggtitle("Elapsed time of each function")
 ```
 
-![](case_I_par-1.png#center) 
+![Bar chart of elapsed time, clusterApply about 26 seconds and the other three functions about 16](case_I_par-1.png#center "Elapsed time of each function") 
 
 ```r
 # clear env
@@ -196,7 +189,7 @@ plot(stLB, title="clusterApplyLB")
 plot(stPL, title="parLapply")
 ```
 
-![](case_II_snow-1.png#center) 
+![Worker timelines when an argument is sent, clusterApply and clusterApplyLB show repeated idle gaps while parLapply runs continuously](case_II_snow-1.png#center "Worker activity when an argument is sent to the workers") 
 
 ```r
 # clear env
@@ -226,7 +219,7 @@ ggplot(data=sysTime, aes(x=fun,y=elapsed,fill=fun)) +
   geom_bar(stat="identity") + ggtitle("Elapsed time of each function")
 ```
 
-![](case_II_par-1.png#center) 
+![Bar chart of elapsed time, clusterApply 19.5 seconds, clusterApplyLB 15, parLapply and parLapplyLB 13.5](case_II_par-1.png#center "Elapsed time of each function") 
 
 
 ```r
@@ -322,3 +315,9 @@ reset("parallel")
 ```
 
 A quick introduction to the **snow** and **parallel** packages is made in this article. Sometimes it may not be easy to create a function that can be sent into clusters or looping may be more natural for computation. In this case, the **foreach** package would be used and an introduction to this package will be made in the next article.
+
+## Related posts
+
+* [Parallel Processing on Single Machine - Part 2](/blog/2015-03-17-parallel-processing-on-single-machine-2) - the foreach and doParallel packages, the next step promised at the end of this article
+* [Parallel Processing on Single Machine - Part 3](/blog/2015-03-19-parallel-processing-on-single-machine-3) - compares the snow and foreach approaches on three practical examples
+* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1) - downloads and merges stock price files, the kind of repeated task worth running in parallel

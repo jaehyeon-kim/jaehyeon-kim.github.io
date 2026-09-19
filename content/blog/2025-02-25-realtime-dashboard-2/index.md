@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Realtime Dashboard with FastAPI, Streamlit and Next.js
 categories:
@@ -18,13 +14,10 @@ tags:
   - Python
   - Streamlit
   - WebSocket
-authors:
-  - JaehyeonKim
-images: []
 description: Streamlit and Apache ECharts draw a live sales dashboard that reads order counts and revenue by country from a FastAPI WebSocket server.
 ---
 
-In this post, we develop a real-time monitoring dashboard using [Streamlit](https://streamlit.io/), an open-source Python framework that allows data scientists and AI/ML engineers to create interactive data apps. The app connects to the WebSocket server we developed in [Part 1](/blog/2025-02-18-realtime-dashboard-1) and continuously fetches data to visualize key metrics such as **order counts**, **sales data**, and **revenue by traffic source and country**. With interactive bar charts and dynamic metrics, users can monitor sales trends and other important business KPIs in real-time.
+A real-time monitoring dashboard is developed using [Streamlit](https://streamlit.io/), an open-source Python framework that allows data scientists and AI/ML engineers to create interactive data apps. The app connects to the WebSocket server we developed in [Part 1](/blog/2025-02-18-realtime-dashboard-1) and continuously fetches data to visualize key metrics such as **order counts**, **sales data**, and **revenue by traffic source and country**. With interactive bar charts and dynamic metrics, users can monitor sales trends and other important business KPIs in real-time.
 
 <!--more-->
 
@@ -282,7 +275,7 @@ else:
 
 As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1), the data generator and WebSocket server can be deployed using Docker Compose with the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) by executing `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`.
 
-![](backend.gif#center)
+![WebSocket client listening while the producer logs stream order events](backend.gif#center "WebSocket client listening while the producer logs stream order events")
 
 ### Frontend Dashboard
 
@@ -299,4 +292,4 @@ $ pip install -r requirements.txt
 $ streamlit run streamlit/app.py
 ```
 
-![](featured.gif#center)
+![Streamlit dashboard updating order counts, sales and revenue charts in real time](featured.gif#center "Streamlit dashboard updating order counts, sales and revenue charts in real time")

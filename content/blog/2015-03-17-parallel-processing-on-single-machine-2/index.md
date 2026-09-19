@@ -5,20 +5,13 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Parallel processing on single machine
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: Part III that demonstrates how to implement parallem processing on single machine in R
+description: Loop in parallel on one machine in R with the foreach and doParallel packages, with the iterators package covered for writing the loop itself.
 ---
 
 In the [previous article](/blog/2015-03-14-parallel-processing-on-single-machine-1), parallel processing on a single machine using the **snow** and **parallel** packages are introduced. The four functions are an extension of `lapply()` with an additional argument that specifies a cluster object. In spite of their effectiveness and ease of use, there may be cases where creating a function that can be sent into clusters is not easy or looping may be more natural. In this article, another way of implementing parallel processing on a single machine is introduced using the **foreach** and **doParallel** packages where clusters are created by the **parallel** package. Finally the **iterators** package is briefly covered as it can facilitate writing a loop. The examples here are largely based on the individual packages' vignettes and further details can be found there.
@@ -34,6 +27,8 @@ library(iterators)
 library(foreach)
 library(doParallel)
 ```
+
+## How foreach Differs from for
 
 A key difference between the *for* construct in base R and the *foreach* construct in the **foreach** package is as following.
 
@@ -83,6 +78,8 @@ x
 ## [[3]]
 ## [1] 20.08554
 ```
+
+## Running Loops in Parallel with %dopar%
 
 The *foreach* construct has two binary operators for executing a loop: `%do%` and `%dopar%`. The first executes a loop sequentially while the latter does it in parallel. By default, the **doParallel** package uses functionality of the **multicore** package on Unix-like systems and that of the **snow** package on Windows. However the default type value (*PSOCK*) of `makeCluster()` in the **parallel** package is brought from the **snow** package and thus the socket transport by the package will be used in this example regardless of operation systems. The number of cores (or workers in the socket transport) is identified by `detectCores()` and this function is provided by the **parallel** package. Note that, if a cluster object is not setup, the loop will be executed sequentially.
 
@@ -226,6 +223,8 @@ x
 ## [1] 506 506 506 506
 ```
 
+## Nested Loops and List Comprehension with %:%
+
 The binary operator of `%:%` can be used for list comprehension (filtering which to loop with `when`) and nested looping.
 
 An example of list comprehension is shown below. It returns a vector of even numbers.
@@ -302,6 +301,8 @@ x
 ## [1,]       11       12       13       14
 ## [2,]       21       22       23       24
 ```
+
+## Iterator Objects with the iterators Package
 
 As a loop is constructed by *foreach*, the **iterators** package can be useful as the package allows to create an iterator object from a conventional R objects: vectors, data frames, matrices, lists and even functions. Some examples are shown below.
 

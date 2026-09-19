@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Data Lake Demo Using Change Data Capture
 categories:
@@ -19,11 +15,8 @@ tags:
   - PostgreSQL
   - SoftEther VPN
   - Terraform
-authors:
-  - JaehyeonKim
-images: []
 cevo: 9
-description: We'll discuss how to set up a development infrastructure on AWS with Terraform. Terraform is used as an effective way of managing resources on AWS. An Aurora PostgreSQL cluster is created in a private subnet and SoftEther VPN is configured to access the database from the developer machine.
+description: Manage AWS development infrastructure with Terraform, creating an Aurora PostgreSQL cluster in a private subnet reached over SoftEther VPN.
 ---
 When I wrote my data lake demo series ([part 1](/blog/2021-12-05-datalake-demo-part1), [part 2](/blog/2021-12-12-datalake-demo-part2) and [part 3](/blog/2021-12-19-datalake-demo-part3)) recently, I used an Aurora PostgreSQL, MSK and EMR cluster. All of them were deployed to private subnets and dedicated infrastructure was created using CloudFormation. Using the infrastructure as code (IaC) tool helped a lot, but it resulted in creating 7 CloudFormation stacks, which was a bit harder to manage in the end. Then I looked into how to simplify building infrastructure and managing resources on AWS and decided to use Terraform instead. I find it has useful constructs (e.g. [meta-arguments](https://developer.hashicorp.com/terraform/language/meta-arguments)) to make it simpler to create and manage resources. It also has a wide range of useful [modules](https://registry.terraform.io/namespaces/terraform-aws-modules) that facilitate development significantly. In this post, we’ll build an infrastructure for development on AWS with Terraform. A VPN server will also be included in order to improve developer experience by accessing resources in private subnets from developer machines.
 
@@ -467,39 +460,39 @@ Both the VPN Server Manager and Client can be obtained from the [download centre
 
 We can begin with adding a new setting.
 
-![](vpn-server-01.png#center)
+![SoftEther VPN Server Manager with an empty connection list and the New Setting button marked](vpn-server-01.png#center "Start a new connection setting")
 
 We need to fill in the input fields in the red boxes below. It’s possible to use the elastic IP address as the host name and the administrator password should match to what is used for Terraform.
 
-![](vpn-server-02.png#center)
+![New Connection Setting dialog with setting name CEVO, host name 13.237.94.201, port 443 and the admin password entered](vpn-server-02.png#center "Connection details for the VPN server")
 
 Then we can make a connection to the server by clicking the connect button.
 
-![](vpn-server-03.png#center)
+![Connection list now holds the CEVO setting for host 13.237.94.201, with the Connect button marked](vpn-server-03.png#center "Connect to the VPN server")
 
 If it’s the first attempt, we’ll see the following pop-up message and we can click yes to set up the IPsec.
 
-![](vpn-server-04.png#center)
+![Pop-up asking whether to set up IPsec so L2TP and EtherIP clients are accepted, with Yes marked](vpn-server-04.png#center "IPsec prompt on the first connection")
 
 In the dialog, we just need to enter the IPsec Pre-Shared key and click ok.
 
-![](vpn-server-05.png#center)
+![IPsec, L2TP and EtherIP server settings dialog with the IPsec Pre-Shared Key field marked](vpn-server-05.png#center "Enter the IPsec pre-shared key")
 
 Once a connection is made successfully, we can manage the [Virtual Hub](https://www.softether.org/4-docs/1-manual/3._SoftEther_VPN_Server_Manual/3.4_Virtual_Hub_Functions) by clicking the manage virtual hub button. Note that we created a Virtual Hub named _DEFAULT_ and the session will be established on that Virtual Hub.
 
-![](vpn-server-06.png#center)
+![Manage VPN Server window with the DEFAULT hub online and listeners on TCP 443, 992, 1194 and 5555](vpn-server-06.png#center "Manage Virtual Hub button marked")
 
 We can create a new user by clicking the manage users button.
 
-![](vpn-server-07.png#center)
+![Virtual Hub DEFAULT window with the Manage Users button marked and the hub status listed on the right](vpn-server-07.png#center "Open the user list of the hub")
 
 And clicking the new button.
 
-![](vpn-server-08.png#center)
+![Manage Users list holding a single user named user3716, with the New button marked](vpn-server-08.png#center "Add a user to the hub")
 
 For simplicity, we can use Password Authentication as the auth type and enter the username and password.
 
-![](vpn-server-09.png#center)
+![Create New User dialog with user name jaehyeon, a password and Password Authentication chosen as the auth type](vpn-server-09.png#center "Details of the new VPN user")
 
 A new user is created, and we can use the credentials on the client program to make a connection to the server.
 
@@ -508,31 +501,31 @@ A new user is created, and we can use the credentials on the client program to m
 
 We can add a VPN connection by clicking the menu shown below.
 
-![](vpn-client-01.png#center)
+![SoftEther VPN Client Manager with an empty connection list and the Add VPN Connection item marked](vpn-client-01.png#center "Add a connection in the VPN client")
 
 We’ll need to create a Virtual Network Adapter and should click the yes button.
 
-![](vpn-client-02.png#center)
+![Dialog saying a Virtual Network Adapter must be created first, with the Yes button marked](vpn-client-02.png#center "A virtual network adapter is needed")
 
 In the new dialog, we can add the adapter name and hit ok. Note we should have the administrator privilege to create a new adapter.
 
-![](vpn-client-03.png#center)
+![Create New Virtual Network Adapter dialog with the adapter name set to VPN](vpn-client-03.png#center "Name the new virtual network adapter")
 
 Then a new dialog box will be shown. We can add a connection by entering the input fields in the red boxes below. The VPN server details should match to what are created by Terraform and the user credentials that are created in the previous section can be used.
 
-![](vpn-client-04.png#center)
+![Client connection dialog with setting name CEVO, host 13.237.94.201, port 443, hub DEFAULT and user jaehyeon](vpn-client-04.png#center "Client settings that match the VPN server")
 
 Once a connection is added, we can make a connection to the VPN server by right-clicking the item and clicking the connect menu.
 
-![](vpn-client-05.png#center)
+![Right-click menu on the CEVO connection, listed as Offline, with the Connect item marked](vpn-client-05.png#center "Connect the client to the VPN server")
 
 We can see that the status is changed into connected.
 
-![](vpn-client-06.png#center)
+![Client list showing CEVO as Connected to 13.237.94.201 on hub DEFAULT, with the adapter enabled](vpn-client-06.png#center "One VPN session is now established")
 
 Once the VPN server is connected, we can access the database that is deployed in the private subnet. A connection is tested by a database client, and it is shown that the connection is successful.
 
-![](vpn-connection.png#center)
+![PostgreSQL client settings for the analytics-db-cluster endpoint, with a test result of Connected in 2062 ms](vpn-connection.png#center "Database in the private subnet reached over the VPN")
 
 ## Summary
 

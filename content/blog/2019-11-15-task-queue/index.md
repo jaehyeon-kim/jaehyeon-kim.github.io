@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -18,9 +14,6 @@ tags:
   - Python
   - R
   - RServe
-authors:
-  - JaehyeonKim
-images: []
 description: A FastAPI web service dispatches tasks to Celery and RServe workers, with Redis as broker and store, running on Docker Compose and Kubernetes.
 ---
 
@@ -31,7 +24,7 @@ In this post, it'll be illustrated how a web service is created using FastAPI fr
 The following diagram shows how the apps work together and the source can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/k8s-job-queue).
 
 
-![](arch.png#center)
+![FastAPI sending tasks to a Celery worker and an Rserve HTTP server, both backed by Redis](arch.png#center "FastAPI sending tasks to a Celery worker and an Rserve HTTP server, both backed by Redis")
 
 
 ## Celery Worker
@@ -225,19 +218,19 @@ docker-compose up -d
 The swagger document of the main web service can be visited via `http://localhost:9000/docs` or `http://<vm-ip-address>:9000` if it's started in a VM.
 
 
-![](swagger-01.png#center)
+![Swagger document of the main web service listing the task endpoints](swagger-01.png#center "Swagger document of the main web service listing the task endpoints")
 
 
 A task can be started by clicking the *Try it out* button, followed by clicking the *Execute* button. Any value between 1 and 50 can be set as the value *total*.
 
 
-![](swagger-02.png#center)
+![Swagger Try it out form starting a task with a total value between 1 and 50](swagger-02.png#center "Swagger Try it out form starting a task with a total value between 1 and 50")
 
 
 The status of a task can be checked by adding its ID to query string.
 
 
-![](swagger-03.png#center)
+![Task status response returned after adding the task ID to the query string](swagger-03.png#center "Task status response returned after adding the task ID to the query string")
 
 
 ## Kubernetes
@@ -344,3 +337,9 @@ http http://172.28.175.23:30000/rserve/collect?task_id=$TASK_ID
     "total": 30
 }
 ```
+
+## Related posts
+
+* [Dynamic Routing and Centralized Auth with Traefik, Python and R Example](/blog/2019-11-29-traefik-example) - putting Traefik in front of the same kind of Python and R services, with centralized authentication
+* [Some Thoughts on Python](/blog/2015-08-08-some-thoughts-on-python) - writing Python in an object-oriented style, shown with API client classes
+* [Some Thoughts on Python for R Users](/blog/2015-08-09-some-thoughts-on-python-for-r-users) - what Python offers an R user, demonstrated on a web service client

@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Deploy Python Stream Processing App on Kubernetes
 categories:
@@ -20,9 +16,6 @@ tags:
   - Docker
   - Kubernetes
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Deploy a PyFlink application to minikube with the Flink Kubernetes Operator, alongside a Kafka cluster that provides its source and sink topics.
 ---
 
@@ -249,7 +242,7 @@ We can use `kubectl port-forward` to connect to the *kafka-ui* server running in
 kubectl port-forward svc/kafka-ui 8080
 ```
 
-![](kafka-ui.png#center)
+![kafka-ui in the minikube cluster reached by port forwarding on port 8080](kafka-ui.png#center "kafka-ui in the minikube cluster reached by port forwarding on port 8080")
 
 ## Develop Stream Processing App
 
@@ -503,7 +496,7 @@ spec:
 
 Before we deploy the PyFlink app, make sure the input topic is created. We can create it using *kafka-ui* easily.
 
-![](topic-create.png#center)
+![Creating the input topic in kafka-ui before the PyFlink app is deployed](topic-create.png#center "Creating the input topic in kafka-ui before the PyFlink app is deployed")
 
 The app can be deployed using `kubectl create`, and it creates the *FlinkDeployment* custom resource, which manages the job manager deployment, task manager pod and associated services.
 
@@ -537,7 +530,7 @@ The Flink web UI can be accessed using `kubectl port-forward` on port 8081. In t
 kubectl port-forward svc/flink-word-len-rest 8081
 ```
 
-![](flink-ui.png#center)
+![Flink job graph with two tasks, tokenizing input then writing average word length](flink-ui.png#center "Flink job graph with two tasks, tokenizing input then writing average word length")
 
 ### Kafka Producer
 
@@ -608,11 +601,11 @@ python kafka/client/producer.py
 
 We can see the output topic (*output-topic-flink*) is created on *kafka-ui*.
 
-![](kafka-topics.png#center)
+![Topic list in kafka-ui with the output topic output-topic-flink created](kafka-topics.png#center "Topic list in kafka-ui with the output topic output-topic-flink created")
 
 Also, we can check the output messages are created as expected in the *Topics* tab. 
 
-![](output-topic-messages.png#center)
+![Average word length messages in the Topics tab of kafka-ui](output-topic-messages.png#center "Average word length messages in the Topics tab of kafka-ui")
 
 ## Delete Resources
 

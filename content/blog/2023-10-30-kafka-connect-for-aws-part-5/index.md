@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Connect for AWS Services Integration
 categories:
@@ -20,12 +16,9 @@ tags:
   - Apache Kafka
   - Kafka Connect
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 description: Deploy a Kafka to OpenSearch pipeline on AWS with Terraform, covering a VPC, VPN server, MSK cluster, OpenSearch domain and the MSK Connect connectors.
 ---
-In the previous post, we discussed how to develop a data pipeline from Apache Kafka into OpenSearch locally using Docker. The pipeline will be deployed on AWS using [Amazon MSK](https://aws.amazon.com/msk/), [Amazon MSK Connect](https://aws.amazon.com/msk/features/msk-connect/) and [Amazon OpenSearch Service](https://aws.amazon.com/opensearch-service/) using [Terraform](https://developer.hashicorp.com/terraform) in this post. First the infrastructure will be deployed that covers a Virtual Private Cloud (VPC), Virtual Private Network (VPN) server, MSK Cluster and OpenSearch domain. Then Kafka source and sink connectors will be deployed on MSK Connect, followed by performing quick data analysis.
+A data pipeline from Apache Kafka into OpenSearch is deployed on AWS using [Amazon MSK](https://aws.amazon.com/msk/), [Amazon MSK Connect](https://aws.amazon.com/msk/features/msk-connect/) and [Amazon OpenSearch Service](https://aws.amazon.com/opensearch-service/) with [Terraform](https://developer.hashicorp.com/terraform) in this post. First the infrastructure will be deployed that covers a Virtual Private Cloud (VPC), Virtual Private Network (VPN) server, MSK Cluster and OpenSearch domain. Then Kafka source and sink connectors will be deployed on MSK Connect, followed by performing quick data analysis. In the previous post, we discussed how to develop that pipeline locally using Docker.
 
 * [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1)
 * [Part 2 Develop Camel DynamoDB Sink Connector](/blog/2023-06-04-kafka-connect-for-aws-part-2)
@@ -316,9 +309,9 @@ $ terraform apply --auto-approve=true -var to_create_connector=false
 
 Once completed, we can check the two key resources on AWS Console - OpenSearch domain and MSK cluster.
 
-![](aws-console-opensearch.png#center)
+![AWS console showing the OpenSearch domain created by Terraform](aws-console-opensearch.png#center "AWS console showing the OpenSearch domain created by Terraform")
 
-![](aws-console-msk-cluster.png#center)
+![AWS console showing the MSK cluster created by Terraform](aws-console-msk-cluster.png#center "AWS console showing the MSK cluster created by Terraform")
 
 #### Kafka Management App
 
@@ -486,7 +479,7 @@ Once created, we can check them in the OpenSearch Dashboards where its endpoint 
 $ terraform output -json | jq -r '.opensearch_domain_dashboard_endpoint.value'
 ```
 
-![](index-creation.png#center)
+![OpenSearch Dashboards with the impressions and clicks indexes just created](index-creation.png#center "OpenSearch Dashboards with the impressions and clicks indexes just created")
 
 #### Connector IAM Role
 
@@ -837,29 +830,29 @@ $ terraform apply --auto-approve=true -var to_create_connector=true
 
 Once completed, we can check the source and sink connectors on AWS Console as following.
 
-![](source-connector.png#center)
+![MSK Connect console with the running source connector](source-connector.png#center "MSK Connect console with the running source connector")
 
-![](sink-connector.png#center)
+![MSK Connect console with the running sink connector](sink-connector.png#center "MSK Connect console with the running sink connector")
 
 #### Source Data
 
 We can use Kpow to see the details of the impressions and clicks topics on *localhost:3000*. Make sure to connect to the VPN server, or it fails to access the MSK cluster.
 
-![](kafka-topics.png#center)
+![Impressions and clicks topics in Kpow with their message counts](kafka-topics.png#center "Impressions and clicks topics in Kpow with their message counts")
 
 As mentioned earlier, only a fraction of correlation IDs of the click messages has actual values, and we can see that by inspecting the messages of the clicks topic.
 
-![](click-messages.png#center)
+![Click messages in Kpow where only some records carry a correlation ID](click-messages.png#center "Click messages in Kpow where only some records carry a correlation ID")
 
 #### OpenSearch Dashboard
 
 In OpenSearch Dashboards, we can search clicks that are associated with impressions. As expected, only a small portion of clicks are searched. 
 
-![](result-query.png#center)
+![OpenSearch Dashboards search returning the small share of clicks linked to impressions](result-query.png#center "OpenSearch Dashboards search returning the small share of clicks linked to impressions")
 
 Moreover, we can join correlated impressions and clicks quickly using the [Query Workbench](https://opensearch.org/docs/latest/search-plugins/sql/sql/index/). Below shows a simple SQL query that joins impressions and associating clicks that are created after a certain time point.
 
-![](result-join.png#center)
+![Query Workbench joining impressions and clicks with a SQL statement](result-join.png#center "Query Workbench joining impressions and clicks with a SQL statement")
 
 ## Destroy Resources
 

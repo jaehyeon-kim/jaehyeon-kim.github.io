@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 categories:
   - Web Development
 tags:
@@ -17,9 +13,6 @@ tags:
   - JavaScript
   - Markdown
   - Marp
-authors:
-  - JaehyeonKim
-images: []
 description: Reveal.js slides written in Markdown and built by Hugo alongside blog posts, with code walkthroughs, fragments, MathJax and Mermaid diagrams.
 ---
 
@@ -106,6 +99,12 @@ Currently, I am evaluating two brief paths:
 *   **The Draw.io JS Viewer:** Utilizing the official Diagrams.net JavaScript library to render `.drawio` XML files dynamically. This would enable interactive features like zooming and layer toggling directly during a presentation.
 
 Moving forward, the goal is to ensure that even the most complex architectural designs remain as easy to maintain as a line of Markdown.
+
+## Related posts
+
+* [Self-managed Blog with Hugo and GitHub Pages](/blog/2023-04-24-self-hosted-blog) - sets up the Hugo site that this Reveal.js layout plugs into
+* [Async Shiny and Its Limitation](/blog/2018-05-19-asyn-shiny-and-its-limitation) - an earlier comparison of a JavaScript frontend against a framework that renders the page for you
+* [Shiny to Vue.js](/blog/2018-05-26-shiny-to-vue.js) - replaces R widgets with native JavaScript libraries, the same shift from generated output to hand-written frontend
 
 ## Why this works for me
 

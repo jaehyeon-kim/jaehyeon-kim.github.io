@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Simplify Streaming Ingestion on AWS
 categories:
@@ -20,9 +16,6 @@ tags:
   - Amazon Redshift
   - Apache Kafka
   - Python
-authors:
-  - JaehyeonKim
-images: []
 cevo: 24
 description: Stream Kafka records from Amazon MSK into Redshift through its direct integration, with a producer Lambda built locally using AWS SAM and Terraform.
 ---
@@ -700,11 +693,11 @@ networks:
 
 A topic named orders is created that has 3 partitions and replication factors. Also, it is set to retain data for 4 weeks.
 
-![](topic-creation-01.png#center)
+![Kafka UI create topic form for orders, with 3 partitions, replication factor 3 and retention set to 4 weeks](topic-creation-01.png#center "Creating the orders topic in Kafka UI")
 
 Once created, it redirects to the overview section of the topic.
 
-![](topic-creation-02.png#center)
+![Kafka UI overview of the orders topic, 3 partitions, 9 of 9 in sync replicas and a message count of 0](topic-creation-02.png#center "Topic overview just after creation")
 
 
 ### Local Testing with SAM
@@ -783,7 +776,7 @@ $ sam local invoke --hook-name terraform module.kafka_producer_lambda.aws_lambda
 
 We can also check the messages using kafka-ui. 
 
-![](message-creation-01.png#center)
+![Redshift query on the orders materialized view, listing kafka_partition, kafka_offset, kafka_timestamp and a JSON data column holding order_id](message-creation-01.png#center "Kafka messages ingested into the materialized view")
 
 ### External Schema and Materialized View Creation
 
@@ -812,7 +805,7 @@ FROM msk_orders.orders;
 
 We can see the ingested Kafka messages as shown below.
 
-![](orders_view.png#center)
+![Redshift query returning 100 rows from the orders view, each with partition, offset, timestamp, key and JSON payload](orders_view.png#center "Ingested Kafka messages in Redshift")
 
 ### Order Items View Creation
 
@@ -859,23 +852,23 @@ CREATE OR REPLACE VIEW order_items AS
 
 We can see the exploded order items as shown below.
 
-![](order_items_view.png#center)
+![Redshift query on order_items, with one row per item holding order_id, ordered_at, user_id, index, product_id and quantity](order_items_view.png#center "Order items exploded out of the message payload")
 
 ### Kafka Producer Deployment
 
 Now we can deploy the Kafka producer Lambda function and EventBridge scheduler using Terraform as usual after resetting the configuration variables. Once deployed, we can see that the scheduler rule has 5 targets of the same Lambda function. 
 
-![](eventbridge-rule.png#center)
+![EventBridge rule crons-rule, enabled, with five targets all pointing at the same kafka_producer Lambda function](eventbridge-rule.png#center "Scheduler rule with five producer targets")
 
 We can check if the Kafka producer sends messages correctly using kafka-ui. After about 30 minutes, we see about 840,000 messages are created in the orders topic.
 
-![](message-generated.png#center)
+![Kafka UI overview of the orders topic after 30 minutes, message count 840700 spread evenly across the three partitions](message-generated.png#center "Messages produced into the orders topic")
 
 ### Query Order Items
 
 As the materialized view is set to refresh automatically, we don’t have to refresh it manually. Using the order items view, we can query the top 10 popular products as shown below.
 
-![](top_products_query.png#center)
+![Redshift query summing quantity by product_id, returning the ten busiest products from 1435 down to 1375](top_products_query.png#center "Top ten products by total quantity")
 
 ## Summary
 

@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Kafka Development with Docker
 categories:
@@ -19,9 +15,6 @@ tags:
   - Docker
   - PyFlink
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Three Flink DataStream applications from a Confluent Java course converted to PyFlink, from ingesting source data to calculating usage statistics.
 ---
 [Building Apache Flink Applications in Java](https://developer.confluent.io/courses/flink-java/overview/) is a course to introduce [Apache Flink](https://flink.apache.org/) through a series of hands-on exercises, and it is provided by [Confluent](https://www.confluent.io/). Utilising the [Flink DataStream API](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/dev/datastream/overview/), the course develops three Flink applications that populate multiple source data sets, collect them into a standardised data set, and aggregate it to produce usage statistics. As part of learning the Flink DataStream API in Pyflink, I converted the Java apps into Python equivalent while performing the course exercises in Pyflink. This post summarises the progress of the conversion and shows the final output.
@@ -149,14 +142,20 @@ docker exec jobmanager /opt/flink/bin/flink run \
 
 We can check the Pyflink jobs are running on the Flink Dashboard via *localhost:8081*.
 
-![](flink-jobs.png#center)
+![Flink Dashboard running jobs flight_importer and user_statistics, both in RUNNING state](flink-jobs.png#center "Two PyFlink jobs running on the Flink Dashboard")
 
 Also, we can check the Kafka topics on *kafka-ui* via *localhost:8080*.
 
-![](kafka-topics.png#center)
+![kafka-ui topic list with flightdata, skyone, sunset and userstatistics, five partitions each](kafka-topics.png#center "Kafka topics used by the lessons")
 
 ## Unit Testing
 
 Four lessons have unit testing cases, and they are expected to run separately by specifying a testing script. For example, below shows running unit testing cases of the final usage statistics calculator job.
 
-![](unit-testing.png#center)
+![Terminal pytest run of test_s20_manage_state.py with three tests passed in 13.92 seconds](unit-testing.png#center "Unit tests of the usage statistics job passing")
+
+## Related posts
+
+* [Getting Started with PyFlink on AWS - Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1) - the PyFlink and Kafka on Docker setup that these applications build on
+* [Local Development - Kafka, Flink and DynamoDB for Real Time Fraud Detection Part 1](/blog/2023-08-10-fraud-detection-part-1) - another local Flink project, this one writing detection results to DynamoDB
+* [Getting Started with PyFlink on AWS - Part 2 Local Flink and MSK](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2) - connects a PyFlink app to an IAM authenticated MSK cluster with a custom uber jar

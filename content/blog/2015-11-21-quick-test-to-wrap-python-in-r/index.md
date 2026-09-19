@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -16,17 +12,16 @@ categories:
 tags: 
   - Python
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: We discuss how to make use of Python outcomes in R using a package.
+description: Wrap Python boto calls for Amazon S3 in an R package, rs3helper, where the Python scripts return JSON so R parses it as vectors and data frames.
 ---
 
-As mentioned in an [earlier post](/blog/2015-08-09-some-thoughts-on-python-for-r-users), things that are not easy in R can be relatively simple in other languages. Another example would be connecting to Amazon Web Services. In relation to s3, although there are a number of existing packages, many of them seem to be deprecated, premature or platform-dependent. (I consider the [cloudyr](https://cloudyr.github.io/) project looks promising though.)
+In relation to s3, although there are a number of existing packages, many of them seem to be deprecated, premature or platform-dependent. As mentioned in an [earlier post](/blog/2015-08-09-some-thoughts-on-python-for-r-users), things that are not easy in R can be relatively simple in other languages, and connecting to Amazon Web Services is another example. (I consider the [cloudyr](https://cloudyr.github.io/) project looks promising though.)
 
 If there isn't a comprehensive *R-way* of doing something yet, it may be necessary to create it from scratch. Actually there are some options to do so by using [AWS Command Line Interface](https://aws.amazon.com/cli/), [AWS REST API](https://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html) or wrapping functionality of another language.
 
 In this post, a quick summary of the last way using Python is illustrated by introducing the [rs3helper](https://github.com/jaehyeon-kim/rs3helper) package.
+
+## Why Wrap Python in a Package
 
 The reasons why I've come up with a package are as following.
 
@@ -36,9 +31,13 @@ The reasons why I've come up with a package are as following.
 
 I use Python 2.7 and the boto library can be installed easily using [pip](https://pip.readthedocs.org/en/stable/quickstart/) by executing `pip install boto`.
 
+## Package Layout for R and Python Files
+
 Using RStudio, it is not that complicated to develop a package. (see [R packages](https://r-pkgs.org/) by Hadley Wickham) Even the folder structure and necessary files are generated if the project type is selected as *R Package*. R script files should locate in the **R** folder while Python scripts should be in **inst/python**. 
 
 In the package, the s3-related R functions exists in **R/s3utils.R** while the corresponding python scripts are in **inst/python** - all Python functions are in **inst/python/s3helper.py**. As the Python function outputs should be passed to R, a *response* variable is returned for each function and it is converted into JSON string. The response variable is a Python list, dictionary or list of dictionaries and thus it is parsed as R vector, list or data frame.
+
+## Wrapper Functions for Looking Up a Bucket
 
 An example of the wrapper functions, which looks up a bucket, is shown below.
 

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Local Development with Python
 categories:
@@ -17,13 +13,10 @@ tags:
   - Apache Beam
   - Beam SQL
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Batch Apache Beam pipelines in Python that aggregate website visit logs by user and time, written with and without Beam SQL and run in notebooks.
 ---
 
-In this series, we discuss local development of [Apache Beam](https://beam.apache.org/) pipelines using Python. A basic Beam pipeline was introduced in [Part 1](/blog/2024-03-28-beam-local-dev-1), followed by demonstrating how to utilise Jupyter notebooks, [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) and [Beam DataFrames](https://beam.apache.org/documentation/dsls/dataframes/overview/). In this post, we discuss Batch pipelines that aggregate website visit log by user and time. The pipelines are developed with and without *Beam SQL*. Additionally, each pipeline is implemented on a Jupyter notebook for demonstration.
+We discuss Batch pipelines that aggregate website visit log by user and time in this post. The pipelines are developed with and without *Beam SQL*. Additionally, each pipeline is implemented on a Jupyter notebook for demonstration. In this series, we discuss local development of [Apache Beam](https://beam.apache.org/) pipelines using Python. A basic Beam pipeline was introduced in [Part 1](/blog/2024-03-28-beam-local-dev-1), followed by demonstrating how to utilise Jupyter notebooks, [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) and [Beam DataFrames](https://beam.apache.org/documentation/dsls/dataframes/overview/).
 
 * [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1)
 * [Part 2 Batch Pipelines](#) (this post)
@@ -350,7 +343,7 @@ When we develop a pipeline, [Interactive Beam](https://github.com/apache/beam/tr
 $ JUPYTER_ENABLE_LAB=yes jupyter lab --ServerApp.token='' --ServerApp.password=''
 ```
 
-![](user_traffic.png#center)
+![Jupyter notebook running the user traffic pipeline with Interactive Beam](user_traffic.png#center "Jupyter notebook running the user traffic pipeline with Interactive Beam")
 
 ## Minute Traffic
 
@@ -662,7 +655,7 @@ $ cat outputs/1712033101760-zeta-00000-of-00001.out
 
 Jupyter notebooks are created for the minute traffic pipelines, and they can be found in [section2/minute_traffic.ipynb](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section2/minute_traffic.ipynb) and [section2/minute_traffic_sql.ipynb](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section2/minute_traffic_sql.ipynb) respectively.
 
-![](minute_traffic.png#center)
+![Jupyter notebook running the minute traffic pipeline with Interactive Beam](minute_traffic.png#center "Jupyter notebook running the minute traffic pipeline with Interactive Beam")
 
 ## Summary
 

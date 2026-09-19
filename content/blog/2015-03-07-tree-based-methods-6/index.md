@@ -5,20 +5,13 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Tree Based Methods in R
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: Part VI of tree based methods in R series. Performance of classification analysis is discussed.
+description: Compare a single classification tree in R with 500 bagged trees on out-of-bag and test errors, cumulative errors and variable importance measures.
 ---
 
 * [Part I](/blog/2015-02-01-tree-based-methods-1)
@@ -146,7 +139,7 @@ ggplot(ind.err, aes(x=error,fill=type)) +
   ggtitle("Error distribution") + theme(plot.title=element_text(face="bold"))
 ```
 
-![](ind_plot-1.png#center) 
+![Histogram of individual tree errors for oob and test samples with the single tree error marked](ind_plot-1.png#center "Histogram of individual tree errors for oob and test samples with the single tree error marked") 
 
 ## Cumulative Error
 
@@ -174,7 +167,7 @@ ggplot(data=bgg.err,aes(x=ntree,y=error,colour=type)) +
   ggtitle("Bagging error") + theme(plot.title=element_text(face="bold"))
 ```
 
-![](cum_plot-1.png#center) 
+![Cumulative oob and test error by number of trees, against the single tree error line](cum_plot-1.png#center "Cumulative oob and test error by number of trees, against the single tree error line") 
 
 ## Variable Importance
 
@@ -201,6 +194,6 @@ ggplot(data=cl.varImp,aes(x=variable,y=value,fill=method)) + geom_bar(stat="iden
   ggtitle("Variable importance") + theme(plot.title=element_text(face="bold"))
 ```
 
-![](varImp_plot-1.png#center) 
+![Bar chart of variable importance for the single tree and bagging, led by Price and ShelveLoc](varImp_plot-1.png#center "Bar chart of variable importance for the single tree and bagging, led by Price and ShelveLoc") 
 
 In this article, a classification tree is evaluated comparing to bagged trees. In comparison to individual oob/test errors, the single tree's test error seems to be quite optimistic. Also oob samples doesn't improve prediction performance as the tree generating process might be dominated by a few predictors. Comparing to the cumulative test error, it seems that the single tree overfits the train data so that its prediction power is not competitive. Although the CART model as a classifier doesn't seem to be attractive for this data set, it may be a bit early to discard it. What seems to be necessary is to check the cases where the dominant predictors' impacts are reduced and subsequent articles would head toward that direction.

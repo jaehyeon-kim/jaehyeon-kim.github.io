@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt Pizza Shop Demo
 categories:
@@ -19,13 +15,10 @@ tags:
   - Docker
   - Python
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 description: Orchestrate the PostgreSQL pizza shop dbt project with Apache Airflow, scheduling the SCD type 2 dimension and fact table builds as an ETL process.
 ---
 
-In this series of posts, we discuss data warehouse/lakehouse examples using [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) including ETL orchestration with Apache Airflow. In Part 1, we developed a *dbt* project on PostgreSQL with fictional pizza shop data. Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.
+We set up an ETL process on a *dbt* project using Apache Airflow in this post. In this series of posts, we discuss data warehouse/lakehouse examples using [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) including ETL orchestration with Apache Airflow. In Part 1, we developed a *dbt* project on PostgreSQL with fictional pizza shop data. Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders.
 
 * [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1)
 * [Part 2 ETL on PostgreSQL via Airflow](#) (this post)
@@ -199,7 +192,7 @@ $ AIRFLOW_UID=$(id -u) docker-compose -f compose-orchestration.yml up -d
 
 Once started, we can visit the Airflow web server on *http://localhost:8080*.
 
-![](airflow-home.png#center)
+![Airflow web server home page listing the demo_etl DAG](airflow-home.png#center "Airflow web server home page listing the demo_etl DAG")
 
 ## ETL Job
 
@@ -421,7 +414,7 @@ def main():
 
 The details of the ETL job can be found on the Airflow web server as shown below.
 
-![](airflow-dag.png#center)
+![Graph of the demo_etl job, update_records followed by the dbt run and test tasks](airflow-dag.png#center "Graph of the demo_etl job, update_records followed by the dbt run and test tasks")
 
 ## Run ETL
 

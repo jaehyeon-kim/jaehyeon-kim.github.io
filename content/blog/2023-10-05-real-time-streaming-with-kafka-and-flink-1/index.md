@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Real Time Streaming with Kafka and Flink
 categories:
@@ -19,9 +15,6 @@ tags:
   - Apache Flink
   - Apache Kafka
   - PyFlink
-authors:
-  - JaehyeonKim
-images: []
 cevo: 33
 docs: https://docs.google.com/document/d/1mX0VLCoGUEdGTSr3EKYkIgPl0KYtgRj1dY5pQ7svUuA
 description: Kafka and PyFlink replace Amazon Kinesis in a real time analytics app from an AWS workshop. The original and the new architecture are compared.
@@ -46,7 +39,7 @@ description: Kafka and PyFlink replace Amazon Kinesis in a real time analytics a
 
 ## Workshop Architecture
 
-![](original.png#center)
+![Original workshop, six labs around Kinesis Data Streams into Firehose, OpenSearch and DynamoDB](original.png#center "Original workshop, six labs around Kinesis Data Streams into Firehose, OpenSearch and DynamoDB")
 
 * Lab 1 - Produce data to Kinesis Data Streams
   * We will go through a couple of ways to write data to a Kinesis Data Stream using [Amazon SDK](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/kinesis.html) and [Amazon Kinesis Producer Library](https://github.com/awslabs/amazon-kinesis-producer).
@@ -63,7 +56,7 @@ description: Kafka and PyFlink replace Amazon Kinesis in a real time analytics a
 
 ## Architecture Based-on Kafka and Flink
 
-![](featured.png#center)
+![Six labs around Amazon MSK with Lambda producers, Flink apps, OpenSearch, DynamoDB and Athena](featured.png#center "Six labs around Amazon MSK with Lambda producers, Flink apps, OpenSearch, DynamoDB and Athena")
 
 * Lab 1 - Produce data to Kafka using Lambda
   * We will create Kafka producers using an EventBridge schedule rule and Lambda producer function. The schedule rule is set to run *every minute* and has a *configurable* number of targets where each of them invokes the producer function. The producer function sends messages to a Kafka cluster on [Amazon MSK](https://aws.amazon.com/msk/). In this way we are able to generate events using multiple Lambda functions according to the desired volume of events.

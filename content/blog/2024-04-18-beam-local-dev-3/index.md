@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Local Development with Python
 categories:
@@ -18,9 +14,6 @@ tags:
   - Apache Flink
   - Apache Kafka
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: The Apache Beam portability layer explained, with bash scripts that manage local Flink and Kafka clusters and a streaming pipeline on the Flink Runner.
 ---
 
@@ -50,7 +43,7 @@ Apache Beam Pipelines are portable on several layers between (1) Beam Runners, (
 
 The portability between programming languages are achieved by the portability layer, and it has two components - Apache Beam components and Runner components. Essentially the Beam Runners (Apache Flink, Apache Spark, Google Cloud Datafolow ...) don't have to understand a Beam SDK but are able to execute pipelines built by it regardless.
 
-![](beam-portability-layer.png#center)
+![SDK driver code submits to the runner job service, which drives a runner coordinator and runner workers, each worker paired with an SDK harness](beam-portability-layer.png#center "Beam portability layer between the SDK and the runner")
 
 Each Runner typically has a coordinator that needs to receive a job submission and creates tasks for worker nodes according to the submission. For example, the coordinator of the Flink Runner is the Flink JobManager, and it receives a Java JAR file for job execution along with the Directed Acyclic Graph (DAG) of transforms, serialized user code and so on.
 
@@ -84,7 +77,7 @@ The portability layer can be extended to cross-language pipelines where transfor
 
 Here the challenge is how to make a non-Java SDK to be able to serialize data for a Java SDK so that its portable pipeline representation can be created! This challenge is handled by the expansion service. Simply put, when a source SDK wants to submit a pipeline to a Runner, it creates its portable pipeline representation. During this process, if it sees an external (cross-language) transform, it sends a request to the expansion service, asking it to expand the transform into a portable representation. Then, the expansion service creates/returns the portable representation, and it is inserted into the complete pipeline representation. For the Python SDK, the expansion service gets started automatically, or we can customize it, for example, to change the SDK harness from DOCKER to PROCESS.
 
-![](expansion-service.png#center)
+![A Python pipeline becomes a portable pipeline, while the expansion service turns a Java PTransform into its portable form, and both are submitted to a portable runner](expansion-service.png#center "How the expansion service handles a cross-language transform")
 
 Note this section is based on [Building Big Data Pipelines with Apache Beam by Jan Lukavský](https://www.packtpub.com/product/building-big-data-pipelines-with-apache-beam/9781800564930) and you can check more details in the book!
 
@@ -421,11 +414,11 @@ $ ./setup/start-flink-env.sh -a
 
 Once the clusters are launched, we can check the Kafka resources on *localhost:8080*.
 
-![](kafka-ui.png#center)
+![Kafka UI dashboard with one online cluster named local, version 2.8-IV1, one broker and no topics yet](kafka-ui.png#center "Kafka cluster on kafka-ui")
 
 And the Flink web UI is accessible on *localhost:8081*.
 
-![](flink-ui.png#center)
+![Flink dashboard overview with 10 available task slots, one task manager and no running jobs](flink-ui.png#center "Flink Web UI before the pipeline is submitted")
 
 ### Generate Data
 
@@ -450,11 +443,11 @@ $ python section3/kafka_io.py --use_own
 
 After a while, we can check both the input and output topics in the *Topics* section of *kafka-ui*.
 
-![](kafka-topics.png#center)
+![Kafka UI topics list with website-visit holding 219 messages and website-out holding 215, both on 3 partitions](kafka-topics.png#center "Input and output topics after the pipeline runs")
 
 We can use the Flink web UI to monitor the pipeline as a Flink job. When we click the *kafka-io* job in the *Running Jobs* section, we see 3 operations are linked in the *Overview* tab. The first two operations are polling and reading Kafka source description while the actual pipeline runs in the last operation.
 
-![](flink-job.png#center)
+![Flink job kafka-io running for 2 minutes 32 seconds, with an impulse source, a Kafka source descriptor read and the main pipeline operation at parallelism 3](flink-job.png#center "The Beam pipeline running as a Flink job")
 
 Note that, although the main pipeline's SDK harness is set to *LOOPBACK*, the Kafka I/O runs on the Java SDK, and it associates with its own SDK harness, which defaults to *DOCKER*. We can check the Kafka I/O's SDK harness process is launched in a container as following.
 

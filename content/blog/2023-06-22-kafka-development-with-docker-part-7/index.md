@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Development with Docker
 categories:
@@ -20,9 +16,6 @@ tags:
   - Docker
   - Python
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 description: Schema registry support added to kafka-python producer and consumer apps, which serialise and deserialise through AWS Glue Schema Registry.
 ---
 
@@ -501,34 +494,34 @@ INFO:root:key={"order_id": "265c64a0-a520-494f-84d5-ebaf4496fe1c"}, value={'orde
 
 We can also check the consumers with the management apps. For example, the 3 running consumers can be seen in the *Consumers* menu of *kafka-ui*. As expected, each consumer subscribes to its own topic partition. We can run the management apps by `docker-compose -f compose-ui.yml up -d`.
 
-![](consumers.png#center)
+![Consumers menu of kafka-ui with three consumers, each on its own topic partition](consumers.png#center "Consumers menu of kafka-ui with three consumers, each on its own topic partition")
 
 
 ## Schemas
 
 On AWS Console, we can check the schema of the value is created.
 
-![](schema-01.png#center)
+![AWS console showing the order value schema in the Glue schema registry](schema-01.png#center "AWS console showing the order value schema in the Glue schema registry")
 
 Also, we are able to see it on *kpow*. The community edition only supports a single schema registry and its name is marked as *glue1*.
 
-![](schema-02.png#center)
+![Same schema in Kpow under the single schema registry named glue1](schema-02.png#center "Same schema in Kpow under the single schema registry named glue1")
 
 ## Kafka Topics
 
 The *orders* topic can be found in the *Topics* menu of *kafka-ui*.
 
-![](topic-01.png#center)
+![Orders topic in the Topics menu of kafka-ui](topic-01.png#center "Orders topic in the Topics menu of kafka-ui")
 
 We can browse individual messages in the *Messages* tab. Note that we should select the Glue serializer plugin name (*online-order*) on the *Value Serde* drop down list. Otherwise, records won't be deserialized correctly.
 
-![](topic-02.png#center)
+![Messages tab of kafka-ui with the online-order Glue plugin chosen as value serde](topic-02.png#center "Messages tab of kafka-ui with the online-order Glue plugin chosen as value serde")
 
 We can check the topic messages on *kpow* as well. If we select *AVRO* on the *Value Deserializer* drop down list, it requires to select the associating schema registry. We can select the pre-set schema registry name of *glue1*. Upon hitting the *Search* button, messages show up after being deserialized properly.
 
-![](topic-03-01.png#center)
+![Kpow message search set to the AVRO value deserializer and the glue1 registry](topic-03-01.png#center "Kpow message search set to the AVRO value deserializer and the glue1 registry")
 
-![](topic-03-02.png#center)
+![Deserialized order messages listed in Kpow after the search](topic-03-02.png#center "Deserialized order messages listed in Kpow after the search")
 
 ## Summary
 

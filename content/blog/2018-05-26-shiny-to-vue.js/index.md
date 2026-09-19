@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -18,11 +14,10 @@ tags:
   - R Shiny
   - R
   - Vue.js
-authors:
-  - JaehyeonKim
-images: []
-description: Although R Shiny added async features but it has limitation when compared to Javascript. In this post, I'll demonstrate how to render htmlwigets in a Vue application in a more performant way as well as how to replace those widgets with native Javascript libraries.
+description: Render htmlwidgets inside a Vue.js application, then replace those widgets with native JavaScript libraries for performance async Shiny cannot reach.
 ---
+
+> **Status, September 2026.** This post works around open source Shiny handling one user session's requests one after another. Shiny now provides `ExtendedTask`, which unblocks the session that started a long running operation, so rewriting an app in a JavaScript framework is no longer needed for that reason alone.
 
 In the [last post](/blog/2018-05-19-asyn-shiny-and-its-limitation), the async feature of Shiny was discussed. Although it is a remarkable step forward to web development in R, it is not to the full extent that a Javascript application can bring. In fact, (long running) requests of a user (or session) are not impacted by those of other users (or sessions) but, for a given user, all requests are handled sequentially. On the other hand, it is not the case for a Javascript-backed app where all requests are processed asynchronously.
 
@@ -260,7 +255,7 @@ export default {
 
 The screen shot of the app is shown below.
 
-![](vue-htmlwidgets.png#center)
+![Vue app with an iris data table and an Iris Scatter chart, each with its own update button](vue-htmlwidgets.png#center "Vue app with an iris data table and an Iris Scatter chart, each with its own update button")
 
 ### Native Libraries instead of Htmlwidgets
 If an app doesn't rely on *htmlwidgets*, it only requires data to create charts and tables. The API has `/hdata` resource to return the iris data. Here the scenario is the iris data will be pulled at the beginning and 10 records are selected randomly when a user clicks a button, resulting in updating components. Note one of the key benefits of this structure is that components can communicate with each other - see what [crosstalk](https://rstudio.github.io/crosstalk/) is aimed for.
@@ -492,4 +487,4 @@ export default {
 
 The screen shot of the app is shown below.
 
-![](vue-native.png#center)
+![Vue app with an iris table, a scatter plot and a 3D scatter plot, all refreshed by one button](vue-native.png#center "Vue app with an iris table, a scatter plot and a 3D scatter plot, all refreshed by one button")

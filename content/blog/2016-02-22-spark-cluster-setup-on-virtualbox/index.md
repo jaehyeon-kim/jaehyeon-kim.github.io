@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -17,11 +13,10 @@ tags:
   - Apache Spark
   - SparkR
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: We discuss how to set up a Spark cluser between 2 Ubuntu guests. Firstly it begins with machine preparation.
+description: Set up a two node Spark standalone cluster on VirtualBox Ubuntu guests, covering machine preparation, copying the VDI image and password-less SSH.
 ---
+
+> **Status, September 2026.** The Spark 1.6.0 download link used below no longer resolves, so the cluster cannot be built by following these commands as written. Download a current Spark release instead and adjust the paths and configuration file names to match it.
 
 We discuss how to set up a Spark cluser between 2 Ubuntu guests. Firstly it begins with machine preparation. Once a machine is baked, its image file (*VDI*) is be copied for the second one. Then how to launch a cluster by [standalone mode](https://spark.apache.org/docs/latest/spark-standalone.html) is discussed. Let's get started.
 
@@ -31,7 +26,7 @@ If you haven't read the previous post, I recommend reading as it introduces [Put
 
 I downloaded _Spark 1.6.0 Pre-built for Hadoop 2.6 and later_ and unpacked it in my user directory as following.
 
-```
+```bash
 cd ~
 wget https://archive.apache.org/dist/spark/spark-1.6.0/spark-1.6.0-bin-hadoop2.6.tgz
 tar zxvf spark-*.tgz
@@ -40,7 +35,7 @@ mv ./spark*/ spark
 
 Then I prepared '_password-less_' SSH access (no passphrase) from the master machine to the other by generating a ssh key.
 
-```
+```bash
 mkdir .ssh
 ssh-keygen -t rsa
 Enter file in which to save the key (/home/you/.ssh/id_rsa): [ENTER]
@@ -50,7 +45,7 @@ Enter same passphrase again: [EMPTY]
 
 You will see two files *id_rsa* (private key) and *id_rsa.pub* (public key) in *.ssh* folder. The public key was added to a file called *authorized_keys* as following. 
 
-```
+```bash
 cd .ssh
 cat id_rsa.pub >> authorized_keys
 chmod 644 authorized_keys
@@ -62,57 +57,57 @@ Note that, by now, there is only a single machine but its image file will be cop
 
 I named the baked machine's image file as _spark-master.vdi_ and copied it as _spark-slave.vdi_. When I tried to create a virtual machine with the new image, the following error was encountered, which indicates duplicate UUIDs.
 
-![](01_uuid_error.png#center)
+![VirtualBox error dialog refusing to open spark-slave.vdi because its UUID already exists](01_uuid_error.png#center "VirtualBox duplicate UUID error")
 
 This was resolved by setting a differnet UUID using *VBOXMANAGE.EXE*. On my Windows (host) CMD, I did the following and it was possible to create a virtual machine from the copied image.
 
-```
+```batch
 cd "C:\Program Files\Oracle\VirtualBox"
 VBOXMANAGE.EXE internalcommands sethduuid "D:\VirtualEnv\spark-slave.vdi"
 ```
 As in the previous post, I set up 2 network adapters - Bridged Adapter and Host-only Adapter. The latter lets a virtual machine to have a static IP. As the second image is copied from the first, both have the same IP address, which can be problematic. They can have different IP addresses by letting them have different MAC addresses. (Note the refresh button in the right.)
 
-![](021_mac_addr.png#center)
+![Network settings of both machines showing different MAC addresses on the host-only adapter](021_mac_addr.png#center "MAC addresses on Adapter 2")
 
 In my case, the master and slave machine's IP addresses are set up to be _192.168.1.8_ and _192.168.1.11_.
 
-![](02_diff_ip.png#center)
+![Two VirtualBox terminals running ip addr, showing 192.168.1.8 and 192.168.1.11 on eth0](02_diff_ip.png#center "Static IP addresses of master and slave")
 
 Also they have the same host name: *ubuntu-master*. It'd be necessary to change the slave machine's host name. I modified the host name in _/etc/hostname_ and _/etc/hosts_. Basically I changed any _ubuntu-master_ in those files to _ubuntu-slave1_ and restarted the machine - see further [details](https://askubuntu.com/questions/87665/how-do-i-change-the-hostname-without-a-restart) Note this requires **root** privilege.
 
 The updated host name is shown below in the right.
 
-![](03_hostnames.png#center)
+![Two terminal prompts reading ubuntu-master and ubuntu-slave1 after the host name change](03_hostnames.png#center "Updated host names")
 
 Finally I added slave's host information to the master's _/etc/hosts_ and did the other way around to the slave's file.
 
-![](04_etc_hosts.png#center)
+![Nano editing /etc/hosts on both machines, each listing the other machine IP and host name](04_etc_hosts.png#center "Host entries added on each machine")
 
 ## Standalone mode setup
 
 Firstly I added the slave machine's host name to the master's _slaves_ file in _~/spark/conf_ as following.
 
-```
+```bash
 cd ~/spark/conf/
 cp slaves.template slaves
 ```
 
 I just commented _localhost_, which is in the last line and added the slave's host name. i.e.
 
-```
+```bash
 #localhost
 ubuntu-slave1
 ```
 
 Then I updated _spark-env.sh_ file on each of the machines.
 
-```
+```bash
 cp spark-env.sh.template spark-env.sh
 ```
 
 And, for the master, I added the following
 
-```
+```bash
 JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 export SPARK_MASTER_IP=192.168.1.8
 export SPARK_WORKER_CORES=1
@@ -124,7 +119,7 @@ export SPARK_LOCAL_IP=192.168.1.8
 ```
 and, for the slave,
 
-```
+```bash
 JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 export SPARK_MASTER_IP=192.168.1.8
 export SPARK_WORKER_CORES=1
@@ -137,10 +132,16 @@ export SPARK_LOCAL_IP=192.168.1.11
 
 That's it. By executing the following command, I was able to create a Spark cluster and to check the status of the cluster on the web UI.
 
-```
+```bash
 ~/spark/sbin/start-all.sh
 ```
 
-![](05_webui.png#center)
+![Spark master web UI at port 8080 listing one alive worker and four gigabytes memory](05_webui.png#center "Spark master web UI")
 
 I hope this post is useful.
+
+## Related posts
+
+* [Quick Start SparkR in Local and Cluster Mode](/blog/2016-03-02-quick-start-sparkr-in-local-and-cluster-mode) - runs SparkR against this cluster and in local mode, with the environment variables and library path to set
+* [Boost SparkR with Hive](/blog/2016-04-30-boost-sparkr-with-hive) - uses the Hive Context from SparkR to reach the UDFs and window functions the SQL Context lacks
+* [AWS Glue Local Development with Docker and Visual Studio Code](/blog/2021-08-20-glue-local-development) - a later way to get a Spark environment without building virtual machines

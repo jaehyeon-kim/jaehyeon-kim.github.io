@@ -5,20 +5,13 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Tree Based Methods in R
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: Part I of tree based methods in R series. Classification analysis is performed using the caret package.
+description: Fit a CART classification model on the ISLR Carseats data with the rpart package in R, and tune the pruning parameter with the caret package.
 ---
 
 * [Part I](#) (this post)
@@ -44,6 +37,8 @@ The bold-cased sections of the [tutorial](https://topepo.github.io/caret/index.h
 - Parallel Processing
 - Adaptive Resampling
 
+## Pruning Parameter Scaling in rpart
+
 The pruning parameter in the **rpart** package is scaled so that its values are from 0 to 1. Specifically the formula is
 
 $$
@@ -53,6 +48,8 @@ $$
 where $$T_{1}$$ is the tree with no splits, $$\mid T\mid$$ is the number of splits for a tree and *R* is the risk.
 
 Due to the inclusion of $$R\left(T_{1}\right)$$, when *cp=1*, the tree will result in no splits while it is not pruned when *cp=0*. On the other hand, in the original setup without the term, the pruning parameter ($$\alpha$$) can range from 0 to infinity.
+
+## Packages and Carseats Data
 
 Let's get started.
 
@@ -193,6 +190,8 @@ with(testData.cl,table(High) / length(High))
 ## 0.4050633 0.5949367
 ```
 
+## Tuning cp with Resampling
+
 The following resampling strategies are considered: *cross-validation*, *repeated cross-validation* and *bootstrap*.
 
 
@@ -268,6 +267,8 @@ subset(fit.cl.boot$results,subset=cp==fit.cl.boot$bestTune$cp)
 ## 2 0.01555024 0.7178692 0.4163337 0.04207806 0.08445416
 ```
 
+## Refit and Evaluate on Test Data
+
 The one from repeated cross-validation is taken to fit to the entire training data.
 
 **Updated on Feb 10, 2015**
@@ -320,7 +321,7 @@ prp(fit.cl
 ## cex 0.7   xlim c(0, 1)   ylim c(-0.1, 1.1)
 ```
 
-![](plot_tree-1.png#center) 
+![Classification tree splitting on shelve location, price, income and advertising into High or No leaves](plot_tree-1.png#center "CART model tree") 
 
 
 

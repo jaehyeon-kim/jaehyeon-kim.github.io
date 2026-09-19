@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Real Time Streaming with Kafka and Flink
 categories:
@@ -19,9 +15,6 @@ tags:
   - OpenSearch
   - PyFlink
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Aggregate taxi ride counts and trip durations by vendor over five second windows with PyFlink, then chart them in an OpenSearch dashboard.
 ---
 The value of data can be maximised when it is used without delay. With Apache Flink, we can build streaming analytics applications that incorporate the latest events with low latency. In this lab, we will create a Pyflink application that writes accumulated taxi rides data into an OpenSearch cluster. It aggregates the number of trips/passengers and trip durations by vendor ID for a window of 5 seconds. The data is then used to create a chart that monitors the status of taxi rides in the OpenSearch Dashboard.
@@ -187,7 +180,7 @@ terraform apply -auto-approve=true -var 'producer_to_create=true' -var 'opensear
 
 Once the resources are deployed, we can check the OpenSearch cluster on AWS Console as shown below.
 
-![](opensearch-cluster.png#center)
+![AWS console page for the real-time-streaming OpenSearch domain, status Active, cluster health Green, version 2.7](opensearch-cluster.png#center "OpenSearch domain created by Terraform")
 
 ### Local OpenSearch Cluster on Docker (Optional)
 
@@ -803,7 +796,7 @@ docker exec jobmanager /opt/flink/bin/flink run \
 
 Once the Pyflink application is submitted, we can check the details of it on the Flink UI as shown below.
 
-![](flink-job.png#center)
+![Flink dashboard for the trip_stats_sink job in state RUNNING, with a source task feeding a window aggregate task](flink-job.png#center "Pyflink application running on Flink 1.17.1")
 
 ### Application Result
 
@@ -811,17 +804,17 @@ Once the Pyflink application is submitted, we can check the details of it on the
 
 We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*.
 
-![](kafka-topic.png#center)
+![Kpow topic page for taxi-rides with 5 partitions, 203K messages and about 47 writes per second](kafka-topic.png#center "Taxi ride records landing in the Kafka topic")
 
 #### OpenSearch Index
 
 The ingested data can be checked easily using the [Query Workbench](https://opensearch.org/docs/latest/dashboards/query-workbench/) as shown below.
 
-![](opensearch-query.png#center)
+![Query Workbench running select star from trip_stats, returning rows of vendor id, trip count and trip duration](opensearch-query.png#center "Ingested records read back with SQL")
 
 To monitor the status of taxi rides, a horizontal bar chart is created in the OpenSearch Dashboard. The average trip duration is selected as the metric, and the records are grouped by vendor ID. We can see the values change while new records arrives.
 
-![](opensearch-chart.png#center)
+![Horizontal bar chart of average trip_duration by vendor id, with the aggregation settings panel on the right](opensearch-chart.png#center "Average trip duration per vendor in OpenSearch Dashboards")
 
 ## Summary
 

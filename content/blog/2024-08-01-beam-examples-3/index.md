@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Python Examples
 categories:
@@ -18,13 +14,10 @@ tags:
   - Apache Flink
   - Apache Kafka
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: A sport activity tracker in Beam Python, built first with native transforms and then with Beam SQL, showing the limits of Beam SQL in the Python SDK.
 ---
 
-In this post, we develop two Apache Beam pipelines that track sport activities of users and output their speed periodically. The first pipeline uses native transforms and [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) is used for the latter. While *Beam SQL* can be useful in some situations, its features in the Python SDK are not complete compared to the Java SDK. Therefore, we are not able to build the required tracking pipeline using it. We end up discussing potential improvements of *Beam SQL* so that it can be used for building competitive applications with the Python SDK.
+Two Apache Beam pipelines that track sport activities of users and output their speed periodically are developed in this post. The first pipeline uses native transforms and [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) is used for the latter. While *Beam SQL* can be useful in some situations, its features in the Python SDK are not complete compared to the Java SDK. Therefore, we are not able to build the required tracking pipeline using it. We end up discussing potential improvements of *Beam SQL* so that it can be used for building competitive applications with the Python SDK.
 
 <!--more-->
 
@@ -239,7 +232,7 @@ user4   88      1722127107.1854854
 
 Also, we can check the input messages using Kafka UI on *localhost:8080*.
 
-![](input-messages.png#center)
+![Input activity messages of several users listed in Kafka UI](input-messages.png#center "Input activity messages of several users listed in Kafka UI")
 
 ## Beam Pipelines
 
@@ -680,11 +673,11 @@ python chapter2/sport_tracker.py --deprecated_read \
 
 On Flink UI, we see the pipeline has two tasks. The first task is performed until windowing the input elements while the second task performs up to sending the metric records into the output topic.
 
-![](sport-tracker-dag.png#center)
+![Flink UI graph of the sport tracker job with its two tasks](sport-tracker-dag.png#center "Flink UI graph of the sport tracker job with its two tasks")
 
 On Kafka UI, we can check the output message is a dictionary of user ID and speed.
 
-![](sport-tracker-output.png#center)
+![Kafka UI output message holding a dictionary of user ID and speed](sport-tracker-output.png#center "Kafka UI output message holding a dictionary of user ID and speed")
 
 ### Sport Tracker SQL
 
@@ -817,7 +810,7 @@ if __name__ == "__main__":
 
 We have 8 test activity records of two users. Below shows those records after sorting by user ID and timestamp. Using the sorted records, we can easily obtain the expected outputs, which can be found in the last column.
 
-![](sport-tracker-sql-test.png#center)
+![Eight test activity records of two users, sorted, with the expected outputs alongside](sport-tracker-sql-test.png#center "Eight test activity records of two users, sorted, with the expected outputs alongside")
 
 Note that the transform by Beam SQL cannot be tested by the streaming Python direct runner because it doesn't support cross-language pipelines. Therefore, we use the Flink runner for testing.
 
@@ -910,7 +903,7 @@ python chapter2/sport_tracker_sql.py --deprecated_read \
 
 On Kafka UI, we can check the output message is a dictionary of user ID and speed.
 
-![](sport-tracker-sql-output.png#center)
+![Kafka UI output message of the SQL pipeline with user ID and speed](sport-tracker-sql-output.png#center "Kafka UI output message of the SQL pipeline with user ID and speed")
 
 ## Potential Improvements of Beam SQL for Python SDK
 

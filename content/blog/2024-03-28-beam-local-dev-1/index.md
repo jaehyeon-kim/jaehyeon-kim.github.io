@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Local Development with Python
 categories:
@@ -18,9 +14,6 @@ tags:
   - Beam SQL
   - Jupyter Notebook
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Run a basic Apache Beam pipeline in Python, then develop interactively in Jupyter notebooks with Beam SQL and Beam DataFrames examples.
 ---
 
@@ -449,11 +442,11 @@ $ JUPYTER_ENABLE_LAB=yes jupyter lab --ServerApp.token='' --ServerApp.password='
 
 The basic pipeline is recreated in [*section1/basic.ipynb*](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section1/basic.ipynb). The *InteractiveRunner* is used for the pipeline and, by default, the Python Direct Runner is taken as the underlying runner. When we run the first two cells, we can show the output records in a data table.
 
-![](basic-01.png#center)
+![JupyterLab notebook where ib.show lists 6,017 rows of ip, id, lat, lng and age bracket](basic-01.png#center "Basic pipeline rebuilt with the interactive runner")
 
 The pipeline DAG can be visualized using the *show_graph* method as shown below. It helps identify or share how a pipeline is executed more effectively.
 
-![](basic-02.png#center)
+![Pipeline graph running Read from files, Parse Json, Filter status and Select columns into events](basic-02.png#center "Pipeline DAG drawn by the show_graph method")
 
 ## Beam SQL
 
@@ -461,11 +454,11 @@ The pipeline DAG can be visualized using the *show_graph* method as shown below.
 
 In [*section1/sql.ipynb*](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section1/sql.ipynb), we first create a PCollection of 3 elements that can be used as source data.
 
-![](sql-01.png#center)
+![Notebook creating a PCollection of three items and showing john 123, jane 234 and jack 345](sql-01.png#center "Source PCollection for the Beam SQL example")
 
 Beam SQL is executed as an IPython extension, and it should be loaded before being used. The magic function requires *query*, and we can optionally specify the output name (*OUTPUT_NAME*) and runner (*RUNNER*).
 
-![](sql-02.png#center)
+![Loading the beam_sql extension, with help text listing the output name, verbose and runner options](sql-02.png#center "Help message of the beam_sql magic function")
 
 After the extension is loaded, we execute a SQL query, optionally specifying the output PCollection name (*filtered*). We can use the existing PCollection named *items* as the source.
 
@@ -476,7 +469,7 @@ There are several notes about Beam SQL on a notebook.
 3. The output PCollection is accessible in the entire notebook, and we can use it in another cell.
 4. While Beam SQL supports both [Calcite SQL](https://calcite.apache.org/) and [ZetaSQL](https://github.com/google/zetasql), the magic function doesn't allow us to select which dialect to choose. Only the default Calcite SQL will be used on a notebook.
 
-![](sql-03.png#center)
+![Beam SQL query selecting where name is jack, returning the single row 3, jack, 345.0](sql-03.png#center "Query output placed into a named PCollection")
 
 ## Beam DataFrames
 
@@ -484,11 +477,15 @@ The Apache Beam Python SDK provides a [DataFrame API](https://beam.apache.org/do
 
 In [*section1/dataframe.ipynb*](https://github.com/jaehyeon-kim/beam-demos/blob/master/beam-dev-env/section1/dataframe.ipynb), we also create a PCollection of 3 elements as the Beam SQL example.
 
-![](dataframe-01.png#center)
+![Notebook creating the same three item PCollection, showing john 123, jane 234 and jack 345](dataframe-01.png#center "Source PCollection for the Beam DataFrames example")
 
 Subsequently we convert the source PCollection into a pandas DataFrame using the *to_dataframe* method, process data via pandas API and return to PCollection using the *to_pcollection* method.
 
-![](dataframe-02.png#center)
+![Converting to a pandas DataFrame, adding 1000 to value, giving 1123.0, 1234.0 and 1345.0](dataframe-02.png#center "Values changed through the pandas API and returned to a PCollection")
+
+## Related posts
+
+* [Cache Data on Apache Beam Pipelines Using a Shared Object](/blog/2024-08-22-cache-using-shared-object) - caches lookup data in memory with the Shared class, refreshed periodically on streaming pipelines
 
 ## Summary
 

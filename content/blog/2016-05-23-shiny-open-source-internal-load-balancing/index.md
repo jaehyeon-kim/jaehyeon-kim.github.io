@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -16,11 +12,10 @@ categories:
 tags: 
   - R Shiny
   - R
-authors:
-  - JaehyeonKim
-images: []
 description: In this post, a simple way of internal load balancing is demonstrated by redirecting multiple same applications, depending on the number of processes binded to them
 ---
+
+> **Status, September 2026.** This post works around the 2016 open source Shiny Server by redirecting sessions between copies of the same application, and the `top`, `netstat` and `lsof` monitoring it relies on is tied to that server layout. Read it as background on the load balancing problem rather than as a deployment recipe.
 
 Shiny is an interesting web framework that helps create a web application quickly. If it targets a large number of users, however, there are several limitations and it is so true when the open source version of Shiny is in use. It would be possible to tackle down some of the limitations with the enterprise version but it is not easy to see enough examples of Shiny applications in production environment. While whether Shiny can be used in production environment is a controversial issue, this series of posts illustrate some ways to use **open source Shiny** a bit more wisely. Specifically the following topics are going to be covered.
 
@@ -37,7 +32,7 @@ In this post, a simple way of **internal load balancing** is demonstrated by *re
 
 As an illustration, 5 applications are added to `/srv/shiny-server/redirect` as shown below. The folders named **1 to 4** are the same application in different folders and the application that redirects a user (or session) to the individual applications is placed in **app** folder. How many sessions are binded by each application is monitored by **monitor.R** and the output is recorded in **monitor.log**.
 
-![](folder_structure.png#center)
+![File listing of /srv/shiny-server/redirect holding folders 1 to 4, app, monitor.log and monitor.R](folder_structure.png#center "Folder structure of the redirect application")
 
 ## Process monitoring
 
@@ -148,7 +143,7 @@ setInterval(function() {
 
 An example of the application is shown below.
 
-![](redirect.png#center)
+![App info table of user counts per app, and a redirect box holding http://demo.anomdev.com/redirect/3](redirect.png#center "Redirect application sending the user to the least busy app")
 
 Here is the code for the *redirected* application.
 
@@ -182,6 +177,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
-![](app.png#center)
+![URL components panel listing protocol http, hostname demo.anomdev.com and pathname /redirect/3/](app.png#center "Redirected application showing the URL it was reached by")
+
+## Related posts
+
+* [Render Multiple Pages](/blog/2016-06-27-shiny-open-source-render-multiple-pages) - the next topic in this series, rendering several pages with htmlOutput and renderUI, including login and registration.
+* [Async Shiny and Its Limitation](/blog/2018-05-19-asyn-shiny-and-its-limitation) - what the async feature of Shiny fixes and where it still falls short.
+* [Shiny to Vue.js](/blog/2018-05-26-shiny-to-vue.js) - moving the front end to Vue.js for performance async Shiny cannot reach.
 
 

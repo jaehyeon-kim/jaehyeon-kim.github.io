@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Integrate Schema Registry with MSK Connect
 categories:
@@ -19,11 +15,8 @@ tags:
   - Apache Airflow
   - Docker
   - Python
-authors:
-  - JaehyeonKim
-images: []
 cevo: 15
-description: We'll discuss limitations of the Lambda invoke function operator of Apache Airflow and create a custom Lambda operator. The custom operator extends the existing one and it reports the invocation result of a function correctly and records the exact error message from failure.
+description: Extend the Apache Airflow Lambda invoke function operator with a correlation ID, so it reports the invocation result and the exact error message.
 ---
 [Apache Airflow](https://airflow.apache.org/) is a popular workflow management platform. A wide range of AWS services are integrated with the platform by [Amazon AWS Operators](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/operators/index.html). AWS Lambda is one of the integrated services, and it can be used to develop workflows efficiently. The current [Lambda Operator](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/operators/lambda.html), however, just invokes a Lambda function, and it can fail to report the invocation result of a function correctly and to record the exact error message from failure. In this post, we’ll discuss a custom Lambda operator that handles those limitations.
 
@@ -565,13 +558,13 @@ with DAG(
 
 As shown below the task by asynchronous invocation is incorrectly marked as _success_. It is because practically only the response status code is checked as it doesn't wait until the invocation finishes. On the other hand, the task by synchronous invocation is indicated as _failed_. However, it doesn’t show the exact error that fails the invocation - see below for further details.
 
-![](dag-without-logging.png#center)
+![Airflow graph view of the example_without_logging DAG, async_w_error outlined green as success while sync_w_error is outlined red as failed](dag-without-logging.png#center "Task states with the built-in Lambda invoke operator")
 
 
 The error message is _Lambda function execution resulted in error_, and it is the generic message constructed by the Lambda invoke function operator.
 
 
-![](dag-without-logging-fail.png#center)
+![Airflow task log for sync_w_error ending in a ValueError, with the generic message Lambda function execution resulted in error boxed in red](dag-without-logging-fail.png#center "Generic error message from the built-in operator")
 
 
 ### Custom Lambda Operator
@@ -646,27 +639,33 @@ with DAG(
 
 As expected we see two success tasks and three failure tasks. The custom Lambda operator tracks Lambda function invocation status correctly.
 
-![](dag-with-logging.png#center)
+![Airflow graph view of the example_with_logging DAG with five tasks, async_wo_error and sync_wo_error green, the other three red](dag-with-logging.png#center "Task states with the custom Lambda operator")
 
 
 Below shows log messages of the success task by asynchronous invocation. Each message includes the same correlation ID and the last message from the Lambda function is _Function ended_.
 
-![](dag-with-logging-success.png#center)
+![Airflow log for async_wo_error carrying Lambda log messages under one correlation id, ending with Function ended boxed in green](dag-with-logging-success.png#center "Successful asynchronous invocation, ending with Function ended")
 
 
 The failed task by asynchronous invocation also shows all log messages, and it is possible to check what caused the invocation to fail.
 
-![](dag-with-logging-fail.png#center)
+![Airflow log for async_w_error with a Function invocation failed message boxed in red, followed by a RuntimeError saying ERROR found in log](dag-with-logging-fail.png#center "Failed asynchronous invocation showing the error from the function")
 
 
 The case of failure due to timeout doesn’t show an error message from the Lambda invocation. However, we can treat it as failure because we don’t see the message of the function invocation ended within the function timeout.
 
-![](dag-with-logging-timeout.png#center)
+![Airflow log for async_timeout_error stopping at iteration 30, then a RuntimeError saying the Lambda function end message was not found after the function timeout](dag-with-logging-timeout.png#center "Timed out invocation detected by the missing end message")
 
 
 Still the failure by synchronous invocation doesn’t show the exact error message, and it is because an error is raised before the process log events function is executed. Because of this, I advise to invoke a Lambda function asynchronously.
 
-![](dag-with-logging-fail-sync.png#center)
+![Airflow log for sync_w_error failing with the generic message Lambda function execution resulted in error and no function log messages](dag-with-logging-fail-sync.png#center "Synchronous invocation still hides the underlying error")
+
+## Related posts
+
+* [Thoughts on Apache Airflow AWS Lambda Operator](/blog/2020-04-13-airflow-lambda-operator) - the earlier custom Lambda operator that this post revisits
+* [ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6) - another Airflow orchestration example, running a dbt project on Amazon Athena
+* [AWS Local Development with LocalStack](/blog/2019-07-20-aws-localstack) - running AWS services on a local machine so functions can be exercised without an AWS account
 
 ## Summary
 

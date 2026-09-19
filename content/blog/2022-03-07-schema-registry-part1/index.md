@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Integrate Schema Registry with MSK Connect
 categories:
@@ -22,9 +18,6 @@ tags:
   - Change Data Capture (CDC)
   - Debezium
   - Docker
-authors:
-  - JaehyeonKim
-images: []
 cevo: 10
 description: A local Change Data Capture setup on Docker Compose with Debezium, the Confluent S3 sink and the Apicurio registry, showing how schema evolution is managed.
 ---
@@ -50,7 +43,7 @@ When we discussed a Change Data Capture (CDC) solution in [one of the earlier po
 
 Below shows an updated CDC architecture with a schema registry. The Debezium connector talks to the schema registry first and checks if the schema is available. If it doesn't exist, it is registered and cached in the schema registry. Then the producer serializes the data with the schema and sends it to the topic with the schema ID. When the sink connector consumes the message, it'll read the schema with the ID and deserializes it. The schema registry uses a PostgreSQL database as an artifact store where multiple versions of schemas are kept. In this post, we'll build it locally using [Docker Compose](https://docs.docker.com/compose/).
 
-![](featured.png#center) 
+![CDC flow from Aurora PostgreSQL through Debezium and Kafka to S3, with Apicurio holding schemas](featured.png#center "CDC flow from Aurora PostgreSQL through Debezium and Kafka to S3, with Apicurio holding schemas") 
 
 
 ## Local Services
@@ -215,7 +208,7 @@ services:
 
 Once started, we see the Confluent schema registry compatible API from the API list, and we'll use it for creating Kafka connectors.
 
-![](01-apicurio.png#center)
+![Apicurio Registry API list including the Confluent schema registry compatible API](01-apicurio.png#center "Apicurio Registry API list including the Confluent schema registry compatible API")
 
 ### Kafka UI
 
@@ -246,7 +239,7 @@ services:
 
 The UI is quite intuitive, and we can monitor (and manage) the Kafka cluster and related objects/resources comprehensively. 
 
-![](02-kafka-ui.png#center)
+![Kafka UI showing the local cluster with its brokers, topics and consumers](02-kafka-ui.png#center "Kafka UI showing the local cluster with its brokers, topics and consumers")
 
 ## Create Connectors
 
@@ -318,12 +311,12 @@ curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json"
 
 Once the source connector is created, we can check that the key and value schemas are created as shown below. Note we can check the details of the schemas by clicking the relevant items.
 
-![](03-schema-registry.png#center)
+![Schema list in Kafka UI with the key and value schemas of the CDC topic](03-schema-registry.png#center "Schema list in Kafka UI with the key and value schemas of the CDC topic")
 
 As we added the schema registry URL as an environment variable, we see the records (key and value) are properly deserialized within the UI.
 
 
-![](04-messages.png#center)
+![Topic messages in Kafka UI deserialized into readable key and value records](04-messages.png#center "Topic messages in Kafka UI deserialized into readable key and value records")
 
 ## Schema Evolution
 
@@ -344,7 +337,7 @@ WHERE customer_id = 'VINET'
 
 Once the above queries are executed, we see a new version is added to the topic's value schema, and it includes the new field. 
 
-![](05-schema-registry-up.png#center)
+![New version of the topic value schema that includes the added employee ID field](05-schema-registry-up.png#center "New version of the topic value schema that includes the added employee ID field")
 
 ## Summary
 

@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Getting Started with Real-Time Streaming in Kotlin
 categories:
@@ -20,9 +16,6 @@ tags:
   - Docker
   - Kpow
   - Factor House Local
-authors:
-  - JaehyeonKim
-images: []
 description: Flink DataStream API in Kotlin computes the same supplier statistics, using watermarks for event time and side outputs to collect late order events.
 ---
 
@@ -737,7 +730,7 @@ A local Kafka environment is a prerequisite. If you don't have one running, use 
     ```
 Once running, the Kpow UI at `http://localhost:3000` will provide visibility into your Kafka cluster.
 
-![](kpow-overview.png#center)
+![Kpow overview of the local cluster, 3 brokers, 5 topics, 82 partitions and one schema registry](kpow-overview.png#center "Kpow overview of the local Kafka cluster")
 
 ### Start the Kafka Order Producer
 
@@ -752,8 +745,8 @@ DELAY_SECONDS=30 ./gradlew run --args="producer"
 
 This will start populating the `orders-avro` topic with Avro-encoded order messages. You can inspect these messages in Kpow. Ensure Kpow is configured with Key Deserializer: *String*, Value Deserializer: *AVRO*, and Schema Registry: *Local Schema Registry*.
 
-![](orders-01.png#center)
-![](orders-02.png#center)
+![Kpow data inspect form set to the orders-avro topic, with String key deserializer, AVRO value deserializer and the local schema registry](orders-01.png#center "Inspecting the orders-avro topic in Kpow")
+![Kpow results listing orders-avro records, each holding order_id, bid_time, price, item and supplier](orders-02.png#center "Avro order messages on the orders-avro topic")
 
 ### Launch the Flink Application
 
@@ -794,8 +787,8 @@ In Kpow, navigate to the `orders-avro-kds-stats` topic. Configure Kpow to view t
 
 You should see `SupplierStats` messages, each representing the total price and count of orders for a supplier within a 5-second window. Notice the `window_start` and `window_end` fields.
 
-![](stats-01.png#center)
-![](stats-02.png#center)
+![Kpow data inspect form set to the orders-avro-kds-stats topic, with String key deserializer and AVRO value deserializer](stats-01.png#center "Inspecting the supplier stats output topic")
+![Kpow results listing supplier stats records, each with window_start, window_end, supplier, total price and count over a five second window](stats-02.png#center "Windowed supplier statistics")
 
 **2. Skipped (Late) Records (`orders-avro-kds-skipped`):**
 
@@ -805,8 +798,8 @@ Next, inspect the `orders-avro-kds-skipped` topic in Kpow. Configure Kpow as fol
 
 These records are the ones that arrived too late to be included in their windows, even after the `allowedLateness` period. They were captured using Flink's powerful `.sideOutputLateData()` function and then converted to JSON with a `"late": true` field for confirmation.
 
-![](skipped-01.png#center)
-![](skipped-02.png#center)
+![Kpow data inspect form set to the orders-avro-kds-skipped topic, with String key deserializer and JSON value deserializer](skipped-01.png#center "Inspecting the skipped records topic")
+![Kpow results listing 17 skipped order records, each carrying the order fields and a late field set to true](skipped-02.png#center "Late records captured as side output")
 
 ## Conclusion
 

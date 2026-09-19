@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka, Flink and DynamoDB for Real Time Fraud Detection
 categories:
@@ -20,9 +16,6 @@ tags:
   - Apache Kafka
   - Python
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 cevo: 32
 docs: https://docs.google.com/document/d/1kRB3XeccUAjNwRH_sFwjJ_fCSnUw3NrQnzF202QGx4o
 description: Deploy the Kafka, Flink and DynamoDB fraud detection app to Amazon Managed Service for Apache Flink, after developing it locally on Docker.
@@ -722,7 +715,7 @@ resource "aws_iam_role" "kda_app_role" {
 
 Once deployed, we can see the application on AWS console, and it stays in the ready status.
 
-![](flink-app.png#center)
+![Managed Apache Flink console page for fraud-detection-kda-app, status Ready, runtime Apache Flink 1.15](flink-app.png#center "Flink application deployed and ready to run")
 
 ### Camel DynamoDB Sink Connector
 
@@ -834,7 +827,7 @@ resource "aws_cloudwatch_log_group" "camel_ddb_sink" {
 
 The sink connector can be checked on AWS Console as shown below. 
 
-![](sink-connector.png#center)
+![MSK Connect page for fraud-detection-transactions-sink, status Running, with its Camel DynamoDB sink settings](sink-connector.png#center "DynamoDB sink connector running on MSK Connect")
 
 ## Run Application
 
@@ -842,41 +835,41 @@ We first need to create records in the source Kafka topics. It is performed by e
 
 Once executed, we can check the source topics are created and messages are ingested.
 
-![](source-topics.png#center)
+![Kpow topic view of transactions and flagged-accounts, 730 messages across four partitions](source-topics.png#center "Source topics created and taking messages")
 
 ### Monitoring on Flink Web UI
 
 We can run the Flink application on AWS console with the *Run without snapshot* option as we haven't enabled [snapshots](https://docs.aws.amazon.com/managed-flink/latest/java/how-fault-snapshot.html).
 
-![](flink-run.png#center)
+![Run application page with Run without snapshot picked from the three restore options](flink-run.png#center "Starting the Flink application without a snapshot")
 
 Once the app is running, we can monitor it on the Flink Web UI available on AWS Console. 
 
-![](flink-dashboard-00.png#center)
+![Streaming applications list with fraud-detection-kda-app running and the Open Apache Flink dashboard button marked](flink-dashboard-00.png#center "Opening the Flink Web UI from the AWS console")
 
 In the Overview section, it shows the available task slots, running jobs and completed jobs.
 
-![](flink-dashboard-01.png#center)
+![Flink Overview with zero available task slots and one running job writing flagged_transactions](flink-dashboard-01.png#center "Overview section of the Flink Web UI")
 
 We can inspect an individual job in the Jobs menu. It shows key details about a job execution in *Overview*, *Exceptions*, *TimeLine*, *Checkpoints* and *Configuration* tabs.
 
-![](flink-dashboard-02.png#center)
+![Flink job graph joining the transactions and flagged_accounts sources into the flagged_transactions writer](flink-dashboard-02.png#center "Job overview showing the running join pipeline")
 
 ### CloudWatch Logging
 
 The application log messages can be checked in the CloudWatch Console, and it gives additional capability to debug the application.
 
-![](flink-logging.png#center)
+![CloudWatch log events for the Flink application, one JSON entry expanded to show Starting remoting](flink-logging.png#center "Application logs in the CloudWatch console")
 
 ### Application Output
 
 We can see details of all the topics in *Kpow*. The output topic (*flagged-transactions*) is created by the Flink application, and fraudulent transaction records are created in it.
 
-![](all-topics.png#center)
+![Kpow listing transactions with 1,470 messages, flagged-transactions with 705 and flagged-accounts with 5](all-topics.png#center "Output topic flagged-transactions created by the Flink application")
 
 Finally, we can check the output records on the DynamoDB table items view. All account IDs end with odd numbers, and it indicates they are from flagged accounts.
 
-![](ddb-output.png#center)
+![DynamoDB items view of fraud-detection-flagged-transactions, 50 rows whose account IDs all end odd](ddb-output.png#center "Flagged transactions written to the DynamoDB table")
 
 ## Summary
 

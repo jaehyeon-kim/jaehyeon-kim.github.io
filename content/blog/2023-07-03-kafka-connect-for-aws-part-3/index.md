@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Connect for AWS Services Integration
 categories:
@@ -22,9 +18,6 @@ tags:
   - Apache Kafka
   - Kafka Connect
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 cevo: 30
 description: Deploy the Camel DynamoDB sink connector and its data generator source on Amazon MSK and MSK Connect, moving the local pipeline onto AWS.
 ---
@@ -503,18 +496,18 @@ resource "aws_cloudwatch_log_group" "msk_data_generator" {
 
 We can check the details of the connector on AWS Console as shown below. 
 
-![](source-connector.png#center)
+![MSK Connect page for connect-for-aws-order-source, status Running, with its 21 line configuration](source-connector.png#center "Source connector summary and configuration on AWS Console")
 
 #### Kafka Topic
 
 As configured, the source connector ingests messages to the *order* topic, and we can check it on *kpow*.
 
-![](topic-01.png#center)
+![kpow topic list with order highlighted, three partitions, three replicas and 3,301 messages](topic-01.png#center "order topic on kpow")
 
 We can browse individual messages in the *Inspect* tab in the *Data* menu.
 
-![](topic-02.png#center)
-![](topic-03.png#center)
+![kpow Data Inspect form for the order topic with String key and JSON value deserializers](topic-02.png#center "Inspect settings used before searching the order topic")
+![Two order records on kpow showing key, offset and a value with order_id and customer_name](topic-03.png#center "Individual messages returned by the search")
 
 ### Sink Connector
 
@@ -640,17 +633,17 @@ resource "aws_cloudwatch_log_group" "camel_ddb_sink" {
 
 The sink connector can be checked on AWS Console as shown below. 
 
-![](sink-connector.png#center)
+![MSK Connect page for connect-for-aws-order-sink running the Camel DynamoDB sink connector](sink-connector.png#center "Sink connector summary and configuration on AWS Console")
 
 #### DynamoDB Destination
 
 We can check the ingested records on the DynamoDB table items view. Below shows a list of scanned records. As expected, it has the *order_id*, *ordered_at* and other attributes.
 
-![](ddb-01.png#center)
+![DynamoDB scan of connect-for-aws-orders returning 50 items with order_id and ordered_at columns](ddb-01.png#center "Scanned records in the DynamoDB table")
 
 We can also obtain an individual Json record by clicking an *order_id* value as shown below.
 
-![](ddb-02.png#center)
+![DynamoDB item in Json view with order_id, ordered_at, customer_id, customer_name, product_id and quantity](ddb-02.png#center "A single order record shown as Json")
 
 ## Summary
 

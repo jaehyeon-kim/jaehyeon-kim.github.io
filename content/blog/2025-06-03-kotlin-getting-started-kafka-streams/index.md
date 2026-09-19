@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Getting Started with Real-Time Streaming in Kotlin
 categories:
@@ -20,13 +16,10 @@ tags:
   - Docker
   - Kpow
   - Factor House Local
-authors:
-  - JaehyeonKim
-images: []
 description: Kafka Streams in Kotlin aggregates Avro order events into tumbling window supplier statistics and handles late records with a custom extractor.
 ---
 
-In this post, we shift our focus from basic Kafka clients to real-time stream processing with **Kafka Streams**. We'll explore a Kotlin application designed to analyze a continuous stream of Avro-formatted order events, calculate supplier statistics in tumbling windows, and intelligently handle late-arriving data. This example demonstrates the power of Kafka Streams for building lightweight, yet robust, stream processing applications directly within your Kafka ecosystem, leveraging event-time processing and custom logic.
+A Kotlin application analyses a continuous stream of Avro-formatted order events, calculates supplier statistics in tumbling windows, and handles late-arriving data. This post shifts our focus from basic Kafka clients to real-time stream processing with **Kafka Streams**. The example demonstrates the power of Kafka Streams for building lightweight, yet robust, stream processing applications directly within your Kafka ecosystem, using event-time processing and custom logic.
 
 <!--more-->
 
@@ -308,7 +301,7 @@ class BidTimeTimestampExtractor : TimestampExtractor {
 
 ### Proactive Late Record Handling
 
-![](late-record-processor.png#center)
+![Flowchart checks record timestamp validity and stream time against window close time](late-record-processor.png#center "Decision flow of the late record processor")
 
 The `LateRecordProcessor` is a custom Kafka Streams `Processor` (using the lower-level Processor API) designed to identify records that would arrive too late to be included in their intended time windows.
 
@@ -679,7 +672,7 @@ If you haven't already, set up your local Kafka environment:
     ```
 Once initialized, Kpow will be accessible at `http://localhost:3000`, showing Kafka brokers, schema registry, and other components.
 
-![](kpow-overview.png#center)
+![Kpow overview shows three brokers, five topics, 82 partitions and one schema registry](kpow-overview.png#center "Kpow overview of the local Kafka cluster")
 
 ### Start the Kafka Order Producer
 
@@ -694,8 +687,8 @@ DELAY_SECONDS=15 ./gradlew run --args="producer"
 
 This will start populating the `orders-avro` topic with Avro-encoded order messages. You can inspect these messages in Kpow. For the `orders-avro` topic, ensure Kpow is configured with Key Deserializer: *String*, Value Deserializer: *AVRO*, and Schema Registry: *Local Schema Registry*.
 
-![](orders-01.png#center)
-![](orders-02.png#center)
+![Kpow data inspect form set to the orders-avro topic with the AVRO value deserializer](orders-01.png#center "Inspecting the orders-avro topic in Kpow")
+![Kpow lists orders-avro records showing order_id, bid_time, price, item and supplier](orders-02.png#center "Avro order messages on the orders-avro topic")
 
 ### Launch the Kafka Streams Application
 
@@ -735,8 +728,8 @@ In Kpow, navigate to the `orders-avro-stats` topic. Configure Kpow to view these
 
 You should see `SupplierStats` messages, each representing the total price and count of orders for a supplier within a 5-second window. Notice the `window_start` and `window_end` fields.
 
-![](stats-01.png#center)
-![](stats-02.png#center)
+![Kpow data inspect form set to the orders-avro-stats topic with the AVRO value deserializer](stats-01.png#center "Inspecting the orders-avro-stats output topic")
+![Kpow lists supplier stats records with window start and end, total price and count](stats-02.png#center "Windowed supplier statistics on the orders-avro-stats topic")
 
 **2. Skipped (Late) Records (`orders-avro-skipped`):**
 
@@ -746,12 +739,12 @@ Next, inspect the `orders-avro-skipped` topic in Kpow. Configure Kpow as follows
 
 Here, you'll find the original order records that were deemed "late" by our `LateRecordProcessor`. These messages have an additional `late: true` field, confirming they were routed by our custom logic.
 
-![](skipped-01.png#center)
-![](skipped-02.png#center)
+![Kpow data inspect form set to the orders-avro-skipped topic with the JSON value deserializer](skipped-01.png#center "Inspecting the orders-avro-skipped topic")
+![Kpow lists 16 skipped order records, each carrying a late field set to true](skipped-02.png#center "Late order records routed to the skipped topic")
 
 We can also track the performance of the application by filtering its consumer group (`orders-avro-stats-kafka-streams`) in the **Consumers** section. This displays key metrics like group state, assigned members, read throughput, and lag:
 
-![](consumer-group-01.png#center)
+![Kpow consumer group orders-avro-stats-kafka-streams is stable with one member and lag 24](consumer-group-01.png#center "Consumer group of the Kafka Streams application")
 
 ## Conclusion
 

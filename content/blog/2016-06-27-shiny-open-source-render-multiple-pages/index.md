@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -16,12 +12,11 @@ categories:
 tags: 
   - R
   - R Shiny
-authors:
-  - JaehyeonKim
-images: []
 cevo: 26
-description: In this post, a simple way of internal load balancing is demonstrated by redirecting multiple same applications, depending on the number of processes binded to them
+description: Render multiple pages in an open source R Shiny application with htmlOutput and renderUI, including login and registration backed by a SQLite database.
 ---
+
+> **Status, September 2026.** The multi-page rendering shown here is a workaround for Shiny Open Source as it stood in 2016, so the package versions, the SQLite login flow and the linked example application are all historical. Check the current Shiny documentation before reusing any of it.
 
 R Shiny applications are served as a single page application and it is not built to render multiple pages. There are benefits of rendering multiple pages such as code management and implement authentication. In this page, we discuss how to implement multi-page rendering in a Shiny app.
 
@@ -31,7 +26,7 @@ As indicated above, Shiny is not designed to render multiple pages and, in gener
 
 A total of 6 pages exist in the application as shown below.
 
-![](flow.png#center)
+![Page flow between Login, Register, Profile and Main App, with Leave and Log out exits](flow.png#center "Page flow between Login, Register, Profile and Main App, with Leave and Log out exits")
 
 At the beginning, the login page is rendered. A user can enter credentials for authentication or move to the register page. User credentials are kept in a SQLite db and the following user information is initialized at each start-up - passwords are encrypted using the [bcrypt package](https://cran.r-project.org/web/packages/bcrypt/index.html).
 
@@ -63,19 +58,19 @@ Note that the authentication plan of this application is for demonstration only.
 
 It is assumed that an application key (*application-key*) should be specified for registration together with user name and password. The register page is shown below.
 
-![](register.png#center)
+![Register page with fields for user name, password and application key](register.png#center "Register page with fields for user name, password and application key")
 
 Once logged on, two extra buttons appear: *Profile* and *App*. The screenshots of before and after login are shown below.
 
-![](login.png#center)
+![Login page before and after sign in, with Profile and App buttons added once logged in](login.png#center "Login page before and after sign in, with Profile and App buttons added once logged in")
 
 The main purpose of the profile page is to *change* the password.
 
-![](profile.png#center)
+![Profile page with the form to change the password](profile.png#center "Profile page with the form to change the password")
 
 The application page keeps the main contents of the application. The default Shiny application is used.
 
-![](app.png#center)
+![Old Faithful Geyser Data app with a bins slider, histogram, and Log out and Profile buttons](app.png#center "Old Faithful Geyser Data app with a bins slider, histogram, and Log out and Profile buttons")
 
 ## UI elements
 
@@ -201,3 +196,8 @@ tryCatch({
 
 I hope this post is useful.
 
+## Related posts
+
+* [Internal Load Balancing](/blog/2016-05-23-shiny-open-source-internal-load-balancing) - spreads users over copies of the same app, the other workaround for the single process limit
+* [Async Shiny and Its Limitation](/blog/2018-05-19-asyn-shiny-and-its-limitation) - measures how far the promises package gets past that limit, and where it stops
+* [Shiny to Vue.js](/blog/2018-05-26-shiny-to-vue.js) - moves the frontend to Vue.js and native JavaScript libraries instead of working around Shiny

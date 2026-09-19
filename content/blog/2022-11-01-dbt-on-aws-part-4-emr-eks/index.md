@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt for Effective Data Transformation on AWS
 categories:
@@ -20,9 +16,6 @@ tags:
   - EMR on EKS
   - Apache Spark
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 cevo: 21
 description: Amazon EMR on EKS data transformation pipelines with dbt. Subsets of IMDb data feed models developed in multiple layers following dbt best practices.
 ---
@@ -204,7 +197,7 @@ spec:
 
 The service can be deployed by `kubectl apply -f resources/spark-thrift-server-service.yaml`, and we can check the service details as shown below - we will use the hostname of the service (EXTERNAL-IP) later.
 
-![](thrift-server-svc.png#center)
+![kubectl output for spark-thrift-server-service as a LoadBalancer with an ELB hostname on port 10001](thrift-server-svc.png#center "Service details including the EXTERNAL-IP hostname")
 
 Similar to beeline, we can check the connection using the _pyhive_ package.
 
@@ -515,7 +508,7 @@ tblproperties ('skip.header.line.count'='1')
 
 Interestingly the header rows of the source tables are not skipped when they are queried by spark while they are skipped by Athena. They have to be filtered out in the stage models of the dbt project as spark is the query engine.
 
-![](emr-eks-source-show.png#center)
+![Query of imdb.title_basics where the header row tconst, titleType appears as a data row](emr-eks-source-show.png#center "Header rows are not skipped when spark queries the source tables")
 
 #### Staging
 
@@ -601,7 +594,7 @@ $ aws glue get-tables --database imdb \
 
 Instead we can use spark sql to query the tables. Below shows a query result of the title basics staging table in Glue Studio notebook.
 
-![](emr-eks-staging-show.png#center)
+![Staging model stg_imdb__title_basics returning renamed columns with the header row filtered out](emr-eks-staging-show.png#center "Title basics staging table queried in a Glue Studio notebook")
 
 #### Intermediate
 
@@ -638,7 +631,7 @@ order by id
 
 The intermediate models are also materialised as views and we can check the array columns are flattened as expected.
 
-![](emr-eks-intremediate-show.png#center)
+![Query of int_genres_flattened_from_title_basics returning title_id and genre, one row per genre](emr-eks-intremediate-show.png#center "Array column flattened into one row per genre")
 
 Below shows the file tree of the intermediate models. Similar to the staging models, the intermediate models can be executed by `dbt run --select intermediate`.
 
@@ -810,7 +803,7 @@ $ dbt test --select marts
 
 As with the other layers, the marts models can be executed by `dbt run --select marts`. While the transformation is performed, we can check the details from the spark history server. The SQL tab shows the three transformations in the marts layer.
 
-![](spark-history-server.png#center)
+![Spark SQL tab showing three running dbt queries and 156 completed, each tagged dbt version 1.3.0](spark-history-server.png#center "Marts transformations in progress on the spark history server")
 
 The file tree of the marts models can be found below.
 
@@ -829,7 +822,7 @@ emr-eks/emr_eks/models/marts/
 
 The models of the marts layer can be consumed by external tools such as [Amazon QuickSight](https://aws.amazon.com/quicksight/). Below shows an example dashboard. The pie chart on the left shows the proportion of titles by genre while the box plot on the right shows the dispersion of average rating by start year.
 
-![](emr-eks-quicksight.png#center)
+![QuickSight pie of titles by genre led by Drama, beside average rating spread by start year](emr-eks-quicksight.png#center "Marts models consumed in a QuickSight dashboard")
 
 ### Generate dbt Documentation
 
@@ -841,11 +834,11 @@ $ dbt docs generate
 $ dbt docs serve
 ```
 
-![](emr-eks-doc-01.png#center)
+![dbt docs overview page with imdb source tables and the emr_eks model folders in the sidebar](emr-eks-doc-01.png#center "Generated dbt documentation site")
 
 A very useful element of dbt documentation is [data lineage](https://docs.getdbt.com/terms/data-lineage), which provides an overall view about how data is transformed and consumed. Below we can see that the final titles model consumes all title-related stating models and an intermediate model from the name basics staging model.
 
-![](emr-eks-doc-02.png#center)
+![dbt lineage graph from imdb sources through staging and intermediate models into names, titles and genre_titles](emr-eks-doc-02.png#center "Data lineage of the dbt project")
 
 ## Summary
 

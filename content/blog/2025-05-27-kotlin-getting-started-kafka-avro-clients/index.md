@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Getting Started with Real-Time Streaming in Kotlin
 categories:
@@ -19,13 +15,10 @@ tags:
   - Docker
   - Kpow
   - Factor House Local
-authors:
-  - JaehyeonKim
-images: []
 description: Avro and Schema Registry replace hand written JSON codecs in a Kotlin Kafka producer and consumer, with generated classes and graceful shutdown.
 ---
 
-In this post, we'll explore a practical example of building Kafka client applications using Kotlin, Apache Avro for data serialization, and Gradle for build management. We'll walk through the setup of a Kafka producer that generates mock order data and a consumer that processes these orders. This example highlights best practices such as schema management with Avro, robust error handling, and graceful shutdown, providing a solid foundation for your own Kafka-based projects. We'll dive into the build configuration, the Avro schema definition, utility functions for Kafka administration, and the core logic of both the producer and consumer applications.
+A Kafka producer that generates mock order data and a consumer that processes these orders are built with Kotlin, Apache Avro for data serialization, and Gradle for build management. This example highlights best practices such as schema management with Avro, robust error handling, and graceful shutdown, providing a solid foundation for your own Kafka-based projects. We'll dive into the build configuration, the Avro schema definition, utility functions for Kafka administration, and the core logic of both the producer and consumer applications.
 
 <!--more-->
 
@@ -572,7 +565,7 @@ docker compose -f compose-kpow-community.yml up -d
 
 Once the services are initialized, we can access the Kpow user interface by navigating to `http://localhost:3000` in the web browser, where we observe the provisioned environment, including three Kafka brokers, one schema registry, and one Kafka Connect instance.
 
-![](kpow-overview.png#center)
+![Kpow with three Kafka brokers, one schema registry and one Kafka Connect instance](kpow-overview.png#center "Kpow with three Kafka brokers, one schema registry and one Kafka Connect instance")
 
 ### Launch Applications
 
@@ -601,16 +594,16 @@ java -jar build/libs/orders-avro-clients-1.0.jar consumer
 
 For this post, we demonstrate starting the applications in development mode using Gradle. Once started, we see logs from both the producer sending messages and the consumer receiving them.
 
-![](kafka-avro-apps.webp#center)
+![Producer and consumer logs side by side as Avro order messages are sent and received](kafka-avro-apps.webp#center "Producer and consumer logs side by side as Avro order messages are sent and received")
 
 Within the Kpow interface, we can check that a new schema, `orders-avro-value`, is now registered with the *Local Schema Registry*.
 
-![](schema-registry.png#center)
+![Kpow listing the orders-avro-value schema in the Local Schema Registry](schema-registry.png#center "Kpow listing the orders-avro-value schema in the Local Schema Registry")
 
 With the applications actively producing and consuming Avro data, Kpow enables inspection of messages on the `orders-avro` topic. In the Kpow UI, navigate to this topic. To correctly view the Avro messages, configure the deserialization settings as follows: set the **Key Deserializer** to *String*, choose *AVRO* for the **Value Deserializer**, and ensure the **Schema Registry** selection is set to *Local Schema Registry*. After applying these configurations, click the Search button to display the messages.
 
-![](message-view-01.png#center)
-![](message-view-02.png#center)
+![Kpow data inspect form with String key, AVRO value and Local Schema Registry](message-view-01.png#center "Kpow data inspect form with String key, AVRO value and Local Schema Registry")
+![Order records on orders-avro with order id, bid time, price, item and supplier](message-view-02.png#center "Order records on orders-avro with order id, bid time, price, item and supplier")
 
 ## Conclusion
 

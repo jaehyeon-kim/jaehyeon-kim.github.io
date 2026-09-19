@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt Pizza Shop Demo
 categories:
@@ -20,13 +16,10 @@ tags:
   - Docker
   - Python
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 description: Orchestrate the Amazon Athena and Iceberg pizza shop dbt project with Apache Airflow, running the dimension and denormalised fact table builds.
 ---
 
-In [Part 5](/blog/2024-03-07-dbt-pizza-shop-5), we developed a [dbt](https://docs.getdbt.com/docs/introduction) project that that targets [Apache Iceberg](https://iceberg.apache.org/) where transformations are performed on [Amazon Athena](https://aws.amazon.com/athena/). Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. To improve query performance, the fact table is denormalized to pre-join records from the dimension tables using the array and struct data types. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.
+An ETL process is set up on the pizza shop dbt project using Apache Airflow. In [Part 5](/blog/2024-03-07-dbt-pizza-shop-5), we developed a [dbt](https://docs.getdbt.com/docs/introduction) project that that targets [Apache Iceberg](https://iceberg.apache.org/) where transformations are performed on [Amazon Athena](https://aws.amazon.com/athena/). Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. To improve query performance, the fact table is denormalized to pre-join records from the dimension tables using the array and struct data types.
 
 * [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1)
 * [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2)
@@ -166,7 +159,7 @@ $ AIRFLOW_UID=$(id -u) docker-compose up -d
 
 Once started, we can visit the Airflow web server on *http://localhost:8080*.
 
-![](airflow-home.png#center)
+![Airflow DAGs page listing a single paused DAG named demo_etl, owned by airflow and tagged pizza](airflow-home.png#center "Airflow web server after startup")
 
 ## ETL Job
 
@@ -362,7 +355,7 @@ def main():
 
 The details of the ETL job can be found on the Airflow web server as shown below.
 
-![](airflow-dag.png#center)
+![Airflow graph view of demo_etl, three successful tasks in sequence, update_records then dbt_run then dbt_test](airflow-dag.png#center "Tasks of the ETL job")
 
 ## Run ETL
 

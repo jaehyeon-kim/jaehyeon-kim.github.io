@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Python Examples
 categories:
@@ -18,13 +14,10 @@ tags:
   - Apache Flink
   - Apache Kafka
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Two Beam Python pipelines compute average word length from a Kafka topic, one emitting a global average and one using a sliding time window.
 ---
 
-In this post, we develop two Apache Beam pipelines that calculate average word lengths from input texts that are ingested by a Kafka topic. They obtain the statistics in different angles. The first pipeline emits the global average lengths whenever a new input text arrives while the latter triggers those values in a sliding time window.
+Two Apache Beam pipelines calculate average word lengths from input texts that are ingested by a Kafka topic. They obtain the statistics in different angles. The first pipeline emits the global average lengths whenever a new input text arrives while the latter triggers those values in a sliding time window. We develop both pipelines in this post.
 
 <!--more-->
 
@@ -439,11 +432,11 @@ python chapter2/average_word_length.py --deprecated_read \
 
 On Flink UI, we see the pipeline has two tasks. The first task is performed until tokenizing text into words while the second task performs up to sending the average word length records into the output topic.
 
-![](avg-word-len-dag.png#center)
+![Flink job graph for avg-word-length, a Kafka source task feeding the average and write task](avg-word-len-dag.png#center "Two tasks of the avg-word-length job on Flink UI")
 
 On Kafka UI, we can check the output message includes an average word length and record creation timestamp.
 
-![](avg-word-len-output.png#center)
+![Kafka UI messages on the average-word-length topic, each with created_at and avg_len values](avg-word-len-output.png#center "Output records carrying an average word length")
 
 ### Calculate Average Word Length with Fixed Lookback
 
@@ -615,7 +608,7 @@ We add four elements as listed below.
 
 Therefore, we can expect which elements belong to which windows and calculate average word lengths accordingly.
 
-![](avg-lookback-elements.png#center)
+![Table of ten sliding windows with their start and end offsets, elements and average length](avg-lookback-elements.png#center "Which elements fall in which window, and the resulting average")
 
 ```python
 # chapter2/sliding_window_word_length_test.py
@@ -712,8 +705,8 @@ python chapter2/sliding_window_word_length.py --deprecated_read\
 
 On Flink UI, we can see two tasks in the job graph as well.
 
-![](avg-lookback-dag.png#center)
+![Flink job graph for slinding-word-length with the same two tasks and 7,080 records passed on](avg-lookback-dag.png#center "Job graph of the sliding window pipeline")
 
 On Kafka UI, we can check the output message includes an average word length as well as window start/end timestamps.
 
-![](avg-lookback-output.png#center)
+![Kafka UI messages on sliding-window-word-length with window_start, window_end and avg_len](avg-lookback-output.png#center "Output records carrying the window bounds and average")

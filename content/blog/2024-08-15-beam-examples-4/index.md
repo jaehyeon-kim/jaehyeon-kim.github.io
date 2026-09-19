@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Python Examples
 categories:
@@ -19,13 +15,10 @@ tags:
   - Apache Kafka
   - Python
   - gRPC
-authors:
-  - JaehyeonKim
-images: []
 description: Data augmentation in Beam Python by calling a gRPC service once per input element, running on a local Flink cluster with Kafka as the source.
 ---
 
-In this post, we develop an Apache Beam pipeline where the input data is augmented by a **Remote Procedure Call (RPC)** service. Each input element performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element. In the subsequent two posts, we will discuss updated pipelines that make RPC calls more efficiently. We begin with illustrating how to manage development resources followed by demonstrating the RPC service that we use in this series. Finally, we develop a Beam pipeline that accesses the external service to augment the input elements.
+Each input element performs a **Remote Procedure Call (RPC)** and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element. In this post, we develop an Apache Beam pipeline where the input data is augmented by an RPC service. We begin with illustrating how to manage development resources followed by demonstrating the RPC service that we use in this series. Finally, we develop a Beam pipeline that accesses the external service to augment the input elements. In the subsequent two posts, we will discuss updated pipelines that make RPC calls more efficiently.
 
 <!--more-->
 
@@ -265,7 +258,7 @@ tree -P "serv*|proto" -I "*pycache*"
 
 We can check the client and server applications as Python scripts. If we select 1, the next prompt requires to enter a word. Upon entering a word, it returns a tuple of the word and its length as an output. We can make an RPC request with a text if we select 2. Similar to the earlier call, it returns enriched outputs as multiple tuples.
 
-![](rpc-demo.png#center)
+![Terminal where Resolve returns a word length of 22 and ResolveBatch returns six word length pairs](rpc-demo.png#center "Unary and batch RPC calls against the local gRPC server")
 
 ## Beam Pipeline
 
@@ -583,7 +576,7 @@ cat /etc/hosts | grep host.docker.internal
 
 We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - `python utils/faker_gen.py`. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about the Kafka producer.
 
-![](input-messages.png#center)
+![Kafka UI input-topic messages tab, 22 messages consumed with the first text value expanded](input-messages.png#center "Input text messages produced into the Kafka topic")
 
 When executing the pipeline, we specify only a single known argument that enables to use the legacy read (`--deprecated_read`) while accepting default values of the other known arguments (`bootstrap_servers`, `input_topic` ...). The remaining arguments are all pipeline arguments. Note that we deploy the pipeline on a local Flink cluster by specifying the flink master argument (`--flink_master=localhost:8081`). Alternatively, we can use an embedded Flink cluster if we exclude that argument.
 
@@ -597,8 +590,8 @@ python chapter3/rpc_pardo.py --deprecated_read \
 
 On Flink UI, we see the pipeline only has a single task.
 
-![](pipeline-dag.png#center)
+![Flink UI job rpc-pardo running as one task box with parallelism 3 and no backpressure](pipeline-dag.png#center "Pipeline runs as a single Flink task")
 
 On Kafka UI, we can check the output message is a dictionary of a word and its length.
 
-![](output-messages.png#center)
+![Kafka UI rpc-pardo topic, 500 messages consumed, key question and value word question length 8](output-messages.png#center "Output messages, each a word and its length")

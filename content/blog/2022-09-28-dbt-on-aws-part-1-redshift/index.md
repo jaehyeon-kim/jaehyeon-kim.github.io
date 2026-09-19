@@ -5,22 +5,15 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt for Effective Data Transformation on AWS
 categories:
   - Data Engineering
 tags: 
   - AWS
-  - AWS Serverless
+  - AWS SAM
   - Amazon Redshift
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 cevo: 18
 description: Redshift Serverless data transformation pipelines with dbt. Subsets of IMDb data feed models developed in multiple layers following dbt best practices.
 ---
@@ -59,7 +52,7 @@ Finally, the following areas are supported by spark, however not supported by DB
 
 Overall dbt can be used as an effective tool for data transformation in a wide range of data projects from data warehousing to data lake to data lakehouse. Also it can be more powerful with spark by its Python models feature. Below shows an overview diagram of the scope of this dbt on AWS series. Redshift is highlighted as it is discussed in this post. 
 
-![](featured.png#center)
+![Source data turned into datasets by dbt on Redshift, Glue, EMR and Athena](featured.png#center "Source data turned into datasets by dbt on Redshift, Glue, EMR and Athena")
 
 ## Infrastructure
 
@@ -116,7 +109,7 @@ $ aws secretsmanager get-secret-value --secret-id redshift-sls-all-secrets --que
 
 The [previous post](/blog/2022-02-06-dev-infra-terraform) demonstrates how to create a VPN user and to establish connection in detail. An example of a successful connection is shown below.
 
-![](vpn-connection.png#center)
+![VPN client showing a successful connection to the server](vpn-connection.png#center "VPN client showing a successful connection to the server")
 
 ## Project
 
@@ -566,7 +559,7 @@ redshift-sls/dbt_redshift_sls/models/staging/
 
 We can keep intermediate results in this layer so that the models of the final marts layer can be simplified. The source data includes columns where array values are kept as comma separated strings. For example, the genres column of the _stg_imdb__title_basics_ model includes up to 3 genre values as shown below. 
 
-![](gnere-before.png#center)
+![Staging rows where the genres column holds up to three genres in one comma separated string](gnere-before.png#center "Staging rows where the genres column holds up to three genres in one comma separated string")
 
 A total of seven columns in three models are columns of comma-separated strings and it is better to flatten them in the intermediate layer. Also, in order to avoid repetition, a [dbt macro](https://docs.getdbt.com/docs/building-a-dbt-project/jinja-macros) (f_latten_fields_) is created to share the column-flattening logic. 
 
@@ -615,7 +608,7 @@ order by id
 
 The intermediate models are also materialised as views, and we can check the array columns are flattened as expected.
 
-![](gnere-after.png#center)
+![Intermediate model rows with one genre per row after the column is flattened](gnere-after.png#center "Intermediate model rows with one genre per row after the column is flattened")
 
 Below shows the file tree of the intermediate models. Similar to the staging models, the intermediate models can be executed by `dbt run --select intermediate`.
 
@@ -777,7 +770,7 @@ redshift-sls/dbt_redshift_sls/models/marts/
 
 Using the [Redshift query editor v2](https://docs.aws.amazon.com/redshift/latest/mgmt/query-editor-v2-using.html), we can quickly create charts with the final models. The example below shows a pie chart and we see about 50% of titles are from the top 5 genres.  
 
-![](pie-chart.png#center)
+![Pie chart in the Redshift query editor where the top five genres cover about half of titles](pie-chart.png#center "Pie chart in the Redshift query editor where the top five genres cover about half of titles")
 
 ### Generate dbt Documentation
 
@@ -789,11 +782,11 @@ $ dbt docs generate
 $ dbt docs serve
 ```
 
-![](dbt-doc-01.png#center)
+![dbt documentation site listing the project models and their descriptions](dbt-doc-01.png#center "dbt documentation site listing the project models and their descriptions")
 
 A very useful element of dbt documentation is [data lineage](https://docs.getdbt.com/terms/data-lineage), which provides an overall view about how data is transformed and consumed. Below we can see that the final titles model consumes all title-related stating models and an intermediate model from the name basics staging model. 
 
-![](dbt-doc-02.png#center)
+![dbt lineage graph where the titles model draws on staging and intermediate models](dbt-doc-02.png#center "dbt lineage graph where the titles model draws on staging and intermediate models")
 
 
 ## Summary

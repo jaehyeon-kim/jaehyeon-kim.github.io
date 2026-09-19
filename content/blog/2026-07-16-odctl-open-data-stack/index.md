@@ -5,26 +5,18 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 categories:
   - Data Engineering
   - Open Source
 tags:
   - Open Data Stack
   - odctl
-  - Kafka
-  - Flink
-  - Spark
+  - Apache Kafka
+  - Apache Flink
+  - Apache Spark
   - Trino
-  - Iceberg
-  - Docker
+  - Apache Iceberg
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: |
   odctl is a CLI on PyPI that launches Kafka, Flink, Spark, Trino, Iceberg, Airflow and an MLOps and observability suite as one local stack.
 ---
@@ -113,6 +105,12 @@ odctl down --all --volumes
 * `.env`: shared environment variables such as default credentials and timezones.
 
 The CLI always prioritizes the files in your local workspace, so you can tweak freely. If you break something, `odctl init --force` restores the pristine defaults.
+
+## Related posts
+
+* [Productionizing an Online Product Recommender using Event Driven Architecture](/blog/2026-02-23-productionize-recommender-with-eda) - Flink, Kafka and Valkey turn a contextual bandit recommender into an event driven service
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system) - a local proof of concept built on this stack, putting a semantic layer between a model and Iceberg
+* [Data Warehousing ETL Demo with Apache Iceberg](/blog/2022-06-26-iceberg-etl-demo) - an Iceberg and PySpark ETL job run in an EMR local environment, then verified in Athena
 
 ## Try It Out
 

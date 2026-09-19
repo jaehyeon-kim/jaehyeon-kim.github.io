@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt Pizza Shop Demo
 categories:
@@ -18,9 +14,6 @@ tags:
   - Docker
   - Python
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 description: Model fictional pizza shop data on PostgreSQL with dbt, building two SCD type 2 dimension tables and one transactional fact table.
 ---
 

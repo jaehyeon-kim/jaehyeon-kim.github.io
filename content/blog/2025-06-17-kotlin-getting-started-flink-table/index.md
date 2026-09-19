@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Getting Started with Real-Time Streaming in Kotlin
 categories:
@@ -20,9 +16,6 @@ tags:
   - Docker
   - Kpow
   - Factor House Local
-authors:
-  - JaehyeonKim
-images: []
 description: Flink Table API in Kotlin states the supplier statistics as a declarative windowed aggregation over a DataStream, with late rows routed by hand.
 ---
 
@@ -803,7 +796,7 @@ To set up your local Kafka environment, follow these steps:
     ```
 Once initialized, Kpow will be accessible at `http://localhost:3000`, showing Kafka brokers, schema registry, and other components.
 
-![](kpow-overview.png#center)
+![Kpow with the Kafka brokers, schema registry and other components of the local setup](kpow-overview.png#center "Kpow with the Kafka brokers, schema registry and other components of the local setup")
 
 ### Start the Kafka Order Producer
 
@@ -818,8 +811,8 @@ DELAY_SECONDS=30 ./gradlew run --args="producer"
 
 This will start populating the `orders-avro` topic with Avro-encoded order messages. You can inspect these messages in Kpow. Ensure Kpow is configured with Key Deserializer: *String*, Value Deserializer: *AVRO*, and Schema Registry: *Local Schema Registry*.
 
-![](orders-01.png#center)
-![](orders-02.png#center)
+![Kpow data inspect form for orders-avro with String key and AVRO value](orders-01.png#center "Kpow data inspect form for orders-avro with String key and AVRO value")
+![Avro order records on the orders-avro topic listed in Kpow](orders-02.png#center "Avro order records on the orders-avro topic listed in Kpow")
 
 ### Launch the Flink Application
 
@@ -860,8 +853,8 @@ In Kpow, navigate to the `orders-avro-ktl-stats` topic. Configure Kpow to view t
 
 You should see `SupplierStats` messages, each representing the total price and count of orders for a supplier within a 5-second (or 5000 millisecond) window. Notice the `window_start` and `window_end` fields.
 
-![](stats-01.png#center)
-![](stats-02.png#center)
+![Kpow data inspect form for the orders-avro-ktl-stats topic](stats-01.png#center "Kpow data inspect form for the orders-avro-ktl-stats topic")
+![SupplierStats records with supplier, window start and end, total price and count](stats-02.png#center "SupplierStats records with supplier, window start and end, total price and count")
 
 **2. Skipped (Late) Records (`orders-avro-ktl-skipped`):**
 
@@ -871,8 +864,8 @@ Next, inspect the `orders-avro-ktl-skipped` topic in Kpow. Configure Kpow as fol
 
 These records were intercepted and rerouted by our custom `LateDataRouter` `ProcessFunction`. This manual step was necessary to separate late data before converting the stream to a `Table`, demonstrating a powerful pattern of blending Flink's APIs to solve complex requirements.
 
-![](skipped-01.png#center)
-![](skipped-02.png#center)
+![Kpow data inspect form for the orders-avro-ktl-skipped topic with a JSON value](skipped-01.png#center "Kpow data inspect form for the orders-avro-ktl-skipped topic with a JSON value")
+![Late order records routed to the skipped topic, listed in Kpow](skipped-02.png#center "Late order records routed to the skipped topic, listed in Kpow")
 
 ## Conclusion
 

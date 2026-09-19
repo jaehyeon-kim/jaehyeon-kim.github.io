@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Realtime Dashboard with FastAPI, Streamlit and Next.js
 categories:
@@ -19,13 +15,10 @@ tags:
   - Python
   - Docker
   - WebSocket
-authors:
-  - JaehyeonKim
-images: []
 description: A Python generator loads theLook eCommerce data into PostgreSQL, and a FastAPI WebSocket server queries it on a timer to serve live dashboards.
 ---
 
-In this series, we develop real-time monitoring dashboard applications. A data generating app is created with Python, and it ingests the [theLook eCommerce](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) data continuously into a PostgreSQL database. A WebSocket server, built by [FastAPI](https://fastapi.tiangolo.com/), periodically queries the data to serve its clients. The monitoring dashboards will be developed using [Streamlit](https://streamlit.io/) and [Next.js](https://nextjs.org/), with [Apache ECharts](https://echarts.apache.org/en/index.html) for visualization. In this post, we walk through the data generation app and backend API, while the monitoring dashboards will be discussed in later posts.
+A data generating app is created with Python, and it ingests the [theLook eCommerce](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) data continuously into a PostgreSQL database. A WebSocket server, built by [FastAPI](https://fastapi.tiangolo.com/), periodically queries the data to serve its clients. In this series, we develop real-time monitoring dashboard applications, and this post walks through the data generation app and backend API. The monitoring dashboards will be developed using [Streamlit](https://streamlit.io/) and [Next.js](https://nextjs.org/), with [Apache ECharts](https://echarts.apache.org/en/index.html) for visualization. They will be discussed in later posts.
 
 <!--more-->
 
@@ -315,7 +308,7 @@ INFO:root:append records, table - events, # records - 19
 
 When the data gets ingested into the database, we see the following tables are created in the *ecommerce* schema.
 
-![](diagram.png#center)
+![Entity diagram of the ecommerce schema with users, orders, order_items, products, events, inventory_items and dist_centers, and the columns of each](diagram.png#center "Tables created in the ecommerce schema")
 
 ### WebSocket Server
 
@@ -479,4 +472,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
 The Docker Compose services can be deployed using the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) by executing `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`.  
 
-![](featured.gif#center)
+![Terminal recording with the WebSocket client on the left printing streamed order JSON, and the server log on the right running the users, order_items and products join every five minutes](featured.gif#center "WebSocket server streaming records to a connected client")
+
+## Related posts
+
+* [Guide to Building Integrated Web Applications with FastAPI and NiceGUI](/blog/2025-11-19-fastapi-nicegui-template) - serves a FastAPI backend and the web UI from one Python process, compared with React and with Streamlit

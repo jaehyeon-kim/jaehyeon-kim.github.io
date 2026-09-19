@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - API development with R
 categories:
@@ -19,11 +15,10 @@ tags:
   - R
   - RServe
   - rApache
-authors:
-  - JaehyeonKim
-images: []
-description: In part I, it is discussed how to serve an R function with plumber, Rserve and rApache. In this post, the APIs are deployed in a Docker container and, after showing example requests, their performance is compared.
+description: Deploy plumber, RServe and rApache APIs in Docker containers, then compare the three R API options on example requests and response performance.
 ---
+> **Status, September 2026.** This post deploys the APIs on R 3.4 through the `rocker/r-ver:3.4` image, and the rApache and Rserve builds it performs are pinned to versions that are no longer current. Use a current R image and serve the function with plumber instead.
+
 In [Part I](/blog/2017-11-18-api-development-with-r-1), it is discussed how to serve an R function with _plumber_, _Rserve_ and _rApache_. In this post, the APIs are deployed in a Docker container and, after showing example requests, their performance is compared. The [rocker/r-ver:3.4](https://hub.docker.com/r/rocker/r-ver/) is used as the base image and each of the APIs is added to it. For simplicity, the APIs are served by [Supervisor](https://supervisord.org/). For performance testing, [Locust](https://locust.io/) is used. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/r-api-demo).
 
 ## Deployment
@@ -226,11 +221,11 @@ locust -f ./locustfile.py --host http://localhost:8000 --no-web -c 3 -r 3
 
 When only 1 request is made successively, the average response time of the APIs is around 500ms. When there are multiple concurrent requests, however, the average response time of the _plumber_ API increases significantly. This is because R is single threaded and requests are _queued_ by _httpuv_. On the other hand, the average response time of the _Rserve_ API stays the same and this is because _Rserve_ handles concurrent requests by _forked_ processes. The performance of the _rApache_ API is in the middle. In practice, it is possible to boost the performance of the _rApache_ API by enabling [Prefork Multi-Processing Module](https://jeffreyhorner.github.io/rapache/manual.html) although it will consume more memory.
 
-![](response_time.png#center)
+![Bar chart of average response time, Rserve flat near 500 ms while plumber rises to 3000 ms at six concurrent requests](response_time.png#center "Average response time by number of concurrent requests")
 
 As expected, the _Rserve_ API handles considerably many requests per second. 
 
-![](req_per_sec.png#center)
+![Bar chart of requests per second, Rserve reaching 12 at six concurrent requests against 4 for rApache and under 2 for plumber](req_per_sec.png#center "Requests per second by number of concurrent requests")
 
 Note that the test function in this post is a bit unrealistic as it just waits before returning a value. In practice, R functions will consume more CPU and the average response time will tend to increase when multiple requests are made concurrently. Even in this case, the benefit of forking will persist.
 

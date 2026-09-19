@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -19,9 +15,6 @@ tags:
   - Apache Airflow
   - Docker
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: In this post, it is demonstrated how AWS Lambda can be integrated with Apache Airflow using a custom operator inspired by the ECS Operator.
 ---
 
@@ -47,7 +40,7 @@ The key difference between ECS and Lambda is that the former sends log events to
 * Wating for function ended
 * Checking the invocation status
 
-![](execute-process.png#center)
+![Three Lambda Operator steps, invoke, wait, check status, with a custom CloudWatch log group](execute-process.png#center "Steps the Lambda Operator runs for a task")
 
 ## Lambda Operator
 
@@ -404,11 +397,17 @@ networks:
 Below shows the demo DAG after running for a while.
 
 
-![](dags.png#center)
+![Airflow DAGs page listing demo-dag on a 30 second schedule with succeeded and failed runs](dags.png#center "demo-dag after running for a while")
 
 Lambda logs (and traceback) are found for both succeeded and failed tasks.
 
-![](log-success.png#center)
+![Airflow task log for demo-task showing Lambda StatusCode 200 and the function's own log lines](log-success.png#center "Lambda logs inside a succeeded Airflow task")
 
 
-![](log-failure.png#center)
+![Airflow task log with the Lambda traceback and AirflowException saying invocation is not successful](log-failure.png#center "Lambda traceback in a failed Airflow task")
+
+## Related posts
+
+* [Revisit AWS Lambda Invoke Function Operator of Apache Airflow](/blog/2022-08-06-revisit-lambda-operator) - the same operator extended with a correlation ID so it reports the exact error message.
+* [dbt Pizza Shop Demo - Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6) - Airflow orchestrating a dbt project on Amazon Athena, a fuller example of task design.
+* [AWS Local Development with LocalStack](/blog/2019-07-20-aws-localstack) - running AWS services on a local machine so Lambda code can be tested without an account.

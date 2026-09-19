@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Development with Docker
 categories:
@@ -19,9 +15,6 @@ tags:
   - Apache Kafka
   - Kafka Connect
   - Schema Registry
-authors:
-  - JaehyeonKim
-images: []
 description: Build the Glue Schema Registry client library and use it to manage and enforce schemas in Kafka producer and consumer applications.
 ---
 
@@ -45,7 +38,7 @@ In order to integrate the *Glue Schema Registry* with an application, we need to
 
 The below diagram shows how Kafka producer and consumer apps are integrated with the *Glue Schema Registry*. As Kafka producer and consumer apps are decoupled, they operate on Kafka topics rather than communicating with each other directly. Therefore, it is important to have a schema registry that manages/stores schemas and validates them.
 
-![](featured.png#center)
+![Producer serialises records and the consumer deserialises them through a Kafka cluster, with both checking schemas against the Glue Schema Registry](featured.png#center "How producer and consumer apps work with the Glue Schema Registry")
 
 1. The producer checks whether the schema that is used for serializing records is valid. Also, a new schema version is registered if it is yet to be done so. 
     + Note the schema registry preforms compatibility checks while registering a new schema version. If it turns out to be incompatible, registration fails and the producer fails to send messages. 

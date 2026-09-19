@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Getting Started with PyFlink on AWS
 categories:
@@ -21,12 +17,9 @@ tags:
   - PyFlink
   - Python
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 description: Deploy a PyFlink app that reads and writes Kafka topics on Amazon MSK to Amazon Managed Service for Apache Flink, the managed Flink runtime.
 ---
-In this series of posts, we discuss a Flink (Pyflink) application that reads/writes from/to Kafka topics. In the previous posts, I demonstrated a Pyflink app that targets a local Kafka cluster as well as a Kafka cluster on Amazon MSK. The app was executed in a virtual environment as well as in a local Flink cluster for improved monitoring. In this post, the app will be deployed via [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/), which is the easiest option to run Flink applications on AWS.
+[Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/) is the easiest option to run Flink applications on AWS, and the Pyflink app is deployed via it in this post. In this series of posts, we discuss a Flink (Pyflink) application that reads/writes from/to Kafka topics. In the previous posts, I demonstrated a Pyflink app that targets a local Kafka cluster as well as a Kafka cluster on Amazon MSK. The app was executed in a virtual environment as well as in a local Flink cluster for improved monitoring.
 
 * [Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1)
 * [Part 2 Local Flink and MSK](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2)
@@ -82,7 +75,7 @@ Once completed, we can check the following contents are included in the applicat
 - Pipeline jar file - *package/lib/pyflink-getting-started-1.0.0.jar*
 - kafka-python package - *package/site_packages/kafka*
 
-![](package-contents.png#center)
+![Contents of kda-package.zip, holding processor.py beside a package folder with lib and site_packages](package-contents.png#center "Application package uploaded to S3")
 
 #### Kafka Management App
 
@@ -621,7 +614,7 @@ resource "aws_iam_role" "kda_app_role" {
 
 Once deployed, we can see the application on AWS console, and it stays in the ready status.
 
-![](kda-app.png#center)
+![Kinesis streaming application kda-getting-started-kda-app with status Ready boxed in red, on the Apache Flink 1.15 runtime](kda-app.png#center "The deployed application on the AWS console")
 
 ## Run Application
 
@@ -629,37 +622,37 @@ We first need to create records in the source Kafka topic. It is done by executi
 
 Once executed, we can check the source topic is created and messages are ingested.
 
-![](source-topic.png#center)
+![Kpow topic details for stocks-in, 2 partitions and 289 messages arriving at 2.26 writes per second](source-topic.png#center "Source topic after the producer starts")
 
 ### Monitoring on Flink Web UI
 
 We can run the Flink application on AWS console with the *Run without snapshot* option as we haven't enabled [snapshots](https://docs.aws.amazon.com/managed-flink/latest/java/how-fault-snapshot.html).
 
-![](kda-run.png#center)
+![Run application page with Run without snapshot selected among the restore options](kda-run.png#center "Starting the application without a snapshot")
 
 Once the app is running, we can monitor it on the Flink Web UI available on AWS Console. 
 
-![](cluster-dashboard-00.png#center)
+![Streaming applications list with the Open Apache Flink dashboard button boxed in red](cluster-dashboard-00.png#center "Opening the Flink dashboard from the console")
 
 In the Overview section, it shows the available task slots, running jobs and completed jobs.
 
-![](cluster-dashboard-01.png#center)
+![Flink dashboard overview with 0 available task slots and one running job inserting into sink_table](cluster-dashboard-01.png#center "Flink Web UI overview of the managed application")
 
 We can inspect an individual job in the Jobs menu. It shows key details about a job execution in *Overview*, *Exceptions*, *TimeLine*, *Checkpoints* and *Configuration* tabs.
 
-![](cluster-dashboard-02.png#center)
+![Flink job page for the sink_table insert, running for 4 minutes with parallelism 1 and 327 KB received](cluster-dashboard-02.png#center "Details of an individual job")
 
 ### CloudWatch Logging
 
 The application log messages can be checked in the CloudWatch Console, and it gives additional capability to debug the application.
 
-![](kda-logging.png#center)
+![CloudWatch log events for the application, with one entry expanded to show a message marking checkpoint 18 as completed](kda-logging.png#center "Application log messages in CloudWatch")
 
 ### Application Output
 
 We can see details of all the topics in *Kpow*. The total number of messages matches between the source and output topics but not within partitions.
 
-![](all-topics.png#center)
+![Kpow topic details for stocks-in and stocks-out, both at 3234 messages but split differently across partitions](all-topics.png#center "Message counts match between the source and output topics")
 
 ## Summary
 

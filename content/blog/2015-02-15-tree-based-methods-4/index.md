@@ -5,19 +5,12 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Tree Based Methods in R
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
 description: Part IV of tree based methods in R series. 3 R packages for classification analysis are compared - rpart, caret and mlr packages.
 ---
 
@@ -41,6 +34,8 @@ Before getting started, I should admit the names are not defined effectively. I 
 - etc: **cp** - complexity parameter, **mmce** - mean misclassification error, **acc** - Accuracy (**caret**), **cm** - confusion matrix
 
 Also the data is randomly split into **trainData** and **testData**. In practice, the latter is not observed and it is used here for evaludation.
+
+## Packages, Data and Balanced Split
 
 Let's get started.
 
@@ -162,6 +157,8 @@ Note that two custom functions are used: `bestParam()` and `updateCM()`. The for
 source("src/mlUtils.R")
 ```
 
+## Fit with rpart
+
 At first, the model is fit using the **rpart** package and **bst** and **lst** *cp* values are obtained.
 
 
@@ -201,7 +198,7 @@ ggplot(data=df[1:nrow(df),], aes(x=CP,y=xerror)) +
   geom_point(aes(x=best[1,1],y=best[2,1]),color="blue",size=3)
 ```
 
-![](rpart_cp_graph-1.png#center) 
+![Cross-validation error against complexity parameter, with red and blue points marking two chosen values](rpart_cp_graph-1.png#center "Cross-validation error by cp") 
 
 The original tree is pruned with the 2 *cp* values, resulting in 2 separate trees, and they are fit on the training data.
 
@@ -303,6 +300,8 @@ ldply(mmce)
 ## 4 rpart   TRUE   TRUE TRUE 0.1061  0.3
 ```
 
+## Fit with caret
+
 Secondly the **caret** package is employed to implement the CART model.
 
 
@@ -355,7 +354,7 @@ ggplot(data=df[1:nrow(df),], aes(x=cp,y=Accuracy)) +
   geom_point(aes(x=mod.crt.eq.lst.cp,y=mod.crt.eq.lst.acc),color="blue",size=3)
 ```
 
-![](cp_graph_caret-1.png#center) 
+![Accuracy falling as the complexity parameter grows, with blue and red points marking two candidates](cp_graph_caret-1.png#center "Accuracy by cp in caret") 
 
 Similar to above, 2 trees with the respective *cp* values are fit into the train and test data and the details are kept in *mmce*. Below is the update by fitting from the train data.
 
@@ -433,6 +432,8 @@ ldply(mmce)
 ## 7 caret   TRUE  FALSE TRUE 0.0156 0.19
 ## 8 caret   TRUE   TRUE TRUE 0.2488  0.3
 ```
+
+## Fit with mlr
 
 Finally the **mlr** package is employed. 
 
@@ -590,6 +591,6 @@ ggplot(data=mmce.crt,aes(x=cp,y=mmce,fill=data)) +
   geom_bar(stat="identity", position=position_dodge())
 ```
 
-![](mmce_plot-1.png#center) 
+![Grouped bar chart of misclassification error by complexity parameter for fitted and predicted data](mmce_plot-1.png#center "Misclassification error by cp") 
 
 It may not be convicing to use a wrapper by this article about a single model. For example, however, if there are multiple models with a variety of tuning parameters to compare, the benefit of having one can be considerable. In the following articles, a similar approach would be taken, which is comparing individual packages to the wrappers.

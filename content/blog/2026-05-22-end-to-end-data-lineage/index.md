@@ -5,23 +5,14 @@ draft: false
 featured: false
 comment: true
 toc: false
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 categories:
   - Data Engineering
-  - Conference
 tags:
   - Apache Kafka
   - Apache Flink
   - Apache Spark
   - OpenLineage
   - Data Lineage
-  - Streaming
-authors:
-  - JaehyeonKim
-images: []
 description: "A comprehensive walkthrough from my session at Current London 2026 on capturing and visualizing data lineage across a production-style data stack."
 ---
 
@@ -59,6 +50,12 @@ Visualizing this multi-path journey, including column-level details, was achieve
 * **Kafka Connect:** Lineage is established at the connector level using a custom Single Message Transform (SMT) to capture operational state without altering the payload.
 * **Apache Flink:** Two distinct patterns were evaluated: a low-overhead listener-based approach, and a manual orchestration method necessary for capturing application cancellations.
 * **Apache Spark:** Spark's `extraListeners` were configured to auto-detect inputs and outputs, linking the batch jobs to upstream Flink outputs via aligned physical namespaces.
+
+## Related posts
+
+* [Setup Local Development Environment for Apache Flink and Spark Using EMR Container Images](/blog/2023-12-07-flink-spark-local-dev) - a local Flink and Spark environment of the kind this lineage work instruments.
+* [Self-service Data Platform via a Multi-tenant SQL Gateway](/blog/2025-07-17-self-service-data-platform-via-sql-gateway) - Apache Kyuubi giving on-demand Spark, Flink and Trino engines with central governance.
+* [Introducing odctl: One CLI for a Local Open Data Stack](/blog/2026-07-16-odctl-open-data-stack) - a CLI that starts Kafka, Flink, Spark, Trino, Iceberg and observability tooling as one local stack.
 
 ## Moving Forward
 

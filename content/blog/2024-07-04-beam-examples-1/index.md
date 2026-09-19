@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Python Examples
 categories:
@@ -18,13 +14,10 @@ tags:
   - Apache Flink
   - Apache Kafka
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Set up a local Apache Flink and Kafka environment, then build two Beam Python streaming pipelines for top K frequent words and longest word length.
 ---
 
-In this series, we develop [Apache Beam](https://beam.apache.org/) Python pipelines. The majority of them are from [Building Big Data Pipelines with Apache Beam by Jan Lukavský](https://www.packtpub.com/en-us/product/building-big-data-pipelines-with-apache-beam-9781800564930). Mainly relying on the Java SDK, the book teaches fundamentals of Apache Beam using hands-on tasks, and we convert those tasks using the Python SDK. We focus on streaming pipelines, and they are deployed on a local (or embedded) [Apache Flink](https://flink.apache.org/) cluster using the [Apache Flink Runner](https://beam.apache.org/documentation/runners/flink/). Beginning with setting up the development environment, we build two pipelines that obtain top K most frequent words and the word that has the longest word length in this post. 
+Beginning with setting up the development environment, we build two pipelines that obtain top K most frequent words and the word that has the longest word length in this post. In this series, we develop [Apache Beam](https://beam.apache.org/) Python pipelines. The majority of them are from [Building Big Data Pipelines with Apache Beam by Jan Lukavský](https://www.packtpub.com/en-us/product/building-big-data-pipelines-with-apache-beam-9781800564930). Mainly relying on the Java SDK, the book teaches fundamentals of Apache Beam using hands-on tasks, and we convert those tasks using the Python SDK. We focus on streaming pipelines, and they are deployed on a local (or embedded) [Apache Flink](https://flink.apache.org/) cluster using the [Apache Flink Runner](https://beam.apache.org/documentation/runners/flink/).
 
 <!--more-->
 
@@ -829,11 +822,11 @@ python chapter2/top_k_words.py --job_name=top-k-words \
 
 On Flink UI, we see the pipeline polls messages and performs the main transform in multiple tasks while keeping Kafka offset commit as a separate task. Note that, although I added a flag (`use_deprecated_read`) to use the legacy read (`ReadFromKafkaViaUnbounded`), the splittable DoFn based read (`ReadFromKafkaViaSDF`) is used. It didn't happen when I used Flink 1.16.3, and I'm looking into it. It looks okay to go through the example pipelines, but check [this issue](https://github.com/apache/beam/issues/20979) before deciding which read to use in production.
 
-![](top-k-dag.png#center)
+![Flink UI graph of the top K words job, with Kafka offset commit as a separate task](top-k-dag.png#center "Flink UI graph of the top K words job, with Kafka offset commit as a separate task")
 
 On Kafka UI, we can check the output message includes frequent word details as well as window start/end timestamps.
 
-![](top-k-output.png#center)
+![Kafka UI output message with frequent word details and window start and end times](top-k-output.png#center "Kafka UI output message with frequent word details and window start and end times")
 
 **Update on 2024-07-11**
 I made a mistake to add the `use_deprecated_read` option to the pipeline argument. For the Python SDK to work, it should be specified in the default IO expansion service directly - see below.
@@ -855,7 +848,7 @@ python chapter2/top_k_words.py --deprecated_read \
 
 We can check the legacy read (`ReadFromKafkaViaUnbounded`) is used in the pipeline DAG.
 
-![](top-k-dag-d.png#center)
+![Pipeline graph showing the legacy ReadFromKafkaViaUnbounded read in use](top-k-dag-d.png#center "Pipeline graph showing the legacy ReadFromKafkaViaUnbounded read in use")
 
 ### Calculate the maximal word length
 
@@ -1090,11 +1083,11 @@ python chapter2/max_word_length_with_ts.py --job_name=max-word-len \
 
 On Flink UI, we see the pipeline polls messages and performs the main transform in multiple tasks while keeping Kafka offset commit as a separate task.
 
-![](max-len-dag.png#center)
+![Flink UI graph of the max word length job, with offset commit as a separate task](max-len-dag.png#center "Flink UI graph of the max word length job, with offset commit as a separate task")
 
 On Kafka UI, we can check the output message includes a longest word as well as its timestamp. Note that, as the input text message has multiple words, we can have multiple output messages that have the same timestamp - recall the accumulation mode is accumulating.
 
-![](max-len-output.png#center)
+![Kafka UI output messages holding the longest word and its timestamp](max-len-output.png#center "Kafka UI output messages holding the longest word and its timestamp")
 
 **Update on 2024-07-11**
 
@@ -1107,4 +1100,4 @@ python chapter2/max_word_length_with_ts.py --deprecated_read \
 	--streaming --environment_type=LOOPBACK --parallelism=3 --checkpointing_interval=10000
 ```
 
-![](max-len-dag-d.png#center)
+![Max word length pipeline graph with the legacy read in use](max-len-dag-d.png#center "Max word length pipeline graph with the legacy read in use")

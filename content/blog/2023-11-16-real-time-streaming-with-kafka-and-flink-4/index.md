@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Real Time Streaming with Kafka and Flink
 categories:
@@ -21,9 +17,6 @@ tags:
   - PyFlink
   - Python
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 description: Export Kafka topic messages to S3 with PyFlink, enriching records through a user defined function and querying them on Athena through a Glue table.
 ---
 
@@ -55,7 +48,7 @@ In this lab, we will create a Pyflink application that exports Kafka topic messa
 
 Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The records are read by a Pyflink application, and it writes them into a S3 bucket. The app enriches the records by adding a new column named *source* using a user defined function. The records in the S3 bucket can be queried on Amazon Athena after creating an external table that sources the bucket.
 
-![](featured.png#center)
+![Six labs drawn around Amazon MSK; Lab 3 sends Flink output to S3, then AWS Glue and Amazon Athena](featured.png#center "Lab architecture, with Lab 3 writing to S3 and reading it on Athena")
 
 ## Infrastructure
 
@@ -854,7 +847,7 @@ docker exec jobmanager /opt/flink/bin/flink run \
     -d
 ```
 
-![](flink-job.png#center)
+![Flink dashboard with the taxi_rides_sink job running, a source feeding a partition committer and sink](flink-job.png#center "PyFlink application running on the Flink cluster")
 
 ### Application Result
 
@@ -862,17 +855,17 @@ docker exec jobmanager /opt/flink/bin/flink run \
 
 We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*.
 
-![](kafka-topic.png#center)
+![Kpow showing the taxi-rides topic with five partitions and about 9,100 messages](kafka-topic.png#center "Taxi rides topic on the Kafka cluster")
 
 Also, we can inspect topic messages in the *Data* tab as shown below.
 
-![](kafka-message.png#center)
+![Kpow record view of a taxi-rides message with vendor_id, trip_duration and pickup and dropoff coordinates](kafka-message.png#center "Inspecting a taxi ride message in the Data tab")
 
 #### S3 Files
 
 We can see the Pyflink app writes the records into the S3 bucket as expected. The files are written in Apache Hive style partitions and only completed files are found. Note that, when I tested the sink connector on the local file system, the file names of *in-progress* and *pending* files begin with dot (.) and the dot is removed when they are completed. I don't see those incomplete files in the S3 bucket, and it seems that only completed files are moved. Note also that, as the checkpoint interval is set to 60 seconds, new files are created every minute. We can adjust the interval if it creates too many small files.
 
-![](s3-files.png#center)
+![S3 console listing eleven part files under taxi-rides/year=2023/month=11/date=14/hour=15/](s3-files.png#center "Records written to S3 in Apache Hive style partitions")
 
 #### Athena Table
 
@@ -910,7 +903,7 @@ Repair: Added partition to metastore taxi_rides:year=2023/month=11/date=14/hour=
 
 After the partition is added, we can query the records as shown below.
 
-![](athena-query.png#center)
+![Athena query editor running SELECT from taxi_rides for 2023 and returning 4,330 rows](athena-query.png#center "Querying the partitioned table on Amazon Athena")
 
 ## Summary
 

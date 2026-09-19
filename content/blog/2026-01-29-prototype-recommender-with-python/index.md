@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - "From Prototype to Production: Real-Time Product Recommendation with Contextual Bandits"
 categories:
@@ -17,14 +13,10 @@ tags:
   - Python
   - Contextual Bandits
   - Reinforcement Learning
-  - Machine Learning
-  - Online Learning
+  - Online Machine Learning
   - Recommender System
   - MABWiser
   - Mab2Rec
-authors:
-  - JaehyeonKim
-images: []
 description: A Python prototype of a contextual multi-armed bandit recommender that simulates user behaviour and validates the algorithm against cold-start users.
 ---
 
@@ -54,7 +46,7 @@ CMAB performs well in **data streaming environments**. Integrated with platforms
 
 In this series, **Part 1** (*this post*) builds a complete **Python prototype** to validate the algorithm and simulate user behavior. [**Part 2**](/blog/2026-02-23-productionize-recommender-with-eda/) will scale this to a distributed, event-driven architecture.
 
-![Architecture](featured.gif#center)
+![Flow from raw products and synthetic users through feature generation, bandit history simulation, offline policy evaluation and live simulation](featured.gif#center "Architecture")
 
 ## Tech Stack
 

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -20,11 +16,8 @@ tags:
   - GraphQL API
   - Node.js
   - Oso
-authors:
-  - JaehyeonKim
-images: []
 cevo: 1
-description: Authorization is the mechanism that controls who can do what on which resource in an application and it is a critical part of an application. In this post, I'll illustrate how to set up authorization in a GraphQL API using a custom directive and Oso, an open-source authorization library.
+description: Add authorization to a GraphQL API with a custom directive and Oso, an open source authorization library, to control who can act on which resource.
 ---
 
 Authorization is the mechanism that controls who can do what on which resource in an application. Although it is a critical part of an application, there are limited resources available on how to build authorization into an app effectively. In this post, I'll be illustrating how to set up authorization in a GraphQL API using a custom [directive](https://www.apollographql.com/docs/apollo-server/schema/directives/) and [Oso](https://www.osohq.com/), an open-source authorization library. This tutorial covers the NodeJS variant of Oso, but it also supports Python and other languages.
@@ -34,7 +27,7 @@ Authorization is the mechanism that controls who can do what on which resource i
 
 There are a number of users and each of them belongs to one or more user groups. The groups are _guest_, _member_ and _admin_. Also, a user can be given escalated permission on one or more projects if he/she belongs to a certain project user group (e.g. _contributor_). 
 
-![](relationship.png#center)
+![Entity diagram joining users to user_groups and user_project_groups, and projects to indicators, with contract_sum on projects](relationship.png#center "Relationship between users, groups, projects and indicators")
 
 Depending on the membership, users have varying levels of permission on user, project and indicator resources. Specifically
 
@@ -282,17 +275,23 @@ docker-compose up --build
 
 The member user can query the project thanks to her user group membership. Also, as the user is a contributor of project 1 and 3, she has access to *contract_sum*.
 
-![](example-01.png#center)
+![GraphQL playground query for project id 1, returning name Hollow Sun and contract_sum 21886 boxed in red](example-01.png#center "The member user reads contract_sum on a project she contributes to")
 
 
 The query returns an error if a project that she is not a contributor is requested. The project query is resolved because of her user group membership while *contract_sum* turns to _null_.
 
-![](example-02.png#center)
+![GraphQL response for project id 4 carrying a FORBIDDEN error, with contract_sum returned as null and boxed in red](example-02.png#center "Requesting contract_sum on another project returns an error and a null value")
 
 
 The contributor user can query all permitted projects without an error as shown below.
 
-![](example-03.png#center)
+![GraphQL query for all projects returning five records, each with a name, status and contract_sum value](example-03.png#center "The contributor user reads every permitted project without an error")
+
+## Related posts
+
+* [Invoking AWS Lambda at a sub-minute frequency](/blog/2021-10-13-lambda-schedule) - uses Amazon SQS to schedule a Lambda more often than once a minute
+* [Some Thoughts on Python](/blog/2015-08-08-some-thoughts-on-python) - writing Python in an object-oriented style, shown with SOAP API client classes
+* [Some Thoughts on Python for R Users](/blog/2015-08-09-some-thoughts-on-python-for-r-users) - calls a SOAP web service from Python with the suds library
 
 ## Conclusion
 

@@ -5,20 +5,13 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Tree Based Methods in R
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: Part V of tree based methods in R series. Performance of regression analysis is discussed.
+description: Evaluate a single regression tree in R against 2000 bagged trees, comparing out-of-bag and test errors, cumulative errors and variable importance.
 ---
 
 * [Part I](/blog/2015-02-01-tree-based-methods-1)
@@ -145,7 +138,7 @@ ggplot(ind.err, aes(x=error,fill=type)) +
   ggtitle("Error distribution") + theme(plot.title=element_text(face="bold"))
 ```
 
-![](ind_plot-1.png#center) 
+![Histogram of out of bag and test errors from bagged trees, with the single tree test error marked by a blue line just below 1](ind_plot-1.png#center "Error distribution of out of bag and test errors, single tree error in blue") 
 
 ## Cumulative Error
 
@@ -166,7 +159,7 @@ ggplot(data=bgg.err,aes(x=ntree,y=error,colour=type)) +
   ggtitle("Bagging error") + theme(plot.title=element_text(face="bold"))
 ```
 
-![](cum_plot-1.png#center) 
+![Bagging error against number of trees, out of bag error settling near 0.05 and test error near 0.5, both below the single tree line at 0.72](cum_plot-1.png#center "Bagging error by number of trees, compared to the single tree error") 
 
 ## Variable Importance
 
@@ -192,7 +185,7 @@ rg.varImp$variable = reorder(rg.varImp$variable, 1/rg.varImp$value)
 ggplot(data=rg.varImp,aes(x=variable,y=value,fill=method)) + geom_bar(stat="identity")
 ```
 
-![](varImp_plot-1.png#center) 
+![Stacked bar chart of variable importance, ShelveLoc and Price highest, Urban lowest, each bar split between CART and bagging](varImp_plot-1.png#center "Variable importance from CART and from bagging") 
 
 In this article, a single regression tree is evaluated by bagged trees. Comparing to individual oob/test errors, the single tree's test error seems to be a likely value. Also, while bagged trees improve prediction performance, the single tree may not be a bad choice especially if more focus is on interpretation. Despite the performance improvement of the bagged trees, there seems to be a chance for additional improvement and the right direction of subsequence articles would be looking into it.
 

@@ -5,24 +5,17 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 categories:
   - Data Integration
   - Data Streaming
 tags: 
   - GCP
-  - Google Pub/Sub
-  - Pub/Sub Emulator
+  - Google Cloud PubSub
+  - PubSub Emulator
   - Change Data Capture (CDC)
   - Debezium
   - PostgreSQL
-authors:
-  - JaehyeonKim
-images: []
 description: Debezium Server streams PostgreSQL row changes into the Google Pub/Sub emulator, with Docker Compose, a theLook data generator and a Python reader.
 ---
 
@@ -417,7 +410,7 @@ INFO:root:append records, table - events, # records - 19
 
 When the data is ingested into the database, we see the following tables are created in the *ecommerce* schema.
 
-![](diagram.png#center)
+![Seven ecommerce tables, users, orders, order_items, products, dist_centers, events and inventory_items, with columns](diagram.png#center "Tables created in the ecommerce schema")
 
 ### Data Subscriber
 
@@ -482,3 +475,9 @@ python ps_sub.py -t demo.ecommerce.orders
 {'order_id': '5928f275-9333-4036-ad25-c92d47c6b2ed', 'user_id': 'e9c4a660-8b0b-4b50-a48f-f99480779070', 'status': 'Complete', 'gender': 'M', 'created_at': 1615172100000000, 'returned_at': None, 'shipped_at': 1615278480000000, 'delivered_at': '2021-03-11 14:06:00', 'num_of_item': 1, '__deleted': 'false', '__op': 'r', '__db': 'develop', '__table': 'orders', '__schema': 'ecommerce', '__lsn': 32919936, '__source_ts_ms': 1730183224763}
 {'order_id': '27937664-36b0-4b1c-a0f6-2e027701398e', 'user_id': 'e3ed22b9-4101-46e9-b642-a0317332f267', 'status': 'Cancelled', 'gender': 'M', 'created_at': 1719298320000000, 'returned_at': None, 'shipped_at': None, 'delivered_at': None, 'num_of_item': 2, '__deleted': 'false', '__op': 'r', '__db': 'develop', '__table': 'orders', '__schema': 'ecommerce', '__lsn': 32919936, '__source_ts_ms': 1730183224763}
 ```
+
+## Related posts
+
+* [Data Lake Demo with CDC - Part 1 Local Development](/blog/2021-12-05-datalake-demo-part1) - the Kafka Connect version of this local setup, with Debezium and an S3 sink connector
+* [Data Lake Demo with CDC - Part 2 Implement CDC](/blog/2021-12-12-datalake-demo-part2) - the same change data capture running on Amazon MSK and MSK Connect
+* [Data Lake Demo with CDC - Part 3 Implement Data Lake](/blog/2021-12-19-datalake-demo-part3) - what to do with the captured changes, using Hudi on EMR and Athena

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Kafka Development with Docker
 categories:
@@ -16,9 +12,6 @@ categories:
 tags: 
   - CKAD
   - Kubernetes
-authors:
-  - JaehyeonKim
-images: []
 description: Three online courses and two practice tests reviewed after passing the Certified Kubernetes Application Developer exam, with notes on each.
 ---
 

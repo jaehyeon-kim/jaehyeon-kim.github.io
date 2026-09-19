@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Real Time Streaming with Kafka and Flink
 categories:
@@ -20,9 +16,6 @@ tags:
   - Apache Kafka
   - Kafka Connect
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 description: Ingest records from a Kafka topic into a DynamoDB table using the Camel DynamoDB sink connector, defined and run on Kafka Connect.
 ---
 
@@ -52,7 +45,7 @@ For example:
 
 Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The messages of the topic are written into a DynamoDB table by a Kafka sink connector, which is deployed on [Amazon MSK Connect](https://aws.amazon.com/msk/features/msk-connect/).
 
-![](featured.png#center)
+![Six labs drawn around Amazon MSK, with Lab 5 sending taxi rides to DynamoDB through MSK Connect](featured.png#center "Lab 5 within the series architecture, a Camel sink connector writing to DynamoDB")
 
 ## Infrastructure
 
@@ -345,7 +338,7 @@ terraform apply -auto-approve=true -var 'producer_to_create=true' -var 'connect_
 
 Once the resources are deployed, we can check the sink connector on AWS Console.
 
-![](kafka-connect.png#center)
+![MSK Connect page for real-time-streaming-taxi-rides-sink, running, reading the taxi-rides topic](kafka-connect.png#center "Sink connector on AWS Console")
 
 ### Local Development (Optional)
 
@@ -467,13 +460,13 @@ $ curl http://localhost:8083/connectors/real-time-streaming-taxi-rides-sink/stat
 
 We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using [*compose-ui.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-ui.yml) - see [this post](/blog/2023-10-23-kafka-connect-for-aws-part-4) for details about *kpow* configuration.
 
-![](kafka-topic.png#center)
+![kpow details for the taxi-rides topic, five partitions holding 151,250 messages in total](kafka-topic.png#center "taxi-rides topic and its partitions on kpow")
 
 ### Table Records
 
 We can check the ingested records on the DynamoDB table items view. Below shows a list of scanned records.
 
-![](dynamodb.png#center)
+![DynamoDB scan of real-time-streaming-taxi-rides returning 50 items with id and dropoff columns](dynamodb.png#center "Ingested taxi ride records in DynamoDB")
 
 ## Summary
 

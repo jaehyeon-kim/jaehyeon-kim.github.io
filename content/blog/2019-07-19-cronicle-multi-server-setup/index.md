@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -16,9 +12,6 @@ categories:
 tags: 
   - Cronicle
   - Docker
-authors:
-  - JaehyeonKim
-images: []
 description: Cronicle is a multi-server task scheduler and runner. In this post, multi-server configuration of Cronicle will be demonstrated with Docker and Nginx as load balancer.
 ---
 
@@ -193,31 +186,31 @@ Once started, Cronicle web app will be accessible at *http://localhost:8080* and
 
 In `Admin > Servers`, it's possible to see that the 2 Cronicle servers are shown. The master server is recognized as expected but the backup server (cronicle2) is not yet added.
 
-![](add-server-01.png#center)
+![Cronicle server cluster page, cronicle1 as Master in the Master Group and cronicle2 listed as Nearby with no groups](add-server-01.png#center "Admin and Servers before the backup server is added")
 
 By default, 2 server groups (All Servers and Master Group) are created and the backup server should be added to the Master Group. To do so, the _Hostname Match_ regular expression is modified as following: `^(cronicle[1-2])$`. 
 
-![](add-server-02.png#center)
+![Edit Server Group dialog for the Master Group, with Hostname Match set to the pattern matching cronicle1 and cronicle2, and Server Class set to Master Eligible](add-server-02.png#center "Widening the hostname match so both servers join the Master Group")
 
 Then it can be shown that the backup server is recognized correctly.
 
-![](add-server-03.png#center)
+![Server cluster page after the change, cronicle2 now shown as Backup in the Master Group and both groups holding 2 servers](add-server-03.png#center "The backup server is recognised and joins the Master Group")
 
 ## Create Event
 
 A test event is created in order to show that an event that's created in the original master can be available in the backup server when it takes the role of master.
 
-![](create-event-01.png#center)
+![Cronicle Schedule tab with no events found and the Add Event button outlined in red](create-event-01.png#center "Schedule tab before any event is created")
 
 Cronicle has a web UI so that it is easy to manage/monitor scheduled events. It also has management API that many jobs can be performed programmatically. Here an event that runs a simple shell script is created.
 
-![](create-event-02.png#center)
+![Add New Event form, event named test, target All Servers, plugin Shell Script running echo Hello World, timing On Demand](create-event-02.png#center "Top half of the new event form")
 
-![](create-event-03.png#center)
+![Lower half of the event form, concurrency 1, timeout 1 hour, no retries, and the Create Event button outlined in red](create-event-03.png#center "Remaining event settings and the Create Event button")
 
 Once created, it is listed in `Schedule` tab.
 
-![](create-event-04.png#center)
+![Schedule tab listing one event named test, category General, plugin Shell Script, target All Servers, timing On demand, status Idle](create-event-04.png#center "The created event in the Schedule tab")
 
 ## Backup Becomes Master
 
@@ -229,12 +222,18 @@ docker-compose rm -f cronicle1
 
 After a while, it's possible to see that the backup server becomes master.
 
-![](remove-master-01.png#center)
+![Server cluster page after cronicle1 is removed, cronicle2 now Master with 20 minutes uptime and cronicle1 shown as Backup](remove-master-01.png#center "The backup server takes over as master")
 
 It can also be checked in `Admin > Activity Log`.
 
-![](remove-master-02.png#center)
+![Cronicle activity log with the entry Server has become master cronicle2 outlined in red, above an entry for lost connectivity to cronicle1](remove-master-02.png#center "Activity log recording the change of master")
 
 In `Schedule`, the test event can be found.
 
-![](remove-master-03.png#center)
+![Schedule tab on the new master, still listing the test event as On demand and Idle](remove-master-03.png#center "The test event survives on the new master")
+
+## Related posts
+
+* [API Development with R Part 1](/blog/2017-11-18-api-development-with-r-1) - serves an R function as an API three ways, with plumber, RServe and rApache
+* [API Development with R Part 2](/blog/2017-11-19-api-development-with-r-2) - runs those three R API options in Docker containers and compares them on example requests
+* [AWS Local Development with LocalStack](/blog/2019-07-20-aws-localstack) - runs AWS services on a local machine so an application can be developed and tested against them

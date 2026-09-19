@@ -5,19 +5,12 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
 description: Setting up random seed is important for reproducibility of analysis. In this post, we discuss how to generate random seed using the caret package.
 ---
 
@@ -32,6 +25,8 @@ library(doParallel)
 library(randomForest)
 library(caret)
 ```
+
+## Seeds Argument in trainControl
 
 In the **caret** package, random seeds are set up by adjusting the argument of *seeds* in `trainControl()` and the object document illustrates it as following.
 
@@ -60,6 +55,8 @@ setSeeds <- function(method = "cv", numbers = 1, repeats = 1, tunes = NULL, seed
   seeds
 }
 ```
+
+## Seeds for 3-Fold and Repeated Cross Validation
 
 Below shows the control variables of the resampling methods used in this post: k-fold cross validation and repeated k-fold cross validation. Here (5 repeats of) 3-fold cross validation is chosen. Also a grid is set up to tune *mtry* of `randomForest()` (*cvTunes*) and *rcvTunes* is for tuning the number of nearest neighbours of `knn()`.
 
@@ -138,6 +135,8 @@ rcvSeeds[c(1, length(rcvSeeds))]
 ## [[2]]
 ## [1] 751240
 ```
+
+## Compare knn and randomForest for Reproducibility
 
 Given the random seeds, train controls are set up as shown below.
 

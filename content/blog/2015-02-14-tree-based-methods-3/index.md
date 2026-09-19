@@ -5,20 +5,13 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Tree Based Methods in R
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: Part III of tree based methods in R series. Regression tasks are discussed.
+description: Fit a regression tree on the Carseats data in R, comparing the pruning parameter caret selects against the 1-SE rule that the rpart package recommends.
 ---
 
 * [Part I](/blog/2015-02-01-tree-based-methods-1)
@@ -43,6 +36,8 @@ The bold-cased sections of the [tutorial](https://topepo.github.io/caret/index.h
 - Other Functions
 - Parallel Processing
 - Adaptive Resampling
+
+## Packages and Carseats Data
 
 Let's get started.
 
@@ -150,6 +145,8 @@ test.res.reg.summary = summary(testData.reg$Sales)
 trControl = trainControl(method="repeatedcv",number=10,repeats=5)
 ```
 
+## Select cp with caret and the 1-SE Rule
+
 Having 5 times of 10-fold cross-validation set above, both the CART is fit as both classification and regression tasks.
 
 
@@ -238,7 +235,7 @@ ggplot(data=df[3:nrow(df),], aes(x=CP,y=xerror)) +
   geom_point(aes(x=best[1,2],y=best[2,2]),color="red",size=3)
 ```
 
-![](show_best-1.png#center) 
+![Line plot of cross-validation error rising with the complexity parameter, best value marked red](show_best-1.png#center "Cross-validation error by cp") 
 
 The best *cp* values for each of the models are shown below
 
@@ -304,6 +301,8 @@ cp.reg.rpart = mod.reg.rpart.param[1,2]
 mod.reg.rpart = rpart(Sales ~ ., data=trainData.reg, control=rpart.control(cp=cp.reg.rpart))
 ```
 
+## Why Classification and Regression Cannot Be Compared Directly
+
 Initially it was planned to compare the regression model to the classification model. Specifically, as the response is converted as a binary variable and the break is at the value of *8.0*, it is possible to create a regression version of confusion matrix by splitting the data at the equivalent percentile, which is about *0.59* in this data. Then the outcomes can be compared. However it turns out that they cannot be compared directly as the regression outcome is too good as shown below. Note `updateCM()` and `regCM()` are custom functions and their sources can be found [here](https://gist.github.com/jaehyeon-kim/5622ae9fa982e0b46550).
 
 
@@ -350,6 +349,8 @@ fit.reg.caret.cm
 ## actual: 59%+            0       132.00        0.00
 ## Use Error               0         0.03        0.01
 ```
+
+## Compare the Two Regression Models
 
 As it is not easy to compare the classification and regression models directly, only the 2 regression models are compared from now on. At first, the regression version of confusion matrices are compared by every 20th percentile followed by the residual mean sqaured error (*RMSE*) values.
 
@@ -526,7 +527,7 @@ resid.plot = ggplot(predDF, aes(x=predicted,y=resid)) +
 grid.arrange(actual.plot, resid.plot, ncol = 2)
 ```
 
-![](caret_test-1.png#center) 
+![Two scatter plots for the test data, actual against predicted and residuals against predicted](caret_test-1.png#center "Actual and residual plots on test data") 
 
 Finally the following shows the CART model tree on the training data.
 
@@ -559,4 +560,4 @@ prp(mod.reg.caret
 ## cex 0.65   xlim c(0, 1)   ylim c(0, 1)
 ```
 
-![](model_tree-1.png#center) 
+![Large regression tree splitting on shelve location, price, age and income into numeric leaves](model_tree-1.png#center "CART model tree") 

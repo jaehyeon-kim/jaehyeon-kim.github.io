@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt Pizza Shop Demo
 categories:
@@ -19,13 +15,10 @@ tags:
   - Python
   - Docker
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 description: Model pizza shop data on Google BigQuery with dbt, keeping SCD type 2 dimensions and denormalising the fact table with nested and repeated fields.
 ---
 
-In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) and ETL is managed by [Apache Airflow](https://airflow.apache.org/). In [Part 1](/blog/2024-01-18-dbt-pizza-shop-1), we developed a *dbt* project on PostgreSQL using fictional pizza shop data. At the end, the data sets are modelled by two [SCD type 2](https://en.wikipedia.org/wiki/Slowly_changing_dimension) dimension tables and one transactional fact table. In this post, we create a new *dbt* project that targets [Google BigQuery](https://cloud.google.com/bigquery). While the dimension tables are kept by the same SCD type 2 approach, the fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested), which potentially can improve query performance by pre-joining corresponding dimension records.
+We create a new *dbt* project that targets [Google BigQuery](https://cloud.google.com/bigquery) in this post. While the dimension tables are kept by the same SCD type 2 approach, the fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested), which potentially can improve query performance by pre-joining corresponding dimension records. In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) and ETL is managed by [Apache Airflow](https://airflow.apache.org/). In [Part 1](/blog/2024-01-18-dbt-pizza-shop-1), we developed a *dbt* project on PostgreSQL using fictional pizza shop data. At the end, the data sets are modelled by two [SCD type 2](https://en.wikipedia.org/wiki/Slowly_changing_dimension) dimension tables and one transactional fact table.
 
 * [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1)
 * [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2)
@@ -591,15 +584,15 @@ $ dbt test
 
 The schema of the fact table can be found below. Both the *product* and *user* fields are marked as the *RECORD* type as they are *struct*s (containers of fields). Also, the mode of the *product* is indicated as *REPEATED*, which means it is an array.
 
-![](fct-orders-schema.png#center)
+![BigQuery fact table schema with product and user as RECORD and product REPEATED](fct-orders-schema.png#center "BigQuery fact table schema with product and user as RECORD and product REPEATED")
 
 In the query result view, non-array fields are not repeated, and a row is split to fill each of the array items.
 
-![](fct-orders-query-01.png#center)
+![Query result where a row is split across its array items, other fields shown once](fct-orders-query-01.png#center "Query result where a row is split across its array items, other fields shown once")
 
 We can use the [*UNNEST*](https://cloud.google.com/bigquery/docs/arrays) operator if we need to convert the elements of an array into rows as shown below.
 
-![](fct-orders-query-02.png#center)
+![Query result after UNNEST, with each array element on its own row](fct-orders-query-02.png#center "Query result after UNNEST, with each array element on its own row")
 
 ## Update Records
 

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt for Effective Data Transformation on AWS
 categories:
@@ -19,9 +15,6 @@ tags:
   - Amazon Athena
   - Amazon QuickSight
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 cevo: 22
 description: Amazon Athena data transformation pipelines with dbt, closing the dbt on AWS series. Subsets of IMDb data feed models developed in multiple layers.
 ---
@@ -232,7 +225,7 @@ done
 
 After the crawlers run successfully, we are able to check the seven source tables. Below shows a query example of one of the source tables in Athena.
 
-![](athena-source-show.png#center)
+![Athena query selecting 20 rows from imdb.title_basics, showing tconst, title type, primary title, start year and genres](athena-source-show.png#center "One of the source tables queried in Athena")
 
 ### Setup dbt Project
 
@@ -461,11 +454,11 @@ athena/athena_proj/models/staging/
     └── stg_imdb__title_ratings.sql
 ```
 
-![](athena-virtual-views.png#center)
+![Athena data panel for the imdb database, listing 7 tables and 7 views named stg_imdb__name_basics through stg_imdb__title_ratings](athena-virtual-views.png#center "Staging models materialised as views")
 
 The views in the staging layer can be queried in Athena as shown below.
 
-![](athena-staging-show.png#center)
+![Athena query on imdb.stg_imdb__title_basics returning renamed columns title_id, title_type, primary_title, is_adult and genres](athena-staging-show.png#center "Staging view queried in Athena")
 
 #### Intermediate
 
@@ -502,7 +495,7 @@ order by id
 
 The intermediate models are also materialised as views, and we can check the array columns are flattened as expected.
 
-![](athena-intermediate-show.png#center)
+![Athena query on int_genres_flattened_from_title_basics, returning one row per title and genre pair](athena-intermediate-show.png#center "Genres flattened into one row per title and genre")
 
 Below shows the file tree of the intermediate models. Similar to the staging models, the intermediate models can be executed by `dbt run --select intermediate`.
 
@@ -689,7 +682,7 @@ athena/athena_proj/models/marts/
 
 The models of the marts layer can be consumed by external tools such as [Amazon QuickSight](https://aws.amazon.com/quicksight/). Below shows an example dashboard. The pie chart on the left shows the proportion of titles by genre while the box plot on the right shows the dispersion of average rating by start year.
 
-![](athena-quicksight.png#center)
+![QuickSight dashboard with a pie chart of titles by genre, Drama and Comedy largest, beside a box plot of average rating by start year](athena-quicksight.png#center "Dashboard built on the marts models")
 
 ### Generate dbt Documentation
 
@@ -701,11 +694,11 @@ $ dbt docs generate
 $ dbt docs serve
 ```
 
-![](athena-doc-01.png#center)
+![dbt documentation overview page, with the imdb sources and the athena_proj staging, intermediate and marts folders in the sidebar](athena-doc-01.png#center "Generated dbt documentation site")
 
 A very useful element of dbt documentation is [data lineage](https://docs.getdbt.com/terms/data-lineage), which provides an overall view about how data is transformed and consumed. Below we can see that the final titles model consumes all title-related stating models and an intermediate model from the name basics staging model.
 
-![](athena-doc-02.png#center)
+![dbt lineage graph tracing the seven imdb sources through staging and intermediate models into the names, genre_titles and titles marts](athena-doc-02.png#center "Data lineage of the dbt project")
 
 ## Summary
 

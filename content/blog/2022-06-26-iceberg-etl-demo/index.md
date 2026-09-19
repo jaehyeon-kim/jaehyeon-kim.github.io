@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Integrate Schema Registry with MSK Connect
 categories:
@@ -20,11 +16,8 @@ tags:
   - Apache Spark
   - PySpark
   - Python
-authors:
-  - JaehyeonKim
-images: []
 cevo: 13
-description: We'll discuss how to implement data warehousing ETL using Iceberg for data storage/management and Spark for data processing. A Pyspark ETL app will be used for demonstration in an EMR local environment. Finally the ETL results will be queried by Athena for verification.
+description: Run a data warehousing ETL job with Apache Iceberg for storage and PySpark for processing in an EMR local environment, then verify results in Athena.
 ---
 
 Unlike traditional Data Lake, new table formats ([Iceberg](https://iceberg.apache.org/), [Hudi](https://hudi.apache.org/) and [Delta Lake](https://delta.io/)) support [features](https://iceberg.apache.org/docs/latest/spark-writes/) that can be used to apply data warehousing patterns, which can bring a way to be rescued from [Data Swamp](https://www.gartner.com/en/newsroom/press-releases/2014-07-28-gartner-says-beware-of-the-data-lake-fallacy). In this post, we'll discuss how to implement ETL using retail analytics data. It has two dimension data (user and product) and a single fact data (order). The dimension data sets have different ETL strategies depending on whether to track historical changes. For the fact data, the primary keys of the dimension data are added to facilitate later queries. We'll use Iceberg for data storage/management and Spark for data processing. Instead of provisioning an EMR cluster, a local development environment will be used. Finally, the ETL results will be queried by Athena for verification.
@@ -105,7 +98,7 @@ $ ./run.sh spark-submit path-to-app.py
 
 We use the [retail analytics sample database](https://docs.yugabyte.com/preview/sample-data/retail-analytics/) from YugaByteDB to get the ETL sample data. Records from the following 3 tables are used to run ETL on its own ETL strategy.
 
-![](03_data_diagram.png#center)
+![Columns of the users, products and orders tables of the sample database](03_data_diagram.png#center "Columns of the users, products and orders tables of the sample database")
 
 The main focus of the demo ETL application is to show how to track product price changes over time and to apply those changes to the order data. Normally ETL is performed daily, but it'll be time-consuming to execute daily incremental ETL with the order data because it includes records spanning for 5 calendar years. Moreover, as it is related to the user and product data, splitting the corresponding dimension records will be quite difficult. Instead, I chose to run yearly incremental ETL. I first grouped orders in 4 groups where the first group (year 0) includes orders in 2016 and 2017. And each of the remaining groups (year 1 to 3) keeps records of a whole year from 2018 to 2020. Then I created 4 product groups in order to match the order groups and to execute incremental ETL together with the order data. The first group (year 0) keeps the original data and the product price is set to be increased by 5% in the following years until the last group (year 3). Note, with this setup, it is expected that orders for a given product tend to be mapped to a higher product price over time. On the other hand, the ETL strategy of the user data is not to track historical data so that it is used as it is. The sample data files used for the ETL app are listed below, and they can be found in the [data folder](https://github.com/jaehyeon-kim/iceberg-etl-demo/tree/main/data) of the **GitHub repository**.
 
@@ -396,7 +389,7 @@ WHERE id = 1
 ORDER BY eff_from
 ```
 
-![](01_products.png#center)
+![Products dimension rows for one product, with effective from and to dates per version](01_products.png#center "Products dimension rows for one product, with effective from and to dates per version")
 
 
 The following query returns sample order records that bought the product. It can be checked that the product surrogate key matches the products dimension records.
@@ -416,7 +409,7 @@ WHERE rn = 1
 ORDER BY created_at
 ```
 
-![](02_orders.png#center)
+![Sample order rows whose product surrogate key matches the products dimension records](02_orders.png#center "Sample order rows whose product surrogate key matches the products dimension records")
 
 ## Summary
 

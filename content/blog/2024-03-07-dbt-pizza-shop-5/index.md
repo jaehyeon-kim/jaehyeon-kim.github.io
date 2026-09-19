@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt Pizza Shop Demo
 categories:
@@ -19,13 +15,10 @@ tags:
   - Python
   - Docker
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 description: Model pizza shop data as Apache Iceberg tables transformed on Amazon Athena with dbt, using array and struct types to denormalise the fact table.
 ---
 
-In [Part 1](/blog/2024-01-18-dbt-pizza-shop-1) and [Part 3](/blog/2024-02-08-dbt-pizza-shop-3), we developed [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) projects that target *PostgreSQL* and *BigQuery* using fictional pizza shop data. The data is modelled by [SCD type 2](https://en.wikipedia.org/wiki/Slowly_changing_dimension) dimension tables and one transactional fact table. While the order records should be joined with dimension tables to get complete details for *PostgreSQL*, the fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested) to improve query performance for *BigQuery*. 
+The data is modelled by [SCD type 2](https://en.wikipedia.org/wiki/Slowly_changing_dimension) dimension tables and one transactional fact table. In [Part 1](/blog/2024-01-18-dbt-pizza-shop-1) and [Part 3](/blog/2024-02-08-dbt-pizza-shop-3), we developed [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) projects that target *PostgreSQL* and *BigQuery* using fictional pizza shop data. While the order records should be joined with dimension tables to get complete details for *PostgreSQL*, the fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested) to improve query performance for *BigQuery*. 
 
 Open Table Formats such as [Apache Iceberg](https://iceberg.apache.org/) bring a new opportunity that implements data warehousing features in a data lake (i.e. data lakehouse) and [Amazon Athena](https://aws.amazon.com/athena/) is probably the easiest way to perform such tasks on AWS. In this post, we create a new *dbt* project that targets *Apache Iceberg* where transformations are performed on *Amazon Athena*. Data modelling is similar to the *BigQuery* project where the dimension tables are modelled by the *SCD type 2* approach and the fact table is denormalized using the *array* and *struct* data types. 
 
@@ -574,15 +567,15 @@ $ dbt test
 
 The schema of the fact table can be found below. The *product* and *user* are marked as the *array* and *struct* type respectively.
 
-![](fct-orders-schema-01.png#center)
+![Glue console page for the fct_orders Iceberg table, listing order_id bigint, product array, user struct and created_at timestamp](fct-orders-schema-01.png#center "Fact table schema in the AWS Glue catalogue")
 
 When we click an individual link, its detailed schema appears in a pop-up window as shown below.
 
-![](fct-orders-schema-02.png#center)
+![Two pop-up windows with JSON for the product array fields and for the user struct fields](fct-orders-schema-02.png#center "Detailed types behind the array and struct columns")
 
 In Athena, we can [flatten the product array](https://docs.aws.amazon.com/athena/latest/ug/flattening-arrays.html) into multiple rows by using *CROSS JOIN* in conjunction with the *UNNEST* operator.
 
-![](fct-orders-query.png#center)
+![Athena query using CROSS JOIN UNNEST on product, returning eight product rows for order 1 with price and quantity](fct-orders-query.png#center "Product array flattened into one row per item")
 
 ## Update Records
 

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -16,13 +12,12 @@ categories:
 tags: 
   - Python
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: An article that motivates the benefits of Python for R users.
+description: Call a SOAP web service from Python with the suds library, a job R has no comprehensive client package for, demonstrated on the Sizmek MDX API.
 ---
 
 There seem to be growing interest in Python in the R cummunity. While there can be a range of opinions about using R over Python (or vice versa) for exploratory data analysis, fitting statistical/machine learning algorithms and so on, I consider one of the strongest attractions of using Python comes from the fact that *Python is a general purpose programming language*. As more developers are involved in, it can provide a way to get jobs done easily, which can be tricky in R. In this article, an example is introduced by illustrating how to connect to [SOAP (Simple Object Access Protocol)](https://en.wikipedia.org/wiki/SOAP) web services.
+
+## SOAP Web Services and Client Libraries
 
 Web service (or API) is a popular way to connect to a server programmatically and SOAP web service is one type. For those who are interested in it, please see [this article](https://msdn.microsoft.com/en-us/library/ms996486.aspx). Although R has good packages to connect to a newer type of web service, which is based on [REST (Representational state transfer)](https://en.wikipedia.org/wiki/Representational_state_transfer) (eg, [httr package](https://cran.r-project.org/web/packages/httr/index.html)), I haven't found a good R package that can be used as a comprehensive SOAP client, which means I have to use the RCurl package at best. On the other hand, as 'batteries included', one of Python's philosophies, assures, it has a number of SOAP client libraries. Among those, I've chosen the [suds library](https://github.com/suds-community/suds).
 
@@ -95,6 +90,8 @@ class Advertiser:
         return filteredList
 ```
 
+## Same Class as S3 Objects in R
+
 The 4 classes have a number of common methods (`GetItemRes(), GetItem(), GetItemPgn(), GetFilter()`) to retrieve data from the relevant sections of the API and these methods are not related to an instance of the classes so that they are set to be static (*@staticmethod*). In R, this class may be constructed as following.
 
 
@@ -125,6 +122,8 @@ GetItemRes.Advertiser <- function(obj) {
 
 ...
 ```
+
+## Retrieving Advertiser Details in Both Languages
 
 While it is relatively straightforward to set up corresponding S3 classes, the issue is that there is no comprehensive SOAP client in R. In Python, the client library helps create a proxy class based on the relevant WSDL file so that a request/response can be handled entirely in a 'Pythonic' way. For example, below shows how to retrieve advertiser details from the API.
 
@@ -186,6 +185,8 @@ On the other hand, if I use the RCurl package, I have to send the following SOAP
 </SOAP-ENV:Envelope>
 DEBUG:suds.client:headers = {'SOAPAction': '"http://api.eyeblaster.com/IAdvertiserService/GetAdvertisers"', 'Content-Type': 'text/xml; charset=utf-8'}
 ```
+
+## When to Reach for Python as an R User
 
 I guess most R users are not programmers but many of them are quite good at understanding how a program works. Therefore, if there is an area that R is not strong, it'd be alright to consider another language to make life easier. Among those, I consider Python is easy to learn and it can provide a range of good tools. If you're interested, please see my next article about [some thoughts on Python](/blog/2015-08-08-some-thoughts-on-python).
 

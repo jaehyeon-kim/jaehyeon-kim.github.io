@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Development with Docker
 categories:
@@ -18,13 +14,10 @@ tags:
   - Docker
   - Kpow
   - kafka-ui
-authors:
-  - JaehyeonKim
-images: []
 description: Kafka management apps compared for local development, covering IAM access control and integration with MSK Connect and Glue Schema Registry.
 ---
 
-In the previous post, I illustrated how to create a topic and to produce/consume messages using the command utilities provided by Apache Kafka. It is not convenient, however, for example, when you consume serialised messages where their schemas are stored in a schema registry. Also, the utilities don't support to browse or manage related resources such as connectors and schemas. Therefore, a Kafka management app can be a good companion for development, which helps monitor and manage resources on an easy-to-use user interface. An app can be more useful if it supports features that are desirable for Kafka development on AWS. Those features cover [IAM access control](https://docs.aws.amazon.com/msk/latest/developerguide/iam-access-control.html) of [Amazon MSK](https://aws.amazon.com/msk/) and integration with [Amazon MSK Connect](https://aws.amazon.com/msk/features/msk-connect/) and [AWS Glue Schema Registry](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html). In this post, I'll introduce several management apps that meet those requirements.
+The command utilities provided by Apache Kafka are not convenient, for example, when you consume serialised messages where their schemas are stored in a schema registry. In the previous post, I illustrated how to create a topic and to produce/consume messages using those utilities. Also, the utilities don't support to browse or manage related resources such as connectors and schemas. Therefore, a Kafka management app can be a good companion for development, which helps monitor and manage resources on an easy-to-use user interface. An app can be more useful if it supports features that are desirable for Kafka development on AWS. Those features cover [IAM access control](https://docs.aws.amazon.com/msk/latest/developerguide/iam-access-control.html) of [Amazon MSK](https://aws.amazon.com/msk/) and integration with [Amazon MSK Connect](https://aws.amazon.com/msk/features/msk-connect/) and [AWS Glue Schema Registry](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html). In this post, I'll introduce several management apps that meet those requirements.
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](#) (this post)
@@ -102,32 +95,32 @@ networks:
 
 Below shows the landing page of *kafka-ui*. It shows details of the single cluster (*local*) and it allows you to check brokers, topics and consumers.
 
-![](ui-overview.png#center)
+![Landing page of kafka-ui with the local cluster, its brokers, topics and consumers](ui-overview.png#center "Landing page of kafka-ui with the local cluster, its brokers, topics and consumers")
 
 The overview section of *Kpow CE* shows more details by default, although we haven't specified many of them (stream/connect cluster, schema registry ...).
 
-![](kpow-overview.png#center)
+![Overview section of Kpow with cluster, topic and consumer details](kpow-overview.png#center "Overview section of Kpow with cluster, topic and consumer details")
 
 ## Create Topic
 ### UI for Apache Kafka (kafka-ui)
 
 In the *Topics* menu, we can click the *Add a Topic* button to begin creating a topic.
 
-![](ui-topic-01.png#center)
+![Topics menu of kafka-ui with the Add a Topic button](ui-topic-01.png#center "Topics menu of kafka-ui with the Add a Topic button")
 
 We can create a topic by clicking the *Create topic* button after entering the topic name, number of partitions, and additional configuration values. I created the topic named *orders* here, and it'll be used later.
 
-![](ui-topic-02.png#center)
+![Create topic form in kafka-ui with the name orders and the number of partitions](ui-topic-02.png#center "Create topic form in kafka-ui with the name orders and the number of partitions")
 
 ### Kpow
 
 Similarly, we can click the *Create Topic* button to begin creating a topic in the *Topics* menu.
 
-![](kpow-topic-01.png#center)
+![Topics menu of Kpow with the Create Topic button](kpow-topic-01.png#center "Topics menu of Kpow with the Create Topic button")
 
 We can create a topic by clicking the *Create Topic* button after entering the topic name and additional configuration values.
 
-![](kpow-topic-02.png#center)
+![Create topic form in Kpow with the topic name and configuration values](kpow-topic-02.png#center "Create topic form in Kpow with the topic name and configuration values")
 
 
 ## Produce Messages
@@ -228,21 +221,21 @@ if __name__ == "__main__":
 
 In the *Messages* tab of the *orders* topic, we can browse the order messages. Be default, it lists messages from the oldest one. It has options to filter messages by *Seek Type* (offset or timestamp) and *Partitions*. Also, it allows you to sort messages by timestamp - *Oldest First* or *Newest First*.
 
-![](ui-topic-03.png#center)
+![Messages tab of the orders topic in kafka-ui with seek type and partition filters](ui-topic-03.png#center "Messages tab of the orders topic in kafka-ui with seek type and partition filters")
 
 It also supports to filter messages by key or value. Below shows an example where messages are filtered by a specific user ID (*072*).
 
-![](ui-topic-04.png#center)
+![Messages in kafka-ui filtered down to the user ID 072](ui-topic-04.png#center "Messages in kafka-ui filtered down to the user ID 072")
 
 ### Kpow
 
 In the *Data* menu, we can select one or more topics in order to browse messages. In *Mode*, we can select one of *Sample*, *Partition* and *Key* options - specific values should be entered if other than *Sample* is selected. In *Window*, it allows you to select the following conditions - *Recent*, *Last minute*, *Last 15 minutes*, *Last hour*, *Last 24 hours*, *Earliest*, *Custom timestamp*, and *Custom datetime*. Unlike *kafka-ui*, it requires to select the appropriate key/value serialisers and JSON is selected for both key and value.
 
-![](kpow-topic-03.png#center)
+![Data menu of Kpow with the Mode and Window options for browsing messages](kpow-topic-03.png#center "Data menu of Kpow with the Mode and Window options for browsing messages")
 
 Similar to *kafka-ui*, it supports to filter messages by key or value. Below shows an example where messages are filtered by a specific user ID (*072*).
 
-![](kpow-topic-04.png#center)
+![Messages in Kpow filtered down to the user ID 072](kpow-topic-04.png#center "Messages in Kpow filtered down to the user ID 072")
 
 ## Summary
 

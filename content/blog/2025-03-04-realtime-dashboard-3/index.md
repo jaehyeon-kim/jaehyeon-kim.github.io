@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Realtime Dashboard with FastAPI, Streamlit and Next.js
 categories:
@@ -18,13 +14,10 @@ tags:
   - Next.js
   - React
   - WebSocket
-authors:
-  - JaehyeonKim
-images: []
 description: Next.js and React with Apache ECharts show the same live order and revenue metrics, reading from the FastAPI WebSocket server in the browser.
 ---
 
-In this post, we build a real-time monitoring dashboard using [Next.js](https://nextjs.org/), a React framework that supports server-side rendering, static site generation, and full-stack capabilities with built-in performance optimizations. Similar to the *Streamlit* app we developed in [Part 2](/blog/2025-02-25-realtime-dashboard-2), this dashboard connects to the WebSocket server from [Part 1](/blog/2025-02-18-realtime-dashboard-1) to continuously fetch and visualize key metrics such as **order counts**, **sales data**, and **revenue by traffic source and country**. With interactive bar charts and dynamic metrics, users can monitor sales trends and other critical business KPIs in real-time.  
+A real-time monitoring dashboard connects to the WebSocket server from [Part 1](/blog/2025-02-18-realtime-dashboard-1) to continuously fetch and visualize key metrics such as **order counts**, **sales data**, and **revenue by traffic source and country**. With interactive bar charts and dynamic metrics, users can monitor sales trends and other critical business KPIs in real-time. In this post, we build it using [Next.js](https://nextjs.org/), a React framework that supports server-side rendering, static site generation, and full-stack capabilities with built-in performance optimizations. It is similar to the *Streamlit* app we developed in [Part 2](/blog/2025-02-25-realtime-dashboard-2).  
 
 <!--more-->
 
@@ -339,7 +332,7 @@ export default function Home() {
 
 As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1), the data generator and WebSocket server can be deployed using Docker Compose with the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) by executing `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`.
 
-![](backend.gif#center)
+![Split terminal creating the producer containers, then producer logs of order JSON and SQL queries](backend.gif#center "Data generator and WebSocket server started with Docker Compose")
 
 ### Frontend Dashboard
 
@@ -356,4 +349,4 @@ $ pnpm install
 $ pnpm dev
 ```
 
-![](featured.gif#center)
+![Order count, item count and sales cards above bar charts of revenue by country and traffic source](featured.gif#center "theLook eCommerce dashboard updating live from the WebSocket server")

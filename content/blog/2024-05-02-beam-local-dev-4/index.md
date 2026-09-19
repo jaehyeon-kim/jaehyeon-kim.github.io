@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Local Development with Python
 categories:
@@ -18,13 +14,10 @@ tags:
   - Apache Flink
   - Apache Kafka
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: A streaming Apache Beam pipeline in Python that aggregates page visits by user in fixed 20 second windows, written with and without Beam SQL.
 ---
 
-In [Part 3](/blog/2024-04-18-beam-local-dev-3), we discussed the portability layer of [Apache Beam](https://beam.apache.org/) as it helps understand (1) how Python pipelines run on the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) and (2) how multiple SDKs can be used in a single pipeline, followed by demonstrating local Flink and Kafka cluster creation for developing streaming pipelines. In this post, we build a streaming pipeline that aggregates page visits by user in a [fixed time window](https://beam.apache.org/documentation/programming-guide/#fixed-time-windows) of 20 seconds. Two versions of the pipeline are created with/without relying on [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/).
+We build a streaming pipeline that aggregates page visits by user in a [fixed time window](https://beam.apache.org/documentation/programming-guide/#fixed-time-windows) of 20 seconds. Two versions of the pipeline are created with/without relying on [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/). In [Part 3](/blog/2024-04-18-beam-local-dev-3), we discussed the portability layer of [Apache Beam](https://beam.apache.org/) as it helps understand (1) how Python pipelines run on the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) and (2) how multiple SDKs can be used in a single pipeline, followed by demonstrating local Flink and Kafka cluster creation for developing streaming pipelines.
 
 * [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1)
 * [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2)
@@ -393,17 +386,17 @@ $ python section3/traffic_agg.py --use_own
 
 After a while, we can check both the input and output topics in the *Topics* section of *kafka-ui*. It can be accessed on *localhost:8080*.
 
-![](kafka-topics.png#center)
+![Input and output topics of the traffic aggregation pipeline in kafka-ui](kafka-topics.png#center "Input and output topics of the traffic aggregation pipeline in kafka-ui")
 
 We can use the Flink web UI to monitor the pipeline as a Flink job. When we click the *traffic-agg* job in the *Running Jobs* section, we see 4 operations are linked in the *Overview* tab. The first two operations are polling and reading Kafka source description. All the transformations up to windowing the keyed elements are performed in the third operation, and the elements are aggregated and written to the Kafka output topic in the last operation.
 
-![](flink-job.png#center)
+![Flink web UI Overview tab of the traffic-agg job with its four linked operations](flink-job.png#center "Flink web UI Overview tab of the traffic-agg job with its four linked operations")
 
 #### SQL Traffic Aggregation
 
 I see the following error when I execute the SQL version of the pipeline with the *use_own* option. It seems that the Java SDK container for SQL transformation fails to download its expansion service and does not complete initialisation steps - see [Part 3](/blog/2024-04-18-beam-local-dev-3) for details about how multiple SDKs can be used in a single pipeline. Therefore, the Flink job fails to access the SDK container, and it keeps recreate a new container.
 
-![](flink-job-sql.png#center)
+![Error raised when the SQL pipeline runs on the local Flink cluster](flink-job-sql.png#center "Error raised when the SQL pipeline runs on the local Flink cluster")
 
 We can see lots of containers are stopped and get recreated.
 
@@ -426,7 +419,7 @@ $ python section3/traffic_agg_sql.py
 
 Similar to the earlier version, we can check the input and output topics on *localhost:8080* as well.
 
-![](kafka-topics-sql.png#center)
+![Input and output topics of the SQL pipeline in kafka-ui](kafka-topics-sql.png#center "Input and output topics of the SQL pipeline in kafka-ui")
 
 ## Summary
 

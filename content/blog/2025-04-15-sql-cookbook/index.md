@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 categories:
   - Data Streaming
@@ -17,10 +13,6 @@ tags:
   - Docker
   - Docker Compose
   - Flink SQL
-  - Flink SQL Client
-authors:
-  - JaehyeonKim
-images: []
 description: Docker Compose runs a local Apache Flink cluster and SQL Client so the Ververica Flink SQL Cookbook recipes work without the Ververica Platform.
 ---
 
@@ -199,11 +191,11 @@ SELECT * FROM heros;
 quit;
 ```
 
-![](featured.gif#center)
+![Flink SQL client creating the heros table and querying it in the record view](featured.gif#center "Flink SQL client creating the heros table and querying it in the record view")
 
 The associating Flink job of the SELECT query can be found on the Flink Web UI at `http://localhost:8081`.
 
-![](web-ui.png#center)
+![Flink web UI with the job that runs the SELECT query](web-ui.png#center "Flink web UI with the job that runs the SELECT query")
 
 ## Caveat
 
@@ -232,4 +224,10 @@ CREATE TABLE server_logs (
 );
 ```
 
-![](sql-error.gif#center)
+![Flink SQL client failing on the unsupported userAgentAny directive](sql-error.gif#center "Flink SQL client failing on the unsupported userAgentAny directive")
+
+## Related posts
+
+* [Local Development - Kafka, Flink and DynamoDB for Real Time Fraud Detection Part 1](/blog/2023-08-10-fraud-detection-part-1) - a local Flink app that puts this kind of SQL into a full pipeline
+* [Getting Started with PyFlink on AWS - Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1) - runs a PyFlink app against Kafka on Docker, in a virtual environment and in a local cluster
+* [Building Apache Flink Applications in Python](/blog/2023-10-19-build-pyflink-apps) - three DataStream applications in PyFlink, for the cases SQL does not cover

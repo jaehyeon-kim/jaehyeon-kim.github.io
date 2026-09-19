@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -19,13 +15,12 @@ tags:
   - HiveQL
   - SparkR
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: One option to boost SparkR's performance as a data processing engine is manipulating data in Hive Context rather than in limited SQL Context. In this post, we discuss how to run SparkR in Hive Context.
+description: Run SparkR in Hive Context to reach the Hive UDFs and window functions the SQL Context lacks, compared against dplyr, plus building Spark with Hive.
 ---
 
-In the [previous post](/blog/2016-03-02-quick-start-sparkr-in-local-and-cluster-mode), it is demonstrated how to start SparkR in local and cluster mode. While SparkR is in active development, it is yet to fully support Spark's key libraries such as MLlib and Spark Streaming. Even, as a data processing engine, this R API is still limited as it is not possible to manipulate RDDs directly but only via Spark SQL/DataFrame API. As can be checked in the [API doc](https://spark.apache.org/docs/latest/api/R/index.html), SparkR rebuilds many existing R functions to work with Spark DataFrame and notably it borrows some functions from the dplyr package. Also there are some alien functions (eg `from_utc_timestamp()`) and many of them are from [Hive Query Language (HiveQL)](https://cwiki.apache.org/confluence/display/Hive/LanguageManual). In relation to those functions from HiveQL, although some Hive user defined functions (UDFs) are ported, still many useful [UDFs](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF) and [Window functions](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics) don't exist. 
+> **Status, September 2026.** This post uses Spark 1.6 and the SparkR API of that release, so the pre-built binary, the build with Hive steps and the function set described here no longer match current Spark. Read it for the Hive Context approach rather than as working instructions.
+
+While SparkR is in active development, it is yet to fully support Spark's key libraries such as MLlib and Spark Streaming. Even, as a data processing engine, this R API is still limited as it is not possible to manipulate RDDs directly but only via Spark SQL/DataFrame API. In the [previous post](/blog/2016-03-02-quick-start-sparkr-in-local-and-cluster-mode), it is demonstrated how to start SparkR in local and cluster mode. As can be checked in the [API doc](https://spark.apache.org/docs/latest/api/R/index.html), SparkR rebuilds many existing R functions to work with Spark DataFrame and notably it borrows some functions from the dplyr package. Also there are some alien functions (eg `from_utc_timestamp()`) and many of them are from [Hive Query Language (HiveQL)](https://cwiki.apache.org/confluence/display/Hive/LanguageManual). In relation to those functions from HiveQL, although some Hive user defined functions (UDFs) are ported, still many useful [UDFs](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF) and [Window functions](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics) don't exist. 
 
 In this circumstances, I consider one option to boost SparkR's performance as a data processing engine is manipulating data in Hive Context rather than in limited SQL Context. There is good and bad news. The good one is existing Hive installation is not necessary to setup Hive Context and the other one is Spark has to be built from source with Hive. In this post, several examples of using Hive UDFs and Window functions are demonstrated, comparing to the dplyr package. Also a summary of Spark build with Hive is discussed.
 
@@ -321,7 +316,7 @@ Here is a summary of steps followed.
 
 The build was done in a VirtualBox guest where 2 cores and 8 GB of memory were allocated. After about 30 minutes, I was able to see the following output and the pre-built Spark source (*spark-1.6.0-bin-spark-1.6.0-bin-hadoop2.4-hive-yarn.tgz*).
 
-![](reactor_summary.png#center)
+![Maven reactor summary listing every Spark module as SUCCESS, with Hive and Hive Thrift Server marked](reactor_summary.png#center "Spark 1.6.0 build finishes with BUILD SUCCESS in 31:24 min")
 
 I hope this post is useful.
 

@@ -5,27 +5,22 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
   - Development
 tags: 
   - R
-authors:
-  - JaehyeonKim
-images: []
 description: In this post, a way to overcome one of R's limitations of lack of multi-threading is discussed by job queuing using the jobqueue package
 ---
 
-In this post, a way to overcome one of R's limitations (**lack of multi-threading**) is discussed by job queuing using the [jobqueue package](https://jobqueue.r-forge.r-project.org/) - a generic asynchronous job queue implementation for R. See the package description below.
+Job queuing using the [jobqueue package](https://jobqueue.r-forge.r-project.org/), a generic asynchronous job queue implementation for R, is a way to overcome one of R's limitations (**lack of multi-threading**). See the package description below.
 
 > The jobqueue package is meant to provide an easy-to-use interface that allows to queue computations for background evaluation while the calling R session remains responsive. It is based on a *1-node socket cluster from the parallel package*. The package provides a way to do basic threading in R. The main focus of the package is on an intuitive and easy-to-use interface for the job queue programming construct. ... Typical applications include: **background computation of lengthy tasks (such as data sourcing, model fitting, bootstrapping), simple/interactive parallelization (if you have 5 different jobs, move them to up to 5 different job queues), and concurrent task scheduling in more complicated R programs.** ...
 
 Added to the typical applications indicated above, this package can be quite beneficial with a Shiny application especially when long-running process has to be served.
+
+## Installing the jobqueue Package
 
 The package is not on CRAN and it can be installed as following.
 
@@ -44,6 +39,8 @@ if(!require(jobqueue)) {
 
 library(jobqueue)
 ```
+
+## Running a Blocking Function Asynchronously
 
 As can be seen in the description, it is highly related to the **parallel** package and thus it wouldn't be hard to understand how it works if you know how to do parallel processing using that package - if not, have a look at [this post](/blog/2015-03-14-parallel-processing-on-single-machine-1). 
 
@@ -125,6 +122,8 @@ out
 ```
 ##  [1]  1  2  3  4  5  6  7  8  9 10
 ```
+
+## Growing a Random Forest Across Two Queues
 
 Another example of applying *job queue* is fitting a bootstrap-based algorithm. In this example, each of 500 trees are grown and they are combined at the end - note that, in practice, it'd be better to save outputs and combine them later.
 

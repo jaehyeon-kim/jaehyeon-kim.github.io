@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Integrate Schema Registry with MSK Connect
 categories:
@@ -19,11 +15,8 @@ tags:
   - Docker
   - Apache Spark
   - PySpark
-authors:
-  - JaehyeonKim
-images: []
 cevo: 12
-description: We'll discuss how to create a Spark local dev environment for EMR using Docker and/or VSCode. A range of Spark development examples are demonstrated and Glue Catalog integration is illustrated as well.
+description: Create a Spark local development environment for Amazon EMR with Docker and Visual Studio Code, with Spark examples and Glue Catalog integration.
 ---
 
 [**UPDATE 2023-12-07**]
@@ -261,12 +254,12 @@ We can open the current folder in the development container after launching the 
 
 * _Remote-Containers: Open Folder in Container..._
 
-![](01-open-folder-in-container.png#center)
+![VSCode command palette with Remote-Containers Open Folder in Container highlighted in red at the top of the list](01-open-folder-in-container.png#center "Opening the project folder inside the development container")
 
 
 Once the development container is ready, the current folder will be open within the spark service container. We are able to check the container’s current folder is `/home/hadoop/repo` and the container user is _hadoop_.
 
-![](02-continer.png#center)
+![VSCode attached to the Spark development container, with a terminal showing pwd as /home/hadoop/repo and whoami as hadoop](02-continer.png#center "Current folder and user inside the container")
 
 
 ### File Permission Management
@@ -380,7 +373,7 @@ $SPARK_HOME/bin/spark-submit \
 
 Once it completes, the Glue table will be created, and we can query it using Athena as shown below.
 
-![](04-glue-table.png#center)
+![Athena query selecting ten rows from tripdata.ny_taxi, returning pickup and dropoff times, location ids and passenger counts](04-glue-table.png#center "The Glue table queried in Athena")
 
 
 If we want to submit the application as an isolated container, we can use the custom image directly. Below shows the equivalent Docker run command.
@@ -457,7 +450,7 @@ def test_to_timestamp_bad_format(spark):
 
 As the test cases don’t access AWS services, they can be executed simply by the Pytest command (e.g. `pytest -v`).  
 
-![](05-pytest.png#center)
+![Pytest run collecting two items, both test_to_timestamp cases passing in 10.51 seconds](05-pytest.png#center "Unit tests run inside the container")
 
 
 Testing can also be made in an isolated container as shown below. Note that we need to add the _PYTHONPATH_ environment variable because we use the bundled Pyspark package.
@@ -481,7 +474,7 @@ $SPARK_HOME/bin/pyspark \
   --master local[*]
 ```
 
-![](08-pyspark.png#center)
+![PySpark shell starting in client mode on local master, reporting Spark 3.1.2-amzn-1 and Python 3.7.10](08-pyspark.png#center "PySpark shell in the development container")
 
 
 Also, below shows an example of launching it as an isolated container.
@@ -504,9 +497,9 @@ Jupyter Notebook is a popular Spark application authoring tool, and we can creat
 
 In the next code cell, the app reads the Glue table and adds a column of trip duration followed by showing the summary statistics of key columns. We see some puzzling records that show zero trip duration or negative total amount. Among those, we find negative total amount records should be reported immediately and a Spark Structured Streaming application turns out to be a good option.
 
-![](07-01-jupyter.png#center)
+![Jupyter notebook cell reading the Glue table and printing summary statistics, with trip_duration minimum 0 and total_amount minimum minus 60](07-01-jupyter.png#center "Summary statistics showing zero durations and negative amounts")
 
-![](07-02-jupyter.png#center)
+![Notebook cell counting rows where total_amount is below zero, returning 50](07-02-jupyter.png#center "Fifty records carry a negative total amount")
 
 
 ### Spark Streaming
@@ -636,12 +629,16 @@ $SPARK_HOME/bin/spark-submit \
 
 We can check the topic via Kafka UI on port 8080. We see the notifications topic has 50 messages, which matches to the number that we obtained from the notebook. 
 
-![](06-notification-01.png#center)
+![Kafka UI topic list showing the notifications topic with one partition, 50 messages and a size of 25KB](06-notification-01.png#center "The notifications topic in Kafka UI")
 
 
 We can check the individual messages via the UI as well.
 
-![](06-notification-02.png#center)
+![Kafka UI message view for the notifications topic, with a JSON record whose total_amount of minus 4.8 is outlined](06-notification-02.png#center "A single notification message with a negative total amount")
+
+## Related posts
+
+* [Develop and Test Apache Spark Apps for EMR Remotely Using Visual Studio Code](/blog/2022-09-07-emr-remote-dev) - the follow-up, developing against an EMR cluster in a private subnet over VPN and remote SSH
 
 ## Summary
 

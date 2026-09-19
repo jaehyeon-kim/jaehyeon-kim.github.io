@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt Guide for Production
 categories:
@@ -19,9 +15,6 @@ tags:
   - Continuous Integration
   - GitHub Actions
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 description: GitHub Actions gives a dbt project on BigQuery a slim CI run on pull requests and a deploy job that publishes the project as a container image.
 ---
 
@@ -157,7 +150,7 @@ $ dbt run --profiles-dir=dbt_profiles --project-dir=pizza_shop --target dev
 
 We can check the models are created in the *pizza_shop* dataset.
 
-![](initial-data.png#center)
+![BigQuery explorer lists nine tables and views in the pizza_shop dataset](initial-data.png#center "Models created in the pizza_shop dataset")
 
 ## CI/CD Process
 
@@ -169,7 +162,7 @@ The CI/CD process has two workflows - `slim-ci` and `deploy`. When a pull reques
 
 The workflows require a variable that keeps the GCP project ID, and it is accessed by `${{ vars.GCP_PROJECT_ID }}`. Also, the service account key is stored as a secret, and it can be retrieved by `${{ secrets.GCP_SA_KEY }}`. They can be created on the repository settings.
 
-![](variable-secret.png#center)
+![GitHub Actions settings page lists the GCP_SA_KEY repository secret](variable-secret.png#center "Repository secret that holds the GCP service account key")
 
 #### Create GCP Resources and Store DBT Artifact
 
@@ -195,11 +188,11 @@ $ gcloud artifacts repositories create dbt-cicd-demo \
 
 The project documentation is published into GitHub Pages. We first need to enable GitHub Pages on the repository settings. We select the site to be built from the *gh-pages* branch. To do so, we have to create the dedicated branch and push to the remote repository beforehand.
 
-![](gh-pages-config-1.png#center)
+![GitHub Pages settings build the site from the gh-pages branch root folder](gh-pages-config-1.png#center "Enabling GitHub Pages on the gh-pages branch")
 
 Enabling GitHub Pages creates an environment with protection rules. By default, the site can only be deployed from the *gh-pages* branch. It can cause the workflow job to fail, and we need to add the main branch in the list. During initial development, we may add one or more feature branches in the list so that the workflow job can be triggered from those branches.
 
-![](gh-pages-config-2.png#center)
+![Environment protection rules allow deployment from the gh-pages and main branches](gh-pages-config-2.png#center "Adding the main branch to the deployment branches")
 
 ### DBT Slim CI
 
@@ -314,11 +307,11 @@ jobs:
 
 In the workflow log, we see only the modified model (*fct_orders*) is created in a *ci* dataset - the dataset name is prefixed and suffixed by *ci* and the commit hash respectively.
 
-![](slim-ci-log.png#center)
+![Workflow log builds one incremental model, fct_orders, in a ci dataset](slim-ci-log.png#center "Slim CI log building only the modified model")
 
 We can see the new column is created in the *fct_orders* table in the *ci* dataset.
 
-![](slim-ci-output.png#center)
+![BigQuery schema of fct_orders in the ci dataset shows the new bar string column](slim-ci-output.png#center "New column created by the modified model")
 
 ### DBT Deployment
 
@@ -474,7 +467,7 @@ jobs:
 
 In the workflow log, we see it creates two models in a *ci* dataset and performs unit testing on the *users* dimension table.
 
-![](unit-test-log.png#center)
+![Workflow log creates src_users and dim_users in a ci dataset, then passes one unit test](unit-test-log.png#center "Unit test run on the users dimension table")
 
 #### DBT Image Build and Push
 
@@ -733,4 +726,4 @@ jobs:
 
 We can check the documentation on [this link](https://jaehyeon.me/dbt-cicd-demo/).
 
-![](gh-pages-output.png#center)
+![dbt documentation site shows the pizza_shop project tree with raw sources and models](gh-pages-output.png#center "Project documentation published to GitHub Pages")

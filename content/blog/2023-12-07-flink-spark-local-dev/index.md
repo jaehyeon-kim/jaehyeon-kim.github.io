@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 categories:
   - Development
   - Data Streaming
@@ -20,9 +16,6 @@ tags:
   - Apache Kafka
   - Apache Spark
   - Docker
-authors:
-  - JaehyeonKim
-images: []
 description: A local Flink and Spark environment built from EMR container images, where Flink ingests data in real time and Spark queries it via the Glue Data Catalog.
 ---
 [**UPDATE 2025-10-01**]
@@ -255,7 +248,7 @@ volumes:
 
 In an [earlier post](/blog/2022-05-08-emr-local-dev), I illustrated how to set up a local development environment using an EMR container image. That post is based the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension of VS Code, and it is assumed that development takes place after attaching the project folder into a Docker container. Thanks to the [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) extension, however, we no longer have to attach the project folder into a container always because the extension allows us to do so with just a few mouse clicks if necessary - see the screenshot below. Moreover, as Spark applications developed in the host folder can easily be submitted to the Spark container via volume-mapping, we can simplify Spark setup dramatically without creating a custom Docker image. Therefore, Spark will be set up using the EMR image where updated Spark configuration files and the project folder are volume-mapped to the container. Also, the Spark History Server will be running in the container, which allows us to monitor completed and running Spark applications.
 
-![](vscode-attach.png#center)
+![VSCode Docker panel listing the running containers, with Attach Visual Studio Code boxed in red in the context menu of the Spark container](vscode-attach.png#center "Attaching VSCode to a running container from the Docker extension")
 
 #### Configuration Updates
 
@@ -541,17 +534,17 @@ docker exec jobmanager /usr/lib/flink/bin/flink run \
 
 Once the app runs, we can see the status of the Flink job on the Flink Web UI (*localhost:8081*).
 
-![](flink-producer.png#center)
+![Flink dashboard showing the orders_table insert job running for 56 seconds, the source operator busy at 100 percent and 141 records received by the writer](flink-producer.png#center "Producer job on the Flink Web UI")
 
 Also, we can check the topic (*orders*) is created and messages are ingested on *kafka-ui* (*localhost:8080*).
 
-![](kafka-topic.png#center)
+![Kafka UI overview of the orders topic, 3 partitions and 291 messages spread across them](kafka-topic.png#center "The orders topic in Kafka UI")
 
 ### Flink Processor
 
 The Flink processor application is created using Flink SQL on the [Flink SQL client](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/dev/table/sqlclient/). The SQL client can be started by executing `docker exec -it jobmanager ./bin/sql-client.sh`.
 
-![](sql-client.png#center)
+![Flink SQL client terminal showing the squirrel banner and the Flink SQL prompt](sql-client.png#center "Flink SQL client started in the jobmanager container")
 
 #### Source Table in Default Catalog
 
@@ -623,7 +616,7 @@ CREATE DATABASE IF NOT EXISTS glue_catalog.demo
 
 Once succeeded, we are able to see the database is created in the Glue Data Catalog.
 
-![](glue-database.png#center)
+![Glue Data Catalog databases list holding default and the new demo database, located at the warehouse prefix in S3](glue-database.png#center "The demo database created in the Glue Data Catalog")
 
 Finally, we create the sink table in the Glue database. The Hive SQL dialect is used to create the table, and it is partitioned by *year*, *month*, *date* and *hour*.
 
@@ -648,7 +641,7 @@ TBLPROPERTIES (
 
 We can check the sink table is created in the Glue database on AWS Console as shown below.
 
-![](glue-table.png#center)
+![Glue table sink_tbl in the demo database, stored as Parquet with columns id, value and ts, partitioned by year, month, date and hour](glue-table.png#center "The sink table registered in the Glue Data Catalog")
 
 #### Flink Job
 
@@ -675,11 +668,11 @@ FROM source_tbl;
 
 Once the Flink app is submitted, we can check the Flink job on the Flink Web UI (*localhost:8081*).
 
-![](flink-processor.png#center)
+![Flink dashboard showing the insert into glue_catalog.demo.sink_tbl job running for 1 minute 18 seconds through a streaming file writer and partition committer](flink-processor.png#center "Processor job on the Flink Web UI")
 
 As expected, the output files are written into S3 in Apache Hive style partitions, and they are created in one minute interval.
 
-![](s3-objects.png#center)
+![S3 console at the year, month, date and hour prefix, listing nine part files written one minute apart](s3-objects.png#center "Output files written in Hive style partitions")
 
 ### Spark Consumer
 
@@ -708,11 +701,11 @@ docker exec spark spark-submit \
 
 The app queries the output table successfully and shows the result as expected.
 
-![](spark-consumer.png#center)
+![Spark shell output of the sink table, 20 rows of id, value, timestamp and the year, month, date and hour partition columns](spark-consumer.png#center "The output table queried from Spark")
 
 We can check the performance of the Spark application on the Spark History Server (*localhost:18080*).
 
-![](spark-history-server.png#center)
+![Spark History Server for the Consume Orders application, 40 seconds of uptime and one completed job finishing in 1 second](spark-history-server.png#center "The Spark application on the History Server")
 
 ## Summary
 

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Kafka Connect for AWS Services Integration
 categories:
@@ -17,10 +13,6 @@ categories:
 tags: 
   - Apache Flink
   - Apache Kafka
-  - Streaming Analytics
-authors:
-  - JaehyeonKim
-images: []
 description: Stateful stream processing set against traditional data infrastructure, showing which application patterns it improves and what opportunities it opens.
 ---
 
@@ -32,17 +24,17 @@ Stream processing technology is becoming more and more popular with companies bi
 
 ### 1.1 Transactional Processing
 
-![](figure1.png#center)
+![A CRM, an order system and a web app each handle events and all read and write the same transactional database below the compute and storage line](figure1.png#center "Transactional processing against a shared database")
 
 Applications are usually connected to external services or face human users and continuously process incoming events such as orders, email, or clicks on a website. When an event is processed, an application reads its state or updates it by running transactions against the remote database system. Often, a database system serves multiple applications that sometimes access the same databases or tables. Since multiple applications might work on the same data representation or share the same infrastructure, changing the schema of a table or scaling a database system requires careful planning and a lot of effort.
 
-![](figure2.png#center)
+![Three services, each with its own application and database, calling one another over REST](figure2.png#center "Microservices communicating over REST")
 
 A recent approach to overcoming the tight bundling of applications is the microservices design pattern. Microservices are designed as small, self-contained, and independent applications. More complex applications are built by connecting several microservices with each other that only communicate over standardised interfaces such as RESTful HTTP or gRPC connections.
 
 ### 1.2 Analytical Processing
 
-![](figure3.png#center)
+![Several transactional databases feed an ETL process that loads a data warehouse, which serves reports and ad hoc queries](figure3.png#center "Analytical processing through a data warehouse")
 
 Transactional data is often distributed across several disconnected database systems and is more valuable when it can be jointly analysed. Moreover, the data often needs to be transformed into a common format. Therefore the data is typically replicated to a data warehouse, a dedicated datastore for analytical query workloads.
 
@@ -56,7 +48,7 @@ Stateful stream processing applications often ingest their incoming events from 
 
 ### 2.1 Event-Driven Applications
 
-![](figure4.png#center)
+![Two event streams feed stateful operators that hold their own state and emit new streams, which a third operator joins into an output stream](figure4.png#center "Event-driven applications reading and writing event streams")
 
 Event-driven applications are stateful streaming applications that ingest event streams and process the events with application-specific business logic. Depending on the business logic, an event-driven application can trigger actions such as sending an alert or an email or write events to an outgoing event stream to be consumed by another event-driven application.
 
@@ -82,7 +74,7 @@ Ingesting, transforming, and inserting data with low latency is another common u
 
 ### 2.3 Streaming Analytics
 
-![](figure5.png#center)
+![An event log feeds an analytics application holding state, which writes results to a database for one dashboard and serves another dashboard directly](figure5.png#center "Streaming analytics from an event log to dashboards")
 
 ETL jobs periodically import data into a datastore and the data is processed by ad-hoc or scheduled queries, which adds considerable latency to the analytics pipeline.
 
@@ -103,3 +95,9 @@ Each of the application areas of the stateful stream processing pattern mentione
 **Data pipeline** and **streaming analytics** are key opportunities in data engineering. The former is already popular especially thanks to [Change Data Capture (CDC)](https://en.wikipedia.org/wiki/Change_data_capture) and I see many customers implement it already or are highly interested in it. I still don't see wide-spread adoption of streaming analytics among customers. However, as the latest generation of stream processors including Apache Flink provide accurate stream processing with high throughput and low latency at scale, I consider it is a matter of time until streaming analytics plays a central role for serving analytical processing needs.
 
 **Building and maintaining stream processing infrastructure** for clients can be an opportunity in application modernisation as well. First of all, Apache Kafka can be used as a distributed event store and it plays a key role because stream processing applications tend to read from or write to an event store. Kafka Connect can also be important as a tool for streaming data between Apache Kafka and other data systems by connectors in a scalable and reliable way. On AWS, there are multiple options and some of them cover Amazon MSK, Confluent Platform via Amazon Marketplace and self-managed cluster on Amazon EKS. Secondly, Apache Flink can be used as the main stream processor as it supports key requirements - state handling, event-time processing, exactly-once state consistency, recovery from failure to name a few. On AWS, Amazon Managed Service for Apache Flink is the easiest option. Moreover EMR on EKS supports Flink workloads (in preview) and self-managed applications can run on Amazon EKS. Lastly, Amazon EKS can be beneficial for deploying applications and workloads related to stateful stream processing in a more efficient manner.
+
+## Related posts
+
+* [Kafka, Flink and DynamoDB for Real Time Fraud Detection - Part 1](/blog/2023-08-10-fraud-detection-part-1) - an event-driven application of this pattern, developed locally on Docker.
+* [Getting Started with PyFlink on AWS - Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1) - a first PyFlink application against a Kafka cluster on Docker.
+* [Getting Started with PyFlink on AWS - Part 2 Local Flink and MSK](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2) - the same application connected to an IAM authenticated MSK cluster.

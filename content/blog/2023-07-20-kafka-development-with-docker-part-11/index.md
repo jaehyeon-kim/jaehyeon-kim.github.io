@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Development with Docker
 categories:
@@ -18,9 +14,6 @@ tags:
   - Apache Kafka
   - Docker
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Control user access to Kafka resources with authorization rules, keeping SASL for client authentication, with Java and Python client examples.
 ---
 
@@ -574,7 +567,7 @@ networks:
     name: kafka-network
 ```
 
-![](messages.png#center)
+![Messages tab of the orders topic in kafka-ui with one order record expanded](messages.png#center "Messages tab of the orders topic in kafka-ui with one order record expanded")
 
 ## Summary
 

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Development on Kubernetes
 categories:
@@ -21,9 +17,6 @@ tags:
   - Docker
   - Python
   - Strimzi
-authors:
-  - JaehyeonKim
-images: []
 description: Send and read Kafka topic records from Python client applications built with the kafka-python package and deployed on Kubernetes.
 ---
 
@@ -264,11 +257,11 @@ minikube service kafka-ui --url
 
 On the management app, we can check messages are created in the *orders* topic. Note that the Kafka cluster is configured to allow automatic creation of topics and the default number of partitions is set to 3.
 
-![](topic.png#center)
+![Kafka UI overview of the orders topic on the demo cluster, 3 partitions holding 6274 messages in total](topic.png#center "The orders topic created automatically")
 
 Also, we can see that messages are consumed by a single consumer in the consumer group named *orders-group*.
 
-![](consumer-group.png#center)
+![Kafka UI consumer group orders-group, stable with one member holding all three partitions and a total lag of 500](consumer-group.png#center "A single consumer reads all three partitions")
 
 ## Deploy Client Apps
 

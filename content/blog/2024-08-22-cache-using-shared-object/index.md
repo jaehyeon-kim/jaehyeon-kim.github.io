@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Apache Beam Python Examples
 categories:
@@ -18,9 +14,6 @@ tags:
   - Caching
   - Data Enrichment
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: The Shared class in the Beam Python SDK caches lookup data in memory for batch and streaming pipelines, with a periodic refresh for the latter.
 ---
 
@@ -321,3 +314,9 @@ INFO:root:refresh customer cache, current tag 1724099780.0, existing tag 1724099
 {'order_id': 'bqlia', 'customer_id': 320, 'timestamp': 1724099783, 'version': 5}
 {'order_id': 'uqywb', 'customer_id': 926, 'timestamp': 1724099783, 'version': 5}
 ```
+
+## Related posts
+
+* [Apache Beam Local Development with Python Part 1](/blog/2024-03-28-beam-local-dev-1) - sets up the local Beam environment, with notebooks, Beam SQL and Beam DataFrames
+* [Apache Beam Local Development with Python - Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2) - batch pipelines that aggregate website visit logs by user and time
+* [Apache Beam Local Development with Python - Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3) - the Beam portability layer and a streaming pipeline on the Flink Runner

@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - 
 categories:
@@ -19,9 +15,6 @@ tags:
   - Apache Kafka
   - Python
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 cevo: 26,27
 description: Integrate Python Kafka producer and consumer apps running on AWS Lambda with the Glue Schema Registry, which manages and validates message schemas.
 ---
@@ -48,7 +41,7 @@ Once messages are sent to a Kafka topic, they can be consumed by Lambda where [A
 
 The infrastructure is built by Terraform and the AWS SAM CLI is used to develop the producer Lambda function locally before deploying to AWS.
 
-![](featured.png#center)
+![EventBridge rule triggers producer Lambdas that publish to MSK, with Glue Schema Registry validating schemas](featured.png#center "Producer and consumer Lambdas around MSK and the Glue Schema Registry")
 
 ## Infrastructure
 A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (`vpc.tf`). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (`vpn.tf`). It is particularly useful to monitor and manage the MSK cluster and Kafka topic as well as developing the Kafka producer Lambda function locally. The details about how to configure the VPN server can be found in an [earlier post](/blog/2022-02-06-dev-infra-terraform). The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/glue-schema-registry) of this post.
@@ -1090,7 +1083,7 @@ python lambda_handler.py
 
 We can see the details from the schema version and the second version is marked as failed.
 
-![](schema-failure.png#center)
+![Glue schema demo-value with version 1 available as checkpoint and version 2 marked Failed](schema-failure.png#center "Second schema version rejected by backward compatibility")
 
 Note that schema versioning and validation would be more relevant to the clients that tightly link the schema and message records. However, it would still be important for a Python client in order to work together with those clients or Kafka connect.
 
@@ -1138,11 +1131,11 @@ networks:
 
 Once started, we can visit the UI on port 3000. The topic is created in the *Topic* menu by specifying the topic name and the number of partitions.
 
-![](kpow-create-topic-01.png#center)
+![Kpow Create Topic panel with name orders, replication factor three and three partitions](kpow-create-topic-01.png#center "Creating the orders topic in Kpow")
 
 Once created, we can check details of the topic by selecting the topic from the drop-down menu.
 
-![](kpow-create-topic-02.png#center)
+![Kpow topic details for orders showing three partitions, three replicas and no messages yet](kpow-create-topic-02.png#center "Details of the orders topic")
 
 ### Local Testing with SAM
 
@@ -1219,23 +1212,23 @@ $ sam local invoke --hook-name terraform module.kafka_producer_lambda.aws_lambda
 
 Once completed, we can check the value schema (*orders-value*) is created in the Kpow UI as shown below.
 
-![](kpow-schema.png#center)
+![Kpow schema page listing subject orders-value as AVRO version 1, TopicNameStrategy, backward, available](kpow-schema.png#center "Value schema registered in the glue1 registry")
 
 We can check the messages. In order to check them correctly, we need to select AVRO as the value deserializer and *glue1* as the schema registry.
 
-![](kpow-data-01.png#center)
+![Kpow data inspect form with value deserializer set to AVRO and schema registry set to glue1](kpow-data-01.png#center "Deserializer and registry chosen before inspecting the topic")
 
-![](kpow-data-02.png#center)
+![Kpow record from orders with an order_id key and a value holding ordered_at, user_id and order items](kpow-data-02.png#center "Messages read back with the Avro deserializer")
 
 ### Kafka App Deployment
 
 Now we can deploy the Kafka applications using Terraform as usual after resetting the configuration variables. Once deployed, we can see that the scheduler rule has 5 targets of the same Lambda function. 
 
-![](eventbridge.png#center)
+![EventBridge rule crons-rule with five targets, all the same kafka_producer Lambda function](eventbridge.png#center "Scheduler rule with five targets of the same function")
 
 We can see the Lambda consumer parses the consumer records correctly in CloudWatch logs.
 
-![](consumer.png#center)
+![CloudWatch log entry showing a parsed consumer record with topic, offset, key and order value](consumer.png#center "Lambda consumer output in CloudWatch logs")
 
 ## Summary
 

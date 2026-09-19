@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Connect for AWS Services Integration
 categories:
@@ -19,9 +15,6 @@ tags:
   - Amazon MSK
   - Apache Kafka
   - Kafka Connect
-authors:
-  - JaehyeonKim
-images: []
 cevo: 28
 description: A survey of the Kafka connectors available for AWS service integration, as the starting point for building real time data pipelines on AWS.
 ---

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Development with Docker
 categories:
@@ -18,10 +14,7 @@ tags:
   - Apache Kafka
   - Docker
   - Python
-  - SSL/TLS
-authors:
-  - JaehyeonKim
-images: []
+  - SSL and TLS
 description: Configure TLS encryption between Kafka brokers and clients, where the client verifies the server certificate, with Java and Python examples.
 ---
 
@@ -55,7 +48,7 @@ By default, Apache Kafka communicates in *PLAINTEXT*, which means that all data 
 
 Below shows an overview of certificate setup and SSL Handshake. It is from *Apache Kafka Series - Kafka Security | SSL SASL Kerberos ACL by Stephane Maarek and Gerd Koenig* ([LINK](https://www.udemy.com/course/apache-kafka-security/)).
 
-![](setup.png#center)
+![Diagram links trust store, certificate authority and keystore, then three SSL handshake steps](setup.png#center "Certificate setup and SSL handshake between a Kafka client and server")
 
 SSL encryption is a one-way verification process where a server certificate is verified by a client via [SSL Handshake](https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_handshake). The following components are required for setting-up certificates.
 
@@ -526,7 +519,7 @@ networks:
 
 Once started, we can check the messages of the *orders* topic successfully.
 
-![](messages.png#center)
+![kafka-ui Messages tab of the orders topic with one record expanded to show order_items](messages.png#center "Messages of the orders topic on kafka-ui")
 
 ## Summary
 

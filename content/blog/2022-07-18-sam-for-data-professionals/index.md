@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Integrate Schema Registry with MSK Connect
 categories:
@@ -18,14 +14,12 @@ tags:
   - AWS Lambda
   - AWS SAM
   - Python
-  - S3
-  - Serverless Application Model (SAM)
-authors:
-  - JaehyeonKim
-images: []
+  - Amazon S3
 cevo: 14
 description: Build a serverless data processing app with AWS SAM. A Lambda function runs when an S3 object is created and gets its third party packages from a layer.
 ---
+> **Status, September 2026.** The `python3.7` runtime declared for the Lambda layer below reached end of support in AWS Lambda on 4 December 2023, and the `python3.8` function runtime followed on 14 October 2024. Build the layer and the function on a supported Python runtime such as `python3.13`.
+
 [AWS Lambda](https://aws.amazon.com/lambda/) provides serverless computing capabilities, and it can be used for performing validation or light processing/transformation of data. Moreover, with its integration with more than 140 AWS services, it facilitates building complex systems employing [event-driven architectures](https://docs.aws.amazon.com/lambda/latest/operatorguide/event-driven-architectures.html). There are many ways to build serverless applications and one of the most efficient ways is using specialised frameworks such as the [AWS Serverless Application Model (SAM)](https://aws.amazon.com/serverless/sam/) and [Serverless Framework](https://www.serverless.com/framework/docs). In this post, I’ll demonstrate how to build a serverless data processing application using SAM.
 
 
@@ -256,13 +250,13 @@ def test_generate_avro_file_fail_incorrect_age_type(input_df):
     assert f"incorrect column type - age" == str(e.value)
 ```
 
-![](testing.png#center)
+![Unit test run output with the handler tests passing](testing.png#center "Unit test run output with the handler tests passing")
 
 ### Build and Deploy
 
 The app has to be built before deployment. It can be done by `sam build`.
 
-![](build.png#center)
+![Terminal output of sam build completing the application build](build.png#center "Terminal output of sam build completing the application build")
 
 
 The deployment can be done with and without a guide. For the latter, we need to specify additional parameters such as the Cloudformation stack name, capabilities (as we create an IAM role for Lambda) and a flag to automatically determine an S3 bucket to store build artifacts. 
@@ -275,9 +269,9 @@ sam deploy \
   --resolve-s3
 ```
 
-![](deploy-01.png#center)
+![Terminal output of sam deploy creating the CloudFormation change set](deploy-01.png#center "Terminal output of sam deploy creating the CloudFormation change set")
 
-![](deploy-02.png#center)
+![Terminal output of sam deploy listing the stack resources it created](deploy-02.png#center "Terminal output of sam deploy listing the stack resources it created")
 
 
 ### Trigger Lambda Function
@@ -293,6 +287,12 @@ $ aws s3 ls s3://sam-for-data-professionals-cevo/output/
 2022-07-17 17:33:21        403 test.avro
 2022-07-17 17:33:21       2112 test.parquet
 ```
+
+## Related posts
+
+* [Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1) - packaging a function and its dependencies by hand, before a framework does it for you
+* [Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2) - deploying that package and setting up the function role
+* [Exposing R ML Model via APIG](/blog/2017-04-13-serverless-data-product-3) - putting an Amazon API Gateway endpoint in front of the function
 
 ## Summary
 

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka, Flink and DynamoDB for Real Time Fraud Detection
 categories:
@@ -21,9 +17,6 @@ tags:
   - Docker
   - Python
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 cevo: 31
 docs: https://docs.google.com/document/d/1dmWCqay1fBfAjRwcdJvX3eJRXB44XYLE-5TGgayp8As
 description: Develop a fraud detection app locally on Docker with Kafka, Flink and DynamoDB, re-implementing a solution taken from an AWS workshop.
@@ -54,7 +47,7 @@ There are a number of AWS workshops and blog posts where we can learn Flink deve
 
 There are two Python applications that send transaction and flagged account records into the corresponding topics - the transaction app sends records indefinitely in a loop. Both the topics are consumed by a Flink application, and it filters the transactions from the flagged accounts followed by sending them into an output topic of flagged transactions. Finally, the flagged transaction records are sent into a DynamoDB table by the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) in order to serve real-time requests from an API.
 
-![](featured.png#center)
+![Two Python generators feed the transactions and flagged accounts topics, a Flink app filters flagged transactions into an output topic, and the Camel sink connector writes them to DynamoDB](featured.png#center "Architecture of the fraud detection application")
 
 ## Infrastructure
 
@@ -111,7 +104,7 @@ curl -o $CONN_PATH/camel-aws-ddb-sink-kafka-connector.tar.gz $CONNECTOR_SRC_DOWN
 
 Once downloaded, they can be found in the corresponding folders as shown below. Although the Flink app doesn't need the *kafka-python* package, it is included in the *site_packages* folder in order to check if `--pyFiles` option works in KDA - it'll be checked in part 2.
 
-![](source-folders.png#center)
+![Project tree with the camel-aws-ddb-sink-kafka-connector folder boxed in red, and the package folder holding the Flink Kafka connector jar and the kafka-python package boxed in blue](source-folders.png#center "Downloaded connector and package folders")
 
 ### Kafka and Related Services
 
@@ -428,7 +421,7 @@ if __name__ == "__main__":
 
 Once we start the apps, we can check the topics for the source data are created and messages are ingested in *Kpow*.
 
-![](source-topics.png#center)
+![Kpow topic details for transactions and flagged-accounts, 140 messages in total across four partitions](source-topics.png#center "Source topics after the generator apps start")
 
 ### Output Data
 
@@ -702,11 +695,11 @@ if __name__ == "__main__":
 
 The terminal on the right-hand side shows the output records of the Flink app while the left-hand side records logs of the transaction app. We see that the account IDs end with all odd numbers, which matches transactions from flagged accounts.
 
-![](terminal-result.png#center)
+![Two terminal panes, the left logging the transaction generator runs and the right printing flagged transaction records whose account ids end in odd numbers](terminal-result.png#center "Flink output beside the transaction generator log")
 
 We can also see details of all the topics in *Kpow* as shown below.
 
-![](all-topics.png#center)
+![Kpow topic details for transactions, flagged-accounts and flagged-transactions, with 300, 5 and 142 messages](all-topics.png#center "All three topics in Kpow")
 
 ### Sink Output Data
 
@@ -744,11 +737,15 @@ The connector is configured to write messages from the *flagged-transactions* to
 
 Below shows the sink connector details on *Kpow*.
 
-![](sink-connector.png#center)
+![Kpow Connect view of the transactions-sink connector, running the Camel class with two tasks and a consumer group lag of 2](sink-connector.png#center "Sink connector details in Kpow")
 
 We can check the ingested records on the DynamoDB table items view. Below shows a list of scanned records.
 
-![](ddb-output.png#center)
+![DynamoDB scan of the flagged-transactions table returning 50 items with transaction id, date, account id, merchant type and amount](ddb-output.png#center "Flagged transactions written to DynamoDB")
+
+## Related posts
+
+* [Run Flink SQL Cookbook in Docker](/blog/2025-04-15-sql-cookbook) - a local Flink cluster and SQL Client on Docker for working through Flink SQL recipes
 
 ## Summary
 

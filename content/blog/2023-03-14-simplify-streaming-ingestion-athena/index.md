@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Simplify Streaming Ingestion on AWS
 categories:
@@ -20,13 +16,10 @@ tags:
   - Amazon MSK
   - Apache Kafka
   - Python
-authors:
-  - JaehyeonKim
-images: []
 cevo: 25
 description: Stream Kafka records from Amazon MSK into Athena through its direct integration, with a producer Lambda built locally using AWS SAM and Terraform.
 ---
-In Part 1, we discussed a streaming ingestion solution using [EventBridge](https://aws.amazon.com/eventbridge/), [Lambda](https://aws.amazon.com/lambda/), [MSK](https://aws.amazon.com/msk/) and [Redshift Serverless](https://aws.amazon.com/redshift/redshift-serverless/). Athena provides the [MSK connector](https://docs.aws.amazon.com/athena/latest/ug/connectors-msk.html) to enable SQL queries on Apache Kafka topics directly, and it can also facilitate the extraction of insights without setting up an additional pipeline to store data into S3. In this post, we discuss how to update the streaming ingestion solution so that data in the Kafka topic can be queried by Athena instead of Redshift.
+Athena provides the [MSK connector](https://docs.aws.amazon.com/athena/latest/ug/connectors-msk.html) to enable SQL queries on Apache Kafka topics directly, and it can also facilitate the extraction of insights without setting up an additional pipeline to store data into S3. In this post, we discuss how to update the streaming ingestion solution so that data in the Kafka topic can be queried by Athena instead of Redshift. In Part 1, we discussed a streaming ingestion solution using [EventBridge](https://aws.amazon.com/eventbridge/), [Lambda](https://aws.amazon.com/lambda/), [MSK](https://aws.amazon.com/msk/) and [Redshift Serverless](https://aws.amazon.com/redshift/redshift-serverless/).
 
 * [Part 1 MSK and Redshift](/blog/2023-02-08-simplify-streaming-ingestion-redshift)
 * [Part 2 MSK and Athena](#) (this post)
@@ -256,27 +249,27 @@ resource "aws_security_group_rule" "athena_connector_msk_egress" {
 
 Unfortunately connecting to MSK from Athena is yet to be supported by CloudFormation or Terraform, and it is performed on AWS console as shown below. First we begin by clicking on the _Create data source_ button.
 
-![](athena-connector-01.png#center)
+![Athena data sources page with the Create data source button](athena-connector-01.png#center "Athena data sources page with the Create data source button")
 
 Then we can search the Amazon MSK data source and proceed by clicking on the _Next _button.
 
-![](athena-connector-02.png#center)
+![Data source choice list with Amazon MSK selected](athena-connector-02.png#center "Data source choice list with Amazon MSK selected")
 
 We can update data source details followed by selecting the connector Lambda function ARN in connection details.
 
-![](athena-connector-03-01.png#center)
+![Data source details form with the name of the new MSK data source](athena-connector-03-01.png#center "Data source details form with the name of the new MSK data source")
 
-![](athena-connector-03-02.png#center)
+![Connection details with the connector Lambda function ARN selected](athena-connector-03-02.png#center "Connection details with the connector Lambda function ARN selected")
 
 Once the data source connection is established, we are able to see the customer database we created earlier - the Glue registry name becomes the database name.
 
 
-![](athena-connector-03-03.png#center)
+![Athena listing the customer database that takes its name from the Glue registry](athena-connector-03-03.png#center "Athena listing the customer database that takes its name from the Glue registry")
 
 
 Also, we can check the table details from the Athena editor as shown below.
 
-![](describe-table.png#center)
+![Athena editor showing the columns and types of the orders table](describe-table.png#center "Athena editor showing the columns and types of the orders table")
 
 ## Kafka Producer
 
@@ -473,13 +466,13 @@ $ sam local invoke --hook-name terraform module.kafka_producer_lambda.aws_lambda
 
 We can also check the messages using kafka-ui.
 
-![](message-creation-for-athena-01.png#center)
+![Order messages produced to the Kafka topic, listed in kafka-ui](message-creation-for-athena-01.png#center "Order messages produced to the Kafka topic, listed in kafka-ui")
 
 ### Order Items Query
 
 Below shows the query result of the orders table. The _items _column is a JSON array but it is stored as string. In order to build analytics queries, we need to flatten the array elements into rows and it is discussed below.
 
-![](athena-connector-query-results-01.png#center)
+![Orders query result where the items column holds a JSON array as a string](athena-connector-query-results-01.png#center "Orders query result where the items column holds a JSON array as a string")
 
 We can flatten the order items using the _UNNEST _function and _CROSS JOIN_. We first need to convert it into an array type, and it is implemented by parsing the column into JSON followed by type-casting it into an array in a CTE. 
 
@@ -505,7 +498,7 @@ CROSS JOIN unnest(parsed.items) AS t(items_unnested)
 
 We can see the flattened order items as shown below.
 
-![](athena-connector-query-results-02.png#center)
+![Query result with order items flattened into one row per product](athena-connector-query-results-02.png#center "Query result with order items flattened into one row per product")
 
 The remaining sections cover deploying the Kafka producer Lambda, producing messages and executing an analytics query. They are skipped in this post as they are exactly and/or almost the same. See Part 1 if you would like to check it.
 

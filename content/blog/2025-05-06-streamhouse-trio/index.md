@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 categories:
   - Data Architecture
@@ -20,9 +16,6 @@ tags:
   - Apache Iceberg
   - Apache Paimon
   - Fluss
-authors:
-  - JaehyeonKim
-images: []
 description: Apache Paimon, Fluss and Apache Iceberg compared as table layers for streaming and batch, then combined into one architecture with Flink and Spark.
 ---
 
@@ -34,7 +27,7 @@ Today, we'll introduce three key open-source technologies shaping this space: [
 
 Let's dive into each component:
 
-### 1. Apache Paimon: The Streaming Lakehouse Table
+## 1. Apache Paimon: The Streaming Lakehouse Table
 
 - **In Simple Terms:** Think of Paimon as a specialized Lakehouse table format built from the ground up for **unified streaming and batch processing**. It excels where real-time updates meet analytical queries.
 - **Type:** Stream-native Lakehouse Table Storage.
@@ -55,7 +48,7 @@ Let's dive into each component:
     - Latency, while good, is not in the millisecond range like pure streaming systems.
 - **Origin:** Originated at Alibaba, now at the Apache Software Foundation.
 
-### 2. Fluss: Ultra-Low-Latency Streaming Storage
+## 2. Fluss: Ultra-Low-Latency Streaming Storage
 
 - **In Simple Terms:** Fluss is purpose-built **pure streaming storage**, optimized for getting data in and out *extremely* fast. It's like a queryable, structured, columnar version of Kafka topics.
 - **Type:** Real-time Optimized Streaming Storage.
@@ -77,7 +70,7 @@ Let's dive into each component:
     - No built-in catalog integration; schema defined within the processing job (e.g., Flink SQL DDL).
 - **Origin:** Originated at Ververica (derived from work at Alibaba).
 
-### 3. Apache Iceberg: The Battle-Tested Batch Lakehouse Standard
+## 3. Apache Iceberg: The Battle-Tested Batch Lakehouse Standard
 
 - **In Simple Terms:** Iceberg is a widely adopted open table format primarily designed for **reliable, large-scale batch analytics** on data lakes. It has been progressively adding streaming capabilities.
 - **Type:** Lakehouse Table Storage (Batch-Optimized).
@@ -97,7 +90,7 @@ Let's dive into each component:
     - Less optimized for high-frequency concurrent writes compared to stream-native formats.
 - **Origin:** Created by Netflix, now a top-level Apache Software Foundation project.
 
-### Putting It All Together: The Streamhouse Architecture
+## Putting It All Together: The Streamhouse Architecture
 
 These three technologies aren't competitors; they are complementary components of a powerful, tiered Streamhouse architecture:
 
@@ -112,7 +105,7 @@ These three technologies aren't competitors; they are complementary components o
 - **Scalable Analytics:** Iceberg offers cost-effective, deep historical analysis with wide tooling support.
 - **Flexibility:** Choose the right storage for the right job based on latency, query patterns, and cost.
 
-### Integration with Flink and Spark
+## Integration with Flink and Spark
 
 - **Flink:** Apache Flink shines in this architecture.
     - **Fluss & Paimon:** Have native, first-class support in Flink. Flink SQL can treat both Fluss streams and Paimon tables as regular tables, enabling powerful unified queries across real-time and operational data.
@@ -123,7 +116,7 @@ These three technologies aren't competitors; they are complementary components o
     - **Paimon:** Also provides Spark connectors for reading and writing Paimon tables, aiming for broad engine compatibility.
     - **Fluss:** Less direct integration currently; data would typically flow *through* Flink *to* Spark or be read from Paimon/Iceberg by Spark.
 
-### Real-time User Activity Tracking for an E-commerce Platform Scenario
+## Real-time User Activity Tracking for an E-commerce Platform Scenario
 
 Imagine an e-commerce website that wants to track user actions (like clicks, page views, adding items to cart) in real-time. They have several goals:
 
@@ -131,8 +124,14 @@ Imagine an e-commerce website that wants to track user actions (like clicks, pag
 2. **Operational Dashboard:** Maintain an up-to-date view of user activity for the last few days, allowing analysts to query recent trends with reasonable latency (seconds to minutes). This data might need updates later (e.g., correcting event types).
 3. **Long-term Analytics:** Store all historical event data cost-effectively for large-scale batch analysis, BI reporting (e.g., monthly user engagement reports), and machine learning model training.
 
-![](streamhouse.png#center)
+![Flow diagram of events moving through Fluss, a Flink SQL job, Paimon and Iceberg on S3](streamhouse.png#center "Hot, warm and cold layers")
 
-### Conclusion
+## Related posts
+
+* [Self-service Data Platform via a Multi-tenant SQL Gateway](/blog/2025-07-17-self-service-data-platform-via-sql-gateway) - Apache Kyuubi provisioning Spark, Flink and Trino engines on demand over table layers like these.
+* [Introducing odctl: One CLI for a Local Open Data Stack](/blog/2026-07-16-odctl-open-data-stack) - a CLI that launches Kafka, Flink, Spark, Trino and Iceberg locally, for trying this architecture out.
+* [Benefits and Opportunities of Stateful Stream Processing](/blog/2023-11-02-stateful-stream-processing) - why streaming-first architectures pay off, the reasoning the Streamhouse rests on.
+
+## Conclusion
 
 The Streamhouse concept, powered by technologies like Paimon, Fluss, and Iceberg, represents a significant step towards truly unified data architectures. By leveraging the specific strengths of each component - Fluss for speed, Paimon for unified transactional tables, and Iceberg for scalable batch analytics and archival – organizations can build platforms that are performant, flexible, and ready for both real-time demands and deep historical insights. This tiered approach, already common in large tech companies, is now becoming accessible to a wider audience through these powerful open-source projects.

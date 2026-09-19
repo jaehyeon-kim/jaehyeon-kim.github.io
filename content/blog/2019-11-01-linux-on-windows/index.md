@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -20,10 +16,7 @@ tags:
   - Minikube
   - Python
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: In this post, I'll demonstrate how to create a Linux development environment on Windows using WSL. Also an example app (Rserve web service with a sidecar container) on Minikube will be demonstrated.
+description: Build a Linux development environment on Windows with WSL, then run an RServe web service with a sidecar container on Minikube as the example app.
 ---
 
 I use Linux containers a lot for development. Having Windows computers at home and work, I used to use Linux VMs on VirtualBox or VMWare Workstation. It's not a bad option but it requires a lot of resources. Recently, after my home computer was updated, I was not able to start my hypervisor anymore. Also I didn't like huge resource consumption of it so that I began to look for a different development environment. A while ago, I played with [Windows Subsystem for Linux (WSL)](https://learn.microsoft.com/en-us/windows/wsl/about) and it was alright. Also [Visual Studio Code (VSCode)](https://code.visualstudio.com/), _my favourite editor_, now supports [remote development](https://code.visualstudio.com/docs/remote/remote-overview). Initially I thought I would be able to create a new development environment with WSL and [Docker for Windows](https://docs.docker.com/docker-for-windows/install/). However it was until I tried a bigger app with [Docker Compose](https://docs.docker.com/compose/) that Docker for Windows has a number of issues especially when containers are started by Docker Compose in WSL. I didn't like to spend too much time on fixing those issues as I concerned those might not be the only ones. Then I decided to install a Linux VM on [Hyper-V](https://learn.microsoft.com/en-us/windows-server/virtualization/hyper-v/overview?pivots=windows). Luckly VSCode also supports a remote VM via SSH.
@@ -34,15 +27,15 @@ What I want was a Linux VM where Docker is installed and it should be possible t
 
 In order to use WSL, it is necessary to enable *Windows Subsystem for Linux* in *Windows features* as following.
 
-![](wsl-setup-01.png#center)
+![Windows Features dialog with Windows Subsystem for Linux ticked](wsl-setup-01.png#center "Windows Features dialog with Windows Subsystem for Linux ticked")
 
 Then a Linux distribution need to be installed from _Windows Store_. I chose Ubuntu 18.04.
 
-![](wsl-setup-02.png#center)
+![Ubuntu 18.04 entry in the Windows Store ready to install](wsl-setup-02.png#center "Ubuntu 18.04 entry in the Windows Store ready to install")
 
 Once installed, you can hit the *Launch* button and a new terminal will pop up as shown below. If it's the first launch, you'd need to create a default user account. I set the username to be *jaehyeon*. The default terminal is not the only way to access to WSL. For example you can enter `bash` to access to it on PowerShell.
 
-![](wsl-setup-03.png#center)
+![Ubuntu terminal on first launch, asking for a default user account](wsl-setup-03.png#center "Ubuntu terminal on first launch, asking for a default user account")
 
 ## Remote WSL
 
@@ -50,11 +43,11 @@ Having WSL alone wouldn't be of much help for development. What's really importa
 
 On **VSCode > Extensions**, search and install *Remote WSL*. Then *Remote Explorer* tab will appear in the left sidebar. There you can open a folder in WSL.
 
-![](remote-wsl-explorer-up.png#center)
+![VSCode Remote Explorer listing WSL targets with a folder opened in Ubuntu](remote-wsl-explorer-up.png#center "VSCode Remote Explorer listing WSL targets with a folder opened in Ubuntu")
 
 As can be seen in the *Extensions* tab, some extensions are installed in the host (LOCAL) and some are in WSL. For example, in order for Python syntax highlighting or autocompletion to work, the Python extension should be installed in WSL where source code exists. One of the great features of VSCode is installation of extensions and configuration is automatic and easy. For some standard extensions, it's sufficient to open a file of a certain file extension.
 
-![](remote-wsl-extensions-up.png#center)
+![VSCode Extensions tab split into LOCAL and WSL sections, Python installed in WSL](remote-wsl-extensions-up.png#center "VSCode Extensions tab split into LOCAL and WSL sections, Python installed in WSL")
 
 You may wonder why I set up Remote WSL although I'm going to install a VM on Hyper-V. It is because not all development can be done in a separate VM easily. For example, a single node Kubernetes cluster will be created by Minikube in a VM but I'm not sure how to connect to it from another VM. On the other hand, connection from WSL can be made without a problem.
 
@@ -63,25 +56,25 @@ You may wonder why I set up Remote WSL although I'm going to install a VM on Hyp
 A Linux VM creation can be started by _Quick Create..._ button in the right panel of *Hyper-V Manager*.
 
 
-![](hyperv-01.png#center)
+![Hyper-V Manager with the Quick Create button in the right panel](hyperv-01.png#center "Hyper-V Manager with the Quick Create button in the right panel")
 
 
 I used a Ubuntu 18.04 server ISO image rather than using the desktop version in the default list. Clicking *Local installation source* will allow to select an ISO or virtual hard disk file. I named it as *ubuntu* and left *Default Switch* selected for *Network* - it allows to connect from host to guest.
 
 
-![](hyperv-02.png#center)
+![Hyper-V quick create dialog with a local Ubuntu ISO and Default Switch for network](hyperv-02.png#center "Hyper-V quick create dialog with a local Ubuntu ISO and Default Switch for network")
 
 
 Once installed, it's possible to connect by clicking *Connect...*. A separate window will pop up.
 
 
-![](hyperv-03.png#center)
+![Hyper-V Manager with the ubuntu virtual machine and the Connect option](hyperv-03.png#center "Hyper-V Manager with the ubuntu virtual machine and the Connect option")
 
 
 It's possible to log in by the default username and password, which are set during installation. Once logged in, it'll go into the user's home directory. Keep the value of *IP address for eth0* as it'll be used for setting-up *Remote SSH*. 
 
 
-![](hyperv-04.png#center)
+![Ubuntu server console after login, showing the IP address for eth0](hyperv-04.png#center "Ubuntu server console after login, showing the IP address for eth0")
 
 
 For [public key authentication for SSH](https://www.ssh.com/ssh/public-key-authentication), check `/etc/ssh/sshd_config` if *RSAAuthentication* is enabled. You may need to add/update the following entries.
@@ -105,7 +98,7 @@ Finally you need to add your RSA public key to `~/.ssh/authorized_keys` followed
 For *Remote SSH*, I installed *VSCode Insiders* as the guest OS is Ubuntu 18.04 - see [System requirements](https://code.visualstudio.com/docs/remote/ssh#_system-requirements). I've decided to keep both stable and insiders versions of VSCode - stable for WSL and insiders for SSH in order not to be confused. In the *Remote Explorer*, you can see *Add New* and *Configure* buttons.
 
 
-![](remote-ssh-add-new-or-configure-01.png#center)
+![VSCode Remote SSH targets with the Add New and Configure buttons](remote-ssh-add-new-or-configure-01.png#center "VSCode Remote SSH targets with the Add New and Configure buttons")
 
 
 To add a new SSH target, you can click the *Add New* button and enter the following SSH command.
@@ -116,23 +109,23 @@ ssh <username>@<vm-ip-address> -A
 ```
 
 
-![](remote-ssh-add-new-or-configure-02.png#center)
+![VSCode prompt to enter the SSH command for the new target](remote-ssh-add-new-or-configure-02.png#center "VSCode prompt to enter the SSH command for the new target")
 
 
 I find the VM IP address changes from time to time and a new IP address can be updated by clicking the *Configure* button followed by changing the IP address as shown below.
 
 
-![](remote-ssh-add-new-or-configure-03.png#center)
+![VSCode Configure option to pick the SSH config file to edit](remote-ssh-add-new-or-configure-03.png#center "VSCode Configure option to pick the SSH config file to edit")
 
 
 
-![](remote-ssh-add-new-or-configure-04.png#center)
+![SSH config file open in VSCode with the VM IP address updated](remote-ssh-add-new-or-configure-04.png#center "SSH config file open in VSCode with the VM IP address updated")
 
 
 Currently R doesn't seem to be supported well by VSCode and it may not be necessary thanks to RStudio IDE. I haven't tried installing RStudio Server in WSL but it'll definitely be possible to install it in a VM. Another way of accessing RStudio Server is via Docker. The Docker extension of VSCode can make it easier to run an existing image or to customize your own.
 
 
-![](remote-ssh-docker.png#center)
+![VSCode Docker extension listing containers on the VM, including RStudio Server](remote-ssh-docker.png#center "VSCode Docker extension listing containers on the VM, including RStudio Server")
 
 
 ## ConEmu
@@ -140,19 +133,19 @@ Currently R doesn't seem to be supported well by VSCode and it may not be necess
 [ConEmu](https://conemu.github.io/) is a handy Windows terminal tool. By default it has multiple terminals pre-configured - PowerShell, Git Bash, Putty, Chocolatey and more. Also it's possible to set up a custom terminal eg) for SSH.
 
 
-![](conemu-note-01.png#center)
+![ConEmu with pre-configured terminals for PowerShell, Git Bash, Putty and Chocolatey](conemu-note-01.png#center "ConEmu with pre-configured terminals for PowerShell, Git Bash, Putty and Chocolatey")
 
 
 In *Setup tasks...*, I created 3 terminals and moved them to top for easy access.
 
 
-![](conemu-note-02.png#center)
+![ConEmu Setup tasks with three custom terminals moved to the top of the list](conemu-note-02.png#center "ConEmu Setup tasks with three custom terminals moved to the top of the list")
 
 
 Also it supports split windows. Below shows an example of 3 terminals in a single window. They are created by *New console dialog...*.
 
 
-![](conemu-note-03.png#center)
+![ConEmu window split into three terminal panes](conemu-note-03.png#center "ConEmu window split into three terminal panes")
 
 
 ## Minikube
@@ -274,25 +267,25 @@ docker-compose up -d
 The swagger document created by the *sidecar* web service can be visited via `http://localhost:9000/docs` or `http://<vm-ip-address>:9000` if it's started in a VM. It basically has a main POST method in `/rserve/test`.
 
 
-![](swagger-00.png#center)
+![Swagger document of the sidecar web service with the POST /rserve/test method](swagger-00.png#center "Swagger document of the sidecar web service with the POST /rserve/test method")
 
 
 The web service is secured by [Bearer Authentication](https://swagger.io/docs/specification/authentication/bearer-authentication/) so that a JWT token needs to be added to requests. A token can be obtained in the `/auth/debug/{username}` endpoint and it can also be tried out in the swagger document as shown below.
 
 
-![](swagger-01.png#center)
+![Swagger call to /auth/debug/{username} returning a JWT token](swagger-01.png#center "Swagger call to /auth/debug/{username} returning a JWT token")
 
 
 The token can be added to the Authrization section.
 
 
-![](swagger-02.png#center)
+![Swagger authorisation dialog with the JWT token entered](swagger-02.png#center "Swagger authorisation dialog with the JWT token entered")
 
 
 After that, a request to `/rserve/test` can be made as an authenticated user. It returns a JSON object that has 3 properties: `n`, `wait` and `hostname`. The first 2 is just returning values from the request while the last shows the hostname where Rserve container is hosted.
 
 
-![](swagger-03.png#center)
+![Response from /rserve/test with the n, wait and hostname properties](swagger-03.png#center "Response from /rserve/test with the n, wait and hostname properties")
 
 
 Containerization makes development easier. When it comes to deployment and management of potentially a large number of containers, a container orchestration engin is quite important. [Kubernetes](https://kubernetes.io/), among other engins, does such jobs well. Developers and administrator can define what it should be and then Kubernetes achieves it. This declarative nature can make complicated jobs to be tractable.

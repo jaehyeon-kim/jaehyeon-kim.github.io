@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Getting Started with PyFlink on AWS
 categories:
@@ -21,12 +17,9 @@ tags:
   - PyFlink
   - Python
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 description: Connect a PyFlink app to an IAM authenticated MSK cluster, building a custom uber jar because Amazon Managed Service for Apache Flink takes only one jar.
 ---
-In this series of posts, we discuss a Flink (Pyflink) application that reads/writes from/to Kafka topics. In part 1, an app that targets a local Kafka cluster was created. In this post, we will update the app by connecting a Kafka cluster on Amazon MSK. The Kafka cluster is authenticated by IAM and the app has additional jar dependency. As [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/) does not allow you to specify multiple pipeline jar files, we have to build a custom Uber Jar that combines multiple jar files. Same as part 1, the app will be executed in a virtual environment as well as in a local Flink cluster for improved monitoring with the updated pipeline jar file.
+A Kafka cluster on Amazon MSK is authenticated by IAM, and the app needs an additional jar dependency for it. As [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/) does not allow you to specify multiple pipeline jar files, we have to build a custom Uber Jar that combines multiple jar files. In this series of posts, we discuss a Flink (Pyflink) application that reads/writes from/to Kafka topics. In part 1, an app that targets a local Kafka cluster was created. In this post, we will update the app by connecting a Kafka cluster on Amazon MSK. Same as part 1, the app will be executed in a virtual environment as well as in a local Flink cluster for improved monitoring with the updated pipeline jar file.
 
 * [Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1)
 * [Part 2 Local Flink and MSK](#) (this post)
@@ -279,7 +272,7 @@ zip -r kda-package.zip processor.py package/lib package/site_packages
 
 Once completed, the Uber Jar file and python package can be found in the *lib* and *site_packages* folders respectively as shown below.
 
-![](source-folders.png#center)
+![Project tree with the remote package folder boxed in red, holding the pyflink-getting-started Uber Jar in lib and the kafka package in site_packages](source-folders.png#center "Uber Jar and Python package built into the package folder")
 
 ### VPC and VPN
 
@@ -599,7 +592,7 @@ if __name__ == "__main__":
 
 Once we start the app, we can check the topic for the source data is created and messages are ingested.
 
-![](source-topic.png#center)
+![Kpow topic details for stocks-in, 2 partitions and 306 messages arriving at 2.56 writes per second](source-topic.png#center "Source topic after the producer starts")
 
 ### Process Data
 
@@ -829,11 +822,11 @@ if __name__ == "__main__":
 
 We can run the app locally as following - `RUNTIME_ENV=LOCAL python processor.py`. The terminal on the right-hand side shows the output records of the Flink app while the left-hand side records logs of the producer app. We can see that the print output from the Flink app gets updated when new source records are sent into the source topic by the producer app.
 
-![](terminal-result.png#center)
+![Two terminal panes, the left logging producer runs and the right printing Flink output rows of timestamp, ticker and price](terminal-result.png#center "Flink output beside the producer log")
 
 We can also see details of all the topics in *Kpow* as shown below. The total number of messages matches between the source and output topics but not within partitions.
 
-![](all-topics.png#center)
+![Kpow topic details for stocks-in and stocks-out, both at 459 messages but split differently across partitions](all-topics.png#center "Message counts match between the source and output topics")
 
 #### Run in Flink Cluster
 
@@ -891,11 +884,11 @@ No scheduled jobs.
 
 The Flink Web UI can be accessed on port 8081. In the Overview section, it shows the available task slots, running jobs and completed jobs.
 
-![](cluster-dashboard-01.png#center)
+![Flink dashboard overview with 2 available task slots and one running job inserting into sink_table](cluster-dashboard-01.png#center "Flink Web UI overview of the local cluster")
 
 We can inspect an individual job in the Jobs menu. It shows key details about a job execution in *Overview*, *Exceptions*, *TimeLine*, *Checkpoints* and *Configuration* tabs.
 
-![](cluster-dashboard-02.png#center)
+![Flink job page for the sink_table insert, running for 1 minute 39 seconds with parallelism 1 and no backpressure](cluster-dashboard-02.png#center "Details of an individual job")
 
 We can cancel a job on the web UI or using the CLI. Below shows how to cancel the job we submitted earlier using the CLI.
 

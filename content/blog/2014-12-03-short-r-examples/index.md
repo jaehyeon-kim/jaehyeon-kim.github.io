@@ -5,19 +5,12 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Tree based methods in R
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
 description: I demonstrate short R examples - summarise a data frame group by a column and a quick way of implementing simulation
 ---
 
@@ -110,3 +103,9 @@ kable(head(df))
 |  3.454449| 16.025874|
 |  5.289533| 11.723384|
 |  3.641087|  6.539533|
+
+## Related posts
+
+* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1) - a longer R example that downloads stock price files and merges them into one data frame
+* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2) - the same job done in memory, avoiding the slower route through local files
+* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files) - returns, standard deviation and correlation worked out across several files

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Python Examples
 categories:
@@ -18,13 +14,10 @@ tags:
   - Apache Flink
   - Apache Kafka
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Pacing messages are added to the Beam sport activity tracker by comparing short term speed metrics against their long term counterparts.
 ---
 
-In [Part 3](/blog/2024-08-01-beam-examples-3), we developed a Beam pipeline that tracks sport activities of users and outputs their speeds periodically. While reporting such values is useful for users on its own, we can provide more engaging information to users if we have a pipeline that reports pacing of their activities over periods. For example, we can send a message to encourage a user to work harder if he/she has a performance goal and is underperforming for some periods. In this post, we develop a new pipeline that tracks user activities and reports pacing details by comparing short term metrics to their long term counterparts.
+We develop a new pipeline that tracks user activities and reports pacing details by comparing short term metrics to their long term counterparts. In [Part 3](/blog/2024-08-01-beam-examples-3), we developed a Beam pipeline that tracks sport activities of users and outputs their speeds periodically. While reporting such values is useful for users on its own, we can provide more engaging information to users if we have a pipeline that reports pacing of their activities over periods. For example, we can send a message to encourage a user to work harder if he/she has a performance goal and is underperforming for some periods.
 
 <!--more-->
 
@@ -239,7 +232,7 @@ user4   99      1731565423.1549182
 
 Also, we can check the input messages using Kafka UI on *localhost:8080*.
 
-![](input-messages.png#center)
+![Kafka UI messages view of input-topic, one record expanded to show a user id, a position and a timestamp, with 500 messages consumed](input-messages.png#center "Position messages on the input topic")
 
 ## Beam Pipeline
 
@@ -533,7 +526,7 @@ After both the short and long averages are obtained, they are joined by the `CoG
 
 The pipeline can be better illustrated with an example. Let say we have three positions of a user, and two metric records can be obtained recursively by comparing a position and its previous one. The short averages are computed with the metrics that belong to `[20, 40)` and `[60, 80)` windows. On the other hand, the long averages are obtained across multiple windows by including all metrics that fall in `[Long Avg Window Start, Window End)`. Note that, as the long averages are re-windowed, joining is based on `[Window Start, Window End)`. We end up having two matching windows and the notification values are obtained by comparing the short and long averages.
 
-![](breakdown.png#center)
+![Worked example for user0, three positions turned into two metrics, then a table of windows with short and long average speeds and the resulting pacing and underperforming notifications](breakdown.png#center "How short and long averages produce a notification")
 
 ```python
 # chapter4/sport_tracker_motivation_co_gbk.py
@@ -831,8 +824,8 @@ python chapter4/sport_tracker_motivation_co_gbk.py --deprecated_read \
 
 On Flink UI, we see the pipeline has multiple tasks. Notably the tasks that compute the short and long averages are split and executed in parallel, and the outcomes are combined subsequently. 
 
-![](pipeline-dag.png#center)
+![Flink job sport-tracker-motivation running for 2 minutes 8 seconds, with the short average and long average branches computed in parallel then joined before writing notifications](pipeline-dag.png#center "The pipeline shown as parallel Flink tasks")
 
 On Kafka UI, we can check the output message is a dictionary of track (user ID) and notification.
 
-![](output-messages.png#center)
+![Kafka UI messages view of the output topic, one record expanded to show track user4 with notification pacing, and the next record showing outperforming](output-messages.png#center "Notification messages keyed by user id")

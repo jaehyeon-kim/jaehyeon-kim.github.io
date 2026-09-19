@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -20,12 +16,11 @@ tags:
   - Docker
   - PySpark
   - Python
-authors:
-  - JaehyeonKim
-images: []
 cevo: 2
-description: In this post, I'll demonstrate how to build development environments for AWS Glue 1.0 and 2.0 using the Docker image and the Visual Studio Code Remote - Containers extension.
+description: Build development environments for AWS Glue 1.0 and 2.0 with the published Docker image and the Visual Studio Code Remote Containers extension.
 ---
+
+> **Status, September 2026.** This post targets AWS Glue 1.0 and 2.0, whose Python 3.6 and 3.7 runtimes are past end of support, and the published Docker image it builds on covers only those versions. Build a Glue 3.0 or later environment instead, as set out in the related posts below.
 
 As described in the product page, [AWS Glue](https://aws.amazon.com/glue) is a _serverless_ data integration service that makes it easy to discover, prepare, and combine data for analytics, machine learning, and application development. For development, a development endpoint is recommended, but it can be costly, inconvenient or [unavailable (for Glue 2.0)](https://docs.aws.amazon.com/glue/latest/dg/reduced-start-times-spark-etl-jobs.html). The [AWS Glue team published a Docker image](https://aws.amazon.com/blogs/big-data/developing-aws-glue-etl-jobs-locally-using-a-container/) that includes the AWS Glue binaries and all the dependencies packaged together. After inspecting it, I find some modifications are necessary in order to build a development environment on it. In this post, I'll demonstrate how to build development environments for AWS Glue 1.0 and 2.0 using the Docker image and the [Visual Studio Code Remote - Containers](https://code.visualstudio.com/docs/remote/containers) extension.
 
@@ -165,12 +160,12 @@ The development container can be run by executing the following command in the c
 
 * _Remote-Containers: Open Folder in Container..._
 
-![](glue_config.png#center)
+![VS Code command palette with Remote-Containers Open Folder in Container highlighted above the devcontainer folder](glue_config.png#center "Opening the workspace folder in the Glue development container")
 
 
 Once the development container is ready, the workspace folder will be open within the container. You will see 2 new images are created from the base Glue image and a container is run from the latest image.
 
-![](glue_container.png#center)
+![docker images lists two vsc-glue images plus aws-glue-libs, and docker ps shows one running container](glue_container.png#center "Images built from the base Glue image and the container run from them")
 
 ## Examples
 
@@ -227,7 +222,7 @@ fi
 
 Using the script above, we can launch the PySpark shells for each of the environments. Python 3.6.10 is associated with the AWS Glue 1.0 while Python 3.7.3 in a virtual environment is with the AWS Glue 2.0.
 
-![](glue_pyspark.png#center)
+![Two PySpark shells on Spark 2.4.3, one on Python 3.6.10 and one on Python 3.7.3](glue_pyspark.png#center "PySpark shells for the Glue 1.0 and Glue 2.0 environments")
 
 ### Spark Submit
 
@@ -284,12 +279,12 @@ glueContext.write_dynamic_frame.from_options(
 
 When the execution completes, we can see the joined data set is stored as a parquet file in the output S3 bucket.
 
-![](glue_spark-submit.png#center)
+![S3 console folder legislator_history holding a SUCCESS marker and a 1.7 MB parquet part file](glue_spark-submit.png#center "Joined data set written to the output S3 bucket")
 
 
 Note that we can monitor and inspect Spark job executions in the Spark UI on port 4040.
 
-![](glue_spark-ui.png#center)
+![Spark UI Jobs page on port 4040 listing five completed jobs for example.py](glue_spark-ui.png#center "Spark job execution inspected in the local Spark UI")
 
 ### Pytest
 
@@ -350,8 +345,14 @@ def test_filter_dynamic_frame_by_value(glueContext):
     )
 ```
 
-![](glue_pytest.png#center)
+![pytest run collecting one item, test_filter_dynamic_frame_by_value, and reporting PASSED](glue_pytest.png#center "Unit test passing inside the container")
 
+
+## Related posts
+
+* [Local Development of AWS Glue 3.0 and Later](/blog/2021-11-14-glue-3-local-development) - the current version of this setup, for Glue 3.0 and later, where the Docker image has to be built yourself.
+* [Develop and Test Apache Spark Apps for EMR Locally Using Docker](/blog/2022-05-08-emr-local-dev) - the equivalent local environment for Amazon EMR, with Glue Data Catalog integration.
+* [Data Warehousing ETL Demo with Apache Iceberg on EMR Local Environment](/blog/2022-06-26-iceberg-etl-demo) - an ETL job built in that local environment with Iceberg storage and PySpark processing.
 
 ## Conclusion
 

@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Serverless Data Product
 categories:
@@ -19,13 +15,12 @@ tags:
   - Amazon API Gateway
   - Python
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: In the previous posts, it is discussed how to package/deploy an R machine learning model with AWS Lambda and to expose the Lambda function via Amazon API Gateway. In this post, I'll demonstrate how to host a web application that services the backend API in a serverless environment.
+description: Host the web application that calls an R machine learning model on Amazon S3, so both the front end and the Lambda backend run without a server.
 ---
 
-In the previous posts, it is discussed how to package/deploy an [R](https://www.r-project.org/about.html) model with [AWS Lambda](https://aws.amazon.com/lambda/details/) and to expose the Lambda function via [Amazon API Gateway](https://aws.amazon.com/api-gateway/). Main benefits of **serverless architecture** is cost-effectiveness and being hassle-free from provisioning/managing servers. While the API returns a predicted admission status value given *GRE*, *GPA* and *Rank*, there is an issue if it is served within a web application: *Cross-Origin Resource Sharing (CORS)*. This post discusses how to resolve this issue by updating API configuration and the Lambda function handler with a simple web application. Also it is illustrated how to host the application in a serverless environment.
+> **Status, September 2026.** The AWS console screens shown here have been redesigned, so the API Gateway *Enable CORS* flow under *Actions*, and the S3 and CloudFront setup pages, no longer match what the console presents. The Lambda handler change and the overall approach still apply, and an infrastructure as code tool is a better fit than clicking through the console.
+
+While the API returns a predicted admission status value given *GRE*, *GPA* and *Rank*, there is an issue if it is served within a web application: *Cross-Origin Resource Sharing (CORS)*. This post discusses how to resolve this issue by updating API configuration and the Lambda function handler with a simple web application. Also it is illustrated how to host the application in a serverless environment. In the previous posts, it is discussed how to package/deploy an [R](https://www.r-project.org/about.html) model with [AWS Lambda](https://aws.amazon.com/lambda/details/) and to expose the Lambda function via [Amazon API Gateway](https://aws.amazon.com/api-gateway/). Main benefits of **serverless architecture** is cost-effectiveness and being hassle-free from provisioning/managing servers.
 
 * Backend
     * [Part I - Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1)
@@ -37,7 +32,7 @@ In the previous posts, it is discussed how to package/deploy an [R](https://www.
 
 A simple *single page application* is created using [React](https://facebook.github.io/react/). By clicking the *Check!* button after entering the *GRE*, *GPA* and *Rank* values, information of the expected admimission status pops up in a modal. The status value is `fetch`ed from the API of the POC application that is discussed in [Part III](/blog/2017-04-13-serverless-data-product-3). The code of this application can be found [here](https://github.com/jaehyeon-kim/serverless-poc/tree/master/poc-web).
 
-![](00-app-01.png#center)
+![Single page app with GRE, GPA and Rank inputs and a Check button](00-app-01.png#center "Single page app with GRE, GPA and Rank inputs and a Check button")
 
 ## Update Lambda function hander
 
@@ -66,7 +61,7 @@ Origin 'http://localhost:9090' is therefore not allowed access. The response had
 
 API Gateway allows to enable CORS and it can be either on a resource or a method within a resource. The *GET* method is selected and *Enable CORS* is clicked after pulling down *actions*.
 
-![](02-enable-cors-01.png#center)
+![API Gateway console with the GET method selected and Enable CORS under Actions](02-enable-cors-01.png#center "API Gateway console with the GET method selected and Enable CORS under Actions")
 
 Simply put, another method of *OPTIONS* is created and the following response headers are added to the *GET* and *OPTIONS* methods.
 
@@ -74,15 +69,15 @@ Simply put, another method of *OPTIONS* is created and the following response he
 * Access-Control-Allow-Headers: Added to _OPTIONS_ only, __X-API-Key is allowed__
 * Access-Control-Allow-Origin: Added to both _GET_ and _OPTIONS_
 
-![](02-enable-cors-02.png#center)
+![Enable CORS form listing the Access-Control-Allow headers for the GET and OPTIONS methods](02-enable-cors-02.png#center "Enable CORS form listing the Access-Control-Allow headers for the GET and OPTIONS methods")
 
 Here is all the steps that enables CORS in API Gateway. Note that the necessary headers are added to *200* response only, not to *400* response so that the above error can't be eliminated for *400* response unless the headers are set separately.
 
-![](02-enable-cors-03.png#center)
+![Confirm method changes dialog listing the OPTIONS method and CORS headers to be added](02-enable-cors-03.png#center "Confirm method changes dialog listing the OPTIONS method and CORS headers to be added")
 
 After that, the API needs to be deployed again and, as can be seen in the deployment history, the latest deployment is selected as the current stage.
 
-![](02-enable-cors-04.png#center)
+![API Gateway deployment history with the latest deployment set as the current stage](02-enable-cors-04.png#center "API Gateway deployment history with the latest deployment set as the current stage")
 
 ### Update handler
 
@@ -150,7 +145,7 @@ aws lambda update-function-code --function-name ServerlessPOCAdmission \
 
 The test result shown below indicates the updated handler is executed correctly.
 
-![](01-update-lambda.png#center)
+![Lambda console test result showing the updated handler returns the expected response](01-update-lambda.png#center "Lambda console test result showing the updated handler returns the expected response")
 
 It can also be checked by the API and now the API can be served in a web application.
 
@@ -206,15 +201,15 @@ index.html
 
 First *read-access* is given to all objects in the bucket (*poc.jaehyeon.me*). It is set in *Bucket Policy* of the permissions tab - *Policy* is discussed in [Part II](/blog/2017-04-11-serverless-data-product-2).
 
-![](03-s3-setup-02.png#center)
+![S3 bucket policy in the permissions tab granting read access to all objects](03-s3-setup-02.png#center "S3 bucket policy in the permissions tab granting read access to all objects")
 
 Then, in the properties tab, *static website hosting* is enabled where *index.html* is set to be rendered for both the default and error document. Now it is possible to have access to the application by the *endpoint*.
 
-![](03-s3-setup-03.png#center)
+![S3 static website hosting enabled with index.html as both index and error document](03-s3-setup-03.png#center "S3 static website hosting enabled with index.html as both index and error document")
 
 In order to replace the *endpoint* with a custom domain name, a [Canonical name (CNAME) record](https://en.wikipedia.org/wiki/CNAME_record) is created in [Amazon Route 53](https://aws.amazon.com/route53/). Note that the CNAME record (*poc.jaehyeon.me*) has to be the same to the bucket name. `s3-website-us-east-1.amazonaws.com.` is entered in *Value*, which is used to define the host name as an alias for the Amazon S3 bucket. Note the period at the end is necessary as it signifies the DNS root and, if it is not specified, a DNS resolver could append it's default domain to the domain you provided. (See [Customizing Amazon S3 URLs with CNAMEs](https://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html#VirtualHostingCustomURLs) for further details.) Now the application can be accessed using `http://poc.jaehyeon.me`. (That demo subdomain no longer exists, so the address is shown here as text rather than as a link.)
 
-![](04-route53.png#center)
+![Route 53 CNAME record pointing poc.jaehyeon.me at the S3 website endpoint](04-route53.png#center "Route 53 CNAME record pointing poc.jaehyeon.me at the S3 website endpoint")
 
 ### CloudFront
 
@@ -222,7 +217,7 @@ It is possible to host the application using *Amazon CloudFront* which is a glob
 
 *Web* is taken as the delivery method.
 
-![](05-cloudfront-01.png#center)
+![CloudFront delivery method step with Web selected](05-cloudfront-01.png#center "CloudFront delivery method step with Web selected")
 
 The S3 bucket (*web.jaehyeon.me*) is selected as the origin domain name. Note, unlike relying on the *static website hosting* property where all objects in the bucket are given *read-access*, in this way, access to the bucket is *restricted* only to CloudFront with a newly created identity. The updated bucket policy is shown below. (See [Using an Origin Access Identity to Restrict Access to Your Amazon S3 Content](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html) for further details.)
 
@@ -245,23 +240,23 @@ The S3 bucket (*web.jaehyeon.me*) is selected as the origin domain name. Note, u
 }
 ```
 
-![](05-cloudfront-02.png#center)
+![CloudFront origin settings with the S3 bucket and access restricted to CloudFront](05-cloudfront-02.png#center "CloudFront origin settings with the S3 bucket and access restricted to CloudFront")
 
 In default cache behavior settings, *Redirect HTTP to HTTPS* is selected for the viewer protocol policy. All other options are left untouched - they are not shown.
 
-![](05-cloudfront-03.png#center)
+![CloudFront default cache behaviour with Redirect HTTP to HTTPS selected](05-cloudfront-03.png#center "CloudFront default cache behaviour with Redirect HTTP to HTTPS selected")
 
 In distribution settings, a CNAME record (*web.jaehyeon.me*) is created to be the same to the bucket name. The custom SSL certificate that is obtained from [AWS Certificate Manager](https://aws.amazon.com/certificate-manager/) is chosen rather than the default CloudFront certificate - see [Part III](/blog/2017-04-13-serverless-data-product-3). Finally it is selected to support only clients that support server name indication (SNI). Note all the other options are left untouched - they are not shown.
 
-![](05-cloudfront-04.png#center)
+![CloudFront distribution settings with the CNAME web.jaehyeon.me and a custom SSL certificate](05-cloudfront-04.png#center "CloudFront distribution settings with the CNAME web.jaehyeon.me and a custom SSL certificate")
 
 Once the distribution is created, the distribution's CloudFront domain name is created and it is possible to use it to create a custom domain.
 
-![](05-cloudfront-06.png#center)
+![CloudFront distribution list showing the generated distribution domain name](05-cloudfront-06.png#center "CloudFront distribution list showing the generated distribution domain name")
 
 In Route 53, a new record set is created and `web.jaehyeon.me` is entered in the name field, followed by selecting *A - IPv4 address* as the type. *Alias* is set to be yes and the *distribution domain name* is entered as the alias target.
 
-![](05-cloudfront-07.png#center)
+![Route 53 record set with an A record aliased to the CloudFront domain name](05-cloudfront-07.png#center "Route 53 record set with an A record aliased to the CloudFront domain name")
 
 Once it is ready, the application can be accessed using either [https://web.jaehyeon.me](https://web.jaehyeon.me) or [https://web.jaehyeon.me](https://web.jaehyeon.me) where HTTP is redirected to HTTPS.
 

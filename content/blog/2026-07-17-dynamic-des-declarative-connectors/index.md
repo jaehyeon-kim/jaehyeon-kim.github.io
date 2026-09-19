@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Building Real-Time Digital Twins with dynamic-des
 categories:
@@ -19,15 +15,11 @@ tags:
   - dynamic-des
   - Digital Twin
   - SimPy
-  - Kafka
+  - Apache Kafka
   - Redis
   - PostgreSQL
   - Python
-authors:
-  - JaehyeonKim
-images: []
-description: |
-  Since the v0.8.1 release, Dynamic DES has gained a declarative SimulationContext API, native Postgres and Redis ingress and egress connectors, and broader object storage support. This post walks through what changed and why the new builder pattern makes real-time digital twins far easier to write.
+description: Dynamic DES v0.11.1 adds a declarative SimulationContext API, native Postgres and Redis ingress and egress connectors, and broader object storage.
 ---
 
 A while back I wrote about [Dynamic DES v0.8.1](/blog/2026-05-25-dynamic-des-parquet-support/) and its native Data Lake integration, using one SimPy codebase for both batch training and live inference. Several releases later, the project has grown in two directions that matter for anyone building event-driven digital twins: a cleaner authoring experience, and more places to send and receive data.

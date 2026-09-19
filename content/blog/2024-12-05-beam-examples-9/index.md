@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Apache Beam Python Examples
 categories:
@@ -18,9 +14,6 @@ tags:
   - Apache Flink
   - Python
   - Splittable DoFn
-authors:
-  - JaehyeonKim
-images: []
 description: Splittable DoFn in Beam Python builds a batch file reader that processes files in parallel, and a PiSampler that estimates pi by Monte Carlo runs.
 ---
 
@@ -52,7 +45,7 @@ Executing an SDF follows the following steps:
 3. The runner redistributes the element and restriction pairs to several workers.
 4. Element and restriction pairs are processed in parallel (e.g. the file is read). Within this last step, the element and restriction pair can pause its own processing and/or be split into further element and restriction pairs.
 
-![](sdf_high_level_overview.png#center)
+![Each element A is paired with an initial restriction, the restriction is split to parallelise the work across workers, then each element and restriction pair is processed with checkpoint and split feedback](sdf_high_level_overview.png#center "How a splittable DoFn pairs, splits and processes elements")
 
 A basic SDF is composed of three parts: a restriction, a restriction provider, and a restriction tracker.
 
@@ -306,7 +299,7 @@ python chapter7/batch_file_read.py \
     --direct_num_workers=3 --direct_running_mode=multi_threading
 ```
 
-![](batch-reader-demo.webp#center)
+![Terminal recording of the batch file reader, logging file name and position as three text files are read at the same time across worker threads](batch-reader-demo.webp#center "Batch file reader processing several files in parallel")
 
 ## PI Sampler
 
@@ -428,4 +421,4 @@ python chapter7/pi_sampler.py -p 200 -n 30000 \
     --direct_num_workers=3 --direct_running_mode=multi_threading
 ```
 
-![](pi-sampler-demo.gif#center)
+![Terminal recording of the PI sampler, logging experiments up to the 200th and printing an estimate of 3.141362 before the workers shut down](pi-sampler-demo.gif#center "PI sampler estimating pi from 200 experiments")

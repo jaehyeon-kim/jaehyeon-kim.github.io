@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - DBT for Effective Data Transformation on AWS
 categories:
@@ -17,11 +13,8 @@ tags:
   - Apache Kafka
   - Docker
   - Python
-authors:
-  - JaehyeonKim
-images: []
 cevo: 23
-description: We will discuss how to configure the Kafka consumer to seek offsets by timestamp where topic partitions are dynamically assigned by subscription. Docker Compose is used for building a single node Kafka cluster and running multiple consumer instances.
+description: Configure a Kafka consumer to seek offsets by timestamp while partitions are assigned by subscription, on a single node cluster in Docker Compose.
 ---
 
 [**UPDATE 2025-10-01**]
@@ -122,7 +115,7 @@ $ docker exec -it kafka \
 
 The topic can be checked in the Kafka UI as shown below.
 
-![](topic-01.png#center)
+![Kafka UI topic list with the orders topic and its two partitions](topic-01.png#center "Kafka UI topic list with the orders topic and its two partitions")
 
 ## Kafka Producer Application
 
@@ -251,7 +244,7 @@ if __name__ == "__main__":
 
 After a while, we can see that messages are sent to the orders topic. Out of 2390 messages, 1179 and 1211 messages are sent to the partition 0 and 1 respectively. 
 
-![](topic-02.png#center)
+![Orders topic in Kafka UI, 1179 messages in partition 0 and 1211 in partition 1](topic-02.png#center "Orders topic in Kafka UI, 1179 messages in partition 0 and 1211 in partition 1")
 
 ## Kafka Consumer Application
 
@@ -405,7 +398,7 @@ $ docker-compose -f compose-consumer.yml up -d --scale consumer=2
 
 Soon after the instances start to poll messages, we can see that their fetch offsets are updated as the current offset values are much higher than 0. 
 
-![](consumer-group-01.png#center)
+![Consumer group in Kafka UI where both instances hold current offsets well above zero](consumer-group-01.png#center "Consumer group in Kafka UI where both instances hold current offsets well above zero")
 
 We can check logs of the consumer instances in order to check their behaviour further. Below shows the logs of one of the instances. 
 
@@ -418,11 +411,17 @@ $ docker logs offset-seeking-consumer-1
 
 We see that the partition 1 is assigned to this instance. The offset 901 is taken to override and the message timestamp of that message is 2023-01-06T19:20:16.107000, which is later than the OFFSET_STR environment value.
 
-![](consumer-group-02.png#center)
+![Consumer logs showing partition 1 assigned and the fetch offset overridden to 901](consumer-group-02.png#center "Consumer logs showing partition 1 assigned and the fetch offset overridden to 901")
 
 We can also check that the correct offset is obtained as the message timestamp of offset 900 is earlier than the OFFSET_STR value.  
 
-![](consumer-group-03.png#center)
+![Message at offset 900 with a timestamp earlier than the configured offset value](consumer-group-03.png#center "Message at offset 900 with a timestamp earlier than the configured offset value")
+
+## Related posts
+
+* [Kafka Development with Docker - Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4) - the kafka-python producer and consumer applications that this offset seeking builds on.
+* [Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7) - the same applications serialising and deserialising through AWS Glue Schema Registry.
+* [Kafka Development with Docker - Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8) - TLS encryption between brokers and clients, with Java and Python examples.
 
 ## Summary
 

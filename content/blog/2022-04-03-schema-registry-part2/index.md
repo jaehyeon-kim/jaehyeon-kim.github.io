@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Integrate Schema Registry with MSK Connect
 categories:
@@ -21,16 +17,12 @@ tags:
   - Apache Kafka
   - Kafka Connect
   - Change Data Capture (CDC)
-  - Docker
   - Debezium
   - Apicurio Registry
-authors:
-  - JaehyeonKim
-images: []
 cevo: 11
 description: Deploy a Change Data Capture pipeline to AWS with the Apicurio registry on ECS, private subnets over VPN and the Avro converter packaged with the connectors.
 ---
-In the [previous post](/blog/2022-03-07-schema-registry-part1), we discussed a Change Data Capture (CDC) solution with a schema registry. A local development environment is set up using Docker Compose. The Debezium and Confluent S3 connectors are deployed with the Confluent Avro converter and the Apicurio registry is used as the schema registry service. A quick example is shown to illustrate how schema evolution can be managed by the schema registry. In this post, we'll build the solution on AWS using [MSK](https://aws.amazon.com/msk/), [MSK Connect](https://aws.amazon.com/msk/features/msk-connect/), [Aurora PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraPostgreSQL.html) and [ECS](https://aws.amazon.com/ecs/).
+We build the Change Data Capture (CDC) solution with a schema registry on AWS using [MSK](https://aws.amazon.com/msk/), [MSK Connect](https://aws.amazon.com/msk/features/msk-connect/), [Aurora PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraPostgreSQL.html) and [ECS](https://aws.amazon.com/ecs/). In the [previous post](/blog/2022-03-07-schema-registry-part1), we discussed that solution in a local development environment set up using Docker Compose. The Debezium and Confluent S3 connectors are deployed with the Confluent Avro converter and the Apicurio registry is used as the schema registry service. A quick example is shown to illustrate how schema evolution can be managed by the schema registry.
 
 * [Part 1 Local Development](/blog/2022-03-07-schema-registry-part1)
 * [Part 2 MSK Deployment](#) (this post)
@@ -98,7 +90,7 @@ Northwind SQL scripts executed
 
 Once the database setup is complete, we can apply the Terraform stack with the _registry_create_ variable to _true_. When it's deployed, we can check the APIs that the registry service supports as shown below. In line with the previous post, we'll use the Confluent schema registry compatible API.
 
-![](00-registry-api.png#center)
+![Apicurio Registry API listing with the Confluent Schema Registry version 6 endpoint /apis/ccompat/v6 marked](00-registry-api.png#center "Supported APIs of the Apicurio registry service")
 
 ### Kafka UI
 
@@ -130,7 +122,7 @@ services:
 
 The UI can be checked on a browser as shown below.
 
-![](01-kafka-ui.png#center)
+![Kafka UI dashboard with one online cluster named msk, version 2.8.1, two brokers and 18 topics](01-kafka-ui.png#center "Kafka UI connected to the MSK cluster")
 
 ## Create Connectors
 
@@ -191,11 +183,11 @@ errors.log.enable=true
 
 As with the previous post, we can check the key and value schemas are created once the source connector is deployed. Note we can check the details of the schemas by clicking the relevant schema items.
 
-![](02-schemas.png#center)
+![Schema Registry page listing ord.ods.cdc_events-value and ord.ods.cdc_events-key, both at version 1](02-schemas.png#center "Key and value schemas created by the source connector")
 
 We can see the messages (key and value) are properly deserialized within the UI as we added the schema registry URL as an environment variable and it can be accessed from it.
 
-![](03-topic-messages.png#center)
+![Topic messages view with an order_id key and the Avro value decoded into readable JSON fields](03-topic-messages.png#center "Deserialized key and value messages of ord.ods.cdc_events")
 
 ## Schema Evolution
 
@@ -216,7 +208,7 @@ WHERE customer_id = 'VINET'
 
 Once the above queries are executed, we see a new version is added to the topic's value schema, and it includes the new field. 
 
-![](04-schema-evolution.png#center)
+![Schema detail at latest version 2 with the added employee_id field marked, and older versions below](04-schema-evolution.png#center "New schema version carrying the employee_id field")
 
 ## Summary
 

@@ -5,20 +5,13 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - Tree based methods in R
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: This is a quick trial of adding overall and conditional (by user) average columns in a data frame.
+description: Add overall and per-user average columns to an R data frame with base, plyr, dplyr and data.table, and time how long each of the five approaches takes.
 ---
 
 This is a quick trial of adding overall and conditional (by user) average columns in a data frame. `base`,`plyr`,`dplyr`,`data.table`,`dplyr + data.table` packages are used. Personally I perfer `dplyr + data.table` - `dplyr` for comperhensive syntax and `data.table` for speed.
@@ -191,3 +184,9 @@ system.time(postDf3 <- preDt %>%
 ##    user  system elapsed 
 ##   0.008   0.004   0.012
 ```
+
+## Related posts
+
+* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1) - building a data frame in R by reading and merging many stock price files
+* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2) - the in-memory version of that merge, which avoids writing each file to disk
+* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files) - grouping and summarising a combined data frame to get returns and correlations

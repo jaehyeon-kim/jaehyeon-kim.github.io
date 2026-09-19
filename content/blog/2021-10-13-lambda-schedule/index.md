@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -17,15 +13,14 @@ tags:
   - AWS
   - AWS Lambda
   - Amazon SQS
-  - EventBridge
+  - Amazon EventBridge
   - Node.js
   - Serverless Framework
-authors:
-  - JaehyeonKim
-images: []
 cevo: 3
 description: Schedule an AWS Lambda function more often than once a minute, using Amazon SQS to get past the one invocation per minute limit of EventBridge rules.
 ---
+
+> **Status, September 2026.** The `nodejs12.x` runtime in the serverless.yml below reached end of support in AWS Lambda on 31 March 2023, and Lambda now blocks function creation and updates on it. Deploy the same code on a supported Node.js runtime such as `nodejs24.x`.
 
 [Triggering a Lambda function by an EventBridge Events rule](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-run-lambda-schedule.html) can be used as a _serverless _replacement of [cron job](https://en.wikipedia.org/wiki/Cron). The highest frequency of it is one invocation per minute so that it cannot be used directly if you need to schedule a Lambda function more frequently. For example, it may be refreshing an application with real time metrics from an Amazon Connect instance where [some metrics are updated every 15 seconds](https://docs.aws.amazon.com/connect/latest/adminguide/real-time-metrics-reports.html). There is a [post in the AWS Architecture Blog](https://aws.amazon.com/blogs/architecture/a-serverless-solution-for-invoking-aws-lambda-at-a-sub-minute-frequency/), and it suggests using [AWS Step Functions](https://aws.amazon.com/step-functions/). Or a usual recommendation is using [Amazon EC2](https://stackoverflow.com/questions/35878619/scheduled-aws-lambda-task-at-less-than-1-minute-frequency). Albeit being _serverless_, the former gets a bit complicated especially in order to [handle the hard quota of 25,000 entries in the execution history](https://docs.aws.amazon.com/step-functions/latest/dg/tutorial-continue-new.html). And the latter is not an option if you look for a _serverless_ solution. In this post, I’ll demonstrate another _serverless_ solution of scheduling a Lambda function at a sub-minute frequency using [Amazon SQS](https://aws.amazon.com/sqs/).
 
@@ -40,7 +35,7 @@ The solution contains 2 Lambda functions and each of them has its own event sour
 
 I find this architecture is simpler than other options.
 
-![](architecture.png#center)
+![An EventBridge rule triggers a sender Lambda every minute, which queues SQS messages with delays of 0 to 50 seconds for a consumer Lambda](architecture.png#center "Scheduling sub-minute events with EventBridge, Lambda and SQS delay seconds")
 
 ## Lambda Functions
 
@@ -197,16 +192,23 @@ resources:
 
 We can filter the log of the consumer function in the CloudWatch page. The function is invoked as expected, but I see the interval gets shortened periodically especially when the delay second value is 0. We’ll have a closer look at that below.
 
-![](cloudwatch-log.png#center)
+![CloudWatch log events filtered on delay second, listing consumer invocations about ten seconds apart with delay values cycling 0 to 50](cloudwatch-log.png#center "Consumer function log events in CloudWatch")
 
 I created a chart that shows delay (milliseconds) by invocation. It shows periodic downward spikes, and they correspond to the invocations where the delay seconds value is 0. For some early invocations, the delay values are more than 1000 milliseconds, which means that the consumer function’s intervals are less than 9 seconds. The delays get stable at or after the 200th invocation. The table in the right-hand side shows the summary statistics of delays after that invocation. It shows the consumer invocation delays spread in a range of 300 milliseconds in general.
 
-![](delay-chart.png#center)
+![Delay by invocation chart with repeated downward spikes reaching minus 1500 milliseconds, beside a table with mean 1.1 and standard deviation 228 milliseconds](delay-chart.png#center "Invocation delay in milliseconds, with summary statistics after the 200th invocation")
 
 ## Caveats
 
 An [EventBridge Events rule can be triggered more than once](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-troubleshooting.html#eb-rule-triggered-more-than-once) and a [message in an Amazon SQS queue can be delivered more than once](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html) as well. Therefore, it is important to design the consumer Lambda function to be _[idempotent](https://aws.amazon.com/premiumsupport/knowledge-center/lambda-function-idempotent/)_.
 
+
+## Related posts
+
+* [Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) - another Lambda function invoked repeatedly by an EventBridge schedule rule, here producing into a Kafka topic
+* [Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1) - how to package a function and its dependencies for Lambda
+* [Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2) - deploying that package and giving the function the role it needs
+* [Adding Authorization to a Graphql API](/blog/2021-07-20-graphql-api-authorization) - another serverless application, covering authorization on an API
 
 ## Conclusion
 

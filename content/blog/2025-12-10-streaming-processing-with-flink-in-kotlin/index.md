@@ -5,22 +5,14 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 categories:
   - Data Streaming
 tags:
   - Apache Flink
   - Kotlin
-  - Stream Processing
   - Gradle
   - Ktor
-authors:
-  - JaehyeonKim
-images: []
 description: Examples from the book Stream Processing with Apache Flink ported to Kotlin, updated to current Flink APIs and built with Gradle after PyFlink lacked features.
 ---
 
@@ -30,7 +22,7 @@ In porting the examples to Kotlin, I also took the opportunity to align the code
 
 <!--more-->
 
-### Updating the Code and APIs
+## Updating the Code and APIs
 
 The book, while conceptually valuable, is a bit dated. As I worked through the examples, I updated several deprecated features to use their modern equivalents.
 
@@ -39,7 +31,7 @@ The book, while conceptually valuable, is a bit dated. As I worked through the e
 *   **`SinkFunction` to Sink V2 API**: Updated the `SinkFunction` to the Sink V2 API.
 *   **Queryable State**: Ignored as it has been deprecated since Flink 1.18. These examples are built using Flink 1.20.1.
 
-### Optimizing the Build with Gradle
+## Optimizing the Build with Gradle
 
 Figuring out the Gradle build was a valuable lesson in itself. I learned how to create a single `build.gradle.kts` to handle two different scenarios: producing a lean production JAR and keeping local execution simple.
 
@@ -75,7 +67,7 @@ tasks.named<JavaExec>("run") {
 }
 ```
 
-### Main Chapters
+## Main Chapters
 
 So far, I have translated the examples from the following main chapters:
 
@@ -84,7 +76,7 @@ So far, I have translated the examples from the following main chapters:
 *   **Chapter 7: State Management**: Explores different types of state in Flink, such as `ValueState`, `ListState`, `MapState`, and `BroadcastState`, along with operator state.
 *   **Chapter 8: Asynchronous I/O and Custom Connectors**: Demonstrates how to interact with external systems asynchronously and build custom sources and sinks.
 
-### How to Build and Run the Examples
+## How to Build and Run the Examples
 
 The Flink applications can be run directly from the command line for local testing and development. This is useful for quick debugging without needing a full Flink cluster. Moreover, each Flink app has detailed documentation so it is easy to understand, for example:
 
@@ -150,6 +142,12 @@ To launch the apps, use the `run` task and set the desired main class with the `
 ./gradlew run -PmainClass=me.jaehyeon.chapter8.CustomConnectors
 ```
 
-### Conclusion
+## Related posts
+
+* [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning) - a larger Flink and Kotlin application, adding online machine learning
+* [Kafka, Flink and DynamoDB for Real Time Fraud Detection](/blog/2023-08-10-fraud-detection-part-1) - a Flink application built locally on Docker with Kafka and DynamoDB
+* [Getting Started with PyFlink on AWS](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1) - the Python API whose limits led to this Kotlin rewrite, shown against a local Kafka cluster
+
+## Conclusion
 
 Working through the examples in Kotlin has been an effective way to dive deeper into Apache Flink. Translating the examples to Kotlin not only forced me to understand the concepts more thoroughly but also provided a great opportunity to get hands-on with the latest APIs and build practices. For those looking to learn Apache Flink through up-to-date examples, I hope sharing my experience and code proves helpful. It's been a fun and effective learning journey.

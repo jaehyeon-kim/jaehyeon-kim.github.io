@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Development with Docker
 categories:
@@ -19,9 +15,6 @@ tags:
   - Docker
   - Python
   - SASL
-authors:
-  - JaehyeonKim
-images: []
 description: Authenticate Kafka clients with SASL instead of client certificates, with Java and Python client examples of the SASL mechanisms.
 ---
 
@@ -473,7 +466,7 @@ networks:
 
 Once started, we can check the messages of the *orders* topic successfully.
 
-![](messages.png#center)
+![Kafka UI messages tab for the orders topic with an expanded order value in JSON](messages.png#center "Messages of the orders topic in UI for Apache Kafka")
 
 ## Summary
 

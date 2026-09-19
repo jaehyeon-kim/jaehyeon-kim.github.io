@@ -5,23 +5,20 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Download Stock Data
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: In an earlier article, a way to download stock price data files from Google, save it into a local drive and merge them into a single data frame. If files are not large, however, it wouldn't be effective and, in this article, files are downloaded and merged internally.
+description: Download stock price data from Google in R and merge it into one data frame in memory, avoiding the slower route of saving each file to a local drive.
 ---
 
+> **Status, September 2026.** Google retired the `finance/historical` CSV endpoint that the URLs here point at, so reading those URLs no longer returns data. The in-memory read and merge pattern still holds if you point it at a price source that is still published.
+
 In an [earlier article](/blog/2014-11-20-download-stock-data-1), a way to download stock price data files from Google, save it into a local drive and merge them into a single data frame. If files are not large, however, it wouldn't be effective and, in this article, files are downloaded and merged internally.
+
+## R Packages Used
 
 The following packages are used.
 
@@ -33,6 +30,8 @@ library(stringr)
 library(plyr)
 library(dplyr)
 ```
+
+## Read and Merge Files from URLs
 
 Taking urls as file locations, files are directly read using `llply` and they are combined using `rbind_all`. As the merged data has multiple stocks' records, `Code` column is created. Note that, when an error occurrs, the function returns a dummy data frame in order not to break the loop - values of the dummy data frame(s) are filtered out at the end.
 
@@ -76,6 +75,8 @@ dataList <- llply(files, function(file, ...) {
 # dummy data frame values are filtered out
 data <- filter(rbind_all(dataList), Code != "NA")
 ```
+
+## Merged Data Sample
 
 Some of the values are shown below.
 

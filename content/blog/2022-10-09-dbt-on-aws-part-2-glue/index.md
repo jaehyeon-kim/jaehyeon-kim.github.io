@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - dbt for Effective Data Transformation on AWS
 categories:
@@ -19,9 +15,6 @@ tags:
   - Amazon QuickSight
   - Apache Spark
   - dbt
-authors:
-  - JaehyeonKim
-images: []
 cevo: 19
 description: AWS Glue data transformation pipelines with dbt. Subsets of IMDb data feed models developed in multiple layers following dbt best practices.
 ---
@@ -377,7 +370,7 @@ done
 
 Note that the header rows of the source tables are not detected properly by the Glue crawlers, and they have to be filtered out in the stage models of the dbt project.
 
-![](source-view.png#center)
+![Glue Studio notebook query on imdb.title_basics with the stray header row boxed in red](source-view.png#center "Header row left in the source table")
 
 ### Setup dbt Project
 
@@ -653,7 +646,7 @@ $ aws glue get-tables --database imdb \
 
 Instead we can use [Glue Studio notebooks](https://docs.aws.amazon.com/glue/latest/ug/notebook-getting-started.html) to query the tables, which is a bit inconvenient.
 
-![](query-view.png#center)
+![Glue Studio notebook returning twenty rows of the stg_imdb__title_basics staging view](query-view.png#center "Staging model queried in a notebook")
 
 #### Intermediate
 
@@ -690,7 +683,7 @@ order by id
 
 The intermediate models are also materialised as views and we can check the array columns are flattened as expected.
 
-![](query-view-flattened.png#center)
+![Query result showing title_id and genre pairs from the flattened genres intermediate model](query-view-flattened.png#center "Flattened genre rows")
 
 Below shows the file tree of the intermediate models. Similar to the staging models, the intermediate models can be executed by `dbt run --select intermediate`.
 
@@ -863,7 +856,7 @@ $ dbt test --select marts
 Below shows the file tree of the marts models. As with the other layers, the marts models can be executed by <code>dbt run <em>--select marts</em></code>.
 
 
-```
+```bash
 $ tree glue/dbt_glue_proj/models/marts/
 glue/dbt_glue_proj/models/marts/
 └── analytics
@@ -879,7 +872,7 @@ glue/dbt_glue_proj/models/marts/
 
 The models of the marts layer can be consumed by external tools such as [Amazon QuickSight](https://aws.amazon.com/quicksight/). Below shows an example dashboard. The two pie charts on top show proportions of genre and title type. The box plots at the bottom show dispersion of the number of votes and average rating by title type.
 
-![](imdb-dashboard.png#center)
+![QuickSight dashboard with two pie charts of title proportions and two box plot panels](imdb-dashboard.png#center "IMDb dashboard in QuickSight")
 
 ### Generate dbt Documentation
 
@@ -891,11 +884,11 @@ $ dbt docs generate
 $ dbt docs serve
 ```
 
-![](doc-01.png#center)
+![dbt documentation site listing imdb sources and the dbt_glue_proj model folders in the sidebar](doc-01.png#center "Generated dbt documentation")
 
 A very useful element of dbt documentation is [data lineage](https://docs.getdbt.com/terms/data-lineage), which provides an overall view about how data is transformed and consumed. Below we can see that the final titles model consumes all title-related stating models and an intermediate model from the name basics staging model. 
 
-![](doc-02.png#center)
+![Lineage graph linking imdb source tables through staging and intermediate models to titles and names](doc-02.png#center "Data lineage of the dbt project")
 
 ## Summary
 

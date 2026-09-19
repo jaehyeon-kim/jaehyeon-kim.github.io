@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Deploy Python Stream Processing App on Kubernetes
 categories:
@@ -21,13 +17,10 @@ tags:
   - Docker
   - Kubernetes
   - Python
-authors:
-  - JaehyeonKim
-images: []
 description: Deploy an Apache Beam Python pipeline to a Flink session cluster on minikube, packaged as a Docker image and submitted as a Kubernetes job.
 ---
 
-In this post, we develop an [Apache Beam](https://beam.apache.org/) pipeline using the [Python SDK](https://beam.apache.org/documentation/sdks/python/) and deploy it on an [Apache Flink](https://flink.apache.org/) cluster via the [Apache Flink Runner](https://beam.apache.org/documentation/runners/flink/). Same as [Part I](/blog/2024-05-30-beam-deploy-1), we deploy a Kafka cluster using the [Strimzi Operator](https://strimzi.io/) on a [minikube](https://minikube.sigs.k8s.io/docs/) cluster as the pipeline uses [Apache Kafka](https://kafka.apache.org/) topics for its data source and sink. Then, we develop the pipeline as a Python package and add the package to a custom Docker image so that Python user code can be executed externally. For deployment, we create a Flink session cluster via the [Flink Kubernetes Operator](https://nightlies.apache.org/flink/flink-kubernetes-operator-docs-main/), and deploy the pipeline using a Kubernetes job. Finally, we check the output of the application by sending messages to the input Kafka topic using a Python producer application.
+An [Apache Beam](https://beam.apache.org/) pipeline built with the [Python SDK](https://beam.apache.org/documentation/sdks/python/) runs on an [Apache Flink](https://flink.apache.org/) cluster via the [Apache Flink Runner](https://beam.apache.org/documentation/runners/flink/). We develop the pipeline as a Python package and add the package to a custom Docker image so that Python user code can be executed externally. In this post, we create a Flink session cluster via the [Flink Kubernetes Operator](https://nightlies.apache.org/flink/flink-kubernetes-operator-docs-main/), and deploy the pipeline using a Kubernetes job. Same as [Part I](/blog/2024-05-30-beam-deploy-1), we deploy a Kafka cluster using the [Strimzi Operator](https://strimzi.io/) on a [minikube](https://minikube.sigs.k8s.io/docs/) cluster as the pipeline uses [Apache Kafka](https://kafka.apache.org/) topics for its data source and sink. Finally, we check the output of the application by sending messages to the input Kafka topic using a Python producer application.
 
 <!--more-->
 
@@ -86,7 +79,7 @@ We can use `kubectl port-forward` to connect to the *kafka-ui* server running in
 kubectl port-forward svc/kafka-ui 8080
 ```
 
-![](kafka-ui.png#center)
+![Kafka UI brokers page for the demo cluster, one broker on version 3.5 listening on port 9092 with no partitions yet](kafka-ui.png#center "Kafka cluster running on Kubernetes")
 
 ## Develop Stream Processing App
 
@@ -569,11 +562,11 @@ The Flink web UI can be accessed using `kubectl port-forward` on port 8081. In t
 kubectl port-forward svc/flink-word-len-rest 8081
 ```
 
-![](flink-ui.png#center)
+![Flink job beam-word-len running for 34 seconds, a Kafka read operation feeding the average word length calculation and the Kafka write, both at parallelism 3](flink-ui.png#center "The Beam pipeline running as a Flink job")
 
 The *Kafka I/O* automatically creates a topic if it doesn't exist, and we can see the input topic is created on *kafka-ui*.
 
-![](kafka-topics-1.png#center)
+![Kafka UI topics list holding input-topic with 3 partitions and no messages yet](kafka-topics-1.png#center "Input topic created by the Kafka I/O")
 
 ### Kafka Producer
 
@@ -644,11 +637,11 @@ python kafka/client/producer.py
 
 We can see the output topic (*output-topic-flink*) is created on *kafka-ui*.
 
-![](kafka-topics-2.png#center)
+![Kafka UI topics list with input-topic at 124 messages and output-topic-beam at 24](kafka-topics-2.png#center "Output topic created once the pipeline emits results")
 
 Also, we can check the output messages are created as expected in the *Topics* tab. 
 
-![](output-topic-messages.png#center)
+![Kafka UI messages view of output-topic-beam, one record expanded to show window_start, window_end and an average length of 5.31](output-topic-messages.png#center "Windowed average word length messages")
 
 ## Delete Resources
 

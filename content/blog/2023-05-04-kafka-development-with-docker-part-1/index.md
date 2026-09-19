@@ -5,21 +5,13 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Development with Docker
 categories:
   - Data Streaming
 tags: 
   - Apache Kafka
-  - Data Streaming
   - Docker
-authors:
-  - JaehyeonKim
-images: []
 description: Set up a Kafka cluster with Docker Compose, the base for a series on developing and testing Kafka applications for AWS in containers.
 ---
 
@@ -53,7 +45,7 @@ I'm teaching myself [modern data streaming architectures](https://docs.aws.amazo
 
 We are going to create a Kafka cluster with 3 brokers and 1 Zookeeper node. Having multiple brokers are advantageous to test Kafka features. For example, the number of replication factor of a topic partition is limited to the number of brokers. Therefore, if we have multiple brokers, we can check what happens when the minimum in-sync replica configuration doesn't meet due to broker failure. We also need Zookeeper for metadata management - see [this article](https://www.conduktor.io/kafka/zookeeper-with-kafka/) for details about the role of Zookeeper. 
 
-![](featured.png#center)
+![Three Kafka brokers each joined by arrows to one ZooKeeper node inside a Docker boundary](featured.png#center "Cluster layout, three brokers and one ZooKeeper node on Docker")
 
 ### Docker Compose File
 

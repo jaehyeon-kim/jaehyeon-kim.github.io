@@ -5,20 +5,13 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
   - Data Analysis
 tags:
   - R
-authors:
-  - JaehyeonKim
-images: []
-description: We discuss how to turn analysis into an R package.
+description: Turn an analysis into an R package, with the treebgg bagging package as the worked example, covering roxygen2 documents, testthat tests and vignettes.
 ---
 
 When I imagine a workflow, it is performing the same or similar tasks regularly (daily or weekly) in an automated way. Although those tasks can be executed in a script or a *source()*d script, it may not be easy to maintain separate scripts while the size of tasks gets bigger or if they have to be executed in different machines. In academia, reproducible research shares similar ideas but the level of reproducibility introduced in [Gandrud, 2013](https://christophergandrud.github.io/RepResR-RStudio/) may not suffice in a business environment as the focus is documenting in a reproducible way. A R package, however, can be an effective tool and it can be considered like a portable class library in C# or Java. Like a class library, it can include a set of necessary tasks (usually using functions) and, being portable, its dependency can be managed well - for example, it is possible to set so that dependent packages can also be installed if some of them are not installed already. Moreover the benefit of creating a R package would be significant if it has to be deployed in a production server as it'd be a lot easier to convince system admin with the built-in unit tests, object documents and package vignettes. In this article an example of creating a R package is illustrated.
@@ -339,3 +332,9 @@ bggs.rg
 ```
 
 Roughly there would be two ways of performing a task. One is easy to start but hard to maintain and the other is hard to start but easy to maintain. Developing a R package should require more time to start but its benefit will be ongoing with little or no maintenance. Depending on complexity of a task, it'd be considerable to turning analysis into a package.
+
+## Related posts
+
+* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1) - downloading stock price files in R and merging them into a single data frame.
+* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2) - the same download kept in memory, avoiding the slower route of saving each file to disk.
+* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files) - returns, standard deviation and correlation from those files, the kind of analysis worth packaging.

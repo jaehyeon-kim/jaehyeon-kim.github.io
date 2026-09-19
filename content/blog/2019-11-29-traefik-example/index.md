@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 # series:
 #   - API development with R
 categories:
@@ -19,10 +15,7 @@ tags:
   - Python
   - R
   - Traefik
-authors:
-  - JaehyeonKim
-images: []
-description: Traefik is a modern HTTP reverse proxy and load balancer. In this post, it'll be demonstrated how path-based routing can be set up by Traefik with Docker. Also a centralized authentication will be illustrated with the Forward Authentication feature of Traefik.
+description: Set up path-based routing with Traefik and Docker for Python and R services, then add centralized authentication with Forward Authentication.
 ---
 
 [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) in [Kubernetes](https://kubernetes.io/) exposes HTTP and HTTPS routes from outside the cluster to services within the cluster. By setting rules, it routes requests to appropriate services (precisely requests are sent to individual [Pods](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/) by [Ingress Controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)). Rules can be set up dynamically and I find it's more efficient compared to traditional [reverse proxy](https://en.wikipedia.org/wiki/Reverse_proxy).
@@ -34,7 +27,7 @@ description: Traefik is a modern HTTP reverse proxy and load balancer. In this p
 Below shows an illustration of [internal architecture](https://doc.traefik.io/traefik/v1.7/basics/) of Traefik.
 
 
-![](traefik-overview.png#center)
+![Traefik internals with HTTP and SSL entrypoints on the left, host and path frontend rules in the middle, and API, WEB and three backoffice backends on the right](traefik-overview.png#center "Internal architecture of Traefik")
 
 
 The [Traefik website](https://doc.traefik.io/traefik/v1.7/basics/) explains workflow of requests as following.
@@ -52,7 +45,7 @@ In this example, a HTTP _entrypoint_ is setup on port 80. Requests through it ar
 As the paths of the rules suggest, requests to `/pybackend` are sent to a _backend_ service, created with [FastAPI](https://fastapi.tiangolo.com/features/). If the other rule is met, requests are sent to the [Rserve](https://www.rforge.net/Rserve/) _backend_ service. Note that only requests from authenticated users are fowarded to relevant _backends_ and it is configured in _frontend_ rules as well. Below shows how authentication is handled.
 
 
-![](traefik-forward-auth.png#center)
+![A request reaches AuthForward, which asks AuthServer for a decision, then proceeds on OK or returns the error on KO](traefik-forward-auth.png#center "How forward authentication handles a request")
 
 
 ## Traefik setup
@@ -113,7 +106,7 @@ docker-compose up -d traefik
 When visiting the monitoring UI via _http://k8s-traefik.info:8080/dashboard_, it's shown that no _frontend_ and _backend_ exists in the _docker_ provider tab.
 
 
-![](traefik-providers-01.png#center)
+![Traefik dashboard on the docker tab, reporting 0 frontends and 0 backends](traefik-providers-01.png#center "Monitoring dashboard before any backend service is started")
 
 
 ## Services
@@ -354,7 +347,7 @@ docker-compose up -d pybackend
 Once those services are started, the frontends/backends of the Python and Rserve services appear in the monitoring UI.
 
 
-![](traefik-providers-00.png#center)
+![Traefik dashboard listing two frontends with the pybackend and rbackend path rules, and two backends on port 8000](traefik-providers-00.png#center "Frontends and backends for the Python and Rserve services")
 
 
 Below shows some request examples.
@@ -415,4 +408,10 @@ while true; do echo '{"gre": 600, "rank": "1"}' \
 ```
 
 
-![](traefik-health.png#center)
+![Traefik health page with total response time 12 seconds, 129 status codes counted, average response time 95 ms and all codes in the 200 bucket](traefik-health.png#center "Health page while requests are sent in a loop")
+
+## Related posts
+
+* [Linux Dev Environment on Windows](/blog/2019-11-01-linux-on-windows) - builds the WSL and Minikube setup these Kubernetes examples run on
+* [Distributed Task Queue with Python and R Example](/blog/2019-11-15-task-queue) - puts similar Python and R services behind Celery and Redis instead of a router
+* [Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1](/blog/2025-02-18-realtime-dashboard-1) - a later Python service example, streaming database records over WebSocket

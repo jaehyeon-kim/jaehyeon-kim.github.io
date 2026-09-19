@@ -5,10 +5,6 @@ draft: false
 featured: false
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Real Time Streaming with Kafka and Flink
 categories:
@@ -21,9 +17,6 @@ tags:
   - Docker
   - PyFlink
   - Kpow
-authors:
-  - JaehyeonKim
-images: []
 cevo: 35
 docs: https://docs.google.com/document/d/1e7APiPwxUcl4nBtbN9_TkprS8qIp9MUqCIbcgv9d4iM
 description: Read records from S3 and send them into a Kafka topic with PyFlink, using a custom pipeline jar for IAM authentication, which is useful for enrichment.
@@ -48,7 +41,7 @@ In this lab, we will create a Pyflink application that reads records from S3 and
 
 Sample taxi ride data is stored in a S3 bucket, and a Pyflink application reads and ingests it into a Kafka topic on Amazon MSK. As [Apache Flink](https://flink.apache.org/) supports both stream and batch processing, we are able to process static data without an issue. We can assume the S3 data is static metadata that needs to be joined into a stream, and this exercise can be useful for data enrichment.
 
-![](featured.png#center)
+![Lab 2 picked out of the workshop, a Flink app loading S3 taxi data into Amazon MSK](featured.png#center "Lab 2 picked out of the workshop, a Flink app loading S3 taxi data into Amazon MSK")
 
 ## Infrastructure
 
@@ -690,7 +683,7 @@ docker exec jobmanager /opt/flink/bin/flink run \
     -d
 ```
 
-![](flink-job.png#center)
+![Flink web UI with the submitted job that reads S3 and writes to the Kafka topic](flink-job.png#center "Flink web UI with the submitted job that reads S3 and writes to the Kafka topic")
 
 #### Execute Locally
 
@@ -706,11 +699,11 @@ Note, in order for the Flink app to be able to access the S3 file system, we hav
 
 We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*.
 
-![](kafka-topic.png#center)
+![Details of the taxi-rides topic in the Topics menu of Kpow](kafka-topic.png#center "Details of the taxi-rides topic in the Topics menu of Kpow")
 
 Also, we can inspect topic messages in the *Data* tab as shown below.
 
-![](kafka-message.png#center)
+![Taxi ride messages inspected in the Data tab of Kpow](kafka-message.png#center "Taxi ride messages inspected in the Data tab of Kpow")
 
 ## Summary
 

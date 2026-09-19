@@ -5,10 +5,6 @@ draft: false
 featured: true
 comment: true
 toc: true
-reward: false
-pinned: false
-carousel: false
-featuredImage: false
 series:
   - Kafka Development on Kubernetes
 categories:
@@ -21,9 +17,6 @@ tags:
   - Docker
   - Python
   - Strimzi
-authors:
-  - JaehyeonKim
-images: []
 description: Create a Kafka cluster on Kubernetes with Strimzi, the first step in a series on Python clients and Kafka Connect pipelines on Kubernetes.
 ---
 
@@ -237,7 +230,7 @@ minikube service kafka-ui --url
 # ❗  Because you are using a Docker driver on linux, the terminal needs to be open to run it.
 ```
 
-![](cluster.png#center)
+![Kafka UI brokers page for demo-cluster, two brokers on port 9092 running Kafka 2.8](cluster.png#center "Kafka cluster seen in the management app")
 
 ## Produce and Consume Messages
 
@@ -261,7 +254,7 @@ kubectl run kafka-consumer --image=quay.io/strimzi/kafka:0.27.1-kafka-2.8.1 --rm
 
 We can also check the messages in the management app as shown below.
 
-![](messages.png#center)
+![Kafka UI messages tab for demo-topic holding records for lemons quantity 7 and apples quantity 5](messages.png#center "Messages produced to demo-topic")
 
 ## Delete Resources
 
@@ -276,6 +269,10 @@ kubectl delete -f manifests/strimzi-cluster-operator-$STRIMZI_VERSION.yaml
 ## delete minikube
 minikube delete
 ```
+
+## Related posts
+
+* [How I Prepared for Certified Kubernetes Application Developer (CKAD)](/blog/2023-10-12-how-i-prepared-for-ckad) - courses and practice tests for the Kubernetes background this series assumes
 
 ## Summary
 
