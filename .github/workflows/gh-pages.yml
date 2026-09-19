@@ -5,7 +5,6 @@ on:
       - master
 permissions:
   contents: write
-  id-token: write
 jobs:
   build-and-deploy:
     concurrency: ci-${{ github.ref }}
@@ -14,7 +13,6 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
         with:
-          submodules: true
           fetch-depth: 0
 
       - name: Setup Node
@@ -32,6 +30,13 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      # Hugo resolves the theme module with the go binary. Without this step it
+      # works only because the runner image happens to ship Go.
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3

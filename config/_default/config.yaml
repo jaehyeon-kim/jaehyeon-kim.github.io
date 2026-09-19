@@ -18,9 +18,6 @@ pygmentsUseClasses: true
 # googleAnalytics: UA-123-45
 # disqusShortname: yourdiscussshortname
 
-blackfriday:
-  hrefTargetBlank: true
-
 taxonomies:
   category: categories
   series: series
@@ -29,9 +26,6 @@ taxonomies:
 
 build:
   writeStats: true
-
-permalinks:
-  news: /news/:year/:month/:title/
 
 # module:
   # proxy: https://goproxy.cn

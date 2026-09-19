@@ -4,7 +4,6 @@
 /public/*
 !/public/ads.txt
 !/public/CNAME
-!/public/site-feature-image.png
 .hugo_build.lock
 hugo_stats.json
 
