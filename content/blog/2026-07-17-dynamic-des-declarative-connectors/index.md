@@ -9,6 +9,8 @@ reward: false
 pinned: false
 carousel: false
 featuredImage: false
+series:
+  - Building Real-Time Digital Twins with dynamic-des
 categories:
   - Data Engineering
   - Open Source

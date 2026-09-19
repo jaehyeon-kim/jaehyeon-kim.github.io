@@ -17,7 +17,7 @@ tags:
   - Docker
   - Plumber
   - R
-  - Rserve
+  - RServe
   - rApache
 authors:
   - JaehyeonKim

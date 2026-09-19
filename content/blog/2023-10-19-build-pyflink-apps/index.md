@@ -17,7 +17,7 @@ tags:
   - Apache Flink
   - Apache Kafka
   - Docker
-  - Pyflink
+  - PyFlink
   - Python
 authors:
   - JaehyeonKim

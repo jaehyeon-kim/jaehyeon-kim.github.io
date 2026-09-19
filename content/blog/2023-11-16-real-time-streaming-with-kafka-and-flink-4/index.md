@@ -18,7 +18,7 @@ tags:
   - Amazon S3
   - Apache Flink
   - Apache Kafka
-  - Pyflink
+  - PyFlink
   - Python
   - Kpow
 authors:

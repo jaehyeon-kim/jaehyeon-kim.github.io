@@ -11,11 +11,13 @@ carousel: false
 featuredImage: false
 # series:
 #   - 
-# categories:
-#   - General
-# tags: 
-#   - GitHub Pages
-#   - Hugo
+categories:
+  - Web Development
+tags:
+  - Hugo
+  - Markdown
+  - Docker Compose
+  - GitHub Actions
 authors:
   - JaehyeonKim
 images: []

@@ -9,7 +9,8 @@ reward: false
 pinned: false
 carousel: false
 featuredImage: false
-# series:
+series:
+  - Building Real-Time Digital Twins with dynamic-des
 categories:
   - Data Engineering
   - Machine Learning

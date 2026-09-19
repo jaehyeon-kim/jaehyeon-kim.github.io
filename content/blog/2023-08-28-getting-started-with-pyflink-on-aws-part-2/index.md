@@ -1,5 +1,5 @@
 ---
-title: Getting Started with Pyflink on AWS - Part 2 Local Flink and MSK
+title: Getting Started with PyFlink on AWS - Part 2 Local Flink and MSK
 date: 2023-08-28
 draft: false
 featured: false
@@ -10,7 +10,7 @@ pinned: false
 carousel: false
 featuredImage: false
 series:
-  - Getting Started with Pyflink on AWS
+  - Getting Started with PyFlink on AWS
 categories:
   - Data Streaming
 tags:
@@ -18,7 +18,7 @@ tags:
   - Amazon MSK
   - Apache Flink
   - Apache Kafka
-  - Pyflink
+  - PyFlink
   - Python
   - Kpow
 authors:

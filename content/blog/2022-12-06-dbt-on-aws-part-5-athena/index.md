@@ -10,7 +10,7 @@ pinned: false
 carousel: false
 featuredImage: false
 series:
-  - DBT for Effective Data Transformation on AWS
+  - dbt for Effective Data Transformation on AWS
 categories:
   - Data Engineering
 tags: 

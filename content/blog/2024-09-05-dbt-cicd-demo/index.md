@@ -10,7 +10,7 @@ pinned: false
 carousel: false
 featuredImage: false
 series:
-  - DBT Guide for Production
+  - dbt Guide for Production
 categories:
   - Data Engineering
 tags: 

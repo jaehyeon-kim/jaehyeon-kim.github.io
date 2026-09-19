@@ -19,7 +19,7 @@ tags:
   - Apache Flink
   - Apache Kafka
   - Docker
-  - Pyflink
+  - PyFlink
   - Kpow
 authors:
   - JaehyeonKim

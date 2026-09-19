@@ -11,8 +11,8 @@ carousel: false
 featuredImage: false
 # series:
 #   - Kafka Development with Docker
-# categories:
-#   - Certification
+categories:
+  - Kubernetes
 tags: 
   - CKAD
   - Kubernetes

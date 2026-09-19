@@ -9,8 +9,8 @@ reward: false
 pinned: false
 carousel: false
 featuredImage: false
-# series:
-#   - Tree based methods in R
+series:
+  - Download Stock Data
 categories:
   - Data Analysis
 tags:

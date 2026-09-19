@@ -18,7 +18,7 @@ tags:
   - Amazon MSK
   - Apache Flink
   - Apache Kafka
-  - Pyflink
+  - PyFlink
 authors:
   - JaehyeonKim
 images: []

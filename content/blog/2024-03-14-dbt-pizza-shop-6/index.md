@@ -10,7 +10,7 @@ pinned: false
 carousel: false
 featuredImage: false
 series:
-  - DBT Pizza Shop Demo
+  - dbt Pizza Shop Demo
 categories:
   - Data Engineering
 tags: 

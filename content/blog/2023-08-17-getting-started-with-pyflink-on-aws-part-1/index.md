@@ -1,5 +1,5 @@
 ---
-title: Getting Started with Pyflink on AWS - Part 1 Local Flink and Local Kafka
+title: Getting Started with PyFlink on AWS - Part 1 Local Flink and Local Kafka
 date: 2023-08-17
 draft: false
 featured: false
@@ -10,14 +10,14 @@ pinned: false
 carousel: false
 featuredImage: false
 series:
-  - Getting Started with Pyflink on AWS
+  - Getting Started with PyFlink on AWS
 categories:
   - Data Streaming
 tags:
   - Apache Flink
   - Apache Kafka
   - Docker
-  - Pyflink
+  - PyFlink
   - Python
   - Kpow
 authors:

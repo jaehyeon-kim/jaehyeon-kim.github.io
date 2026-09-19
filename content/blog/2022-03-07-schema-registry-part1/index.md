@@ -17,7 +17,7 @@ categories:
 tags: 
   - AWS
   - Apache Kafka
-  - Kafka connect
+  - Kafka Connect
   - Apicurio Registry
   - Change Data Capture (CDC)
   - Debezium

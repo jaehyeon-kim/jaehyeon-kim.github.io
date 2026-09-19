@@ -17,7 +17,7 @@ tags:
   - Apache Flink
   - Apache Kafka
   - OpenSearch
-  - Pyflink
+  - PyFlink
   - Python
 authors:
   - JaehyeonKim

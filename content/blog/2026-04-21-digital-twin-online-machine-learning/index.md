@@ -9,6 +9,8 @@ reward: false
 pinned: false
 carousel: false
 featuredImage: false
+series:
+  - Building Real-Time Digital Twins with dynamic-des
 categories:
   - Stream Processing
   - Machine Learning

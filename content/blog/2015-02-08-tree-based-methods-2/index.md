@@ -10,7 +10,7 @@ pinned: false
 carousel: false
 featuredImage: false
 series:
-  - Tree based methods in R
+  - Tree Based Methods in R
 categories:
   - Data Analysis
 tags:
