@@ -18,6 +18,11 @@ pygmentsUseClasses: true
 # googleAnalytics: UA-123-45
 # disqusShortname: yourdiscussshortname
 
+# Hugo capitalises the first letter of a taxonomy list title by default, which
+# renders the dbt series and tag as "Dbt" and PyFlink as "Pyflink". Needs Hugo
+# 0.123.3 or later, where this option was added.
+capitalizeListTitles: false
+
 taxonomies:
   category: categories
   series: series
