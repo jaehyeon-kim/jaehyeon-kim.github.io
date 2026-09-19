@@ -1,5 +1,5 @@
 ---
-title: Real Time Streaming with Kafka and Flink - Lab 4 Clean, Aggregate, and Enrich Events with Flink
+title: Clean, Aggregate, and Enrich Events with Flink - Real Time Streaming with Kafka and Flink Lab 4
 date: 2023-11-23
 draft: false
 featured: false
@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: The value of data can be maximised when it is used without delay. With Apache Flink, we can build streaming analytics applications that incorporate the latest events with low latency. In this lab, we will create a Pyflink application that writes accumulated taxi rides data into an OpenSearch cluster. It aggregates the number of trips/passengers and trip durations by vendor ID for a window of 5 seconds. The data is then used to create a chart that monitors the status of taxi rides in the OpenSearch Dashboard.
+description: Aggregate taxi ride counts and trip durations by vendor over five second windows with PyFlink, then chart them in an OpenSearch dashboard.
 ---
 The value of data can be maximised when it is used without delay. With Apache Flink, we can build streaming analytics applications that incorporate the latest events with low latency. In this lab, we will create a Pyflink application that writes accumulated taxi rides data into an OpenSearch cluster. It aggregates the number of trips/passengers and trip durations by vendor ID for a window of 5 seconds. The data is then used to create a chart that monitors the status of taxi rides in the OpenSearch Dashboard.
 

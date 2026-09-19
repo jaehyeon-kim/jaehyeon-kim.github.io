@@ -25,7 +25,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. In this post, we discuss how to set up a data ingestion pipeline using Kafka connectors. Fake customer and order data is ingested into Kafka topics using the MSK Data Generator. Also, we use the Confluent S3 sink connector to save the messages of the topics into a S3 bucket. The Kafka Connect servers and individual connectors are deployed using the custom resources of Strimzi on Kubernetes.
+description: Ingest fake customer and order data into Kafka with the MSK Data Generator and save it to S3, with connectors deployed as Strimzi custom resources.
 ---
 
 [Kafka Connect](https://kafka.apache.org/documentation/#connect) is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It makes it simple to quickly define connectors that move large collections of data into and out of Kafka. In this post, we discuss how to set up a data ingestion pipeline using Kafka connectors. Fake customer and order data is ingested into Kafka topics using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator). Also, we use the [Confluent S3](https://www.confluent.io/hub/confluentinc/kafka-connect-s3) sink connector to save the messages of the topics into a S3 bucket. The Kafka Connect servers and individual connectors are deployed using the custom resources of [Strimzi](https://strimzi.io/) on Kubernetes.

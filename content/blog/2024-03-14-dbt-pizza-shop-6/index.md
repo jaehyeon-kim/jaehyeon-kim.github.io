@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In Part 5, we developed a dbt project that that targets Apache Iceberg where transformations are performed on Amazon Athena. Two dimension tables that keep product and user records are created as Type 2 slowly changing dimension (SCD Type 2) tables, and one transactional fact table is built to keep pizza orders. To improve query performance, the fact table is denormalized to pre-join records from the dimension tables using the array and struct data types. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.
+description: Orchestrate the Amazon Athena and Iceberg pizza shop dbt project with Apache Airflow, running the dimension and denormalised fact table builds.
 ---
 
 In [Part 5](/blog/2024-03-07-dbt-pizza-shop-5), we developed a [dbt](https://docs.getdbt.com/docs/introduction) project that that targets [Apache Iceberg](https://iceberg.apache.org/) where transformations are performed on [Amazon Athena](https://aws.amazon.com/athena/). Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. To improve query performance, the fact table is denormalized to pre-join records from the dimension tables using the array and struct data types. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.

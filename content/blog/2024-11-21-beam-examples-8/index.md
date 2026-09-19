@@ -1,5 +1,5 @@
 ---
-title: Apache Beam Python Examples - Part 8 Enhance Sport Activity Tracker with Runner Motivation
+title: Enhance Sport Activity Tracker with Runner Motivation - Apache Beam Python Examples Part 8
 date: 2024-11-21
 draft: false
 featured: false
@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: 
+description: Pacing messages are added to the Beam sport activity tracker by comparing short term speed metrics against their long term counterparts.
 ---
 
 In [Part 3](/blog/2024-08-01-beam-examples-3), we developed a Beam pipeline that tracks sport activities of users and outputs their speeds periodically. While reporting such values is useful for users on its own, we can provide more engaging information to users if we have a pipeline that reports pacing of their activities over periods. For example, we can send a message to encourage a user to work harder if he/she has a performance goal and is underperforming for some periods. In this post, we develop a new pipeline that tracks user activities and reports pacing details by comparing short term metrics to their long term counterparts.

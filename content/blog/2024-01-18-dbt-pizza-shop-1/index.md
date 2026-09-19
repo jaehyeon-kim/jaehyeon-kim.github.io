@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: The data build tool (dbt) is a popular data transformation tool for data warehouse development. Moreover, it can be used for data lakehouse development thanks to open table formats such as Apache Iceberg, Apache Hudi and Delta Lake. dbt supports key AWS analytics services and I wrote a series of posts that discuss how to utilise dbt with Redshift, Glue, EMR on EC2, EMR on EKS, and Athena. Those posts focus on platform integration, however, they do not show realistic ETL scenarios. In this series of posts, we discuss practical data warehouse/lakehouse examples including ETL orchestration with Apache Airflow. As a starting point, we develop a dbt project on PostgreSQL using fictional pizza shop data in this post.
+description: Model fictional pizza shop data on PostgreSQL with dbt, building two SCD type 2 dimension tables and one transactional fact table.
 ---
 
 The [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) is a popular data transformation tool for data warehouse development. Moreover, it can be used for [data lakehouse](https://www.databricks.com/glossary/data-lakehouse) development thanks to open table formats such as Apache Iceberg, Apache Hudi and Delta Lake. *dbt* supports key AWS analytics services and I wrote a series of posts that discuss how to utilise *dbt* with [Redshift](/blog/2022-09-28-dbt-on-aws-part-1-redshift), [Glue](/blog/2022-10-09-dbt-on-aws-part-2-glue), [EMR on EC2](/blog/2022-10-19-dbt-on-aws-part-3-emr-ec2), [EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks), and [Athena](/blog/2023-04-12-integrate-glue-schema-registry). Those posts focus on platform integration, however, they do not show realistic ETL scenarios. 

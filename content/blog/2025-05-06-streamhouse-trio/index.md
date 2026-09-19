@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: Apache Paimon, Fluss and Apache Iceberg compared as table layers for streaming and batch, then combined into one architecture with Flink and Spark.
 ---
 
 The world of data is converging. The traditional divide between batch processing for historical analytics and stream processing for real-time insights is becoming increasingly blurry. Businesses demand architectures that handle both seamlessly. Enter the "Streamhouse" - an evolution of the Lakehouse concept, designed with streaming as a first-class citizen.

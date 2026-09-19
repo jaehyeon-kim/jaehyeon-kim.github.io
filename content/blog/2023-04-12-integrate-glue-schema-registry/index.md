@@ -23,7 +23,7 @@ authors:
   - JaehyeonKim
 images: []
 cevo: 26,27
-description: Glue Schema Registry provides a centralized repository for managing and validating schemas for topic message data. Its features can be utilized by many AWS services when building data streaming applications. In this post, we will discuss how to integrate Python Kafka producer and consumer apps in AWS Lambda with the Glue Schema Registry.
+description: Integrate Python Kafka producer and consumer apps running on AWS Lambda with the Glue Schema Registry, which manages and validates message schemas.
 ---
 
 [**UPDATE 2025-10-01**]

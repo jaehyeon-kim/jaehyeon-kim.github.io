@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: A Kotlin Kafka producer and consumer for order events, with custom JSON serialisers, admin helpers and a Gradle build, run on Factor House Local.
 ---
 
 This post explores a Kotlin-based Kafka project, meticulously detailing the construction and operation of both a Kafka producer application, responsible for generating and sending order data, and a Kafka consumer application, designed to receive and process these orders. We'll delve into each component, from build configuration to message handling, to understand how they work together in an event-driven system.

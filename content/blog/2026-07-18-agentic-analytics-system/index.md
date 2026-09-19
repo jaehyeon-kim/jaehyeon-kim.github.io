@@ -28,7 +28,7 @@ authors:
   - JaehyeonKim
 images: []
 description: |
-  Direct text-to-SQL is hard to trust in production because raw schemas do not capture governed metrics or business meaning. This post walks through a local, open-source proof of concept that puts a semantic layer between the language model and the lakehouse, combining Strands, WrenAI, Trino, Iceberg, and long-term agent memory.
+  A local open source proof of concept that puts a semantic layer between a language model and an Iceberg lakehouse, using Strands, WrenAI and Trino.
 ---
 Generative AI has made conversational analytics feel within reach, yet direct text-to-SQL systems remain hard to operate reliably. A database schema tells you the tables, columns, and types, but it says nothing about which datasets are canonical, which join paths are approved, how a governed metric is calculated, or what the business actually means by "revenue" or "active customer". Ask a language model to infer all of that from raw tables and, sooner or later, it will confidently invent an answer.
 

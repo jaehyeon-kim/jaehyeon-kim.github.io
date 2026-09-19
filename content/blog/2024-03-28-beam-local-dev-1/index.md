@@ -1,5 +1,5 @@
 ---
-title: Apache Beam Local Development with Python - Part 1 Pipeline, Notebook, SQL and DataFrame
+title: Pipeline, Notebook, SQL and DataFrame - Apache Beam Local Development with Python Part 1
 date: 2024-03-28
 draft: false
 featured: true
@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Apache Beam and Apache Flink are open-source frameworks for parallel, distributed data processing at scale. Flink has DataStream and Table/SQL APIs and the former has more capacity to develop sophisticated data streaming applications. The DataStream API of PyFlink, Flink’s Python API, however, is not as complete as its Java counterpart, and it doesn’t provide enough capability to extend when there are missing features in Python. On the other hand, Apache Beam supports more possibility to extend and/or customise its features. In this series of posts, we discuss local development of Apache Beam pipelines using Python. In Part 1, a basic Beam pipeline is introduced, followed by demonstrating how to utilise Jupyter notebooks for interactive development. It also covers Beam SQL and Beam DataFrames examples on notebooks. In subsequent posts, we will discuss batch and streaming pipeline development and concludes with illustrating unit testing of existing pipelines.
+description: Run a basic Apache Beam pipeline in Python, then develop interactively in Jupyter notebooks with Beam SQL and Beam DataFrames examples.
 ---
 
 [Apache Beam](https://beam.apache.org/) and [Apache Flink](https://flink.apache.org/) are open-source frameworks for parallel, distributed data processing at scale. Flink has DataStream and Table/SQL APIs and the former has more capacity to develop sophisticated data streaming applications. The DataStream API of PyFlink, Flink's Python API, however, is not as complete as its Java counterpart, and it doesn't provide enough capability to extend when there are missing features in Python. Recently I had a chance to look through Apache Beam and found it supports more possibility to extend and/or customise its features.

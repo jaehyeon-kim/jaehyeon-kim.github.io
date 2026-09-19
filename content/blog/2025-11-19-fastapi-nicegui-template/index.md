@@ -28,7 +28,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: 
+description: FastAPI and NiceGUI served from one Python process give a backend API and a web UI in a single codebase, compared here with React and with Streamlit.
 ---
 
 The standard architecture for modern web applications involves a decoupled frontend, typically built with a JavaScript framework, and a backend API. This pattern is powerful but introduces complexity in managing two separate codebases, development environments, and the API contract between them.

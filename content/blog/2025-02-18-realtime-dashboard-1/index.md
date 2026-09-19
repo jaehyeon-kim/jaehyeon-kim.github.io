@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: A Python generator loads theLook eCommerce data into PostgreSQL, and a FastAPI WebSocket server queries it on a timer to serve live dashboards.
 ---
 
 In this series, we develop real-time monitoring dashboard applications. A data generating app is created with Python, and it ingests the [theLook eCommerce](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) data continuously into a PostgreSQL database. A WebSocket server, built by [FastAPI](https://fastapi.tiangolo.com/), periodically queries the data to serve its clients. The monitoring dashboards will be developed using [Streamlit](https://streamlit.io/) and [Next.js](https://nextjs.org/), with [Apache ECharts](https://echarts.apache.org/en/index.html) for visualization. In this post, we walk through the data generation app and backend API, while the monitoring dashboards will be discussed in later posts.

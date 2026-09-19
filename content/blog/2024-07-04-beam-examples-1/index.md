@@ -1,5 +1,5 @@
 ---
-title: Apache Beam Python Examples - Part 1 Calculate K Most Frequent Words and Max Word Length
+title: Calculate K Most Frequent Words and Max Word Length - Apache Beam Python Examples Part 1
 date: 2024-07-04
 draft: false
 featured: true
@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: 
+description: Set up a local Apache Flink and Kafka environment, then build two Beam Python streaming pipelines for top K frequent words and longest word length.
 ---
 
 In this series, we develop [Apache Beam](https://beam.apache.org/) Python pipelines. The majority of them are from [Building Big Data Pipelines with Apache Beam by Jan Lukavský](https://www.packtpub.com/en-us/product/building-big-data-pipelines-with-apache-beam-9781800564930). Mainly relying on the Java SDK, the book teaches fundamentals of Apache Beam using hands-on tasks, and we convert those tasks using the Python SDK. We focus on streaming pipelines, and they are deployed on a local (or embedded) [Apache Flink](https://flink.apache.org/) cluster using the [Apache Flink Runner](https://beam.apache.org/documentation/runners/flink/). Beginning with setting up the development environment, we build two pipelines that obtain top K most frequent words and the word that has the longest word length in this post. 

@@ -1,5 +1,5 @@
 ---
-title: Apache Beam Python Examples - Part 10 Develop Streaming File Reader using Splittable DoFn
+title: Develop Streaming File Reader using Splittable DoFn - Apache Beam Python Examples Part 10
 date: 2024-12-19
 draft: false
 featured: false
@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: 
+description: A streaming file reader built with Splittable DoFn scans an input folder for new files repeatedly, a pattern for unbounded sources in the Python SDK.
 ---
 
 In [Part 9](/blog/2024-12-05-beam-examples-9), we developed two Apache Beam pipelines using [*Splittable DoFn (SDF)*](https://beam.apache.org/documentation/programming-guide/#splittable-dofns). One of them is a batch file reader, which reads a list of files in an input folder followed by processing them in parallel. We can extend the I/O connector so that, instead of listing files once at the beginning, it scans an input folder periodically for new files and processes whenever new files are created in the folder. The techniques used in this post can be quite useful as they can be applied to developing I/O connectors that target other unbounded (or streaming) data sources (eg Kafka) using the Python SDK.

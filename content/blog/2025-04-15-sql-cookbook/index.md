@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: Docker Compose runs a local Apache Flink cluster and SQL Client so the Ververica Flink SQL Cookbook recipes work without the Ververica Platform.
 ---
 
 The [Flink SQL Cookbook](https://github.com/ververica/flink-sql-cookbook) by Ververica is a hands-on, example-rich guide to mastering [Apache Flink SQL](https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/sql/overview/) for real-time stream processing. It offers a wide range of self-contained recipes, from basic queries and table operations to more advanced use cases like windowed aggregations, complex joins, user-defined functions (UDFs), and pattern detection. These examples are designed to be run on the Ververica Platform, and as such, the cookbook doesn't include instructions for setting up a Flink cluster.

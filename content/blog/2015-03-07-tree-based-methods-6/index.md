@@ -1,5 +1,5 @@
 ---
-title: Tree Based Methods in R - Part VI
+title: Tree Based Methods in R - Part 6
 date: 2015-03-07
 draft: false
 featured: false

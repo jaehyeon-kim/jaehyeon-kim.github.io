@@ -19,7 +19,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: I recently obtained the Certified Kubernetes Application Developer (CKAD) certification.  It is for Kubernetes engineers, cloud engineers and other IT professionals responsible for building, deploying, and configuring cloud native applications with Kubernetes. In this post, I will summarise how I prepared for the exam by reviewing three online courses and two practice tests that I went through.
+description: Three online courses and two practice tests reviewed after passing the Certified Kubernetes Application Developer exam, with notes on each.
 ---
 
 I recently obtained the [Certified Kubernetes Application Developer (CKAD)](https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/) certification. CKAD has been developed by [The Linux Foundation](https://www.linuxfoundation.org/) and the [Cloud Native Computing Foundation (CNCF)](https://www.cncf.io/), to help expand the Kubernetes ecosystem through standardized training and certification. Specifically this certification is for Kubernetes engineers, cloud engineers and other IT professionals responsible for building, deploying, and configuring cloud native applications with Kubernetes. In this post, I will summarise how I prepared for the exam by reviewing three online courses and two practice tests that I went through.

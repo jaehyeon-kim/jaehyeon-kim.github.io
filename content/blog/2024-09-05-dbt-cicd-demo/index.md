@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: GitHub Actions gives a dbt project on BigQuery a slim CI run on pull requests and a deploy job that publishes the project as a container image.
 ---
 
 Continuous integration (CI) is the process of ensuring new code integrates with the larger code base, and it puts a great emphasis on testing automation to check that the application is not broken whenever new commits are integrated into the main branch. Continuous delivery (CD) is an extension of continuous integration since it automatically deploys all code changes to a testing and/or production environment after the build stage. CI/CD helps development teams avoid bugs and code failures while maintaining a continuous cycle of software development and updates. In this post, we discuss how to set up a CI/CD pipeline for a [data build tool (*dbt*)](https://www.getdbt.com/) project using [GitHub Actions](https://github.com/features/actions) where [BigQuery](https://cloud.google.com/bigquery?hl=en) is used as the target data warehouse.

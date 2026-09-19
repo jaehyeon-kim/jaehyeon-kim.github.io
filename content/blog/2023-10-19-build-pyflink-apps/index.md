@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Building Apache Flink Applications in Java by Confluent is a course to introduce Apache Flink through a series of hands-on exercises. Utilising the Flink DataStream API,  the course develops three Flink applications from ingesting source data into calculating usage statistics. As part of learning the Flink DataStream API in Pyflink, I converted the Java apps into Python equivalent while performing the course exercises in Pyflink. This post summarises the progress of the conversion and shows the final output.
+description: Three Flink DataStream applications from a Confluent Java course converted to PyFlink, from ingesting source data to calculating usage statistics.
 ---
 [Building Apache Flink Applications in Java](https://developer.confluent.io/courses/flink-java/overview/) is a course to introduce [Apache Flink](https://flink.apache.org/) through a series of hands-on exercises, and it is provided by [Confluent](https://www.confluent.io/). Utilising the [Flink DataStream API](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/dev/datastream/overview/), the course develops three Flink applications that populate multiple source data sets, collect them into a standardised data set, and aggregate it to produce usage statistics. As part of learning the Flink DataStream API in Pyflink, I converted the Java apps into Python equivalent while performing the course exercises in Pyflink. This post summarises the progress of the conversion and shows the final output.
 

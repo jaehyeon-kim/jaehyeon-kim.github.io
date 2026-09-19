@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In Part 3, we discussed the portability layer of Apache Beam as it helps understand (1) how Python pipelines run on the Flink Runner and (2) how multiple SDKs can be used in a single pipeline, followed by demonstrating local Flink and Kafka cluster creation for developing streaming pipelines. In this post, we develop a streaming pipeline that aggregates page visits by user in a fixed time window of 20 seconds. Two versions of the pipeline are created with/without relying on Beam SQL.
+description: A streaming Apache Beam pipeline in Python that aggregates page visits by user in fixed 20 second windows, written with and without Beam SQL.
 ---
 
 In [Part 3](/blog/2024-04-18-beam-local-dev-3), we discussed the portability layer of [Apache Beam](https://beam.apache.org/) as it helps understand (1) how Python pipelines run on the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) and (2) how multiple SDKs can be used in a single pipeline, followed by demonstrating local Flink and Kafka cluster creation for developing streaming pipelines. In this post, we build a streaming pipeline that aggregates page visits by user in a [fixed time window](https://beam.apache.org/documentation/programming-guide/#fixed-time-windows) of 20 seconds. Two versions of the pipeline are created with/without relying on [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/).

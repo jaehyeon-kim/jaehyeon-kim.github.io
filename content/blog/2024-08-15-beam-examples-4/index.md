@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: 
+description: Data augmentation in Beam Python by calling a gRPC service once per input element, running on a local Flink cluster with Kafka as the source.
 ---
 
 In this post, we develop an Apache Beam pipeline where the input data is augmented by a **Remote Procedure Call (RPC)** service. Each input element performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element. In the subsequent two posts, we will discuss updated pipelines that make RPC calls more efficiently. We begin with illustrating how to manage development resources followed by demonstrating the RPC service that we use in this series. Finally, we develop a Beam pipeline that accesses the external service to augment the input elements.

@@ -28,7 +28,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: Apache Flink, Kafka and Valkey turn a contextual bandit recommender into an event driven service with stateful training and low latency inference.
 ---
 
 In [**Part 1**](/blog/2026-01-29-prototype-recommender-with-python/), we built a contextual bandit prototype using Python and [`Mab2Rec`](https://github.com/fidelity/mab2rec). While effective for testing algorithms locally, a monolithic script cannot handle production scale. Real-world recommendation systems require low-latency inference for users and high-throughput training for model updates.

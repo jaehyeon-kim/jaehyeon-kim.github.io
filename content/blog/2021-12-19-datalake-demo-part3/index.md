@@ -1,5 +1,5 @@
 ---
-title: Data Lake Demo using Change Data Capture (CDC) on AWS – Part 3 Implement Data Lake
+title: Implement Data Lake - Data Lake Demo using Change Data Capture (CDC) on AWS Part 3
 date: 2021-12-19
 draft: false
 featured: false

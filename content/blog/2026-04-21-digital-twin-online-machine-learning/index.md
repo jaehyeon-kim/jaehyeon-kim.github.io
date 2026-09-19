@@ -29,7 +29,7 @@ authors:
   - JaehyeonKim
 images: []
 description: |
-  Discover how to build a fault-tolerant streaming architecture using Apache Flink and Kotlin. This guide demonstrates applying Online Machine Learning to autonomously detect concept drift and correct for physical machinery wear in real-time, which is safely managed by a deterministic Shadow Mode router.
+  An Apache Flink and Kotlin streaming architecture where online machine learning detects concept drift from machinery wear, controlled by a shadow mode router.
 ---
 ## Overview
 

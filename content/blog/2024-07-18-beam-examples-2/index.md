@@ -1,5 +1,5 @@
 ---
-title: Apache Beam Python Examples - Part 2 Calculate Average Word Length with/without Fixed Look back
+title: Calculate Average Word Length with/without Fixed Look back - Apache Beam Python Examples Part 2
 date: 2024-07-18
 draft: false
 featured: false
@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: 
+description: Two Beam Python pipelines compute average word length from a Kafka topic, one emitting a global average and one using a sliding time window.
 ---
 
 In this post, we develop two Apache Beam pipelines that calculate average word lengths from input texts that are ingested by a Kafka topic. They obtain the statistics in different angles. The first pipeline emits the global average lengths whenever a new input text arrives while the latter triggers those values in a sliding time window.

@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: To improve security, we can extend TLS (SSL or TLS/SSL) encryption either by enforcing two-way verification where a client certificate is verified by Kafka brokers (SSL authentication). Or we can choose a separate authentication mechanism, which is typically Simple Authentication and Security Layer (SASL). In this post, we will discuss how to implement SSL authentication with Java and Python client examples while SASL authentication is covered in the next post.
+description: Enforce two-way TLS verification so Kafka brokers check the client certificate, with Java and Python client examples of SSL authentication.
 ---
 
 [**UPDATE 2025-10-01**]

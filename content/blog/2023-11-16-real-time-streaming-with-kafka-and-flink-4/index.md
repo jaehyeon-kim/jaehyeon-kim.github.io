@@ -1,5 +1,5 @@
 ---
-title: Real Time Streaming with Kafka and Flink - Lab 3 Transform and write data to S3 from Kafka using Flink
+title: Transform and write data to S3 from Kafka using Flink - Real Time Streaming with Kafka and Flink Lab 3
 date: 2023-11-16
 draft: false
 featured: false
@@ -24,7 +24,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In this lab, we will create a Pyflink application that exports Kafka topic messages into a S3 bucket. The app enriches the records by adding a new column using a user defined function and writes them via the FileSystem SQL connector. This allows us to achieve a simpler architecture compared to the original lab where the records are sent into Amazon Kinesis Data Firehose, enriched by a separate Lambda function and written to a S3 bucket afterwards. While the records are being written to the S3 bucket, a Glue table will be created to query them on Amazon Athena.
+description: Export Kafka topic messages to S3 with PyFlink, enriching records through a user defined function and querying them on Athena through a Glue table.
 ---
 
 [**UPDATE 2025-10-01**]

@@ -1,5 +1,5 @@
 ---
-title: Apache Beam Python Examples - Part 5 Call RPC Service in Batch using Stateless DoFn
+title: Call RPC Service in Batch using Stateless DoFn - Apache Beam Python Examples Part 5
 date: 2024-09-18
 draft: false
 featured: false
@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: 
+description: Batching gRPC calls in a stateless DoFn so one request covers a whole bundle, cutting the time a Beam Python pipeline spends on enrichment.
 ---
 
 In the [previous post](/blog/2024-08-15-beam-examples-4), we developed an Apache Beam pipeline where the input data is augmented by a **Remote Procedure Call (RPC)** service. Each input element performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element. In this post, we discuss how to enhance the pipeline so that a single RPC call is made for a bundle of elements, which can save a significant amount time compared to making a call for each element.

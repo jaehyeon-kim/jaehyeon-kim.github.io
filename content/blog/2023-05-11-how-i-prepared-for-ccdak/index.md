@@ -19,7 +19,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: I recently obtained the Confluent Certified Developer for Apache Kafka (CCDAK) certification. It focuses on knowledge of developing applications that work with Kafka, and is targeted to developers and solutions architects. As it assumes Java APIs for development and testing, I am contacted to share how I prepared for it as a non-Java developer from time to time. I thought it would be better to write a post to summarise how I did it rather than answering to them individually. 
+description: How a non-Java developer prepared for and passed the Confluent Certified Developer for Apache Kafka exam, which assumes the Java APIs throughout.
 ---
 
 I recently obtained the [Confluent Certified Developer for Apache Kafka (CCDAK)](https://www.confluent.io/certification/) certification. It focuses on knowledge of developing applications that work with Kafka, and is targeted to developers and solutions architects. As it assumes Java APIs for development and testing, I am contacted to share how I prepared for it as a non-Java developer from time to time. I thought it would be better to write a post to summarise how I did it rather than answering to them individually. 

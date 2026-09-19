@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Apache Flink became generally available for Amazon EMR on EKS from the EMR 6.15.0 releases. As it is integrated with the Glue Data Catalog, it can be particularly useful if we develop real time data ingestion/processing via Flink and build analytical queries using Spark (or any other tools or services that can access to the Glue Data Catalog). In this post, we will discuss how to set up a local development environment for Apache Flink and Spark using the EMR container images. After illustrating the environment setup, we will discuss a solution where data ingestion/processing is performed in real time using Apache Flink and the processed data is consumed by Apache Spark for analysis.
+description: A local Flink and Spark environment built from EMR container images, where Flink ingests data in real time and Spark queries it via the Glue Data Catalog.
 ---
 [**UPDATE 2025-10-01**]
 

@@ -1,5 +1,5 @@
 ---
-title: Real Time Streaming with Kafka and Flink - Lab 6 Consume data from Kafka using Lambda
+title: Consume data from Kafka using Lambda - Real Time Streaming with Kafka and Flink Lab 6
 date: 2023-12-14
 draft: false
 featured: false
@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Amazon MSK can be configured as an event source of a Lambda function. Lambda internally polls for new messages from the event source and then synchronously invokes the target Lambda function. With this feature, we can develop a Kafka consumer application in serverless environment where developers can focus on application logic. In this lab, we will discuss how to create a Kafka consumer using a Lambda function.
+description: Consume Kafka messages with an AWS Lambda function, using Amazon MSK as an event source so that Lambda polls the topic and invokes the function.
 ---
 Amazon MSK can be configured as an [event source](https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html) of a Lambda function. Lambda internally polls for new messages from the event source and then synchronously invokes the target Lambda function. With this feature, we can develop a Kafka consumer application in serverless environment where developers can focus on application logic. In this lab, we will discuss how to create a Kafka consumer using a Lambda function.
 

@@ -1,5 +1,5 @@
 ---
-title: Serverless Data Product POC Backend Part II - Deploying R ML Model via Lambda
+title: Serverless Data Product POC Backend Part 2 - Deploying R ML Model via Lambda
 date: 2017-04-11
 draft: false
 featured: false

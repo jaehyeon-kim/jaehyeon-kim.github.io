@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In Part 3, we developed a dbt project that targets Google BigQuery with fictional pizza shop data. Two dimension tables that keep product and user records are created as Type 2 slowly changing dimension (SCD Type 2) tables, and one transactional fact table is built to keep pizza orders. The fact table is denormalized using nested and repeated fields for improving query performance. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.
+description: Orchestrate the BigQuery pizza shop dbt project with Apache Airflow, running the SCD type 2 dimension tables and the denormalised fact table.
 ---
 
 In [Part 3](/blog/2024-02-08-dbt-pizza-shop-3), we developed a [dbt](https://docs.getdbt.com/docs/introduction) project that targets Google BigQuery with fictional pizza shop data. Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. The fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested) for improving query performance. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.

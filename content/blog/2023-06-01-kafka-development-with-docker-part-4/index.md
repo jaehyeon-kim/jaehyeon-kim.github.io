@@ -20,7 +20,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Kafka includes the Producer/Consumer APIs that allow client applications to send/read streams of data to/from topics in a Kafka cluster. While the main Kafka project maintains only the Java clients, there are several open source projects that provide the Kafka client APIs in Python. In this post, I'll demonstrate how to develop producer/consumer applications using the kafka-python package.
+description: Kafka producer and consumer applications written in Python with kafka-python, one of several open source alternatives to the Java clients.
 ---
 
 [**UPDATE 2025-10-01**]

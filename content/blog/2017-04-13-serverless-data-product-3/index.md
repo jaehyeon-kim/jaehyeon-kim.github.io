@@ -1,5 +1,5 @@
 ---
-title: Serverless Data Product POC Backend Part III - Exposing R ML Model via APIG
+title: Serverless Data Product POC Backend Part 3 - Exposing R ML Model via APIG
 date: 2017-04-13
 draft: false
 featured: false

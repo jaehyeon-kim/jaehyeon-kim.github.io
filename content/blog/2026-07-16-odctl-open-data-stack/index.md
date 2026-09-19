@@ -26,7 +26,7 @@ authors:
   - JaehyeonKim
 images: []
 description: |
-  Provisioning a local data platform usually means fighting dependency conflicts, port clashes, and brittle Docker Compose files. odctl is a small CLI that turns Kafka, Flink, Spark, Trino, Iceberg, Airflow, and a full MLOps and observability suite into a cohesive stack you can launch with a single command. Now available on PyPI.
+  odctl is a CLI on PyPI that launches Kafka, Flink, Spark, Trino, Iceberg, Airflow and an MLOps and observability suite as one local stack.
 ---
 
 Anyone who has tried to stand up a realistic data platform on their laptop knows the pain. You want Kafka talking to Flink, Spark writing to Iceberg, Trino querying the result, and maybe a catalog and a lineage tool watching over all of it. What you actually get is an afternoon lost to dependency conflicts, port clashes, and a Docker Compose file that grows a new bug every time you touch it.

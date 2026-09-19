@@ -1,5 +1,5 @@
 ---
-title: Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 3 Next.js Dashboard
+title: Next.js Dashboard - Realtime Dashboard with FastAPI, Streamlit and Next.js Part 3
 date: 2025-03-04
 draft: false
 featured: false
@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: Next.js and React with Apache ECharts show the same live order and revenue metrics, reading from the FastAPI WebSocket server in the browser.
 ---
 
 In this post, we build a real-time monitoring dashboard using [Next.js](https://nextjs.org/), a React framework that supports server-side rendering, static site generation, and full-stack capabilities with built-in performance optimizations. Similar to the *Streamlit* app we developed in [Part 2](/blog/2025-02-25-realtime-dashboard-2), this dashboard connects to the WebSocket server from [Part 1](/blog/2025-02-18-realtime-dashboard-1) to continuously fetch and visualize key metrics such as **order counts**, **sales data**, and **revenue by traffic source and country**. With interactive bar charts and dynamic metrics, users can monitor sales trends and other critical business KPIs in real-time.  

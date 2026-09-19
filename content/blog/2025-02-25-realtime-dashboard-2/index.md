@@ -1,5 +1,5 @@
 ---
-title: Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 2 Streamlit Dashboard
+title: Streamlit Dashboard - Realtime Dashboard with FastAPI, Streamlit and Next.js Part 2
 date: 2025-02-25
 draft: false
 featured: false
@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: Streamlit and Apache ECharts draw a live sales dashboard that reads order counts and revenue by country from a FastAPI WebSocket server.
 ---
 
 In this post, we develop a real-time monitoring dashboard using [Streamlit](https://streamlit.io/), an open-source Python framework that allows data scientists and AI/ML engineers to create interactive data apps. The app connects to the WebSocket server we developed in [Part 1](/blog/2025-02-18-realtime-dashboard-1) and continuously fetches data to visualize key metrics such as **order counts**, **sales data**, and **revenue by traffic source and country**. With interactive bar charts and dynamic metrics, users can monitor sales trends and other important business KPIs in real-time.

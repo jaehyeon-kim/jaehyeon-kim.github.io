@@ -20,7 +20,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: Reveal.js slides written in Markdown and built by Hugo alongside blog posts, with code walkthroughs, fragments, MathJax and Mermaid diagrams.
 ---
 
 For a long time, I wanted a way to host my technical presentations directly on my website without relying on external platforms or bulky PDF exports. I wanted a **"Slides as Code"** approach: version-controlled Markdown files that live natively alongside my blog posts.

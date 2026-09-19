@@ -1,5 +1,5 @@
 ---
-title: Serverless Data Product POC Backend Part I - Packaging R ML Model for Lambda
+title: Serverless Data Product POC Backend Part 1 - Packaging R ML Model for Lambda
 date: 2017-04-08
 draft: false
 featured: false

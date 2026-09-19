@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In this series of posts, we discuss data warehouse/lakehouse examples using data build tool (dbt) including ETL orchestration with Apache Airflow. In Part 1, we developed a dbt project on PostgreSQL with fictional pizza shop data. Two dimension tables that keep product and user records are created as Type 2 slowly changing dimension (SCD Type 2) tables, and one transactional fact table is built to keep pizza orders. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.
+description: Orchestrate the PostgreSQL pizza shop dbt project with Apache Airflow, scheduling the SCD type 2 dimension and fact table builds as an ETL process.
 ---
 
 In this series of posts, we discuss data warehouse/lakehouse examples using [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) including ETL orchestration with Apache Airflow. In Part 1, we developed a *dbt* project on PostgreSQL with fictional pizza shop data. Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. In this post, we discuss how to set up an ETL process on the project using Apache Airflow.

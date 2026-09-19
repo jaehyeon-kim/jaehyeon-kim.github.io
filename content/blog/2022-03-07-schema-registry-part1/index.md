@@ -1,5 +1,5 @@
 ---
-title: Use External Schema Registry with MSK Connect – Part 1 Local Development
+title: Use External Schema Registry with MSK Connect - Part 1 Local Development
 date: 2022-03-07
 draft: false
 featured: false
@@ -26,7 +26,7 @@ authors:
   - JaehyeonKim
 images: []
 cevo: 10
-description: We'll discuss a Change Data Capture (CDC) architecture with a schema registry. As a starting point, a local development environment is set up using Docker Compose. The Debezium and Confluent S3 connectors are deployed with the Confluent Avro converter and the Apicurio registry is used as the schema registry service. A quick example is shown to illustrate how schema evolution can be managed by the schema registry.
+description: A local Change Data Capture setup on Docker Compose with Debezium, the Confluent S3 sink and the Apicurio registry, showing how schema evolution is managed.
 ---
 
 [**UPDATE 2025-10-01**]

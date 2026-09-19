@@ -1,5 +1,5 @@
 ---
-title: Kafka Development with Docker - Part 7 Producer and Consumer with Glue Schema Registry
+title: Producer and Consumer with Glue Schema Registry - Kafka Development with Docker Part 7
 date: 2023-06-22
 draft: false
 featured: false
@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In Part 4, we developed Kafka producer and consumer applications using the kafka-python package without integrating schema registry. Later we discussed the benefits of schema registry when developing Kafka applications in Part 5. In this post, I'll demonstrate how to enhance the existing applications by integrating AWS Glue Schema Registry.
+description: Schema registry support added to kafka-python producer and consumer apps, which serialise and deserialise through AWS Glue Schema Registry.
 ---
 
 [**UPDATE 2025-10-01**]

@@ -1,5 +1,5 @@
 ---
-title: Real Time Streaming with Kafka and Flink - Lab 1 Produce data to Kafka using Lambda
+title: Produce data to Kafka using Lambda - Real Time Streaming with Kafka and Flink Lab 1
 date: 2023-10-26
 draft: false
 featured: false
@@ -26,7 +26,7 @@ authors:
 images: []
 cevo: 34
 docs: https://docs.google.com/document/d/1noUCJwNq9LCQRbW58axYjpn8L8ICSseLizVS-744WoE
-description: In this lab, we will create a Kafka producer application using AWS Lambda, which sends fake taxi ride data into a Kafka topic on Amazon MSK. A configurable number of the producer Lambda function will be invoked by an Amazon EventBridge schedule rule. In this way we are able to generate test data concurrently based on the desired volume of messages. 
+description: Produce fake taxi ride data into a Kafka topic on Amazon MSK from an AWS Lambda function invoked repeatedly by an EventBridge schedule rule.
 ---
 
 In this lab, we will create a Kafka producer application using [AWS Lambda](https://aws.amazon.com/lambda/), which sends fake taxi ride data into a Kafka topic on [Amazon MSK](https://aws.amazon.com/msk/). A configurable number of the producer Lambda function will be invoked by an [Amazon EventBridge](https://aws.amazon.com/eventbridge/) schedule rule. In this way we are able to generate test data concurrently based on the desired volume of messages. 

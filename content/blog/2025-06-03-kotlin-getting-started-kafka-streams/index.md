@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: Kafka Streams in Kotlin aggregates Avro order events into tumbling window supplier statistics and handles late records with a custom extractor.
 ---
 
 In this post, we shift our focus from basic Kafka clients to real-time stream processing with **Kafka Streams**. We'll explore a Kotlin application designed to analyze a continuous stream of Avro-formatted order events, calculate supplier statistics in tumbling windows, and intelligently handle late-arriving data. This example demonstrates the power of Kafka Streams for building lightweight, yet robust, stream processing applications directly within your Kafka ecosystem, leveraging event-time processing and custom logic.

@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: Debezium Server streams PostgreSQL row changes into the Google Pub/Sub emulator, with Docker Compose, a theLook data generator and a Python reader.
 ---
 
 *Change data capture* (CDC) is a data integration pattern to track changes in a database so that actions can be taken using the changed data. [*Debezium*](https://debezium.io/) is probably the most popular open source platform for CDC. Originally providing Kafka source connectors, it also supports a ready-to-use application called [Debezium server](https://debezium.io/documentation/reference/stable/operations/debezium-server.html). The standalone application can be used to stream change events to other messaging infrastructure such as Google Cloud Pub/Sub, Amazon Kinesis and Apache Pulsar. In this post, we develop a CDC solution locally using Docker. The source of the [theLook eCommerce](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) is modified to generate data continuously, and the data is inserted into multiple tables of a PostgreSQL database. Among those tables, two of them are tracked by the Debezium server, and it pushes row-level changes of those tables into Pub/Sub topics on the [Pub/Sub emulator](https://cloud.google.com/pubsub/docs/emulator). Finally, messages of the topics are read by a Python application.

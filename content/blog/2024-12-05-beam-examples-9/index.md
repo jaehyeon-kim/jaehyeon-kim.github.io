@@ -1,5 +1,5 @@
 ---
-title: Apache Beam Python Examples - Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn
+title: Develop Batch File Reader and PiSampler using Splittable DoFn - Apache Beam Python Examples Part 9
 date: 2024-12-05
 draft: false
 featured: false
@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: 
+description: Splittable DoFn in Beam Python builds a batch file reader that processes files in parallel, and a PiSampler that estimates pi by Monte Carlo runs.
 ---
 
 A [*Splittable DoFn (SDF)*](https://beam.apache.org/documentation/programming-guide/#splittable-dofns) is a generalization of a *DoFn* that enables Apache Beam developers to create modular and composable I/O components. Also, it can be applied in advanced non-I/O scenarios such as Monte Carlo simulation. In this post, we develop two Apache Beam pipelines. The first pipeline is an I/O connector, and it reads a list of files in a folder followed by processing each of the file objects in parallel. The second pipeline estimates the value of $\pi$ by performing Monte Carlo simulation.

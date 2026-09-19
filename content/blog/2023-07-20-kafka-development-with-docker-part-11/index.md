@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In the previous posts, we discussed how to implement client authentication by TLS (SSL or TLS/SSL) and SASL authentication. One of the key benefits of client authentication is achieving user access control. In this post, we will discuss how to configure Kafka authorization with Java and Python client examples while SASL is kept for client authentication.
+description: Control user access to Kafka resources with authorization rules, keeping SASL for client authentication, with Java and Python client examples.
 ---
 
 [**UPDATE 2025-10-01**]

@@ -1,5 +1,5 @@
 ---
-title: Apache Beam Python Examples - Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn
+title: Call RPC Service in Batch with Defined Batch Size using Stateful DoFn - Apache Beam Python Examples Part 6
 date: 2024-10-02
 draft: false
 featured: false
@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: 
+description: A stateful DoFn with Beam state and timers fixes the gRPC batch size and maximum wait time instead of leaving the bundle size to the runner.
 ---
 
 In the [previous post](/blog/2024-09-18-beam-examples-5), we continued discussing an Apache Beam pipeline that arguments input data by calling a **Remote Procedure Call (RPC)** service. A pipeline was developed that makes a single RPC call for a bundle of elements. The bundle size is determined by the runner, however, we may encounter an issue e.g. if an RPC service becomes quite slower if many elements are included in a single request. We can improve the pipeline using stateful `DoFn` where the number elements to process and maximum wait seconds can be controlled by *state* and *timers*. Note that, although the stateful `DoFn` used in this post solves the data augmentation task well, in practice, we should use the built-in transforms such as [BatchElements](https://beam.apache.org/documentation/transforms/python/aggregation/batchelements/) and [GroupIntoBatches](https://beam.apache.org/documentation/transforms/python/aggregation/groupintobatches/) whenever possible. 

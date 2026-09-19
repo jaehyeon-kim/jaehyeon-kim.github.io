@@ -24,7 +24,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: In Part 3, we developed a data ingestion pipeline using Kafka Connect source and sink connectors without enabling schemas. Later we discussed the benefits of schema registry when developing Kafka applications in Part 5. In this post, I'll demonstrate how to enhance the existing data ingestion pipeline by integrating AWS Glue Schema Registry.
+description: Schema registry support added to a Kafka Connect ingestion pipeline, so the source and sink connectors serialise through AWS Glue Schema Registry.
 ---
 
 [**UPDATE 2025-10-01**]

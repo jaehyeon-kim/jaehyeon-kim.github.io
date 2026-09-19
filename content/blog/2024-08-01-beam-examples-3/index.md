@@ -1,5 +1,5 @@
 ---
-title: Apache Beam Python Examples - Part 3 Build Sport Activity Tracker with/without SQL
+title: Build Sport Activity Tracker with/without SQL - Apache Beam Python Examples Part 3
 date: 2024-08-01
 draft: false
 featured: false
@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: 
+description: A sport activity tracker in Beam Python, built first with native transforms and then with Beam SQL, showing the limits of Beam SQL in the Python SDK.
 ---
 
 In this post, we develop two Apache Beam pipelines that track sport activities of users and output their speed periodically. The first pipeline uses native transforms and [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) is used for the latter. While *Beam SQL* can be useful in some situations, its features in the Python SDK are not complete compared to the Java SDK. Therefore, we are not able to build the required tracking pipeline using it. We end up discussing potential improvements of *Beam SQL* so that it can be used for building competitive applications with the Python SDK.

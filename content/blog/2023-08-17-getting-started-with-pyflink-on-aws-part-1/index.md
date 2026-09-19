@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Apache Flink is widely used for building real-time stream processing applications. On AWS, Amazon Managed Service for Apache Flink is the easiest option to develop a Flink app as it provides the underlying infrastructure. Updating a guide from AWS, this series of posts discuss how to develop and deploy a Flink (Pyflink) application via KDA where the data source and sink are Kafka topics. In part 1, the app will be developed locally targeting a Kafka cluster created by Docker. Furthermore, it will be executed in a virtual environment as well as in a local Flink cluster for improved monitoring.
+description: Develop a PyFlink app against a Kafka cluster on Docker, running it both in a virtual environment and in a local Flink cluster for better monitoring.
 ---
 
 [**UPDATE 2025-10-01**]

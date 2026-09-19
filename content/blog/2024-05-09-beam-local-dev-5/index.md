@@ -20,7 +20,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: We developed batch and streaming pipelines in Part 2 and Part 4. Often it is faster and simpler to identify and fix bugs on the pipeline code by performing local unit testing. Moreover, especially when it comes to creating a streaming pipeline, unit testing cases can facilitate development further by using TestStream as it allows us to advance watermarks or processing time according to different scenarios. In this post, we discuss how to perform unit testing of the batch and streaming pipelines that we developed earlier.
+description: Unit test batch and streaming Apache Beam pipelines in Python, using TestStream to advance watermarks and processing time across scenarios.
 ---
 
 We developed batch and streaming pipelines in [Part 2](/blog/2024-04-04-beam-local-dev-2) and [Part 4](/blog/2024-05-02-beam-local-dev-4). Often it is faster and simpler to identify and fix bugs on the pipeline code by performing local unit testing. Moreover, especially when it comes to creating a streaming pipeline, unit testing cases can facilitate development further by using [TestStream](https://beam.apache.org/releases/pydoc/2.22.0/_modules/apache_beam/testing/test_stream.html) as it allows us to advance [watermarks](https://beam.apache.org/documentation/basics/#watermark) or processing time according to different scenarios. In this post, we discuss how to perform unit testing of the batch and streaming pipelines that we developed earlier.

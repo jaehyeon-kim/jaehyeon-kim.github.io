@@ -1,5 +1,5 @@
 ---
-title: Real Time Streaming with Kafka and Flink - Lab 5 Write data to DynamoDB using Kafka Connect
+title: Write data to DynamoDB using Kafka Connect - Real Time Streaming with Kafka and Flink Lab 5
 date: 2023-11-30
 draft: false
 featured: false
@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Kafka Connect is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It makes it simple to quickly define connectors that move large collections of data into and out of Kafka. In this lab, we will discuss how to create a data pipeline that ingests data from a Kafka topic into a DynamoDB table using the Camel DynamoDB sink connector.
+description: Ingest records from a Kafka topic into a DynamoDB table using the Camel DynamoDB sink connector, defined and run on Kafka Connect.
 ---
 
 [**UPDATE 2025-10-01**]

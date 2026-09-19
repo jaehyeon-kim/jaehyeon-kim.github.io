@@ -1,5 +1,5 @@
 ---
-title: Kafka, Flink and DynamoDB for Real Time Fraud Detection - Part 2 Deployment via AWS Managed Flink
+title: Deployment via AWS Managed Flink - Kafka, Flink and DynamoDB for Real Time Fraud Detection Part 2
 date: 2023-09-14
 draft: false
 featured: false
@@ -25,7 +25,7 @@ authors:
 images: []
 cevo: 32
 docs: https://docs.google.com/document/d/1kRB3XeccUAjNwRH_sFwjJ_fCSnUw3NrQnzF202QGx4o
-description: This series aims to help those who are new to Apache Flink and Amazon Managed Service for Apache Flink by re-implementing a simple fraud detection application that is discussed in an AWS workshop titled AWS Kafka and DynamoDB for real time fraud detection. In part 1, I demonstrated how to develop the application locally, and the app will be deployed via Amazon Managed Service for Apache Flink in this post.
+description: Deploy the Kafka, Flink and DynamoDB fraud detection app to Amazon Managed Service for Apache Flink, after developing it locally on Docker.
 ---
 This series aims to help those who are new to [Apache Flink](https://flink.apache.org/) and [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/) by re-implementing a simple fraud detection application that is discussed in an AWS workshop titled [AWS Kafka and DynamoDB for real time fraud detection](https://catalog.us-east-1.prod.workshops.aws/workshops/ad026e95-37fd-4605-a327-b585a53b1300/en-US). In part 1, I demonstrated how to develop the application locally, and the app will be deployed via *Amazon Managed Service for Apache Flink* in this post.
 

@@ -20,7 +20,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Apache Kafka is one of the key technologies for modern data streaming architectures on AWS. Developing and testing Kafka-related applications can be easier using Docker and Docker Compose. In this series of posts, I will demonstrate reference implementations of those applications in Dockerized environments.
+description: Set up a Kafka cluster with Docker Compose, the base for a series on developing and testing Kafka applications for AWS in containers.
 ---
 
 [**UPDATE 2025-10-01**]

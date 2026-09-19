@@ -34,7 +34,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Providing direct access to big data engines like Spark and Flink often creates chaos. A gateway-centric architecture solves this by introducing a robust control plane. This article presents a detailed blueprint using Apache Kyuubi, a multi-tenant SQL gateway, to provision and manage on-demand Spark, Flink, and Trino engines. Learn how this model delivers true self-service analytics with centralized governance, finally resolving the conflict between user empowerment and platform stability.
+description: Apache Kyuubi as a multi-tenant SQL gateway that provisions on-demand Spark, Flink and Trino engines, giving self-service analytics with central governance.
 ---
 In the modern data stack, providing direct access to powerful engines like Apache Spark and Flink is a double-edged sword. While it empowers users, it often leads to chaos: resource contention from "noisy neighbors," inconsistent security enforcement, and operational fragility. The core problem is the lack of a robust control plane between users and the raw compute power. The solution, therefore, isn't to take power away from users, but to manage it through an intelligent intermediary.
 

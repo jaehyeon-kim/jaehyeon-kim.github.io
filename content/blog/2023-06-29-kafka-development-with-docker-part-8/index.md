@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: We can configure Kafka clients and other components to use TLS (SSL or TLS/SSL) encryption to secure communication. It is a one-way verification process where a server certificate is verified by a client via SSL Handshake. Moreover we can improve security by adding client authentication. In this post, we will discuss how to configure SSL encryption with Java and Python client examples while client authentication will be covered in later posts.
+description: Configure TLS encryption between Kafka brokers and clients, where the client verifies the server certificate, with Java and Python examples.
 ---
 
 [**UPDATE 2025-10-01**]

@@ -1,5 +1,5 @@
 ---
-title: Kafka Connect for AWS Services Integration - Part 2 Develop Camel DynamoDB Sink Connector
+title: Develop Camel DynamoDB Sink Connector - Kafka Connect for AWS Services Integration Part 2
 date: 2023-06-04
 draft: false
 featured: false
@@ -24,7 +24,7 @@ authors:
   - JaehyeonKim
 images: []
 cevo: 29
-description: The suite of Apache Camel Kafka connectors and the Kinesis Kafka connector from the AWS Labs can be effective for building data ingestion pipelines that integrate AWS services. In this post, I will illustrate how to develop the Camel DynamoDB sink connector using Docker. Fake order data will be generated using the MSK Data Generator source connector, and the sink connector will be configured to consume the topic messages to ingest them into a DynamoDB table.
+description: Develop the Camel DynamoDB sink connector on Docker, consuming fake order records from a Kafka topic and writing them into a DynamoDB table.
 ---
 
 [**UPDATE 2025-10-01**]

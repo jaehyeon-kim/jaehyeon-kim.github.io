@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: The Glue Schema Registry supports features to manage and enforce schemas on data streaming applications using convenient integrations with Apache Kafka and other AWS managed services. In order to utilise those features, we need to use the client library. In this post, I'll illustrate how to build the client library after introducing how it works to integrate the Glue Schema Registry with Kafka producer and consumer apps.
+description: Build the Glue Schema Registry client library and use it to manage and enforce schemas in Kafka producer and consumer applications.
 ---
 
 As described in the [Confluent document](https://docs.confluent.io/platform/current/schema-registry/index.html#sr-overview), _Schema Registry_ provides a centralized repository for managing and validating schemas for topic message data, and for serialization and deserialization of the data over the network. Producers and consumers to Kafka topics can use schemas to ensure data consistency and compatibility as schemas evolve. In AWS, the [Glue Schema Registry](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html) supports features to manage and enforce schemas on data streaming applications using convenient integrations with Apache Kafka, [Amazon Managed Streaming for Apache Kafka](https://aws.amazon.com/msk/), [Amazon Kinesis Data Streams](https://aws.amazon.com/kinesis/data-streams/), [Amazon Kinesis Data Analytics for Apache Flink](https://aws.amazon.com/kinesis/data-analytics/), and [AWS Lambda](https://aws.amazon.com/lambda/).

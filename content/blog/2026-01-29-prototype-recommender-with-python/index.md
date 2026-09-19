@@ -25,7 +25,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Traditional recommendation systems often struggle with cold-start users and with incorporating immediate contextual signals. In contrast, Contextual Multi-Armed Bandits, or CMAB, learn continuously in an online setting by balancing exploration and exploitation using real-time context. In Part 1, we develop a Python prototype that simulates user behavior and validates the algorithm, establishing a foundation for scalable, real-time recommendation systems.
+description: A Python prototype of a contextual multi-armed bandit recommender that simulates user behaviour and validates the algorithm against cold-start users.
 ---
 
 ## Overview

@@ -22,7 +22,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: Deploying a dbt project to dev and prod on BigQuery, covering slim CI, unit tests and a write audit publish step that builds on a cloned dataset.
 ---
 
 In the [previous post](/blog/2024-09-05-dbt-cicd-demo), we started discussing a *continuous integration/continuous delivery (CI/CD)* process of a *dbt* project by introducing two GitHub Actions workflows - `slim-ci` and `deploy`. The former is triggered when a pull request is created to the main branch, and it builds only modified models and its first-order children in a *ci* dataset, followed by performing tests on them. The second workflow gets triggered once a pull request is merged. Beginning with running unit tests, it packages the *dbt* project as a Docker container and publishes to *Artifact Registry*. In this post, we focus on how to deploy a *dbt* project in multiple environments while walking through the entire CI/CD process step-by-step.

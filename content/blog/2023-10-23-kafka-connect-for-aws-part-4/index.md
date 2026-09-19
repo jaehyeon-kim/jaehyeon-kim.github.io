@@ -1,5 +1,5 @@
 ---
-title: Kafka Connect for AWS Services Integration - Part 4 Develop Aiven OpenSearch Sink Connector
+title: Develop Aiven OpenSearch Sink Connector - Kafka Connect for AWS Services Integration Part 4
 date: 2023-10-23
 draft: false
 featured: false
@@ -25,7 +25,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: Kafka Connect can be an effective tool to ingest data from Apache Kafka into OpenSearch. In this post, we will discuss how to develop a data pipeline from Apache Kafka into OpenSearch locally using Docker while the pipeline will be deployed on AWS in the next post. Fake impressions and clicks data will be pushed into Kafka topics using a Kafka source connector and those records will be ingested into OpenSearch indexes using a sink connector for near-real time analytics.
+description: Build a local Kafka to OpenSearch pipeline on Docker with the Aiven sink connector, ingesting fake impressions and clicks for near real time analytics.
 ---
 
 [**UPDATE 2025-10-01**]

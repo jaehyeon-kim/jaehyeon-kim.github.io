@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: The Shared class in the Beam Python SDK caches lookup data in memory for batch and streaming pipelines, with a periodic refresh for the latter.
 ---
 
 I recently contributed to Apache Beam by adding a common pipeline pattern - [*Cache data using a shared object*](https://beam.apache.org/documentation/patterns/shared-class/). Both batch and streaming pipelines are introduced, and they utilise the [`Shared` class](https://beam.apache.org/releases/pydoc/current/_modules/apache_beam/utils/shared.html#Shared) of the Python SDK to enrich `PCollection` elements. This pattern can be more memory-efficient than side inputs, simpler than a stateful `DoFn`, and more performant than calling an external service, because it does not have to access an external service for every element or bundle of elements. In this post, we discuss this pattern in more details with batch and streaming use cases. For the latter, we configure the cache gets refreshed periodically.

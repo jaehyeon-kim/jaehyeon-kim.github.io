@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: Flink Table API in Kotlin states the supplier statistics as a declarative windowed aggregation over a DataStream, with late rows routed by hand.
 ---
 
 In the last post, we explored the fine-grained control of Flink's DataStream API. Now, we'll approach the same problem from a higher level of abstraction using the **Flink Table API**. This post demonstrates how to build a declarative analytics pipeline that processes our continuous stream of Avro-formatted order events. We will define a `Table` on top of a `DataStream` and use SQL-like expressions to perform windowed aggregations. This example highlights the power and simplicity of the Table API for analytical tasks and showcases Flink's seamless integration between its different API layers to handle complex requirements like late data.

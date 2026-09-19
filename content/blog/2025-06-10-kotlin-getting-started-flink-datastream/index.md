@@ -23,7 +23,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description:
+description: Flink DataStream API in Kotlin computes the same supplier statistics, using watermarks for event time and side outputs to collect late order events.
 ---
 
 Building on our exploration of stream processing, we now transition from Kafka's native library to **Apache Flink**, a powerful, general-purpose distributed processing engine. In this post, we'll dive into Flink's foundational **DataStream API**. We will tackle the same supplier statistics problem - analyzing a stream of Avro-formatted order events - but this time using Flink's robust features for stateful computation. This example will highlight Flink's sophisticated event-time processing with watermarks and its elegant, built-in mechanisms for handling late-arriving data through side outputs.

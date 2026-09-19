@@ -21,7 +21,7 @@ tags:
 authors:
   - JaehyeonKim
 images: []
-description: 
+description: Examples from the book Stream Processing with Apache Flink ported to Kotlin, updated to current Flink APIs and built with Gradle after PyFlink lacked features.
 ---
 
 A couple of years ago, I read [Stream Processing with Apache Flink](https://www.oreilly.com/library/view/stream-processing-with/9781491974285/) and worked through the examples using PyFlink. While the book offered a solid introduction to Flink, I frequently hit limitations with the Python API, as many features from the book weren't supported. This time, I decided to revisit the material, but using Kotlin. The experience has been much more rewarding and fun.
