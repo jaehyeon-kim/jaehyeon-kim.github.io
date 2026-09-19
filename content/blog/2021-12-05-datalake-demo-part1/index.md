@@ -359,7 +359,7 @@ services:
 
 #### Install Connectors
 
-We use the [Debezium connector for PostgreSQL](https://debezium.io/documentation/reference/stable/connectors/postgresql.html) as the source connector and [Lenses S3 Connector](https://docs.lenses.io/4.1/integrations/connectors/stream-reactor/sinks/s3sinkconnector/) as the sink connector. The source connector is installed via the confluent hub client while the sink connector is [added as a community connector](https://docs.confluent.io/home/connect/community.html). Note that the environment variable of CONNECT_PLUGIN_PATH is updated to include the kafka plugin folder (`/usr/local/share/kafka/plugins`).
+We use the [Debezium connector for PostgreSQL](https://debezium.io/documentation/reference/stable/connectors/postgresql.html) as the source connector and [Lenses S3 Connector](https://docs.lenses.io/latest/connectors/kafka-connectors/sinks/aws-s3) as the sink connector. The source connector is installed via the confluent hub client while the sink connector is [added as a community connector](https://docs.confluent.io/home/connect/community.html). Note that the environment variable of CONNECT_PLUGIN_PATH is updated to include the kafka plugin folder (`/usr/local/share/kafka/plugins`).
 
 
 ```Dockerfile
@@ -458,7 +458,7 @@ curl http://localhost:8083/connectors/orders-source/status
 
 [Lenses S3 Connector](https://lenses.io/blog/2020/11/new-kafka-to-S3-connector/) is a Kafka Connect sink connector for writing records from Kafka to AWS S3 Buckets. It extends the standard connect config adding a parameter for a SQL command (Lenses Kafka Connect Query Language or "KCQL"). This defines how to map data from the source (in this case Kafka) to the target (S3). Importantly, it also includes how data should be partitioned into S3, the bucket names and the serialization format (support includes JSON, Avro, Parquet, Text, CSV and binary).
 
-I find the Lenses S3 connector is more straightforward to configure than the Confluent S3 sink connector for its [SQL-like syntax](https://docs.lenses.io/4.1/integrations/connectors/stream-reactor/sinks/s3sinkconnector/). The KCQL configuration indicates that object files are set to be
+I find the Lenses S3 connector is more straightforward to configure than the Confluent S3 sink connector for its [SQL-like syntax](https://docs.lenses.io/latest/connectors/kafka-connectors/sinks/aws-s3). The KCQL configuration indicates that object files are set to be
 
 
 * moved from a Kafka topic (`demo.datalake.cdc_events`) to an S3 bucket (`data-lake-demo-cevo`) with object prefix of _`cdc-events-local`,

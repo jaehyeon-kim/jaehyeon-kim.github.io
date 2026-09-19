@@ -32,7 +32,7 @@ Also one of the R's best IDE (RStudio) doesn't seem to provide an incremental de
 
 If one has decided to avoid for-loops, the way how to code would need to be changed. With for-loops, the focus is 'how to get the job done'. One the other hand, if it is replaced with looping functions, the focus should be 'what does the outcome look like'. In other words, the way of thinking should be declarative, rather than imperative.
 
-Below shows two examples from [The R Project for Statistical Computing](http://www.linkedin.com/groups/R-Project-Statistical-Computing-77616?home=&gid=77616&trk=anet_ug_hm) in LinkedIn. Instead of using for-loop, _apply_ family of functions or _plyr_ package are used for recursive computation.
+Below shows two examples from [The R Project for Statistical Computing](https://www.linkedin.com/groups/R-Project-Statistical-Computing-77616?home=&gid=77616&trk=anet_ug_hm) in LinkedIn. Instead of using for-loop, _apply_ family of functions or _plyr_ package are used for recursive computation.
 
 The following packages are used.
 
@@ -42,7 +42,7 @@ library(knitr)
 library(plyr)
 ```
 
-## [How can I set up for function for the following codes?](http://www.linkedin.com/groups/How-can-I-set-up-77616.S.5944557854001238016?trk=groups_search_item_list-0-b-ttl&goback=%2Egna_77616)
+## [How can I set up for function for the following codes?](https://www.linkedin.com/groups/How-can-I-set-up-77616.S.5944557854001238016?trk=groups_search_item_list-0-b-ttl&goback=%2Egna_77616)
 
 In this post, the goal is to create a function that creates a simulated vector with the following code.
 
@@ -99,7 +99,7 @@ head(simVec)
 ## [1]  0.90176825 -0.55948429  0.23258654  0.08713173  0.49159634  0.71904362
 ```
 
-## [Automatically selecting groups of numeric values in a data frame](http://www.linkedin.com/groups/Automatically-selecting-groups-numeric-values-77616.S.5950288359975899139?trk=groups_followed_item_list-0-b-ttl)
+## [Automatically selecting groups of numeric values in a data frame](https://www.linkedin.com/groups/Automatically-selecting-groups-numeric-values-77616.S.5950288359975899139?trk=groups_followed_item_list-0-b-ttl)
 
 * I'm trying to extract subsets of values from my dataset which are grouped by a value (which could be any number). This column is set by another piece of software and so the code needs to be flexible enough to identify groups of identical numbers without the number being specified. I.e. if value in row10 = row11 then group. For that I have used:
 

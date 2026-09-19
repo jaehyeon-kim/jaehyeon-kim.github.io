@@ -61,7 +61,7 @@ Fake taxi ride data is sent to a Kafka topic by the Kafka producer application t
 
 ### AWS Infrastructure
 
-The AWS infrastructure is created using [Terraform](https://www.terraform.io/) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post - see this [earlier post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details about how to create the resources. The infrastructure can be deployed (as well as destroyed) using Terraform CLI as shown below.
+The AWS infrastructure is created using [Terraform](https://developer.hashicorp.com/terraform) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post - see this [earlier post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details about how to create the resources. The infrastructure can be deployed (as well as destroyed) using Terraform CLI as shown below.
 
 ```bash
 # initialize
@@ -181,7 +181,7 @@ services:
       - appnet
     environment:
       BOOTSTRAP: kafka-0:9092
-    env_file: # https://kpow.io/get-started/#individual
+    env_file: # https://factorhouse.io/products/kpow/
       - ./kpow.env
     depends_on:
       - zookeeper

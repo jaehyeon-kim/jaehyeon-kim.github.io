@@ -24,9 +24,9 @@ authors:
 images: []
 description: API is an effective way of distributing analysis outputs to external clients. When it comes to API development with R, however, there are not many choices. In this post, serving an R function with plumber, Rserve and rApache is discussed.
 ---
-API is an effective way of distributing analysis outputs to external clients. When it comes to API development with R, however, there are not many choices. Probably development would be made with [plumber](https://github.com/trestletech/plumber), [Rserve](https://www.rforge.net/Rserve/), [rApache](http://rapache.net/) or [OpenCPU](https://www.opencpu.org/) if a client or bridge layer to R is not considered. 
+API is an effective way of distributing analysis outputs to external clients. When it comes to API development with R, however, there are not many choices. Probably development would be made with [plumber](https://github.com/trestletech/plumber), [Rserve](https://www.rforge.net/Rserve/), [rApache](https://jeffreyhorner.github.io/rapache/) or [OpenCPU](https://www.opencpu.org/) if a client or bridge layer to R is not considered. 
 
-This is 2 part series in relation to _API development with R_. In this post, serving an R function with _plumber_, _Rserve_ and _rApache_ is discussed. _OpenCPU_ is not discussed partly because it could be overkill for API. Also its performance may be similar to _rApache_ with [Prefork Multi-Processing Module](http://httpd.apache.org/docs/2.2/mod/prefork.html) enabled. Then deploying the APIs in a Docker container, making example HTTP requests and their performance will be discussed in [Part II](/blog/2015-02-08-tree-based-methods-2).
+This is 2 part series in relation to _API development with R_. In this post, serving an R function with _plumber_, _Rserve_ and _rApache_ is discussed. _OpenCPU_ is not discussed partly because it could be overkill for API. Also its performance may be similar to _rApache_ with [Prefork Multi-Processing Module](https://httpd.apache.org/docs/2.2/mod/prefork.html) enabled. Then deploying the APIs in a Docker container, making example HTTP requests and their performance will be discussed in [Part II](/blog/2015-02-08-tree-based-methods-2).
 
 ## Plumber
 
@@ -195,7 +195,7 @@ parse_headers <- function(headers) {
 
 > rApache is a project supporting web application development using the R statistical language and environment and the Apache web server.
 
-_rApache_ provides multiple ways to specify an R function that handles incoming HTTP requests - see the [manual](http://rapache.net/manual.html) for details. Among the multiple _RHandlers_, I find using a [Rook](https://github.com/jeffreyhorner/Rook) application can be quite effective.
+_rApache_ provides multiple ways to specify an R function that handles incoming HTTP requests - see the [manual](https://jeffreyhorner.github.io/rapache/manual.html) for details. Among the multiple _RHandlers_, I find using a [Rook](https://github.com/jeffreyhorner/Rook) application can be quite effective.
 
 Here is the test function as a Rook application. As `process_request()`, it parses function arguments according to the request method and content type. Then a value is returned after wating the specified seconds. The response of a Rook application is a list of _status_, _headers_ and _body_.
 

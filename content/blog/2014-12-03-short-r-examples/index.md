@@ -21,7 +21,7 @@ images: []
 description: I demonstrate short R examples - summarise a data frame group by a column and a quick way of implementing simulation
 ---
 
-As I don't use R at work yet, I haven't got enough chances to learn R by doing. Together with teaching myself machine learning with R, I consider it would be a good idea to collect examples on the web. Recently I have been visiting a Linkedin group called [The R Project for Statistical Computing](http://www.linkedin.com/groups/R-Project-Statistical-Computing-77616?home=&gid=77616&trk=anet_ug_hm) and suggesting scripts on data manipulation or programming topics. Actually I expected some of the topics may also be helpful to learn machine learning/statistics but, possibly due to lack of understaning of the topics in context, I've found only a few - it may be necessary to look for another source. Anyway below is a summary of two examples.
+As I don't use R at work yet, I haven't got enough chances to learn R by doing. Together with teaching myself machine learning with R, I consider it would be a good idea to collect examples on the web. Recently I have been visiting a Linkedin group called [The R Project for Statistical Computing](https://www.linkedin.com/groups/R-Project-Statistical-Computing-77616?home=&gid=77616&trk=anet_ug_hm) and suggesting scripts on data manipulation or programming topics. Actually I expected some of the topics may also be helpful to learn machine learning/statistics but, possibly due to lack of understaning of the topics in context, I've found only a few - it may be necessary to look for another source. Anyway below is a summary of two examples.
 
 ## Summarise a data frame group by a column
 

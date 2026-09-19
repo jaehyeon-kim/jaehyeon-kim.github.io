@@ -24,7 +24,7 @@ description: Introduction to Python
 
 When I bagan to teach myself C# 3 years ago, I only had some experience in interactive analysis tools such as MATLAB and R - I didn't consider R as a programming language at that time. The general purpose programming language shares some common features (data type, loop, if...) but it is rather different in the way how code is written/organized, which is object oriented. Therefore, while it was not a problem to grap the common features, it took quite some time to understand and keep my code in an object oriented way. 
 
-Python, as another object-oriented programming language, the situation would be similar. The snippets in the following link show an example - ([Link](https://bitbucket.org/snippets/jaehyeon-kim/GApK6)). There 4 classes are defined to connect to the advertiser service of [Sizmek MDX API](http://platform.mediamind.com/Eyeblaster.MediaMind.API.Doc/?v=3). 
+Python, as another object-oriented programming language, the situation would be similar. The snippets that showed an example are no longer available. There 4 classes are defined to connect to the advertiser service of [Sizmek MDX API](http://platform.mediamind.com/Eyeblaster.MediaMind.API.Doc/?v=3). 
 
 Specifically
 
@@ -35,7 +35,7 @@ Helper - class to keep utility methods
 
 Then, as seen in *example.py*, advertiser details can be requested by `Advertiser.GetItemRes()`, parsed by `Advertiser.GetItem()` and printed by `Helper.PrintObjects()`. I admit that the code wouldn't be Pythonic as I'm still teaching myself the language but the idea of expressing code in an object oriented way should be valid. In this regard, it would be important to appreciate and adopt this style of coding for successful Python development. (A more extended demo can be found in [my GitHub repo](https://github.com/jaehyeon-kim/sizmek_demo).)
 
-Recently I happened to find a book titled [Introducing Python: Modern Computing in Simple Packages]( http://shop.oreilly.com/product/0636920028659.do). A more generic explanation would be made using it. Its table of contents with some grouping is listed below.
+Recently I happened to find a book titled [Introducing Python: Modern Computing in Simple Packages]( https://shop.oreilly.com/product/0636920028659.do). A more generic explanation would be made using it. Its table of contents with some grouping is listed below.
 
 - **Intro**
     + Chapter 1, A Taste of Py

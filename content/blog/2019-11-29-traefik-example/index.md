@@ -27,21 +27,21 @@ description: Traefik is a modern HTTP reverse proxy and load balancer. In this p
 
 [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) in [Kubernetes](https://kubernetes.io/) exposes HTTP and HTTPS routes from outside the cluster to services within the cluster. By setting rules, it routes requests to appropriate services (precisely requests are sent to individual [Pods](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/) by [Ingress Controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)). Rules can be set up dynamically and I find it's more efficient compared to traditional [reverse proxy](https://en.wikipedia.org/wiki/Reverse_proxy).
 
-[Traefik](https://docs.traefik.io/v1.7/) is a modern HTTP reverse proxy and load balancer and it can be used as a _Kubernetes_ _Ingress Controller_. Moreover it supports other [providers](https://docs.traefik.io/providers/overview/), which are existing infrastructure components such as orchestrators, container engines, cloud providers, or key-value stores. To name a few, Docker, Kubernetes, AWS ECS, AWS DynamoDB and Consul are [supported providers](https://docs.traefik.io/v1.7/). With _Traefik_, it is possible to configure routing dynamically. Another interesting feature is [Forward Authentication](https://docs.traefik.io/v1.7/configuration/entrypoints/#forward-authentication) where authentication can be handled by an external service. In this post, it'll be demonstrated how _path-based_ routing can be set up by _Traefik with Docker_. Also a centralized authentication will be illustrated with the _Forward Authentication_ feature of _Traefik_.
+[Traefik](https://doc.traefik.io/traefik/v1.7/) is a modern HTTP reverse proxy and load balancer and it can be used as a _Kubernetes_ _Ingress Controller_. Moreover it supports other [providers](https://doc.traefik.io/traefik/providers/overview/), which are existing infrastructure components such as orchestrators, container engines, cloud providers, or key-value stores. To name a few, Docker, Kubernetes, AWS ECS, AWS DynamoDB and Consul are [supported providers](https://doc.traefik.io/traefik/v1.7/). With _Traefik_, it is possible to configure routing dynamically. Another interesting feature is [Forward Authentication](https://doc.traefik.io/traefik/v1.7/configuration/entrypoints/#forward-authentication) where authentication can be handled by an external service. In this post, it'll be demonstrated how _path-based_ routing can be set up by _Traefik with Docker_. Also a centralized authentication will be illustrated with the _Forward Authentication_ feature of _Traefik_.
 
 ## How Traefik works
 
-Below shows an illustration of [internal architecture](https://docs.traefik.io/v1.7/basics/) of Traefik.
+Below shows an illustration of [internal architecture](https://doc.traefik.io/traefik/v1.7/basics/) of Traefik.
 
 
 ![](traefik-overview.png#center)
 
 
-The [Traefik website](https://docs.traefik.io/v1.7/basics/) explains workflow of requests as following.
+The [Traefik website](https://doc.traefik.io/traefik/v1.7/basics/) explains workflow of requests as following.
 
-> * Incoming requests end on [entrypoints](https://docs.traefik.io/v1.7/basics/#entrypoints), as the name suggests, they are the network entry points into Traefik (listening port, SSL, traffic redirection...).
-> * Traffic is then forwarded to a matching [frontend](https://docs.traefik.io/v1.7/basics/#frontends). A frontend defines routes from entrypoints to [backends](https://docs.traefik.io/v1.7/basics/#backends). Routes are created using requests fields (Host, Path, Headers...) and can match or not a request.
-> * The frontend will then send the request to a backend. A backend can be composed by one or more [servers](https://docs.traefik.io/v1.7/basics/#servers), and by a load-balancing strategy.
+> * Incoming requests end on [entrypoints](https://doc.traefik.io/traefik/v1.7/basics/#entrypoints), as the name suggests, they are the network entry points into Traefik (listening port, SSL, traffic redirection...).
+> * Traffic is then forwarded to a matching [frontend](https://doc.traefik.io/traefik/v1.7/basics/#frontends). A frontend defines routes from entrypoints to [backends](https://doc.traefik.io/traefik/v1.7/basics/#backends). Routes are created using requests fields (Host, Path, Headers...) and can match or not a request.
+> * The frontend will then send the request to a backend. A backend can be composed by one or more [servers](https://doc.traefik.io/traefik/v1.7/basics/#servers), and by a load-balancing strategy.
 > * Finally, the server will forward the request to the corresponding microservice in the private network.
 
 In this example, a HTTP _entrypoint_ is setup on port 80. Requests through it are forwarded to 2 web services by the following _frontend_ rules.

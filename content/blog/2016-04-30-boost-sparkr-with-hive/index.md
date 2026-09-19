@@ -25,7 +25,7 @@ images: []
 description: One option to boost SparkR's performance as a data processing engine is manipulating data in Hive Context rather than in limited SQL Context. In this post, we discuss how to run SparkR in Hive Context.
 ---
 
-In the [previous post](/blog/2016-03-02-quick-start-sparkr-in-local-and-cluster-mode), it is demonstrated how to start SparkR in local and cluster mode. While SparkR is in active development, it is yet to fully support Spark's key libraries such as MLlib and Spark Streaming. Even, as a data processing engine, this R API is still limited as it is not possible to manipulate RDDs directly but only via Spark SQL/DataFrame API. As can be checked in the [API doc](http://spark.apache.org/docs/latest/api/R/index.html), SparkR rebuilds many existing R functions to work with Spark DataFrame and notably it borrows some functions from the dplyr package. Also there are some alien functions (eg `from_utc_timestamp()`) and many of them are from [Hive Query Language (HiveQL)](https://cwiki.apache.org/confluence/display/Hive/LanguageManual). In relation to those functions from HiveQL, although some Hive user defined functions (UDFs) are ported, still many useful [UDFs](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF) and [Window functions](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics) don't exist. 
+In the [previous post](/blog/2016-03-02-quick-start-sparkr-in-local-and-cluster-mode), it is demonstrated how to start SparkR in local and cluster mode. While SparkR is in active development, it is yet to fully support Spark's key libraries such as MLlib and Spark Streaming. Even, as a data processing engine, this R API is still limited as it is not possible to manipulate RDDs directly but only via Spark SQL/DataFrame API. As can be checked in the [API doc](https://spark.apache.org/docs/latest/api/R/index.html), SparkR rebuilds many existing R functions to work with Spark DataFrame and notably it borrows some functions from the dplyr package. Also there are some alien functions (eg `from_utc_timestamp()`) and many of them are from [Hive Query Language (HiveQL)](https://cwiki.apache.org/confluence/display/Hive/LanguageManual). In relation to those functions from HiveQL, although some Hive user defined functions (UDFs) are ported, still many useful [UDFs](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF) and [Window functions](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics) don't exist. 
 
 In this circumstances, I consider one option to boost SparkR's performance as a data processing engine is manipulating data in Hive Context rather than in limited SQL Context. There is good and bad news. The good one is existing Hive installation is not necessary to setup Hive Context and the other one is Spark has to be built from source with Hive. In this post, several examples of using Hive UDFs and Window functions are demonstrated, comparing to the dplyr package. Also a summary of Spark build with Hive is discussed.
 
@@ -297,7 +297,7 @@ sales %>% dplyr::arrange(dealer, type, day) %>%
 
 ## Spark build with Hive
 
-I built Spark with Hive in the latest LTS Ubuntu - [Ubuntu 16.04 Xenial Xerus](http://releases.ubuntu.com/16.04/). I just used the default JAVA version and Scala 2.10.3. The source is built for Hadoop 2.4 (`-Phadoop-2.4` and `-Dhadoop.version=2.4.0`) with YARN (`-Pyarn`) and Hive (`-Phive` and `-Phive-thriftserver`). I also selected to include SparkR (`-Psparkr`). See the [official documentation](http://spark.apache.org/docs/latest/building-spark.html) for further details.
+I built Spark with Hive in the latest LTS Ubuntu - [Ubuntu 16.04 Xenial Xerus](https://releases.ubuntu.com/16.04/). I just used the default JAVA version and Scala 2.10.3. The source is built for Hadoop 2.4 (`-Phadoop-2.4` and `-Dhadoop.version=2.4.0`) with YARN (`-Pyarn`) and Hive (`-Phive` and `-Phive-thriftserver`). I also selected to include SparkR (`-Psparkr`). See the [official documentation](https://spark.apache.org/docs/latest/building-spark.html) for further details.
 
 Here is a summary of steps followed.
 
@@ -307,7 +307,7 @@ Here is a summary of steps followed.
     + `sudo apt-get install default-jdk`
     + `export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"`
 * Install Scala 2.10.3
-    + `wget http://www.scala-lang.org/files/archive/scala-2.10.3.tgz`
+    + `wget https://www.scala-lang.org/files/archive/scala-2.10.3.tgz`
     + `tar xvf scala-2.10.3.tgz`
     + `sudo mv scala-2.10.3 /usr/bin`
     + `sudo ln -s /usr/bin/scala-2.10.3 /usr/bin/scala`

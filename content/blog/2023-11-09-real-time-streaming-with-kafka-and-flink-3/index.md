@@ -54,7 +54,7 @@ Sample taxi ride data is stored in a S3 bucket, and a Pyflink application reads 
 
 ### AWS Infrastructure
 
-The AWS infrastructure is created using [Terraform](https://www.terraform.io/) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post - see the [previous post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details. The infrastructure can be deployed (as well as destroyed) using Terraform CLI as shown below. 
+The AWS infrastructure is created using [Terraform](https://developer.hashicorp.com/terraform) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post - see the [previous post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details. The infrastructure can be deployed (as well as destroyed) using Terraform CLI as shown below. 
 
 ```bash
 # initialize
@@ -113,7 +113,7 @@ RUN wget -P /etc/lib/ https://repo.maven.apache.org/maven2/org/apache/kafka/kafk
 
 #### Flink Cluster on Docker Compose
 
-The docker compose file includes services for a Flink cluster and [Kpow Community Edition](https://docs.kpow.io/ce/). For the Flink cluster, both a single master container (*jobmanager*) and one task container (*taskmanager*) are created. The former runs the job *Dispatcher* and *ResourceManager* while *TaskManager* is run in the latter. Once a Flink app (job) is submitted to the *Dispatcher*, it spawns a *JobManager* thread and provides the *JobGraph* for execution. The *JobManager* requests the necessary processing slots from the *ResourceManager* and deploys the job for execution once the requested slots have been received.
+The docker compose file includes services for a Flink cluster and [Kpow Community Edition](https://docs.factorhouse.io/kpow/getting-started). For the Flink cluster, both a single master container (*jobmanager*) and one task container (*taskmanager*) are created. The former runs the job *Dispatcher* and *ResourceManager* while *TaskManager* is run in the latter. Once a Flink app (job) is submitted to the *Dispatcher*, it spawns a *JobManager* thread and provides the *JobGraph* for execution. The *JobManager* requests the necessary processing slots from the *ResourceManager* and deploys the job for execution once the requested slots have been received.
 
 Kafka bootstrap server addresses and AWS credentials are required for the Flink cluster and kpow app, which are specified as environment variables. The bootstrap server addresses can be obtained via terraform (`terraform output -json | jq -r '.msk_bootstrap_brokers_sasl_iam.value'`) or from AWS Console.
 
@@ -193,7 +193,7 @@ services:
       SASL_MECHANISM: AWS_MSK_IAM
       SASL_JAAS_CONFIG: software.amazon.msk.auth.iam.IAMLoginModule required;
       SASL_CLIENT_CALLBACK_HANDLER_CLASS: software.amazon.msk.auth.iam.IAMClientCallbackHandler
-    env_file: # https://kpow.io/get-started/#individual
+    env_file: # https://factorhouse.io/products/kpow/
       - ./kpow.env
 
 networks:

@@ -37,7 +37,7 @@ library(doParallel)
 
 ## k-means clustering
 
-This example is from [McCallum and Weston (2012)](http://shop.oreilly.com/product/0636920021421.do). It is originally created using `clusterApply()` in the **snow** package. Firstly a slight modification is made to be used with `parLapplyLB()` in the **parallel** package. Also a *foreach* construct is created for comparison.
+This example is from [McCallum and Weston (2012)](https://shop.oreilly.com/product/0636920021421.do). It is originally created using `clusterApply()` in the **snow** package. Firstly a slight modification is made to be used with `parLapplyLB()` in the **parallel** package. Also a *foreach* construct is created for comparison.
 
 According to the document, 
 

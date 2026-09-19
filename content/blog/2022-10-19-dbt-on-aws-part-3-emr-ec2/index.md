@@ -26,7 +26,7 @@ cevo: 20
 description: The data build tool (dbt) is an effective data transformation tool and it supports key AWS analytics services - Redshift, Glue, EMR and Athena. In part 3 of the dbt on AWS series, we discuss data transformation pipelines using dbt on Amazon EMR. Subsets of IMDb data are used as source and data models are developed in multiple layers according to the dbt best practices.
 ---
 
-The [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) is an effective data transformation tool and it supports key AWS analytics services - Redshift, Glue, EMR and Athena. In the previous posts, we discussed benefits of a common data transformation tool and the potential of dbt to cover a wide range of data projects from data warehousing to data lake to data lakehouse. Demo data projects that target Redshift Serverless and Glue are illustrated as well. In part 3 of the dbt on AWS series, we discuss data transformation pipelines using dbt on [Amazon EMR](https://aws.amazon.com/emr/). [Subsets of IMDb data](https://www.imdb.com/interfaces/) are used as source and data models are developed in multiple layers according to the [dbt best practices](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview). A list of posts of this series can be found below.
+The [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) is an effective data transformation tool and it supports key AWS analytics services - Redshift, Glue, EMR and Athena. In the previous posts, we discussed benefits of a common data transformation tool and the potential of dbt to cover a wide range of data projects from data warehousing to data lake to data lakehouse. Demo data projects that target Redshift Serverless and Glue are illustrated as well. In part 3 of the dbt on AWS series, we discuss data transformation pipelines using dbt on [Amazon EMR](https://aws.amazon.com/emr/). [Subsets of IMDb data](https://data.imdb.com/non-commercial-datasets/) are used as source and data models are developed in multiple layers according to the [dbt best practices](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview). A list of posts of this series can be found below.
 
 * [Part 1 Redshift](/blog/2022-09-28-dbt-on-aws-part-1-redshift)
 * [Part 2 Glue](/blog/2022-10-09-dbt-on-aws-part-2-glue)
@@ -183,7 +183,7 @@ resource "aws_glue_catalog_database" "imdb_db_marts" {
 
 ## Project
 
-We build a data transformation pipeline using [subsets of IMDb data](https://www.imdb.com/interfaces/) - seven titles and names related datasets are provided as gzipped, tab-separated-values (TSV) formatted files. The project ends up creating three tables that can be used for reporting and analysis.
+We build a data transformation pipeline using [subsets of IMDb data](https://data.imdb.com/non-commercial-datasets/) - seven titles and names related datasets are provided as gzipped, tab-separated-values (TSV) formatted files. The project ends up creating three tables that can be used for reporting and analysis.
 
 
 ### Save Data to S3

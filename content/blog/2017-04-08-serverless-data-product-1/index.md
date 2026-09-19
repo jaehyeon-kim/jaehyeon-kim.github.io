@@ -29,7 +29,7 @@ Let say you've got a prediction model built in R and you'd like to *productioniz
 
 A developer can be relieved from the overwhelming DevOps stuff if his/her model is deployed in a **serverless** environment that is provided by cloud computing companies - Amazon Web Service, Microsoft Azure, Google Cloud Platform and IBM OpenWhisk. They provide *FaaS* ([Function as a Service](https://en.wikipedia.org/wiki/Function_as_a_Service)) and, simply put, it allows to run code on demand without provisioning or managing servers. Furthermore an application can be developed/managed in a more efficient way if the workflow is streamlined by **events**. Let say the model has to be updated periodically. It requires to save new raw data into a place, to export it to a database, to manipulate and save it back to another place for modelling... This kind of workflow can be efficiently managed by events where a function is configured to subscribe a specific event and its code is run accordingly. In this regards, I find there is a huge potential for **serverless** **event-driven** architecture in data product development.
 
-This is the first post of *Serverless Data Product POC* series and I'm planning to introduce a data product in a **serverless** environment. For the backend, a simple logistic regression model is packaged and tested for [AWS Lambda](https://aws.amazon.com/lambda/) - R is not included in [Lambda runtime](http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html) so that it is packaged and run via the Python [rpy2](https://pypi.python.org/pypi/rpy2) package. Then the model is deployed at [AWS Lambda](https://aws.amazon.com/lambda/) and the Lambda function is exposed via [Amazon API Gateway](https://aws.amazon.com/api-gateway/). For the frontend, a simple single page application is served from [Amazon S3](https://aws.amazon.com/s3/).
+This is the first post of *Serverless Data Product POC* series and I'm planning to introduce a data product in a **serverless** environment. For the backend, a simple logistic regression model is packaged and tested for [AWS Lambda](https://aws.amazon.com/lambda/) - R is not included in [Lambda runtime](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html) so that it is packaged and run via the Python [rpy2](https://pypi.python.org/pypi/rpy2) package. Then the model is deployed at [AWS Lambda](https://aws.amazon.com/lambda/) and the Lambda function is exposed via [Amazon API Gateway](https://aws.amazon.com/api-gateway/). For the frontend, a simple single page application is served from [Amazon S3](https://aws.amazon.com/s3/).
 
 * Backend
     * [Part I - Packaging R ML Model for Lambda](#) - this post
@@ -44,7 +44,7 @@ This is the first post of *Serverless Data Product POC* series and I'm planning 
 
 ## Model
 
-The data is from the [LOGIT REGRESSION - R DATA ANALYSIS EXAMPLES](http://stats.idre.ucla.edu/r/dae/logit-regression/) of UCLA: Statistical Consulting Group. It is hypothetical data about graduate school admission and has 3 featues (_gre_, _gpa_, _rank_) and 1 binary response (_admit_).
+The data is from the [LOGIT REGRESSION - R DATA ANALYSIS EXAMPLES](https://stats.idre.ucla.edu/r/dae/logit-regression/) of UCLA: Statistical Consulting Group. It is hypothetical data about graduate school admission and has 3 featues (_gre_, _gpa_, _rank_) and 1 binary response (_admit_).
 
 
 ```r
@@ -63,7 +63,7 @@ summary(data)
 ##  Max.   :1.0000   Max.   :800.0   Max.   :4.000
 ```
 
-GLM is fit to the data and the fitted object is saved as _admission.rds_. The choice of logistic regression is because it is included in the *stats* package, which is one of the default packages, and I'd like to have R as small as possible for this POC application. Note that AWS Lambda has limits in deployment package size (50MB compressed) so that it is important to keep a deployment package small - see [AWS Lambda Limits](http://docs.aws.amazon.com/lambda/latest/dg/limits.html) for further details. Then the saved file is uploaded to S3 to a bucket named *serverless-poc-models* - the Lambda function handler will use this object for prediction as described in the next section.
+GLM is fit to the data and the fitted object is saved as _admission.rds_. The choice of logistic regression is because it is included in the *stats* package, which is one of the default packages, and I'd like to have R as small as possible for this POC application. Note that AWS Lambda has limits in deployment package size (50MB compressed) so that it is important to keep a deployment package small - see [AWS Lambda Limits](https://docs.aws.amazon.com/lambda/latest/dg/limits.html) for further details. Then the saved file is uploaded to S3 to a bucket named *serverless-poc-models* - the Lambda function handler will use this object for prediction as described in the next section.
 
 ```r
 fit <- glm(admit ~ ., data = data, family = "binomial")
@@ -74,14 +74,14 @@ Note that, if data is transformed for better performance, a model object alone m
 
 ## Lambda function handler
 
-[Lambda function handler](http://docs.aws.amazon.com/lambda/latest/dg/python-programming-model-handler-types.html) is a function that AWS Lambda can invoke when the service executes the code. In this example, it downloads the model objects from S3, predicts admission status and returns the result - *handler.py* and *test_handler.py* can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/serverless-poc/tree/master/poc-logit-handler).
+[Lambda function handler](https://docs.aws.amazon.com/lambda/latest/dg/python-programming-model-handler-types.html) is a function that AWS Lambda can invoke when the service executes the code. In this example, it downloads the model objects from S3, predicts admission status and returns the result - *handler.py* and *test_handler.py* can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/serverless-poc/tree/master/poc-logit-handler).
 
 This and the next sections are based on the following posts with necessary modifications.
 
 * [Analyzing Genomics Data at Scale using R, AWS Lambda, and Amazon API Gateway](https://aws.amazon.com/blogs/compute/analyzing-genomics-data-at-scale-using-r-aws-lambda-and-amazon-api-gateway/)
 * [Run ML predictions with R on AWS Lambda](https://tech.foodora.com/run-machine-learning-predictions-with-r-on-aws-lambda/)
 
-*handler.py* begins with importing packages and setting-up environment variables. The above posts indicate C shared libraries of R must be loaded. When I tested the handler while uncommenting the for-loop of loading those libraries, however, I encountered the following error - `OSError: lib/libRrefblas.so: undefined symbol: xerbla_`. It is only when the for-loop is commented out that the script runs through to the handler. I guess the necessary C shared libraries are loaded via Lambda environment variables although I'm not sure why manual loading creates such an error. According to [Lambda Execution Environment and Available Libraries](http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html), the following environment variables are available.
+*handler.py* begins with importing packages and setting-up environment variables. The above posts indicate C shared libraries of R must be loaded. When I tested the handler while uncommenting the for-loop of loading those libraries, however, I encountered the following error - `OSError: lib/libRrefblas.so: undefined symbol: xerbla_`. It is only when the for-loop is commented out that the script runs through to the handler. I guess the necessary C shared libraries are loaded via Lambda environment variables although I'm not sure why manual loading creates such an error. According to [Lambda Execution Environment and Available Libraries](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html), the following environment variables are available.
 
 * `LAMBDA_TASK_ROOT` - Contains the path to your Lambda function code.
 * `LD_LIBRARY_PATH` - Contains `/lib64`, `/usr/lib64`, `LAMBDA_TASK_ROOT`, `LAMBDA_TASK_ROOT/lib`. Used to store helper libraries and function code.
@@ -214,7 +214,7 @@ if __name__ == "__main__":
 
 ## Packaging
 
-According to [Lambda Execution Environment and Available Libraries](http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html), Lambda functions run in *AMI name: amzn-ami-hvm-2016.03.3.x86_64-gp2*. A t2.medium EC2 instance is used from this AMI to create the Lambda deployment package. In order to use R in AWS Lambda, R, some of its C shared libraries, the Lambda function handler (*handler.py*) and the handler's dependent packages should be included in a zip deployment package file. 
+According to [Lambda Execution Environment and Available Libraries](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html), Lambda functions run in *AMI name: amzn-ami-hvm-2016.03.3.x86_64-gp2*. A t2.medium EC2 instance is used from this AMI to create the Lambda deployment package. In order to use R in AWS Lambda, R, some of its C shared libraries, the Lambda function handler (*handler.py*) and the handler's dependent packages should be included in a zip deployment package file. 
 
 ### Preparation
 
@@ -271,7 +271,7 @@ ldd /usr/lib64/R/bin/exec/R | grep "=> /" | awk '{print $3}' | \
 
 ### Install rpy2 and copy to Lamdba package folder
 
-Python virtualenv is used to install the rpy2 package. The idea is straightforward but actually it was a bit tricky as the rpy2 and its dependent packages can be found in either *site-packages* or *dist-packages* folder even in a single EC2 instance - the [AWS Doc](http://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html) doesn't explain clearly. `pip install rpy2 -t folder-path` was tricky as well because the rpy2 package was not installed sometimes while its dependent packages were installed. One way to check is executing `pip list` in the virtualenv and, if the rpy2 package is not shown, it is in *dist-packages*.
+Python virtualenv is used to install the rpy2 package. The idea is straightforward but actually it was a bit tricky as the rpy2 and its dependent packages can be found in either *site-packages* or *dist-packages* folder even in a single EC2 instance - the [AWS Doc](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html) doesn't explain clearly. `pip install rpy2 -t folder-path` was tricky as well because the rpy2 package was not installed sometimes while its dependent packages were installed. One way to check is executing `pip list` in the virtualenv and, if the rpy2 package is not shown, it is in *dist-packages*.
 
 
 ```bash
@@ -288,7 +288,7 @@ deactivate
 
 ### Copy handler.py/test_handler.py, compress and copy to S3 bucket
 
-*handler.py* and *test_handler.py* are copied to the Lambda package folder and all contents in the folder are compressed. Note that *handler.py* should exist in the root of the compressed file so that it is necessary to run *zip* in the deployment package folder. The size of *admission.zip* is about 27MB so that it is good to deploy. Finally the package file is copied to a S3 bucket called *serverless-poc-handlers* - note that the [aws cli should be configured](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) to copy the file to S3.
+*handler.py* and *test_handler.py* are copied to the Lambda package folder and all contents in the folder are compressed. Note that *handler.py* should exist in the root of the compressed file so that it is necessary to run *zip* in the deployment package folder. The size of *admission.zip* is about 27MB so that it is good to deploy. Finally the package file is copied to a S3 bucket called *serverless-poc-handlers* - note that the [aws cli should be configured](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) to copy the file to S3.
 
 
 ```bash

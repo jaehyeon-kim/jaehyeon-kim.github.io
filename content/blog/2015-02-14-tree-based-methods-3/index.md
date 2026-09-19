@@ -30,7 +30,7 @@ description: Part III of tree based methods in R series. Regression tasks are di
 
 While classification tasks are implemented in the last two articles ([Part I](/blog/2015-02-01-tree-based-methods-1) and [Part II](/blog/2015-02-08-tree-based-methods-2)), a regression task is the topic of this article. While the **caret** package selects the tuning parameter (*cp*) that minimizes the error (*RMSE*), the **rpart** packages recommends the *1-SE rule*, which selects the smallest tree within 1 standard error of the minimum cross validation error (*xerror*). The models with 2 complexity parameters that are suggested by the packages are compared.
 
-The bold-cased sections of the [tutorial](http://topepo.github.io/caret/index.html) of the caret package are covered in this article.
+The bold-cased sections of the [tutorial](https://topepo.github.io/caret/index.html) of the caret package are covered in this article.
 
 - Visualizations
 - Pre-Processing
@@ -163,7 +163,7 @@ mod.cl = train(High ~ .
                ,trControl=trControl)
 ```
 
-Note that the package developer informs that, in spite of the warning messages, the function fits the training data without a problem so that the outcome can be relied upon ([Link](http://stackoverflow.com/questions/26828901/warning-message-missing-values-in-resampled-performance-measures-in-caret-tra)). Note that the criterion is selecting the *cp* that has the lowest *RMSE*.
+Note that the package developer informs that, in spite of the warning messages, the function fits the training data without a problem so that the outcome can be relied upon ([Link](https://stackoverflow.com/questions/26828901/warning-message-missing-values-in-resampled-performance-measures-in-caret-tra)). Note that the criterion is selecting the *cp* that has the lowest *RMSE*.
 
 
 ```r

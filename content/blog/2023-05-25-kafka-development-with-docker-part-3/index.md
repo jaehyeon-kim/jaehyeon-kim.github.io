@@ -164,7 +164,7 @@ rm -rf ${SRC_PATH} && mkdir -p ${SRC_PATH}/msk-datagen
 
 ## Confluent S3 Sink Connector
 echo "downloading confluent s3 connector..."
-DOWNLOAD_URL=https://d1i4a15mxbxib1.cloudfront.net/api/plugins/confluentinc/kafka-connect-s3/versions/10.4.3/confluentinc-kafka-connect-s3-10.4.3.zip
+DOWNLOAD_URL=https://hub-downloads.confluent.io/api/plugins/confluentinc/kafka-connect-s3/versions/10.4.3/confluentinc-kafka-connect-s3-10.4.3.zip
 
 curl -o ${SRC_PATH}/confluent.zip ${DOWNLOAD_URL} \
   && unzip -qq ${SRC_PATH}/confluent.zip -d ${SRC_PATH} \

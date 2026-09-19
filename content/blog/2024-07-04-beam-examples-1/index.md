@@ -63,7 +63,7 @@ To set up a local Flink cluster, we should download a supported Flink release (e
 mkdir -p setup && cd setup
 ## 1. download flink binary and decompress in the same folder
 FLINK_VERSION=1.18.1 # change flink version eg) 1.16.3, 1.17.2, 1.18.1 ...
-wget https://dlcdn.apache.org/flink/flink-${FLINK_VERSION}/flink-${FLINK_VERSION}-bin-scala_2.12.tgz
+wget https://archive.apache.org/dist/flink/flink-${FLINK_VERSION}/flink-${FLINK_VERSION}-bin-scala_2.12.tgz
 tar -zxf flink-${FLINK_VERSION}-bin-scala_2.12.tgz
 ## 2. update flink configuration in eg) ./flink-${FLINK_VERSION}/conf/flink-conf.yaml
 ##  rest.port: 8081                    # uncommented

@@ -47,7 +47,7 @@ According to [Wikipedia](https://en.wikipedia.org/wiki/Cross-origin_resource_sha
 
 > Cross-origin resource sharing (CORS) is a mechanism that allows restricted resources (e.g. fonts) on a web page to be requested from another domain outside the domain from which the first resource was served. A web page may freely embed cross-origin images, stylesheets, scripts, iframes, and videos. Certain "cross-domain" requests, notably Ajax requests, however are forbidden by default by the same-origin security policy.
 
-Here is an example from a [Stack Overflow answer](http://stackoverflow.com/questions/4850702/is-cors-a-secure-way-to-do-cross-domain-ajax-requests) why it can be important to prevent CORS.
+Here is an example from a [Stack Overflow answer](https://stackoverflow.com/questions/4850702/is-cors-a-secure-way-to-do-cross-domain-ajax-requests) why it can be important to prevent CORS.
 
 * You go to website X and the author of website X has written an evil script which gets sent to your browser.
 * That script running on your browser logs onto your bank website and does evil stuff and because it's running as you in your browser it has permission to do so.
@@ -86,7 +86,7 @@ After that, the API needs to be deployed again and, as can be seen in the deploy
 
 ### Update handler
 
-Despite enabling CORS, it was not possilbe to resolve the issue. After some search, a way is found in a [Stack Overflow answer](http://stackoverflow.com/questions/35190615/api-gateway-cors-no-access-control-allow-origin-header). It requires to update the Lambda function handler ([handler.py](https://github.com/jaehyeon-kim/serverless-poc/blob/master/poc-logit-handler/handler.py)) that extends the 200 response with *headers* elements - one for *CORS support to work* and the other for *cookies, authorization headers with HTTPS*. The original response is added to the *body* element of the new response. Note it'd be necessary to modify the case of *400* response in order to reduce the risk of encountering the error although it is not covered here.
+Despite enabling CORS, it was not possilbe to resolve the issue. After some search, a way is found in a [Stack Overflow answer](https://stackoverflow.com/questions/35190615/api-gateway-cors-no-access-control-allow-origin-header). It requires to update the Lambda function handler ([handler.py](https://github.com/jaehyeon-kim/serverless-poc/blob/master/poc-logit-handler/handler.py)) that extends the 200 response with *headers* elements - one for *CORS support to work* and the other for *cookies, authorization headers with HTTPS*. The original response is added to the *body* element of the new response. Note it'd be necessary to modify the case of *400* response in order to reduce the risk of encountering the error although it is not covered here.
 
 
 ```python
@@ -139,7 +139,7 @@ zip -r9 $HOME/admission.zip *
 aws s3 cp $HOME/admission.zip s3://serverless-poc-handlers
 ```
 
-The AWS web console doesn't have an option to update a Lambda function where the deployment package is in S3 so that [aws cli](http://docs.aws.amazon.com/cli/latest/reference/lambda/update-function-code.html) is used instead.
+The AWS web console doesn't have an option to update a Lambda function where the deployment package is in S3 so that [aws cli](https://docs.aws.amazon.com/cli/latest/reference/lambda/update-function-code.html) is used instead.
 
 
 ```bash
@@ -183,7 +183,7 @@ $httpStatus
 
 ## Hosting
 
-Amazon S3 is one of the popular ways to store static web contents and it can be used as a way to host a static web site. The React application can be hosted on S3 as the backend logic of calling the API is bundled and accessible. 2 ways are illustrated in this section. The former is via the *Static website hosting* property of [Amazon S3 Buckets](http://docs.aws.amazon.com/AmazonS3/latest/dev/HowDoIWebsiteConfiguration.html) while the latter is through [Amazon CloudFront](https://aws.amazon.com/cloudfront/), which is a content delivery network (CDN) service. Note that only *HTTP* is avaialble if the application is hosted without CloudFront.
+Amazon S3 is one of the popular ways to store static web contents and it can be used as a way to host a static web site. The React application can be hosted on S3 as the backend logic of calling the API is bundled and accessible. 2 ways are illustrated in this section. The former is via the *Static website hosting* property of [Amazon S3 Buckets](https://docs.aws.amazon.com/AmazonS3/latest/dev/HowDoIWebsiteConfiguration.html) while the latter is through [Amazon CloudFront](https://aws.amazon.com/cloudfront/), which is a content delivery network (CDN) service. Note that only *HTTP* is avaialble if the application is hosted without CloudFront.
 
 Separate S3 buckets are created to store the application as shown below.
 
@@ -212,7 +212,7 @@ Then, in the properties tab, *static website hosting* is enabled where *index.ht
 
 ![](03-s3-setup-03.png#center)
 
-In order to replace the *endpoint* with a custom domain name, a [Canonical name (CNAME) record](https://en.wikipedia.org/wiki/CNAME_record) is created in [Amazon Route 53](https://aws.amazon.com/route53/). Note that the CNAME record (*poc.jaehyeon.me*) has to be the same to the bucket name. `s3-website-us-east-1.amazonaws.com.` is entered in *Value*, which is used to define the host name as an alias for the Amazon S3 bucket. Note the period at the end is necessary as it signifies the DNS root and, if it is not specified, a DNS resolver could append it's default domain to the domain you provided. (See [Customizing Amazon S3 URLs with CNAMEs](http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html#VirtualHostingCustomURLs) for further details.) Now the application can be accessed using `http://poc.jaehyeon.me`. (That demo subdomain no longer exists, so the address is shown here as text rather than as a link.)
+In order to replace the *endpoint* with a custom domain name, a [Canonical name (CNAME) record](https://en.wikipedia.org/wiki/CNAME_record) is created in [Amazon Route 53](https://aws.amazon.com/route53/). Note that the CNAME record (*poc.jaehyeon.me*) has to be the same to the bucket name. `s3-website-us-east-1.amazonaws.com.` is entered in *Value*, which is used to define the host name as an alias for the Amazon S3 bucket. Note the period at the end is necessary as it signifies the DNS root and, if it is not specified, a DNS resolver could append it's default domain to the domain you provided. (See [Customizing Amazon S3 URLs with CNAMEs](https://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html#VirtualHostingCustomURLs) for further details.) Now the application can be accessed using `http://poc.jaehyeon.me`. (That demo subdomain no longer exists, so the address is shown here as text rather than as a link.)
 
 ![](04-route53.png#center)
 
@@ -224,7 +224,7 @@ It is possible to host the application using *Amazon CloudFront* which is a glob
 
 ![](05-cloudfront-01.png#center)
 
-The S3 bucket (*web.jaehyeon.me*) is selected as the origin domain name. Note, unlike relying on the *static website hosting* property where all objects in the bucket are given *read-access*, in this way, access to the bucket is *restricted* only to CloudFront with a newly created identity. The updated bucket policy is shown below. (See [Using an Origin Access Identity to Restrict Access to Your Amazon S3 Content](http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html) for further details.)
+The S3 bucket (*web.jaehyeon.me*) is selected as the origin domain name. Note, unlike relying on the *static website hosting* property where all objects in the bucket are given *read-access*, in this way, access to the bucket is *restricted* only to CloudFront with a newly created identity. The updated bucket policy is shown below. (See [Using an Origin Access Identity to Restrict Access to Your Amazon S3 Content](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html) for further details.)
 
 
 ```json
@@ -263,10 +263,10 @@ In Route 53, a new record set is created and `web.jaehyeon.me` is entered in the
 
 ![](05-cloudfront-07.png#center)
 
-Once it is ready, the application can be accessed using either [http://web.jaehyeon.me](http://web.jaehyeon.me) or [https://web.jaehyeon.me](https://web.jaehyeon.me) where HTTP is redirected to HTTPS.
+Once it is ready, the application can be accessed using either [https://web.jaehyeon.me](https://web.jaehyeon.me) or [https://web.jaehyeon.me](https://web.jaehyeon.me) where HTTP is redirected to HTTPS.
 
 ## Final thoughts
 
-This is the end of the *Serverless Data Product POC* series. I consider a good amount of information is shared in relation to *serverless data product development* and I hope you find the posts useful. For demonstration, I used the AWS web console but it wouldn't be suitable in a production environment as it involves a lot of manual jobs as well as those jobs are not reproducible. There are a number of notable frameworks that help develop applications in serverless environment: [Serverless Framework](https://serverless.com/), [Apex](http://apex.run/), [Chalice](https://github.com/awslabs/chalice) and [Zappa](https://github.com/Miserlou/Zappa). I hope there will be another series that cover one of these frameworks. 
+This is the end of the *Serverless Data Product POC* series. I consider a good amount of information is shared in relation to *serverless data product development* and I hope you find the posts useful. For demonstration, I used the AWS web console but it wouldn't be suitable in a production environment as it involves a lot of manual jobs as well as those jobs are not reproducible. There are a number of notable frameworks that help develop applications in serverless environment: [Serverless Framework](https://www.serverless.com/), [Apex](https://apex.run/), [Chalice](https://github.com/awslabs/chalice) and [Zappa](https://github.com/Miserlou/Zappa). I hope there will be another series that cover one of these frameworks. 
 
 

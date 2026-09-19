@@ -48,7 +48,7 @@ Amazon API Gageway provides several options to create an API. *New API* is selec
 
 ### Create resource and method
 
-According to [Thoughts on RESTful API Design](http://restful-api-design.readthedocs.io/en/latest/index.html), 
+According to [Thoughts on RESTful API Design](https://restful-api-design.readthedocs.io/en/latest/index.html), 
 
 > *In any RESTful API, a resource is an* __object__ *with a type, associated data, relationships to other resources, and a set of* __methods__ *that operate on it.*
 
@@ -111,7 +111,7 @@ Then the resource is named as *Admit*.
 
 ![](A02-create-resource-02.png#center)
 
-After creating the resource, it is necessary to create one or more [HTTP methods](http://restful-api-design.readthedocs.io/en/latest/methods.html) on it. 
+After creating the resource, it is necessary to create one or more [HTTP methods](https://restful-api-design.readthedocs.io/en/latest/methods.html) on it. 
 
 ![](A03-create-method-01.png#center)
 
@@ -143,7 +143,7 @@ It is possible to update the target backend or to modify data from the incoming 
 
 Among the 3 event elements (*gre*, *gpa* and *rank*), *rank* is a factor or, at least, it should be a string while the others can be either numbers or *numeric* strings. Therefore the Lambda function will complain if a numeric *rank* value is included in a query string (eg `rank=1`). Although it is possible to modify the Lambda function handler, an easier way is to modify data from the incoming request. 
 
-In *Body Mapping Templates*, the recommended option of *When there are no templates defined (recommended)* is selected in request body passthrough and *application/json* is added to *Content-Type*. Data from incoming request can be updated in the template that is shown by clicking the added content type (*application/json*). As shown below, *rank* is changed into a string before the Lambda function is called. Note [Velocity Template Engine](http://velocity.apache.org/) is used in Amazon API Gateway.
+In *Body Mapping Templates*, the recommended option of *When there are no templates defined (recommended)* is selected in request body passthrough and *application/json* is added to *Content-Type*. Data from incoming request can be updated in the template that is shown by clicking the added content type (*application/json*). As shown below, *rank* is changed into a string before the Lambda function is called. Note [Velocity Template Engine](https://velocity.apache.org/) is used in Amazon API Gateway.
 
 
 ```js
@@ -265,7 +265,7 @@ A usage plan enforces *Throttling (Rate and Burst)* and *Quota* of an API and it
 * __Burst__ is the capacity of the Token Bucket.
 * __Quota__ is the total number of requests in a given time period.
 
-For further details, see [Manage API Request Throttling](http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html) and [Token Bucket vs Leaky Bucket](https://www.youtube.com/watch?v=ac23ul88jLU).
+For further details, see [Manage API Request Throttling](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html) and [Token Bucket vs Leaky Bucket](https://www.youtube.com/watch?v=ac23ul88jLU).
 
 A usage plan named *ServerlessPOC* is created where the rate, burst and quote are 10 requests per second, 20 requests and 500 requests per day respectively. 
 
@@ -316,8 +316,8 @@ The prerequisites for using a custom dome name for an API are
 
 I registered a domain name (`jaehyeon.me`) in [Amazon Route 53](https://aws.amazon.com/route53/) and requested ACM Certificate through [AWS Certificate Manager](https://aws.amazon.com/certificate-manager/). It was quite quick to me and it took less than 1 day. See the following articles for how-to.
 
-  * [Registering Domain Names Using Amazon Route 53](http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/registrar.html)
-  * [Requesting and Managing ACM Certificates](http://docs.aws.amazon.com/acm/latest/userguide/gs-acm.html)
+  * [Registering Domain Names Using Amazon Route 53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/registrar.html)
+  * [Requesting and Managing ACM Certificates](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm.html)
 
 The domain name of the API is set to be `api.jaehyeon.me` and the approved ACM Certificate is selected. In *Base Path Mappings*, *poc* is added to the path and the production stage of the ServerlessPOC API is selected as the destination. In this way, it is possible to change the resource URL as following.
 

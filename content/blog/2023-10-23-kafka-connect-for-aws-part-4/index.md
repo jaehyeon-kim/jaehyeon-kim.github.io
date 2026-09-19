@@ -298,7 +298,7 @@ connectors/
 
 ## Kafka Management App
 
-A Kafka management app can be a good companion for development as it helps monitor and manage resources on an easy-to-use user interface. We'll use [Kpow Community Edition](https://docs.kpow.io/ce/) in this post, and we can link a single Kafka cluster, Kafka connect server and schema registry. Note that the community edition is valid for 12 months and the license can be requested in this [page](https://kpow.io/get-started/#individual). Once requested, the license details will be emailed, and they can be added as an environment file (*env_file*).
+A Kafka management app can be a good companion for development as it helps monitor and manage resources on an easy-to-use user interface. We'll use [Kpow Community Edition](https://docs.factorhouse.io/kpow/getting-started) in this post, and we can link a single Kafka cluster, Kafka connect server and schema registry. Note that the community edition is valid for 12 months and the license can be requested in this [page](https://factorhouse.io/products/kpow/). Once requested, the license details will be emailed, and they can be added as an environment file (*env_file*).
 
 ```yaml
 # docker-compose.yml
@@ -318,7 +318,7 @@ services:
     environment:
       BOOTSTRAP: kafka-0:9092
       CONNECT_REST_URL: http://kafka-connect:8083
-    env_file: # https://kpow.io/get-started/#individual
+    env_file: # https://factorhouse.io/products/kpow/
       - ./kpow.env
   
   ...

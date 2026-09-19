@@ -21,7 +21,7 @@ images: []
 description: In this post, a way to overcome one of R's limitations of lack of multi-threading is discussed by job queuing using the jobqueue package
 ---
 
-In this post, a way to overcome one of R's limitations (**lack of multi-threading**) is discussed by job queuing using the [jobqueue package](http://jobqueue.r-forge.r-project.org/) - a generic asynchronous job queue implementation for R. See the package description below.
+In this post, a way to overcome one of R's limitations (**lack of multi-threading**) is discussed by job queuing using the [jobqueue package](https://jobqueue.r-forge.r-project.org/) - a generic asynchronous job queue implementation for R. See the package description below.
 
 > The jobqueue package is meant to provide an easy-to-use interface that allows to queue computations for background evaluation while the calling R session remains responsive. It is based on a *1-node socket cluster from the parallel package*. The package provides a way to do basic threading in R. The main focus of the package is on an intuitive and easy-to-use interface for the job queue programming construct. ... Typical applications include: **background computation of lengthy tasks (such as data sourcing, model fitting, bootstrapping), simple/interactive parallelization (if you have 5 different jobs, move them to up to 5 different job queues), and concurrent task scheduling in more complicated R programs.** ...
 

@@ -287,7 +287,7 @@ After reviewing, we can create the connector.
 
 [Lenses S3 Connector](https://lenses.io/blog/2020/11/new-kafka-to-S3-connector/) is a Kafka Connect sink connector for writing records from Kafka to AWS S3 Buckets. It extends the standard connect config adding a parameter for a SQL command (Lenses Kafka Connect Query Language or "KCQL"). This defines how to map data from the source (in this case Kafka) to the target (S3). Importantly, it also includes how data should be partitioned into S3, the bucket names and the serialization format (support includes JSON, Avro, Parquet, Text, CSV and binary).
 
-I find the Lenses S3 connector is more straightforward to configure than the Confluent S3 sink connector for its [SQL-like syntax](https://docs.lenses.io/4.1/integrations/connectors/stream-reactor/sinks/s3sinkconnector/). The KCQL configuration indicates that object files are set to be
+I find the Lenses S3 connector is more straightforward to configure than the Confluent S3 sink connector for its [SQL-like syntax](https://docs.lenses.io/latest/connectors/kafka-connectors/sinks/aws-s3). The KCQL configuration indicates that object files are set to be
 
 
 * moved from a Kafka topic (`msk.datalake.cdc_events`) to an S3 bucket (`data-lake-demo-cevo`) with object prefix of _`cdc-events-local`,

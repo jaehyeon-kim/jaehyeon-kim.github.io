@@ -106,8 +106,8 @@ Two other vendors ([Aiven](https://aiven.io/) and [Lenses](https://lenses.io/)) 
 |:------|:-----:|:---:|:---:|
 |[S3](https://docs.aiven.io/docs/products/kafka/kafka-connect/howto/s3-sink-connector-aiven)||✔|Aiven|
 |[OpenSearch](https://docs.aiven.io/docs/products/kafka/kafka-connect/howto/opensearch-sink)||✔|Aiven|
-|[S3](https://docs.lenses.io/5.1/connectors/sinks/s3sinkconnector/)||✔|Lenses|
-|[S3](https://docs.lenses.io/5.1/connectors/sources/s3sourceconnector/)|✔||Lenses|
+|[S3](https://docs.lenses.io/latest/connectors/kafka-connectors/sinks/aws-s3)||✔|Lenses|
+|[S3](https://docs.lenses.io/latest/connectors/kafka-connectors/sources/aws-s3)|✔||Lenses|
 
 ## Summary
 

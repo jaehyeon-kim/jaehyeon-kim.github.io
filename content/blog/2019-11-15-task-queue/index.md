@@ -24,7 +24,7 @@ images: []
 description: In this post, I'll illustrate how a web service is created using FastAPI framework where tasks are sent to multiple workers. The workers are built with Celery and Rserve. Redis is used as a message broker/result backend for Celery and a key-value store for Rserve. Demos can be run in both Docker Compose and Kubernetes.
 ---
 
-While I'm looking into [Apache Airflow](https://airflow.apache.org/), a workflow management tool, I thought it would be beneficial to get some understanding of how [Celery](http://www.celeryproject.org/) works. To do so, I built a simple web service that sends tasks to Celery workers and collects the results from them. [FastAPI](https://fastapi.tiangolo.com/) is used for developing the web service and [Redis](https://redis.io/) is used for the message broker and result backend. During the development, I thought it would be possible to implement similar functionality in R with [Rserve](https://www.rforge.net/Rserve/). Therefore a Rserve worker is added as an example as well. Coupling a web service with distributed task queue is beneficial on its own as it helps the service be more responsive by offloading heavyweight and long running processes to task workers.
+While I'm looking into [Apache Airflow](https://airflow.apache.org/), a workflow management tool, I thought it would be beneficial to get some understanding of how [Celery](https://www.celeryproject.org/) works. To do so, I built a simple web service that sends tasks to Celery workers and collects the results from them. [FastAPI](https://fastapi.tiangolo.com/) is used for developing the web service and [Redis](https://redis.io/) is used for the message broker and result backend. During the development, I thought it would be possible to implement similar functionality in R with [Rserve](https://www.rforge.net/Rserve/). Therefore a Rserve worker is added as an example as well. Coupling a web service with distributed task queue is beneficial on its own as it helps the service be more responsive by offloading heavyweight and long running processes to task workers.
 
 In this post, it'll be illustrated how a web service is created using FastAPI framework where tasks are sent to multiple workers. The workers are built with Celery and Rserve. Redis is used as a message broker/result backend for Celery and a key-value store for Rserve. Demos can be run in both [Docker Compose](https://docs.docker.com/compose/) and [Kubernetes](https://kubernetes.io/).
 
@@ -65,7 +65,7 @@ def long_task(self, total):
 
 ## Rserve Worker
 
-[redux](https://github.com/richfitz/redux) package, Redis client for R, and [RSclient](http://www.rforge.net/RSclient/) package, R-based client for Rserve, are used to set up the Rserve worker. The function `RR()` checks if a Redis DB is available and returns a `hiredis` object, which is an interface to Redis. The task (`long_task()`) is constructed to be similar to the Celery task. In order for the task to be executed asynchronously, a handler function (`handle_long_task()`) is used to receive a request from the main web service. Once called, the task function is sent to be evaluated by a Rserve client (`RS.eval()`) - note `wait=FALSE` and `lazy=TRUE`. Its evaluation is asynchronous as the task function is run by a separate forked process. Finally the status of a task can be obtained by `get_task()` and it pulls the status output from the Redis DB - note a R list is converted as binary. The source of the Rserve worker can be found in `/queue_rserve/tasks.R`.
+[redux](https://github.com/richfitz/redux) package, Redis client for R, and [RSclient](https://www.rforge.net/RSclient/) package, R-based client for Rserve, are used to set up the Rserve worker. The function `RR()` checks if a Redis DB is available and returns a `hiredis` object, which is an interface to Redis. The task (`long_task()`) is constructed to be similar to the Celery task. In order for the task to be executed asynchronously, a handler function (`handle_long_task()`) is used to receive a request from the main web service. Once called, the task function is sent to be evaluated by a Rserve client (`RS.eval()`) - note `wait=FALSE` and `lazy=TRUE`. Its evaluation is asynchronous as the task function is run by a separate forked process. Finally the status of a task can be obtained by `get_task()` and it pulls the status output from the Redis DB - note a R list is converted as binary. The source of the Rserve worker can be found in `/queue_rserve/tasks.R`.
 
 ```r
 RR <- function(check_conn_only = FALSE) {
@@ -287,7 +287,7 @@ service/redis-service    ClusterIP   10.99.52.18      <none>        6379/TCP    
 service/rserve-service   ClusterIP   10.105.249.199   <none>        8000/TCP       25s
 ```
 
-The execute/collect pair of requests to the Celery worker are shown below. [HttPie](https://httpie.org/) is used to make HTTP requests.
+The execute/collect pair of requests to the Celery worker are shown below. [HttPie](https://httpie.io/) is used to make HTTP requests.
 
 ```bash
 echo '{"total": 30}' | http POST http://172.28.175.23:30000/celery/execute

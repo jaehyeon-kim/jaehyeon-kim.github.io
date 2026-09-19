@@ -30,7 +30,7 @@ description: Part II of tree based methods in R series. Cost-sensitive classific
 
 In the previous article ([Tree Based Methods in R - Part I](/blog/2015-02-01-tree-based-methods-1)), a decision tree is created on the *Carseats* data which is in the chapter 8 lab of [ISLR](https://www.statlearning.com/). In that article, potentially asymetric costs due to misclassification are not taken into account. When unbalance between false positive and false negative can have a significant impact, it can be explicitly adjusted either by altering prior (or empirical) probabilities or by adding a loss matrix. 
 
-A comprehensive summary of this topic, as illustrated in [Berk (2008)](http://www.springer.com/mathematics/probability/book/978-0-387-77500-5), is shown below.
+A comprehensive summary of this topic, as illustrated in [Berk (2008)](https://www.springer.com/mathematics/probability/book/978-0-387-77500-5), is shown below.
 
 > ...when the CART solution is determined solely by the data, the prior distribution is empirically determined, and the costs in the loss matrix of all classification errors are the same. Costs are being assigned even if the data analyst makes no conscious decision about them. Should the balance of false negatives to false positives that results be unsatisfactory, that balance can be changed. Either the costs in the loss matrix can be directly altered, leaving the prior distribution to be empirically determined, or the prior distribution can be altered leaving the default costs untouched. Much of the software currently available makes it easier to change the prior in the binary response case. When there are more than two response categories, it will usually be easier in practice to change the costs in the loss matrix directly.
 
@@ -44,7 +44,7 @@ The corresponding altered priors can be obtained by
 
 ![](latex-pi.png#center)
 
-The bold-cased sections of the [tutorial](http://topepo.github.io/caret/index.html) of the caret package are covered in this article.
+The bold-cased sections of the [tutorial](https://topepo.github.io/caret/index.html) of the caret package are covered in this article.
 
 - Visualizations
 - Pre-Processing
@@ -193,7 +193,7 @@ cp = mod.eq.cost$bestTune$cp
 mod.eq.cost = rpart(High ~ ., data=trainData, control=rpart.control(cp=cp))
 ```
 
-Confusion matrices are obtained from both the training and test data sets. Here the matrices are transposed to the previous article and this is to keep the same structure as used in [Berk (2008)](http://www.springer.com/mathematics/probability/book/978-0-387-77500-5) - the source of `getUpdatedCM()` can be found in this [gist](https://gist.github.com/jaehyeon-kim/23bc73660e0e7b53a36f). 
+Confusion matrices are obtained from both the training and test data sets. Here the matrices are transposed to the previous article and this is to keep the same structure as used in [Berk (2008)](https://www.springer.com/mathematics/probability/book/978-0-387-77500-5) - the source of `getUpdatedCM()` can be found in this [gist](https://gist.github.com/jaehyeon-kim/23bc73660e0e7b53a36f). 
 
 The **model error** means how successful fitting or prediction is on each class given data and it is shown that the *High* class is more misclassified. The *use error* is to see how useful the model is given fitted or predicted values. It is also found that misclassification of the *High* class becomes worse when the model is applied to the test data.
 
@@ -360,4 +360,4 @@ pred.cm.uq.cost
 ## Use Error          0.35     0.15        0.25
 ```
 
-<!-- <script src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type="text/javascript"></script> -->
+<!-- <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type="text/javascript"></script> -->

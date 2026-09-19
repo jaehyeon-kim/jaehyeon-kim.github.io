@@ -26,7 +26,7 @@ cevo: 9
 description: We'll discuss how to set up a development infrastructure on AWS with Terraform. Terraform is used as an effective way of managing resources on AWS. An Aurora PostgreSQL cluster is created in a private subnet and SoftEther VPN is configured to access the database from the developer machine.
 ---
 
-When I wrote my data lake demo series ([part 1](/blog/2021-12-05-datalake-demo-part1), [part 2](/blog/2021-12-12-datalake-demo-part2) and [part 3](/blog/2021-12-19-datalake-demo-part3)) recently, I used an Aurora PostgreSQL, MSK and EMR cluster. All of them were deployed to private subnets and dedicated infrastructure was created using CloudFormation. Using the infrastructure as code (IaC) tool helped a lot, but it resulted in creating 7 CloudFormation stacks, which was a bit harder to manage in the end. Then I looked into how to simplify building infrastructure and managing resources on AWS and decided to use Terraform instead. I find it has useful constructs (e.g. [meta-arguments](https://blog.knoldus.com/meta-arguments-in-terraform/)) to make it simpler to create and manage resources. It also has a wide range of useful [modules](https://registry.terraform.io/namespaces/terraform-aws-modules) that facilitate development significantly. In this post, we’ll build an infrastructure for development on AWS with Terraform. A VPN server will also be included in order to improve developer experience by accessing resources in private subnets from developer machines.
+When I wrote my data lake demo series ([part 1](/blog/2021-12-05-datalake-demo-part1), [part 2](/blog/2021-12-12-datalake-demo-part2) and [part 3](/blog/2021-12-19-datalake-demo-part3)) recently, I used an Aurora PostgreSQL, MSK and EMR cluster. All of them were deployed to private subnets and dedicated infrastructure was created using CloudFormation. Using the infrastructure as code (IaC) tool helped a lot, but it resulted in creating 7 CloudFormation stacks, which was a bit harder to manage in the end. Then I looked into how to simplify building infrastructure and managing resources on AWS and decided to use Terraform instead. I find it has useful constructs (e.g. [meta-arguments](https://developer.hashicorp.com/terraform/language/meta-arguments)) to make it simpler to create and manage resources. It also has a wide range of useful [modules](https://registry.terraform.io/namespaces/terraform-aws-modules) that facilitate development significantly. In this post, we’ll build an infrastructure for development on AWS with Terraform. A VPN server will also be included in order to improve developer experience by accessing resources in private subnets from developer machines.
 
 [**UPDATE 2023-10-13**]
 - In later projects, the VPN admin password and VPN pre shared key are auto-generated and saved as a secret in AWS Secrets Manager. The changes are added to VPN section. 
@@ -46,12 +46,12 @@ Even developing a single database can result in a stack of resources and Terrafo
 
 
 
-* [init](https://www.terraform.io/cli/commands/init) - It is used to initialize a working directory containing Terraform configuration files.
-* [plan](https://www.terraform.io/cli/commands/plan) - It creates an execution plan, which lets you preview the changes that Terraform plans to make to your infrastructure.
-* [apply](https://www.terraform.io/cli/commands/apply) - It executes the actions proposed in a Terraform plan.
-* [destroy](https://www.terraform.io/cli/commands/destroy) - It is a convenient way to destroy all remote objects managed by a particular Terraform configuration.
+* [init](https://developer.hashicorp.com/terraform/cli/commands/init) - It is used to initialize a working directory containing Terraform configuration files.
+* [plan](https://developer.hashicorp.com/terraform/cli/commands/plan) - It creates an execution plan, which lets you preview the changes that Terraform plans to make to your infrastructure.
+* [apply](https://developer.hashicorp.com/terraform/cli/commands/apply) - It executes the actions proposed in a Terraform plan.
+* [destroy](https://developer.hashicorp.com/terraform/cli/commands/destroy) - It is a convenient way to destroy all remote objects managed by a particular Terraform configuration.
 
-The [**GitHub repository**](https://github.com/jaehyeon-kim/dev-infra-demo-terraform) for this post has the following directory structure. [Terraform resources](https://www.terraform.io/language/resources) are grouped into 4 files, and they’ll be discussed further below. The remaining files are supporting elements and their details can be found in the [language reference](https://www.terraform.io/language).
+The [**GitHub repository**](https://github.com/jaehyeon-kim/dev-infra-demo-terraform) for this post has the following directory structure. [Terraform resources](https://developer.hashicorp.com/terraform/language/resources) are grouped into 4 files, and they’ll be discussed further below. The remaining files are supporting elements and their details can be found in the [language reference](https://developer.hashicorp.com/terraform/language).
 
 
 ```bash
@@ -74,7 +74,7 @@ $ tree
 
 ### VPC
 
-We can use the [AWS VPC module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) to construct a VPC. A [Terraform module](https://www.terraform.io/language/modules) is a container for multiple resources, and it makes it easier to manage related resources. A VPC with 2 availability zones is defined and private/public subnets are configured to each of them. Optionally a NAT gateway is added only to a single availability zone.
+We can use the [AWS VPC module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) to construct a VPC. A [Terraform module](https://developer.hashicorp.com/terraform/language/modules) is a container for multiple resources, and it makes it easier to manage related resources. A VPC with 2 availability zones is defined and private/public subnets are configured to each of them. Optionally a NAT gateway is added only to a single availability zone.
 
 
 ```terraform

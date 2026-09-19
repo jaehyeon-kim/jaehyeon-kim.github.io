@@ -21,7 +21,7 @@ images: []
 description: Part I that demonstrates how to implement parallem processing on single machine in R
 ---
 
-Lack of multi-threading and memory limitation are two outstanding weaknesses of base R. In fact, however, if the size of data is not so large that it can be read in RAM, the former would be relatively easily handled by parallel processing, provided that multiple processors are equipped. This article introduces to a way of implementing parallel processing on a single machine using the **snow** and **parallel** packages - the examples are largely based on [McCallum and Weston (2012)](http://shop.oreilly.com/product/0636920021421.do).
+Lack of multi-threading and memory limitation are two outstanding weaknesses of base R. In fact, however, if the size of data is not so large that it can be read in RAM, the former would be relatively easily handled by parallel processing, provided that multiple processors are equipped. This article introduces to a way of implementing parallel processing on a single machine using the **snow** and **parallel** packages - the examples are largely based on [McCallum and Weston (2012)](https://shop.oreilly.com/product/0636920021421.do).
 
 The **snow** and **multicore** are two of the packages for parallel processing and the **parallel** package, which has been included in the base R distribution by CRAN (since R 2.14.0), provides functions of both the packages (and more). Only the functions based on the **snow** package are covered in the article.
 
@@ -203,7 +203,7 @@ plot(stPL, title="parLapply")
 reset("snow")
 ```
 
-Although `clusterApplyLB()` has some improvement over `clusterApply()`, it is `parLapply()` which takes the least amount of time. Actually, for the **snow** package, [McCallum and Weston (2012)](http://shop.oreilly.com/product/0636920021421.do) recommends `parLapply()` and it'd be better to use `parLapplyLB()` if the **parallel** package is used. The elapsed time of each function is shown below - the last two functions' elapsed time is identical as individual tasks are assumed to take exactly the same amount of time.
+Although `clusterApplyLB()` has some improvement over `clusterApply()`, it is `parLapply()` which takes the least amount of time. Actually, for the **snow** package, [McCallum and Weston (2012)](https://shop.oreilly.com/product/0636920021421.do) recommends `parLapply()` and it'd be better to use `parLapplyLB()` if the **parallel** package is used. The elapsed time of each function is shown below - the last two functions' elapsed time is identical as individual tasks are assumed to take exactly the same amount of time.
 
 
 ```r
@@ -236,7 +236,7 @@ reset("parallel")
 
 ## Initialization of workers
 
-Sometimes workers have to be initialized (eg loading a library) and two functions can be used: `clusterEvalQ()` and `clusterCall()`. While the former just executes an expression, it is possible to send a variable using the latter. Note that it is recommended to let an expression or a function return *NULL* in order not to receive unnecessary data from workers ([McCallum and Weston (2012)](http://shop.oreilly.com/product/0636920021421.do)). Only an example by the **snow** package is shown below.
+Sometimes workers have to be initialized (eg loading a library) and two functions can be used: `clusterEvalQ()` and `clusterCall()`. While the former just executes an expression, it is possible to send a variable using the latter. Note that it is recommended to let an expression or a function return *NULL* in order not to receive unnecessary data from workers ([McCallum and Weston (2012)](https://shop.oreilly.com/product/0636920021421.do)). Only an example by the **snow** package is shown below.
 
 
 ```r

@@ -161,7 +161,7 @@ In later versions of the Strimzi operator manage the Kafka and Zookeeper nodes u
 
 ### Deploy Kafka UI
 
-[UI for Apache Kafka (kafka-ui)](https://docs.kafka-ui.provectus.io/overview/readme) is a free and open-source Kafka management application, and it is deployed as a Kubernetes Deployment. The Deployment is configured to have a single instance, and the Kafka cluster access details are specified as environment variables. The app is associated by a service of the *NodePort* type for external access.
+[UI for Apache Kafka (kafka-ui)](https://ui.docs.kafbat.io/) is a free and open-source Kafka management application, and it is deployed as a Kubernetes Deployment. The Deployment is configured to have a single instance, and the Kafka cluster access details are specified as environment variables. The app is associated by a service of the *NodePort* type for external access.
 
 ```yaml
 # manifests/kafka-ui.yaml

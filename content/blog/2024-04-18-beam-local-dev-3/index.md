@@ -98,7 +98,7 @@ The latest supported version of Apache Flink is 1.16 as of writing this post, an
 
 ```bash
 $ mkdir setup && cd setup
-$ wget https://dlcdn.apache.org/flink/flink-1.16.3/flink-1.16.3-bin-scala_2.12.tgz
+$ wget https://archive.apache.org/dist/flink/flink-1.16.3/flink-1.16.3-bin-scala_2.12.tgz
 $ tar -zxf flink-1.16.3-bin-scala_2.12.tgz
 $ chmod -R +x flink-1.16.3/bin/
 ```

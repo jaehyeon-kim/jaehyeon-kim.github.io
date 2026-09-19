@@ -114,7 +114,7 @@ spec:
       - name: confluentinc-kafka-connect-s3
         artifacts:
           - type: zip
-            url: https://d1i4a15mxbxib1.cloudfront.net/api/plugins/confluentinc/kafka-connect-s3/versions/10.4.3/confluentinc-kafka-connect-s3-10.4.3.zip
+            url: https://hub-downloads.confluent.io/api/plugins/confluentinc/kafka-connect-s3/versions/10.4.3/confluentinc-kafka-connect-s3-10.4.3.zip
       - name: msk-data-generator
         artifacts:
           - type: jar

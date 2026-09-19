@@ -1097,7 +1097,7 @@ Note that schema versioning and validation would be more relevant to the clients
 ## Deployment
 ### Topic Creation
 
-We plan to create the *orders* topic with multiple partitions. Although we can use the Kafka CLI tool, it can be performed easily using [Kpow](https://docs.kpow.io/ce/). It is a Kafka monitoring and management tool, which provides a web UI. Also, it supports the Glue Schema Registry and MSK Connect out-of-box, which is quite convenient. In the docker-compose file, we added environment variables for the MSK cluster, MSK Connect and Glue Schema Registry details. Note it fails to start if the schema registry does not exist. I created the registry while I demonstrated schema evolution, or it can be created simply as shown below.
+We plan to create the *orders* topic with multiple partitions. Although we can use the Kafka CLI tool, it can be performed easily using [Kpow](https://docs.factorhouse.io/kpow/getting-started). It is a Kafka monitoring and management tool, which provides a web UI. Also, it supports the Glue Schema Registry and MSK Connect out-of-box, which is quite convenient. In the docker-compose file, we added environment variables for the MSK cluster, MSK Connect and Glue Schema Registry details. Note it fails to start if the schema registry does not exist. I created the registry while I demonstrated schema evolution, or it can be created simply as shown below.
 
 ```bash
 $ aws glue create-registry --registry-name customer

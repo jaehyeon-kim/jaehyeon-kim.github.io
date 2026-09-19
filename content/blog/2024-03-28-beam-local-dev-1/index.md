@@ -439,7 +439,7 @@ $ head -n 3 outputs/1711341025220-00000-of-00001.out
 
 ## Interactive Beam
 
-[Interactive Beam](https://github.com/apache/beam/tree/master/sdks/python/apache_beam/runners/interactive) is aimed at integrating Apache Beam with [Jupyter notebook](http://jupyter.org/) to make pipeline prototyping and data exploration much faster and easier. It provides nice features such as graphical representation of pipeline DAGs and [PCollection](https://beam.apache.org/documentation/basics/#pcollection) elements, fetching PCollections as pandas DataFrame and faster execution/re-execution of pipelines.
+[Interactive Beam](https://github.com/apache/beam/tree/master/sdks/python/apache_beam/runners/interactive) is aimed at integrating Apache Beam with [Jupyter notebook](https://jupyter.org/) to make pipeline prototyping and data exploration much faster and easier. It provides nice features such as graphical representation of pipeline DAGs and [PCollection](https://beam.apache.org/documentation/basics/#pcollection) elements, fetching PCollections as pandas DataFrame and faster execution/re-execution of pipelines.
 
 We can start a Jupyter server while enabling Jupyter Lab and ignoring authentication as shown below. Once started, it can be accessed on *http://localhost:8888*.
 

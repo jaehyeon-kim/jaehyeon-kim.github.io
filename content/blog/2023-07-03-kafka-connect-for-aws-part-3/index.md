@@ -213,7 +213,7 @@ resource "aws_dynamodb_table" "orders_table" {
 
 ## Kafka Management App
 
-A Kafka management app can be a good companion for development as it helps monitor and manage resources on an easy-to-use user interface. We'll use [*Kpow Community Edition (CE)*](https://docs.kpow.io/ce/) in this post. It allows you to manage one Kafka Cluster, one Schema Registry, and one Connect Cluster, with the UI supporting a single user session at a time. In the following compose file, we added connection details of the MSK cluster and MSK Connect.
+A Kafka management app can be a good companion for development as it helps monitor and manage resources on an easy-to-use user interface. We'll use [*Kpow Community Edition (CE)*](https://docs.factorhouse.io/kpow/getting-started) in this post. It allows you to manage one Kafka Cluster, one Schema Registry, and one Connect Cluster, with the UI supporting a single user session at a time. In the following compose file, we added connection details of the MSK cluster and MSK Connect.
 
 ```yaml
 # kafka-connect-for-aws/part-03/docker-compose.yml

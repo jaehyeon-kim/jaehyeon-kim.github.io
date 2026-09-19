@@ -40,7 +40,7 @@ We develop an Apache Beam pipeline using the Python SDK and deploy it on an [Apa
 
 ## Setup Kafka Cluster
 
-Same as [Part I](/blog/2024-05-30-beam-deploy-1), we deploy a Kafka cluster using the [Strimzi Operator](https://strimzi.io/) on a [minikube](https://minikube.sigs.k8s.io/docs/) cluster. Also, we create [UI for Apache Kafka (kafka-ui)](https://docs.kafka-ui.provectus.io/overview/readme) to facilitate development. See [Part I](/blog/2024-05-30-beam-deploy-1) for details about how to create them. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-deploy).
+Same as [Part I](/blog/2024-05-30-beam-deploy-1), we deploy a Kafka cluster using the [Strimzi Operator](https://strimzi.io/) on a [minikube](https://minikube.sigs.k8s.io/docs/) cluster. Also, we create [UI for Apache Kafka (kafka-ui)](https://ui.docs.kafbat.io/) to facilitate development. See [Part I](/blog/2024-05-30-beam-deploy-1) for details about how to create them. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-deploy).
 
 When a Kafka cluster is created successfully, we can see the following resources.
 

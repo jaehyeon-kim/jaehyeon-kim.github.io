@@ -292,7 +292,7 @@ The web service can be started as following.
 FLASK_APP=api FLASK_ENV=development flask run
 ```
 
-Using [HttPie](https://httpie.org/), the record created just before can be checked as following.
+Using [HttPie](https://httpie.io/), the record created just before can be checked as following.
 
 ```bash
 http http://localhost:5000/api/records/4

@@ -30,7 +30,7 @@ description: Part I of tree based methods in R series. Classification analysis i
 
 This is the first article about tree based methods using R. *Carseats* data in the chapter 8 lab of [ISLR](https://www.statlearning.com/) is used to perform classification analysis. Unlike the lab example, the **rpart** package is used to fit the CART model on the data and the **caret** package is used for tuning the pruning parameter (`cp`).
 
-The bold-cased sections of the [tutorial](http://topepo.github.io/caret/index.html) are covered in this article.
+The bold-cased sections of the [tutorial](https://topepo.github.io/caret/index.html) are covered in this article.
 
 - Visualizations
 - Pre-Processing
@@ -361,4 +361,4 @@ mmse.cl
 
 More models are going to be implemented/compared in the subsequent articles.
 
-<!-- <script src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type="text/javascript"></script> -->
+<!-- <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' type="text/javascript"></script> -->

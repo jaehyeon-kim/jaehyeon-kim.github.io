@@ -24,19 +24,19 @@ description: We discuss how to make use of Python outcomes in R using a package.
 
 As mentioned in an [earlier post](/blog/2015-08-09-some-thoughts-on-python-for-r-users), things that are not easy in R can be relatively simple in other languages. Another example would be connecting to Amazon Web Services. In relation to s3, although there are a number of existing packages, many of them seem to be deprecated, premature or platform-dependent. (I consider the [cloudyr](https://cloudyr.github.io/) project looks promising though.)
 
-If there isn't a comprehensive *R-way* of doing something yet, it may be necessary to create it from scratch. Actually there are some options to do so by using [AWS Command Line Interface](https://aws.amazon.com/cli/), [AWS REST API](http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html) or wrapping functionality of another language.
+If there isn't a comprehensive *R-way* of doing something yet, it may be necessary to create it from scratch. Actually there are some options to do so by using [AWS Command Line Interface](https://aws.amazon.com/cli/), [AWS REST API](https://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html) or wrapping functionality of another language.
 
 In this post, a quick summary of the last way using Python is illustrated by introducing the [rs3helper](https://github.com/jaehyeon-kim/rs3helper) package.
 
 The reasons why I've come up with a package are as following.
 
-* Firstly, Python is relatively easy to learn and it has quite a comprehensive interface to Amazon Web Services - [boto](http://boto.cloudhackers.com/en/latest/).
-* Secondly, in order to call Python in R, the [rPython](http://rpython.r-forge.r-project.org/) package may be used if it only targets UNIX-like platforms. For cross-platform functionality, however, `system` command has to be executed. 
+* Firstly, Python is relatively easy to learn and it has quite a comprehensive interface to Amazon Web Services - [boto](https://boto.cloudhackers.com/en/latest/).
+* Secondly, in order to call Python in R, the [rPython](https://rpython.r-forge.r-project.org/) package may be used if it only targets UNIX-like platforms. For cross-platform functionality, however, `system` command has to be executed. 
 * Finally, due to the previous reason, it wouldn't be stable to keep the source files locally and it'd be necessary to keep them in a package.
 
-I use Python 2.7 and the boto library can be installed easily using [pip](http://pip.readthedocs.org/en/stable/quickstart/) by executing `pip install boto`.
+I use Python 2.7 and the boto library can be installed easily using [pip](https://pip.readthedocs.org/en/stable/quickstart/) by executing `pip install boto`.
 
-Using RStudio, it is not that complicated to develop a package. (see [R packages](http://r-pkgs.had.co.nz/) by Hadley Wickham) Even the folder structure and necessary files are generated if the project type is selected as *R Package*. R script files should locate in the **R** folder while Python scripts should be in **inst/python**. 
+Using RStudio, it is not that complicated to develop a package. (see [R packages](https://r-pkgs.org/) by Hadley Wickham) Even the folder structure and necessary files are generated if the project type is selected as *R Package*. R script files should locate in the **R** folder while Python scripts should be in **inst/python**. 
 
 In the package, the s3-related R functions exists in **R/s3utils.R** while the corresponding python scripts are in **inst/python** - all Python functions are in **inst/python/s3helper.py**. As the Python function outputs should be passed to R, a *response* variable is returned for each function and it is converted into JSON string. The response variable is a Python list, dictionary or list of dictionaries and thus it is parsed as R vector, list or data frame.
 

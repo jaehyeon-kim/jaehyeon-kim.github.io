@@ -314,7 +314,7 @@ connectors/
 
 ## Kafka Management App
 
-A Kafka management app can be a good companion for development as it helps monitor and manage resources on an easy-to-use user interface. We'll use [*kafka-ui*](https://docs.kafka-ui.provectus.io/overview/readme) in this post. It provides a docker image, and we can link one or more Kafka clusters and related resources to it. In the following compose file, we added connection details of the Kafka cluster and Kafka Connect server.
+A Kafka management app can be a good companion for development as it helps monitor and manage resources on an easy-to-use user interface. We'll use [*kafka-ui*](https://ui.docs.kafbat.io/) in this post. It provides a docker image, and we can link one or more Kafka clusters and related resources to it. In the following compose file, we added connection details of the Kafka cluster and Kafka Connect server.
 
 ```yaml
 # kafka-connect-for-aws/part-02/compose-ui.yml

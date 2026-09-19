@@ -23,17 +23,17 @@ images: []
 description: We discuss how to set up a Spark cluser between 2 Ubuntu guests. Firstly it begins with machine preparation.
 ---
 
-We discuss how to set up a Spark cluser between 2 Ubuntu guests. Firstly it begins with machine preparation. Once a machine is baked, its image file (*VDI*) is be copied for the second one. Then how to launch a cluster by [standalone mode](http://spark.apache.org/docs/latest/spark-standalone.html) is discussed. Let's get started.
+We discuss how to set up a Spark cluser between 2 Ubuntu guests. Firstly it begins with machine preparation. Once a machine is baked, its image file (*VDI*) is be copied for the second one. Then how to launch a cluster by [standalone mode](https://spark.apache.org/docs/latest/spark-standalone.html) is discussed. Let's get started.
 
 ## Machine preparation 
 
-If you haven't read the previous post, I recommend reading as it introduces [Putty](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html) as well. Also, as Spark need Java Development Kit (JDK), you may need to _apt-get_ it first - see [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-java-on-ubuntu-with-apt-get) for further details.
+If you haven't read the previous post, I recommend reading as it introduces [Putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/download.html) as well. Also, as Spark need Java Development Kit (JDK), you may need to _apt-get_ it first - see [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-java-on-ubuntu-with-apt-get) for further details.
 
 I downloaded _Spark 1.6.0 Pre-built for Hadoop 2.6 and later_ and unpacked it in my user directory as following.
 
 ```
 cd ~
-wget http://www.us.apache.org/dist/spark/spark-1.6.0/spark-1.6.0-bin-hadoop2.6.tgz
+wget https://archive.apache.org/dist/spark/spark-1.6.0/spark-1.6.0-bin-hadoop2.6.tgz
 tar zxvf spark-*.tgz
 mv ./spark*/ spark
 ```
@@ -78,7 +78,7 @@ In my case, the master and slave machine's IP addresses are set up to be _192.16
 
 ![](02_diff_ip.png#center)
 
-Also they have the same host name: *ubuntu-master*. It'd be necessary to change the slave machine's host name. I modified the host name in _/etc/hostname_ and _/etc/hosts_. Basically I changed any _ubuntu-master_ in those files to _ubuntu-slave1_ and restarted the machine - see further [details](http://askubuntu.com/questions/87665/how-do-i-change-the-hostname-without-a-restart) Note this requires **root** privilege.
+Also they have the same host name: *ubuntu-master*. It'd be necessary to change the slave machine's host name. I modified the host name in _/etc/hostname_ and _/etc/hosts_. Basically I changed any _ubuntu-master_ in those files to _ubuntu-slave1_ and restarted the machine - see further [details](https://askubuntu.com/questions/87665/how-do-i-change-the-hostname-without-a-restart) Note this requires **root** privilege.
 
 The updated host name is shown below in the right.
 

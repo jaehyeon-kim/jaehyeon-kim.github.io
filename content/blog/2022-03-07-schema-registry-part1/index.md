@@ -121,6 +121,7 @@ services:
 
 When the script ([download-connectors.sh](https://github.com/jaehyeon-kim/msk-connect-schema-registry/blob/main/connect/local/download-connectors.sh)) runs, it downloads connector sources from Maven Central and Confluent Hub and decompresses. And the [Kafka Connect Avro Converter](https://www.confluent.io/hub/confluentinc/kafka-connect-avro-converter) is packaged together with connector sources, which is necessary for Avro serialization of messages and schema registry integration. Note that, if we run our own Kafka connect, we'd add it to one of the folders of the connect service and update its plugin path to enable class discovery. However, we don't have such control on MSK Connect, and we should add the converter source to the individual connectors.
 
+The Voluble download in the script no longer works. Voluble was retired and Confluent Hub no longer serves it. The source is still at [MichaelDrogalis/voluble](https://github.com/MichaelDrogalis/voluble), so the connector has to be built from there.
 
 ```bash
 # connect/local/download-connectors.sh
@@ -142,7 +143,7 @@ curl -S -L ${DOWNLOAD_URL} | tar -C ${SRC_PATH} --warning=no-unknown-keyword -xz
 
 ## Confluent S3 Sink Connector
 echo "downloading confluent s3 connector..."
-DOWNLOAD_URL=https://d1i4a15mxbxib1.cloudfront.net/api/plugins/confluentinc/kafka-connect-s3/versions/10.0.5/confluentinc-kafka-connect-s3-10.0.5.zip
+DOWNLOAD_URL=https://hub-downloads.confluent.io/api/plugins/confluentinc/kafka-connect-s3/versions/10.0.5/confluentinc-kafka-connect-s3-10.0.5.zip
 
 curl ${DOWNLOAD_URL} -o ${SRC_PATH}/confluent.zip \
   && unzip -qq ${SRC_PATH}/confluent.zip -d ${SRC_PATH} \
@@ -151,7 +152,7 @@ curl ${DOWNLOAD_URL} -o ${SRC_PATH}/confluent.zip \
 
 ## Voluble Source Connector
 echo "downloading voluble connector..."
-DOWNLOAD_URL=https://d1i4a15mxbxib1.cloudfront.net/api/plugins/mdrogalis/voluble/versions/0.3.1/mdrogalis-voluble-0.3.1.zip
+DOWNLOAD_URL=https://hub-downloads.confluent.io/api/plugins/mdrogalis/voluble/versions/0.3.1/mdrogalis-voluble-0.3.1.zip
 
 curl ${DOWNLOAD_URL} -o ${SRC_PATH}/voluble.zip \
   && unzip -qq ${SRC_PATH}/voluble.zip -d ${SRC_PATH} \
@@ -160,7 +161,7 @@ curl ${DOWNLOAD_URL} -o ${SRC_PATH}/voluble.zip \
 
 if [ ${WITH_AVRO} == "Y" ]; then
   echo "downloading kafka connect avro converter..."
-  DOWNLOAD_URL=https://d1i4a15mxbxib1.cloudfront.net/api/plugins/confluentinc/kafka-connect-avro-converter/versions/6.0.3/confluentinc-kafka-connect-avro-converter-6.0.3.zip
+  DOWNLOAD_URL=https://hub-downloads.confluent.io/api/plugins/confluentinc/kafka-connect-avro-converter/versions/6.0.3/confluentinc-kafka-connect-avro-converter-6.0.3.zip
 
   curl ${DOWNLOAD_URL} -o ${SRC_PATH}/avro.zip \
     && unzip -qq ${SRC_PATH}/avro.zip -d ${SRC_PATH} \

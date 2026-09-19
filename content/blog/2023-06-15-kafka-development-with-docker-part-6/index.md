@@ -168,7 +168,7 @@ rm -rf ${SRC_PATH} && mkdir -p ${SRC_PATH}/msk-datagen
 
 ## Confluent S3 Sink Connector
 echo "downloading confluent s3 connector..."
-DOWNLOAD_URL=https://d1i4a15mxbxib1.cloudfront.net/api/plugins/confluentinc/kafka-connect-s3/versions/10.4.3/confluentinc-kafka-connect-s3-10.4.3.zip
+DOWNLOAD_URL=https://hub-downloads.confluent.io/api/plugins/confluentinc/kafka-connect-s3/versions/10.4.3/confluentinc-kafka-connect-s3-10.4.3.zip
 
 curl -o ${SRC_PATH}/confluent.zip ${DOWNLOAD_URL} \
   && unzip -qq ${SRC_PATH}/confluent.zip -d ${SRC_PATH} \
@@ -253,7 +253,7 @@ plugins/aws-glue-schema-registry-v.1.1.15/protobuf-kafkaconnect-converter/target
 
 We should configure additional details in environment variables in order to integrate Glue Schema Registry. While both apps provide serializers/deserializers, *kpow* supports to manage schemas as well.
 
-For *kafka-ui*, we can add one or more [serialization plugins](https://docs.kafka-ui.provectus.io/configuration/serialization-serde). I added the [Glue registry serializer](https://github.com/provectus/kafkaui-glue-sr-serde) as a plugin and named it online-order*. It requires the plugin binary file path, class name, registry name and AWS region name. Another key configuration values are the key and value schema templates values, which are used for finding schema names. They are left unchanged because I will not enable schema for the key and the default template rule (`%s`) for the value matches the default naming convention of the client library. Note that those template properties are only applicable for message production on the UI, and we can leave them commented out if we don't attempt that.
+For *kafka-ui*, we can add one or more [serialization plugins](https://ui.docs.kafbat.io/configuration/serialization-serde). I added the [Glue registry serializer](https://github.com/provectus/kafkaui-glue-sr-serde) as a plugin and named it online-order*. It requires the plugin binary file path, class name, registry name and AWS region name. Another key configuration values are the key and value schema templates values, which are used for finding schema names. They are left unchanged because I will not enable schema for the key and the default template rule (`%s`) for the value matches the default naming convention of the client library. Note that those template properties are only applicable for message production on the UI, and we can leave them commented out if we don't attempt that.
 
 The configuration of *kpow* is simpler as it only requires the registry ARN and AWS region. Note that the app fails to start if the registry doesn't exit. I created the registry named *online-order* before starting it.
 
