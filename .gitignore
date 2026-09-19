@@ -1,5 +1,4 @@
 .ignore
-venv
 /node_modules
 /resources
 /public/*
@@ -11,3 +10,10 @@ hugo_stats.json
 
 # macOS
 .DS_Store
+
+# Python, for scripts/
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.python-version

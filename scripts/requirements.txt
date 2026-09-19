@@ -1,0 +1,4 @@
+# Card image generation for the Projects page, see make-project-cards.py.
+# Pillow is the only dependency, and it is not needed to build the site,
+# because assets/projects/*.png are committed.
+pillow>=12.0,<13

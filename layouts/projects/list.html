@@ -1,0 +1,42 @@
+{{ define "content" }}
+<div class="col-xxl-12">
+  {{ partial "breadcrumb" . }}
+  {{ with .Content }}
+  <div class="row card component">
+    <div class="card-body">{{ . }}</div>
+  </div>
+  {{ end }}
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    {{ range sort site.Data.projects "weight" }}
+    {{ $p := . }}
+    <div class="col">
+      <div class="card h-100 project-card">
+        {{- $img := "" -}}
+        {{- with $p.image -}}
+          {{- $img = resources.Get (printf "projects/%s" .) -}}
+        {{- else -}}
+          {{- $remote := resources.GetRemote (printf "https://opengraph.githubassets.com/1/%s" $p.repo) -}}
+          {{- if or (not $remote) $remote.Err -}}
+            {{- warnf "projects: no social image for %s, card rendered without one" $p.repo -}}
+          {{- else -}}
+            {{- $img = $remote -}}
+          {{- end -}}
+        {{- end -}}
+        {{- with $img -}}
+        {{- $thumb := .Resize "600x webp q80" -}}
+        <img class="card-img-top" src="{{ $thumb.RelPermalink }}" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" alt="{{ $p.name }}" loading="lazy">
+        {{- end -}}
+        <div class="card-body">
+          <h2 class="card-title h5">{{ $p.name }}</h2>
+          <p class="card-text">{{ $p.description }}</p>
+        </div>
+        <div class="card-footer bg-transparent border-top-0">
+          <a class="btn btn-sm btn-outline-primary" href="https://github.com/{{ $p.repo }}" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> Repository</a>
+          {{ with $p.url }}<a class="btn btn-sm btn-primary" href="{{ . }}">Read more</a>{{ end }}
+        </div>
+      </div>
+    </div>
+    {{ end }}
+  </div>
+</div>
+{{ end }}
