@@ -7,10 +7,6 @@
 
 &lt;h2 id="architecture" data-numberify>Architecture&lt;a class="anchor ms-1" href="#architecture">&lt;/a>&lt;/h2>
 &lt;p>The stack is fully decoupled. An AI orchestrator interprets requests and talks to the semantic engine over the Model Context Protocol (MCP). The semantic engine plans deterministic queries from its business models and vector memory, and those queries execute against the physical lakehouse.&lt;/p>
-&lt;p>&lt;picture>&lt;img class="img-fluid mx-auto d-block" alt="Agentic Analytics System architecture: a Strands orchestrator coordinates the WrenAI semantic engine, LanceDB retrieval, and Mem0 memory over MCP, with queries executing against Trino, Iceberg, and SeaweedFS." src="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/featured.png" loading="lazy" width="929" height="626" />
-&lt;/picture>
-
-&lt;/p>
 &lt;p>The diagram above traces a request end to end, and the table below maps each component to its role.&lt;/p>
 &lt;table>
 &lt;thead>
@@ -546,10 +542,6 @@ Calculating the exact Rolling Force required to crush the steel is critical.</de
 &lt;p>Here is an overview of the architecture and the engineering challenges solved along the way. The complete source code for this project, including the Flink stream processor and the Python Digital Twin simulation, is available on &lt;a href="https://github.com/jaehyeon-kim/oml-digital-twin-hotrolling" target="_blank" rel="noopener noreferrer">GitHub&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>.&lt;/p>
 
 &lt;h2 id="architecture-at-a-glance" data-numberify>Architecture at a Glance&lt;a class="anchor ms-1" href="#architecture-at-a-glance">&lt;/a>&lt;/h2>
-&lt;p>&lt;picture>&lt;img class="img-fluid mx-auto d-block" alt="High-Level System Architecture" src="https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/featured.png" loading="lazy" width="1082" height="460" />
-&lt;/picture>
-
-&lt;/p>
 &lt;p>The project is split into three highly decoupled domains:&lt;/p>
 &lt;ol>
 &lt;li>&lt;strong>Digital Twin (Python):&lt;/strong> Utilizing the &lt;a href="https://github.com/jaehyeon-kim/dynamic-des" target="_blank" rel="noopener noreferrer">Dynamic DES&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a> Python package, this layer generates synthetic rolling events, applies simulated mechanical wear, calculates theoretical/actual physics, and pushes the data to Kafka.&lt;/li>
@@ -1860,10 +1852,6 @@ This is the standard Linear Regression prediction. It asks: &lt;em>&amp;ldquo;Ba
 &lt;p>This definition is more than just a product description; it&amp;rsquo;s a strategic vision. By embracing this model, we can finally deliver on the promise of self-service data access without sacrificing stability or governance. Let&amp;rsquo;s explore exactly how each layer of the platform is designed to support this powerful concept.&lt;/p>
 
 &lt;h2 id="architecture-a-layer-by-layer-breakdown" data-numberify>Architecture: A Layer-by-Layer Breakdown&lt;a class="anchor ms-1" href="#architecture-a-layer-by-layer-breakdown">&lt;/a>&lt;/h2>
-&lt;p>&lt;picture>&lt;img class="img-fluid mx-auto d-block" alt="Self-Service Data Platform" src="https://jaehyeon.me/blog/2025-07-17-self-service-data-platform-via-sql-gateway/featured.png" loading="lazy" width="915" height="766" />
-&lt;/picture>
-
-&lt;/p>
 
 &lt;h3 id="1-client-layer-simplicity-through-standardization" data-numberify>1. Client Layer: Simplicity Through Standardization&lt;a class="anchor ms-1" href="#1-client-layer-simplicity-through-standardization">&lt;/a>&lt;/h3>
 &lt;p>&lt;em>How do users connect? Via interactive SQL clients or programmatic APIs.&lt;/em>&lt;/p>
