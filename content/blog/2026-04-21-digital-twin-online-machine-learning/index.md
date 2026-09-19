@@ -31,7 +31,6 @@ images: []
 description: |
   Discover how to build a fault-tolerant streaming architecture using Apache Flink and Kotlin. This guide demonstrates applying Online Machine Learning to autonomously detect concept drift and correct for physical machinery wear in real-time, which is safely managed by a deterministic Shadow Mode router.
 ---
-
 ## Overview
 
 Imagine using a rolling pin to flatten out a thick piece of dough. A Hot Strip Mill does the exact same thing, but with glowing red-hot steel slabs (often heated over 1000°C) and massive mechanical rollers. The steel is passed through a series of these rollers, crushing it down from a thick block into a long, thin sheet.
@@ -52,7 +51,6 @@ Here is an overview of the architecture and the engineering challenges solved al
 
 ## Architecture at a Glance
 
-![High-Level System Architecture](featured.png#center)
 
 The project is split into three highly decoupled domains:
 

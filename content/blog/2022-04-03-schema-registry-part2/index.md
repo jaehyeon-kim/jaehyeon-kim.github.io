@@ -30,7 +30,6 @@ images: []
 cevo: 11
 description: We'll continue the discussion of a Change Data Capture (CDC) solution with a schema registry and its deployment to AWS. All major resources are deployed in private subnets and VPN is used to access them in order to improve developer experience. The Apicurio registry is used as the schema registry service and it is deployed as an ECS service. In order for the connectors to have access to the registry, the Confluent Avro Converter is packaged together with the connector sources. The post ends with illustrating how schema evolution is managed by the schema registry.
 ---
-
 In the [previous post](/blog/2022-03-07-schema-registry-part1), we discussed a Change Data Capture (CDC) solution with a schema registry. A local development environment is set up using Docker Compose. The Debezium and Confluent S3 connectors are deployed with the Confluent Avro converter and the Apicurio registry is used as the schema registry service. A quick example is shown to illustrate how schema evolution can be managed by the schema registry. In this post, we'll build the solution on AWS using [MSK](https://aws.amazon.com/msk/), [MSK Connect](https://aws.amazon.com/msk/features/msk-connect/), [Aurora PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraPostgreSQL.html) and [ECS](https://aws.amazon.com/ecs/).
 
 * [Part 1 Local Development](/blog/2022-03-07-schema-registry-part1)
@@ -40,7 +39,6 @@ In the [previous post](/blog/2022-03-07-schema-registry-part1), we discussed a C
 
 Below shows an updated CDC architecture with a schema registry. The Debezium connector talks to the schema registry first and checks if the schema is available. If it doesn't exist, it is registered and cached in the schema registry. Then the producer serializes the data with the schema and sends it to the topic with the schema ID. When the sink connector consumes the message, it'll read the schema with the ID and deserializes it. The schema registry uses a PostgreSQL database as an artifact store where multiple versions of schemas are kept. In this post, we'll build it on AWS. An MSK cluster will be created and data will be pushed from a database deployed using Aurora PostgreSQL. The database has a schema called _registry_ and schema metadata will be stored in it. The [Apicurio registry](https://www.apicur.io/registry/docs/apicurio-registry/2.1.x/index.html) will be deployed as an ECS service behind an internal load balancer.
 
-![](featured.png#center) 
 
 ## Infrastructure
 

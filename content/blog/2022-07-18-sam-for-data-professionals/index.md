@@ -26,7 +26,6 @@ images: []
 cevo: 14
 description: We'll discuss how to build a serverless data processing application using the Serverless Application Model (SAM). A Lambda function is developed, which is triggered whenever an object is created in a S3 bucket. 3rd party packages are necessary for data processing and they are made available by Lambda layers.
 ---
-
 [AWS Lambda](https://aws.amazon.com/lambda/) provides serverless computing capabilities, and it can be used for performing validation or light processing/transformation of data. Moreover, with its integration with more than 140 AWS services, it facilitates building complex systems employing [event-driven architectures](https://docs.aws.amazon.com/lambda/latest/operatorguide/event-driven-architectures.html). There are many ways to build serverless applications and one of the most efficient ways is using specialised frameworks such as the [AWS Serverless Application Model (SAM)](https://aws.amazon.com/serverless/sam/) and [Serverless Framework](https://www.serverless.com/framework/docs). In this post, I’ll demonstrate how to build a serverless data processing application using SAM.
 
 
@@ -36,7 +35,6 @@ When we create an application or pipeline with AWS Lambda, most likely we’ll i
 
 In this post, we’ll build a simple data pipeline using SAM where a Lambda function is triggered when an object (CSV file) is created in a S3 bucket. The Lambda function converts the object into parquet and AVRO files and saves to a destination S3 bucket. For simplicity, we’ll use a single bucket for the source and destination.
 
-![](featured.png#center)
 
 ## SAM Application
 

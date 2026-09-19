@@ -24,7 +24,6 @@ authors:
 images: []
 description: Building Apache Flink Applications in Java by Confluent is a course to introduce Apache Flink through a series of hands-on exercises. Utilising the Flink DataStream API,  the course develops three Flink applications from ingesting source data into calculating usage statistics. As part of learning the Flink DataStream API in Pyflink, I converted the Java apps into Python equivalent while performing the course exercises in Pyflink. This post summarises the progress of the conversion and shows the final output.
 ---
-
 [Building Apache Flink Applications in Java](https://developer.confluent.io/courses/flink-java/overview/) is a course to introduce [Apache Flink](https://flink.apache.org/) through a series of hands-on exercises, and it is provided by [Confluent](https://www.confluent.io/). Utilising the [Flink DataStream API](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/dev/datastream/overview/), the course develops three Flink applications that populate multiple source data sets, collect them into a standardised data set, and aggregate it to produce usage statistics. As part of learning the Flink DataStream API in Pyflink, I converted the Java apps into Python equivalent while performing the course exercises in Pyflink. This post summarises the progress of the conversion and shows the final output.
 
 ## Architecture
@@ -35,7 +34,6 @@ The [flight importer job](https://github.com/jaehyeon-kim/flink-demos/tree/maste
 
 The [usage statistics calculator](https://github.com/jaehyeon-kim/flink-demos/tree/master/building-pyflink-apps/src/s20_manage_state.py) sources the *flightdata* topic and calculates usage statistics over a one-minute window, which is grouped by email address. Moreover, while accessing the global state, it produces cumulative usage statistics, which carries information from one window to the next. It is developed using Pyflink as well.
 
-![](featured.png#center)
 
 ## Course Contents
 

@@ -27,7 +27,6 @@ cevo: 32
 docs: https://docs.google.com/document/d/1kRB3XeccUAjNwRH_sFwjJ_fCSnUw3NrQnzF202QGx4o
 description: This series aims to help those who are new to Apache Flink and Amazon Managed Service for Apache Flink by re-implementing a simple fraud detection application that is discussed in an AWS workshop titled AWS Kafka and DynamoDB for real time fraud detection. In part 1, I demonstrated how to develop the application locally, and the app will be deployed via Amazon Managed Service for Apache Flink in this post.
 ---
-
 This series aims to help those who are new to [Apache Flink](https://flink.apache.org/) and [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/) by re-implementing a simple fraud detection application that is discussed in an AWS workshop titled [AWS Kafka and DynamoDB for real time fraud detection](https://catalog.us-east-1.prod.workshops.aws/workshops/ad026e95-37fd-4605-a327-b585a53b1300/en-US). In part 1, I demonstrated how to develop the application locally, and the app will be deployed via *Amazon Managed Service for Apache Flink* in this post.
 
 * [Part 1 Local Development](/blog/2023-08-10-fraud-detection-part-1)
@@ -39,7 +38,6 @@ This series aims to help those who are new to [Apache Flink](https://flink.apach
 
 There are two Python applications that send transaction and flagged account records into the corresponding topics - the transaction app sends records indefinitely in a loop. Note that, as the Kafka cluster is deployed in private subnets, a VPN server is used to generate records from the developer machine. Both the topics are consumed by a Flink application, and it filters the transactions from the flagged accounts followed by sending them into an output topic of flagged transactions. Finally, the flagged transaction records are sent into a DynamoDB table by the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) in order to serve real-time requests from an API.
 
-![](featured.png#center)
 
 ## Infrastructure
 

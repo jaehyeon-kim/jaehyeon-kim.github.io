@@ -25,7 +25,6 @@ authors:
 images: []
 description: Amazon MSK can be configured as an event source of a Lambda function. Lambda internally polls for new messages from the event source and then synchronously invokes the target Lambda function. With this feature, we can develop a Kafka consumer application in serverless environment where developers can focus on application logic. In this lab, we will discuss how to create a Kafka consumer using a Lambda function.
 ---
-
 Amazon MSK can be configured as an [event source](https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html) of a Lambda function. Lambda internally polls for new messages from the event source and then synchronously invokes the target Lambda function. With this feature, we can develop a Kafka consumer application in serverless environment where developers can focus on application logic. In this lab, we will discuss how to create a Kafka consumer using a Lambda function.
 
 * [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
@@ -40,7 +39,6 @@ Amazon MSK can be configured as an [event source](https://docs.aws.amazon.com/la
 
 Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The messages of the *taxi-rides* topic are consumed by a Lambda function where the MSK cluster is configured as an event source of the function.
 
-![](featured.png#center)
 
 ## Infrastructure
 

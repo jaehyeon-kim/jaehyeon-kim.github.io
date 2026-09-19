@@ -25,7 +25,6 @@ images: []
 cevo: 15
 description: We'll discuss limitations of the Lambda invoke function operator of Apache Airflow and create a custom Lambda operator. The custom operator extends the existing one and it reports the invocation result of a function correctly and records the exact error message from failure.
 ---
-
 [Apache Airflow](https://airflow.apache.org/) is a popular workflow management platform. A wide range of AWS services are integrated with the platform by [Amazon AWS Operators](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/operators/index.html). AWS Lambda is one of the integrated services, and it can be used to develop workflows efficiently. The current [Lambda Operator](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/operators/lambda.html), however, just invokes a Lambda function, and it can fail to report the invocation result of a function correctly and to record the exact error message from failure. In this post, we’ll discuss a custom Lambda operator that handles those limitations.
 
 
@@ -33,7 +32,6 @@ description: We'll discuss limitations of the Lambda invoke function operator of
 
 We’ll discuss a custom Lambda operator, and it extends the Lambda operator provided by AWS. When a DAG creates a task that invokes a Lambda function, it updates the Lambda payload with a _correlation ID_ that uniquely identifies the task. The correlation ID is added to every log message that the Lambda function generates. Finally, the custom operator filters the associating CloudWatch log events, prints the log messages and raises a runtime error when an error message is found. In this setup, we are able to correctly identify the function invocation result and to point to the exact error message if it fails. The source of this post can be found in a [**GitHub repository**](https://github.com/jaehyeon-kim/revisit-lambda-operator).
 
-![](featured.png#center)
 
 ## Lambda Setup
 

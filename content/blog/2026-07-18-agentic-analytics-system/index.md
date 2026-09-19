@@ -30,7 +30,6 @@ images: []
 description: |
   Direct text-to-SQL is hard to trust in production because raw schemas do not capture governed metrics or business meaning. This post walks through a local, open-source proof of concept that puts a semantic layer between the language model and the lakehouse, combining Strands, WrenAI, Trino, Iceberg, and long-term agent memory.
 ---
-
 Generative AI has made conversational analytics feel within reach, yet direct text-to-SQL systems remain hard to operate reliably. A database schema tells you the tables, columns, and types, but it says nothing about which datasets are canonical, which join paths are approved, how a governed metric is calculated, or what the business actually means by "revenue" or "active customer". Ask a language model to infer all of that from raw tables and, sooner or later, it will confidently invent an answer.
 
 I built a proof of concept to explore a more disciplined approach: put a semantic layer between the model and the data, and let the agent reason over governed business concepts instead of guessing at raw schemas. It runs entirely locally on an open-source stack, and it happens to tie together two of my other projects along the way.
@@ -47,7 +46,6 @@ I evaluated several options (WrenAI, Vanna AI, Nao, and MetricFlow) and selected
 
 The stack is fully decoupled. An AI orchestrator interprets requests and talks to the semantic engine over the Model Context Protocol (MCP). The semantic engine plans deterministic queries from its business models and vector memory, and those queries execute against the physical lakehouse.
 
-![Agentic Analytics System architecture: a Strands orchestrator coordinates the WrenAI semantic engine, LanceDB retrieval, and Mem0 memory over MCP, with queries executing against Trino, Iceberg, and SeaweedFS.](featured.png#center)
 
 The diagram above traces a request end to end, and the table below maps each component to its role.
 

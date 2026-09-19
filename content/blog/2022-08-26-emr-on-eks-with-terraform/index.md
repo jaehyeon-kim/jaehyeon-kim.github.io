@@ -27,7 +27,6 @@ images: []
 cevo: 16
 description: We'll discuss how to provision and manage Spark jobs on EMR on EKS with Terraform. Amazon EKS Blueprints for Terraform will be used for provisioning EKS, EMR virtual cluster and related resources. Also Spark job autoscaling will be managed by Karpenter where two Spark jobs with and without Dynamic Resource Allocation (DRA) will be compared.
 ---
-
 [Amazon EMR on EKS](https://aws.amazon.com/emr/features/eks/) is a deployment option for Amazon EMR that allows you to automate the provisioning and management of open-source big data frameworks on EKS. While [eksctl](https://eksctl.io/) is popular for working with [Amazon EKS](https://aws.amazon.com/eks/) clusters, it has limitations when it comes to building infrastructure that integrates multiple AWS services. Also, it is not straightforward to update EKS cluster resources incrementally with it. On the other hand [Terraform](https://developer.hashicorp.com/terraform) can be an effective tool for managing infrastructure that includes not only EKS and EMR virtual clusters but also other AWS resources. Moreover, Terraform has a wide range of [modules](https://developer.hashicorp.com/terraform/language/modules), and it can even be simpler to build and manage infrastructure using those compared to the CLI tool. In this post, we’ll discuss how to provision and manage Spark jobs on EMR on EKS with Terraform. [Amazon EKS Blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints/) will be used for provisioning EKS, EMR virtual cluster and related resources. Also, Spark job autoscaling will be managed by [Karpenter](https://karpenter.sh/) where two Spark jobs with and without [Dynamic Resource Allocation (DRA)](https://spark.apache.org/docs/latest/job-scheduling.html#dynamic-resource-allocation) will be compared.
 
 [**Update 2023-12-15**] Amazon EKS Blueprints for Terraform is upgraded into the version 5 while this post is based on the version 4.7.0. Some links don't exist in the new GitHub page.
@@ -36,7 +35,6 @@ description: We'll discuss how to provision and manage Spark jobs on EMR on EKS 
 
 When a user submits a Spark job, multiple Pods (controller, driver and executors) will be deployed to the EKS cluster that is registered with EMR. In general, Karpenter provides just-in-time capacity for unschedulable Pods by creating (and terminating afterwards) additional nodes. We can configure the pod templates of a Spark job so that all the Pods are managed by Karpenter. In this way, we are able to run it only in transient nodes. Karpenter simplifies autoscaling by provisioning just-in-time capacity, and it also reduces scheduling latency. The source can be found in the post's [**GitHub repository**](https://github.com/jaehyeon-kim/emr-on-eks-terraform).
 
-![](featured.png#center)
 
 ### VPC
 

@@ -24,7 +24,6 @@ authors:
 images: []
 description: The value of data can be maximised when it is used without delay. With Apache Flink, we can build streaming analytics applications that incorporate the latest events with low latency. In this lab, we will create a Pyflink application that writes accumulated taxi rides data into an OpenSearch cluster. It aggregates the number of trips/passengers and trip durations by vendor ID for a window of 5 seconds. The data is then used to create a chart that monitors the status of taxi rides in the OpenSearch Dashboard.
 ---
-
 The value of data can be maximised when it is used without delay. With Apache Flink, we can build streaming analytics applications that incorporate the latest events with low latency. In this lab, we will create a Pyflink application that writes accumulated taxi rides data into an OpenSearch cluster. It aggregates the number of trips/passengers and trip durations by vendor ID for a window of 5 seconds. The data is then used to create a chart that monitors the status of taxi rides in the OpenSearch Dashboard.
 
 * [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
@@ -39,7 +38,6 @@ The value of data can be maximised when it is used without delay. With Apache Fl
 
 Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The Pyflink app aggregates the number of trips/passengers and trip durations by vendor ID for a window of 5 seconds and sends the accumulated records into an OpenSearch cluster. The data is then used to create a chart that monitors the status of taxi rides in the OpenSearch Dashboard.
 
-![](featured.png#center)
 
 ## Infrastructure
 

@@ -24,7 +24,6 @@ images: []
 cevo: 17
 description: We will discuss how to set up a remote dev environment on an EMR cluster deployed in a private subnet with VPN and the VS Code remote SSH extension. Typical Spark development examples will be illustrated while sharing the cluster with multiple users. Overall it brings an effective way of developing Spark apps on EMR, which improves developer experience significantly.
 ---
-
 When we develop a Spark application on EMR, we can use [docker for local development](/blog/2022-05-08-emr-local-dev) or notebooks via [EMR Studio](https://aws.amazon.com/emr/features/studio/) (or [EMR Notebooks](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html)). However, the local development option is not viable if the size of data is large. Also, I am not a fan of notebooks as it is not possible to utilise the features my editor supports such as syntax highlighting, autocomplete and code formatting. Moreover, it is not possible to organise code into modules and to perform unit testing properly with that option. In this post, We will discuss how to set up a remote development environment on an EMR cluster deployed in a private subnet with VPN and the [VS Code remote SSH extension](https://code.visualstudio.com/docs/remote/ssh). Typical Spark development examples will be illustrated while sharing the cluster with multiple users. Overall it brings another effective way of developing Spark apps on EMR, which improves developer experience significantly.
 
 
@@ -34,7 +33,6 @@ An EMR cluster is deployed in a private subnet and, by default, it is not possib
 
 SoftEther VPN provides the server and client manager programs and they can be downloaded from the [download centre page](https://www.softether-download.com/en.aspx?product=softether). We can create a VPN user using the server manager and the user can establish connection using the client manager. In this way a developer can access an EMR cluster deployed in a private subnet from the developer machine. Check one of my earlier posts titled [Simplify Your Development on AWS with Terraform](/blog/2022-02-06-dev-infra-terraform) for a step-by-step illustration of creating a user and making a connection. The [VS Code Remote - SSH extension](https://code.visualstudio.com/docs/remote/ssh) is used to open a folder in the master node of an EMR cluster. In this way, developer experience can be improved significantly while making use of the full feature set of VS Code. The architecture of the remote development environment is shown below.
 
-![](featured.png#center)
 
 ## Infrastructure
 
