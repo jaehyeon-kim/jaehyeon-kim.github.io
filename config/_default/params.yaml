@@ -100,7 +100,7 @@ sidebar:
   # collapsed: true # Collapse sidebar widgets by default on small screens.
 
 codeBlock:
-  maxLines: 20
+  maxLines: 60
   lineNos: true # true/false represents that show/hide the line numbers by default.
 
 post:

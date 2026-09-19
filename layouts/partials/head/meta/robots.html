@@ -1,0 +1,18 @@
+{{/* Overrides the theme partial of the same name.
+
+     Tag term pages are noindex, follow. 89 of 166 list a single post and 29
+     list two, so half the indexable surface is a page whose content is a link
+     to one article, competing with the article itself. "follow" keeps the
+     links crawlable, so nothing is orphaned. Categories and series stay
+     indexable: they are curated and mostly hold several posts.
+
+     Everything else falls through to the theme's behaviour, which reads
+     .Params.metaRobots then Site.Params.metaRobots. */}}
+{{- if and (eq .Kind "term") (eq .Data.Plural "tags") -}}
+    <meta name="robots" content="noindex, follow" />
+{{- else -}}
+{{- $content := default $.Site.Params.metaRobots .Params.metaRobots }}
+{{- if and (not (and (isset .Params "metarobots") (not .Params.metaRobots))) $content }}
+    <meta name="robots" content="{{ $content }}" />
+{{- end -}}
+{{- end -}}
