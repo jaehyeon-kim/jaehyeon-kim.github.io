@@ -1,0 +1,12 @@
+{{- if partial "functions/toc" . -}}
+<div id="postTOC" class="mb-3 text-surface">
+  <h2 class="mb-3">
+    {{- i18n "table_of_contents" -}}
+    {{/* aria-label added for the same reason as render-heading.html: the anchor is
+         empty because its icon comes from CSS, so it has no accessible name. */}}
+    <a class="anchor ms-1" href="#postTOC" aria-label="Link to this section: {{ i18n "table_of_contents" }}"></a>
+  </h2>
+  {{ .TableOfContents }}
+  <hr class="text-secondary">
+</div>
+{{- end -}}

@@ -32,7 +32,7 @@
         </div>
         <div class="card-footer bg-transparent border-top-0">
           <a class="btn btn-sm btn-outline-primary" href="https://github.com/{{ $p.repo }}" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> Repository</a>
-          {{ with $p.url }}<a class="btn btn-sm btn-primary" href="{{ . }}">Read more</a>{{ end }}
+          {{ with $p.url }}<a class="btn btn-sm btn-primary" href="{{ . }}">Read more<span class="visually-hidden">: {{ $p.name }}</span></a>{{ end }}
         </div>
       </div>
     </div>

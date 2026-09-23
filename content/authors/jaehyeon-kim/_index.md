@@ -1,6 +1,6 @@
 ---
 title: Jaehyeon Kim
-description: Data Engineer | Data Streaming Enthusiast | Powering ML & AI in Real Time
+description: Data Engineer | Data Streaming | Powering ML & AI in Real Time
 social:
   github: jaehyeon-kim
   # twitter: razonyang

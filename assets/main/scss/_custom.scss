@@ -15,3 +15,19 @@ td a {
     height: auto;
     aspect-ratio: 20 / 7;
   }
+
+// Contrast failures reported by PageSpeed. `.post-taxonomy` applied `opacity: 0.75`,
+// which blended both the badge fill and its label toward the white page: the white
+// label measured 2.94:1 and the count badge's grey text 2.92:1, against a 4.5:1
+// minimum. Dropping the dimming restores the theme's own colours, which measure
+// 4.69:1 both ways, so nothing else needs changing here.
+.post-taxonomy {
+  opacity: 1;
+}
+
+// Footer and post meta text sits on the #f6f8fa panel, where #6c757d measures 4.40:1,
+// just under the minimum. This is the smallest darkening that passes, at 4.76:1.
+.copyright small,
+p.text-secondary > small {
+  color: #696f77;
+}

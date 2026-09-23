@@ -3,4 +3,4 @@ title: Projects
 sidebar: false
 ---
 
-Open source I build and maintain, and the repositories behind the posts. Each card links the code, and most link the writing that walks through it.
+Open source I build and maintain, spanning data engineering, data streaming, machine learning, data architecture, agentic AI and software development. Hands-on and runnable.

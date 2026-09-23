@@ -12,6 +12,7 @@ categories:
 tags:
   - R
 description: Fit a CART classification model on the ISLR Carseats data with the rpart package in R, and tune the pruning parameter with the caret package.
+math: true # This post renders maths, so it needs the KaTeX bundle.
 ---
 
 * [Part I](#) (this post)

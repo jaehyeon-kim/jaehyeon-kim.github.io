@@ -1,0 +1,22 @@
+{{- /*
+  Overrides the theme render hook to give each heading anchor an accessible name.
+  The theme emits `<a class="anchor ms-1" href="#..."></a>` with no content, because
+  the link icon comes from CSS. Lighthouse fails "Links do not have a discernible
+  name" on every heading, which costs 3 accessibility points on every post page, and
+  a keyboard or screen reader user reaches a link that announces nothing.
+
+  aria-label carries the heading text, and the visible output is unchanged.
+*/ -}}
+{{- $anchor := printf "<a class=\"anchor ms-1\" href=\"#%s\" aria-label=\"Link to this section: %s\"></a>" .Anchor (.PlainText | htmlEscape) | safeHTML -}}
+{{- $numberifyHeadings := true }}
+{{- if isset .Page.Params "numberifyheadings" }}
+  {{- $numberifyHeadings = .Page.Params.numberifyHeadings }}
+{{- end }}
+{{ printf "<h%d id=\"%s\"%s>%s%s</h%d>"
+  .Level
+  .Anchor
+  (cond $numberifyHeadings ` data-numberify` ``)
+  .PlainText
+  $anchor
+  .Level | safeHTML
+}}

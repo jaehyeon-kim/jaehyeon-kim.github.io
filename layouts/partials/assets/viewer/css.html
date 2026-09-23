@@ -1,0 +1,18 @@
+{{- /*
+  Overrides the theme partial to load the image viewer stylesheet without blocking
+  first paint. PageSpeed reported this file as a render-blocking request costing
+  300 ms, and it styles a lightbox that only appears once a reader clicks an image,
+  so nothing visible on load depends on it.
+
+  The preload swaps itself to a stylesheet once fetched. The noscript copy keeps the
+  lightbox styled for readers without JavaScript, who cannot open it anyway, but it
+  costs nothing to be correct.
+*/ -}}
+{{- if .Site.Params.viewer }}
+    {{- $outputStyle := "expanded" }}
+    {{- if hugo.IsProduction }}{{ $outputStyle = "compressed" }}{{ end }}
+    {{- $options := dict "targetPath" "assets/viewer/bundle.min.css" "outputStyle" $outputStyle "includePaths" (slice "node_modules") }}
+    {{- $style := resources.Get "viewer/scss/index.scss" | toCSS $options | fingerprint }}
+    <link data-precache rel="preload" as="style" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}" crossorigin="anonymous"></noscript>
+{{- end -}}

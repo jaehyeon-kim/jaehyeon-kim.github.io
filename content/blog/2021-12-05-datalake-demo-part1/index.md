@@ -22,6 +22,7 @@ tags:
   - Debezium
 cevo: 5
 description: Set up the source PostgreSQL database with an outbox table, then run Debezium and an S3 sink connector locally with Docker Compose.
+math: true # This post renders maths, so it needs the KaTeX bundle.
 ---
 
 [Change data capture (CDC)](https://www.redhat.com/en/topics/integration/what-is-change-data-capture#what-is-cdc) is a proven data integration pattern that has a wide range of applications. Among those, data replication to data lakes is a good use case in data engineering. Coupled with [best-in-breed data lake formats](https://lakefs.io/hudi-iceberg-and-delta-lake-data-lake-table-formats-compared/) such as [Apache Hudi](https://hudi.apache.org/), we can build an efficient data replication solution. This is the first post of the data lake demo series. Over time, we'll build a data lake that uses CDC. As a starting point, we'll discuss the source database and CDC streaming infrastructure in the local environment.

@@ -7,6 +7,10 @@
          from partials/hooks/head-end.html does not reach it. These pages are in
          the sitemap, so they need one. */}}
     <link rel="canonical" href="{{ .Permalink }}">
+    {{/* Same reason as the canonical above: no baseof, so the theme's meta tags do
+         not reach these pages and every deck was shipping without a description.
+         Each one already carries a description in its front matter. */}}
+    {{ with .Description }}<meta name="description" content="{{ . }}">{{ end }}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/{{ .Params.reveal_theme | default "black" }}.css" id="theme">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">

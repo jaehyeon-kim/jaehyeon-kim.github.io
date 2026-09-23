@@ -6,7 +6,7 @@ mainSections:
 
 # titleSeparator: '|' # Title separator. Default to -.
 
-description: Data Engineer | Data Streaming Enthusiast | Powering ML & AI in Real Time
+description: Data Engineer | Data Streaming | Powering ML & AI in Real Time
 keywords: Real-time Analytics, Data Engineering, Data Streaming, Machine Learning, Artificial Intelligence, Data Architecture, Apache Kafka, Apache Flink, Apache Spark
 images:
   - site-feature-image.png
@@ -44,12 +44,12 @@ color: light # light, dark or auto. Default to auto.
 # Google Adsense
 googleAdsense: ca-pub-2764466088407958
 
-math: true # Enable math globally.
+math: false # Enabled per page via front matter; only a few posts use it.
 toc: true # Disable TOC globally.
 tocPosition: content # sidebar or content
 breadcrumb: true # Disable breadcrumb
 breadcrumbDivider: > # Breadcrumb divider
-diagram: true
+diagram: false # Enabled per page via front matter; no post currently uses Mermaid.
 socialShare: false # disable social network sharing
 searchBar: true # disable search-bar
 
@@ -69,6 +69,10 @@ taxonomyPostCount: 20 # The number of taxonomy's posts. Turn off by setting it t
 countTaxonomyPosts: true # Count posts of taxonomy.
 
 sidebarTaxonomies: [categories, tags, series] # The order of taxonomies on the sidebar.
+
+# Terms kept out of the sidebar only. Their pages still exist and stay in the
+# sitemap; this just stops them taking a slot in the tag cloud.
+sidebarExcludedTerms: ["R", "RServe", "R Shiny", "Kpow", "Tree Based Methods in R"]
 
 pinnedPost: false # Turn on/off pinned posts.
 pinnedPostCount: 3 # The number of pinned posts.
