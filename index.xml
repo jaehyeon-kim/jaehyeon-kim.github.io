@@ -1,4 +1,58 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Data Engineer | Data Streaming | Powering ML &amp; AI in Real Time</description><language>en</language><atom:link href="https://jaehyeon.me/index.xml" rel="self" type="application/rss+xml"/><lastBuildDate>Sat, 18 Jul 2026 00:00:00 +0000</lastBuildDate><item><title>Building an Agentic Analytics System over an Iceberg Lakehouse</title><link>https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/</link><guid>https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/</guid><pubDate>Sat, 18 Jul 2026 00:00:00 +0000</pubDate><category>Agentic AI</category><category>WrenAI</category><category>Strands</category><category>Trino</category><category>Apache Iceberg</category><category>Mem0</category><category>dynamic-des</category><category>odctl</category><description>&lt;p>Generative AI has made conversational analytics feel within reach, yet direct text-to-SQL systems remain hard to operate reliably. A database schema tells you the tables, columns, and types, but it says nothing about which datasets are canonical, which join paths are approved, how a governed metric is calculated, or what the business actually means by &amp;ldquo;revenue&amp;rdquo; or &amp;ldquo;active customer&amp;rdquo;. Ask a language model to infer all of that from raw tables and, sooner or later, it will confidently invent an answer.&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Data Engineer | Data Streaming | Powering ML &amp; AI in Real Time</description><language>en</language><atom:link href="https://jaehyeon.me/index.xml" rel="self" type="application/rss+xml"/><lastBuildDate>Mon, 28 Sep 2026 00:00:00 +0000</lastBuildDate><item><title>Learning MLOps with a Feature Store: A New Series</title><link>https://jaehyeon.me/blog/2026-09-28-mlops-with-a-feature-store/</link><guid>https://jaehyeon.me/blog/2026-09-28-mlops-with-a-feature-store/</guid><pubDate>Mon, 28 Sep 2026 00:00:00 +0000</pubDate><category>MLOps</category><category>Feature Store</category><category>Feast</category><category>MLflow</category><category>Apache Airflow</category><category>Apache Iceberg</category><category>odctl</category><category>dynamic-des</category><description>&lt;p>I am teaching myself MLOps with Jim Dowling&amp;rsquo;s &lt;a href="https://www.oreilly.com/library/view/building-machine-learning/9781098165222/" target="_blank" rel="noopener noreferrer">&lt;em>Building Machine Learning Systems with a Feature Store&lt;/em>&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>. This series follows that work: I rebuild the book&amp;rsquo;s hands-on projects with open-source tools, running on my laptop.&lt;/p></description><content:encoded>&lt;p>I am teaching myself MLOps with Jim Dowling&amp;rsquo;s &lt;a href="https://www.oreilly.com/library/view/building-machine-learning/9781098165222/" target="_blank" rel="noopener noreferrer">&lt;em>Building Machine Learning Systems with a Feature Store&lt;/em>&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>. This series follows that work: I rebuild the book&amp;rsquo;s hands-on projects with open-source tools, running on my laptop.&lt;/p>
+&lt;h2 id="why-this-book" data-numberify>Why This Book&lt;a class="anchor ms-1" href="#why-this-book" aria-label="Link to this section: Why This Book">&lt;/a>&lt;/h2>
+&lt;p>Rather than teaching one tool, this book teaches one way to build any ML system, and applies it to classic machine learning and to systems built on large language models alike: batch predictions, real-time predictions and agents.&lt;/p>
+&lt;p>It rests on one architecture, split into three kinds of pipeline, known as FTI pipelines:&lt;/p>
+&lt;ul>
+&lt;li>a &lt;strong>feature pipeline&lt;/strong> turns raw data into features, the inputs a model learns from;&lt;/li>
+&lt;li>a &lt;strong>training pipeline&lt;/strong> turns features and labels into a model;&lt;/li>
+&lt;li>an &lt;strong>inference pipeline&lt;/strong> turns features and a model into predictions.&lt;/li>
+&lt;/ul>
+&lt;p>The pipelines never call each other. They share only two stores: a &lt;strong>feature store&lt;/strong>, which keeps features so that training and prediction read exactly the same values, and a &lt;strong>model registry&lt;/strong>, which keeps every trained model as a numbered version and marks the one in use. So each pipeline can be built, tested, scheduled and changed on its own.&lt;/p>
+
+&lt;h2 id="three-projects" data-numberify>Three Projects&lt;a class="anchor ms-1" href="#three-projects" aria-label="Link to this section: Three Projects">&lt;/a>&lt;/h2>
+&lt;p>The book teaches through three systems, each adding something new:&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>Air quality forecasting:&lt;/strong> a batch system that predicts daily air pollution for the week ahead from weather forecasts.&lt;/li>
+&lt;li>&lt;strong>Credit card fraud detection:&lt;/strong> a real-time system, with features computed from a stream of transactions.&lt;/li>
+&lt;li>&lt;strong>A personalised video recommender:&lt;/strong> a real-time system modelled on TikTok, which retrieves and ranks videos for each user.&lt;/li>
+&lt;/ol>
+
+&lt;h2 id="rebuilding-on-open-source" data-numberify>Rebuilding on Open Source&lt;a class="anchor ms-1" href="#rebuilding-on-open-source" aria-label="Link to this section: Rebuilding on Open Source">&lt;/a>&lt;/h2>
+&lt;p>The book builds its projects on Hopsworks, a platform from the author&amp;rsquo;s company that bundles a feature store, a model registry and model serving. I am rebuilding each one with open-source tools instead:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>What the system needs&lt;/th>
+&lt;th>Open-source tool&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Feature storage&lt;/td>
+&lt;td>Apache Iceberg tables&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Feature store&lt;/td>
+&lt;td>Feast, with an online store in Valkey&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Model registry and experiment tracking&lt;/td>
+&lt;td>MLflow&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Scheduling the pipelines&lt;/td>
+&lt;td>Apache Airflow&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Streaming features&lt;/td>
+&lt;td>Apache Kafka and Apache Flink&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>All of them run locally with &lt;a href="https://github.com/jaehyeon-kim/odctl" target="_blank" rel="noopener noreferrer">odctl&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>, a command-line tool I built that starts an open data stack with Docker Compose, as introduced in an &lt;a href="https://jaehyeon.me/blog/2026-07-16-odctl-open-data-stack/">earlier post&lt;/a>. The data comes from simulations built with &lt;a href="https://github.com/jaehyeon-kim/dynamic-des" target="_blank" rel="noopener noreferrer">dynamic-des&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>, a Python library I built for discrete-event simulations that stream their output to Kafka, files and Iceberg. So every project runs offline, and nothing needs a cloud account.&lt;/p>
+
+&lt;h2 id="what-comes-next" data-numberify>What Comes Next&lt;a class="anchor ms-1" href="#what-comes-next" aria-label="Link to this section: What Comes Next">&lt;/a>&lt;/h2>
+&lt;p>Each project gets its own post in this series, covering how the design maps onto open-source tools, what worked, and what broke along the way. I will share them as each one is ready.&lt;/p></content:encoded></item><item><title>Building an Agentic Analytics System over an Iceberg Lakehouse</title><link>https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/</link><guid>https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/</guid><pubDate>Sat, 18 Jul 2026 00:00:00 +0000</pubDate><category>Agentic AI</category><category>WrenAI</category><category>Strands</category><category>Trino</category><category>Apache Iceberg</category><category>Mem0</category><category>dynamic-des</category><category>odctl</category><description>&lt;p>Generative AI has made conversational analytics feel within reach, yet direct text-to-SQL systems remain hard to operate reliably. A database schema tells you the tables, columns, and types, but it says nothing about which datasets are canonical, which join paths are approved, how a governed metric is calculated, or what the business actually means by &amp;ldquo;revenue&amp;rdquo; or &amp;ldquo;active customer&amp;rdquo;. Ask a language model to infer all of that from raw tables and, sooner or later, it will confidently invent an answer.&lt;/p>
 &lt;p>I built a proof of concept to explore a more disciplined approach: put a semantic layer between the model and the data, and let the agent reason over governed business concepts instead of guessing at raw schemas. It runs entirely locally on an open-source stack, and it happens to tie together two of my other projects along the way.&lt;/p></description><content:encoded>&lt;p>Generative AI has made conversational analytics feel within reach, yet direct text-to-SQL systems remain hard to operate reliably. A database schema tells you the tables, columns, and types, but it says nothing about which datasets are canonical, which join paths are approved, how a governed metric is calculated, or what the business actually means by &amp;ldquo;revenue&amp;rdquo; or &amp;ldquo;active customer&amp;rdquo;. Ask a language model to infer all of that from raw tables and, sooner or later, it will confidently invent an answer.&lt;/p>
 &lt;p>I built a proof of concept to explore a more disciplined approach: put a semantic layer between the model and the data, and let the agent reason over governed business concepts instead of guessing at raw schemas. It runs entirely locally on an open-source stack, and it happens to tie together two of my other projects along the way.&lt;/p>
 &lt;h2 id="why-a-semantic-layer" data-numberify>Why a Semantic Layer&lt;a class="anchor ms-1" href="#why-a-semantic-layer" aria-label="Link to this section: Why a Semantic Layer">&lt;/a>&lt;/h2>
@@ -5723,156 +5777,4 @@ The &lt;code>avro&lt;/code> block in &lt;code>build.gradle.kts&lt;/code> configu
 &lt;/p>
 
 &lt;h2 id="conclusion" data-numberify>Conclusion&lt;a class="anchor ms-1" href="#conclusion" aria-label="Link to this section: Conclusion">&lt;/a>&lt;/h2>
-&lt;p>This post detailed the creation of Kotlin Kafka producer and consumer applications for handling JSON order data. We covered project setup, data modeling, custom serialization, client logic with error handling, deployment against a local Kafka cluster using the &lt;em>Factor House Local&lt;/em> project with &lt;em>Kpow&lt;/em>.&lt;/p></content:encoded></item><item><title>Meet the Streamhouse Trio - Paimon, Fluss, and Iceberg for Unified Data Architectures</title><link>https://jaehyeon.me/blog/2025-05-06-streamhouse-trio/</link><guid>https://jaehyeon.me/blog/2025-05-06-streamhouse-trio/</guid><pubDate>Tue, 06 May 2025 00:00:00 +0000</pubDate><category>Apache Flink</category><category>Apache Iceberg</category><category>Apache Paimon</category><category>Fluss</category><description>&lt;p>The world of data is converging. The traditional divide between batch processing for historical analytics and stream processing for real-time insights is becoming increasingly blurry. Businesses demand architectures that handle both seamlessly. Enter the &amp;ldquo;Streamhouse&amp;rdquo; - an evolution of the Lakehouse concept, designed with streaming as a first-class citizen.&lt;/p>
-&lt;p>Today, we&amp;rsquo;ll introduce three key open-source technologies shaping this space: &lt;a href="https://paimon.apache.org/" target="_blank" rel="noopener noreferrer">&lt;strong>Apache Paimon™&lt;/strong>&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>, &lt;a href="https://alibaba.github.io/fluss-docs/" target="_blank" rel="noopener noreferrer">&lt;strong>Fluss&lt;/strong>&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>, and &lt;a href="https://iceberg.apache.org/" target="_blank" rel="noopener noreferrer">&lt;strong>Apache Iceberg&lt;/strong>&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>. While each has unique strengths, their true power lies in how they can be integrated to build robust, flexible, and performant data platforms.&lt;/p></description><content:encoded>&lt;p>The world of data is converging. The traditional divide between batch processing for historical analytics and stream processing for real-time insights is becoming increasingly blurry. Businesses demand architectures that handle both seamlessly. Enter the &amp;ldquo;Streamhouse&amp;rdquo; - an evolution of the Lakehouse concept, designed with streaming as a first-class citizen.&lt;/p>
-&lt;p>Today, we&amp;rsquo;ll introduce three key open-source technologies shaping this space: &lt;a href="https://paimon.apache.org/" target="_blank" rel="noopener noreferrer">&lt;strong>Apache Paimon™&lt;/strong>&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>, &lt;a href="https://alibaba.github.io/fluss-docs/" target="_blank" rel="noopener noreferrer">&lt;strong>Fluss&lt;/strong>&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>, and &lt;a href="https://iceberg.apache.org/" target="_blank" rel="noopener noreferrer">&lt;strong>Apache Iceberg&lt;/strong>&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>. While each has unique strengths, their true power lies in how they can be integrated to build robust, flexible, and performant data platforms.&lt;/p>
-&lt;p>Let&amp;rsquo;s dive into each component:&lt;/p>
-
-&lt;h2 id="1-apache-paimon-the-streaming-lakehouse-table" data-numberify>1. Apache Paimon: The Streaming Lakehouse Table&lt;a class="anchor ms-1" href="#1-apache-paimon-the-streaming-lakehouse-table" aria-label="Link to this section: 1. Apache Paimon: The Streaming Lakehouse Table">&lt;/a>&lt;/h2>
-&lt;ul>
-&lt;li>&lt;strong>In Simple Terms:&lt;/strong> Think of Paimon as a specialized Lakehouse table format built from the ground up for &lt;strong>unified streaming and batch processing&lt;/strong>. It excels where real-time updates meet analytical queries.&lt;/li>
-&lt;li>&lt;strong>Type:&lt;/strong> Stream-native Lakehouse Table Storage.&lt;/li>
-&lt;li>&lt;strong>Designed For:&lt;/strong> Managing dynamic tables that require frequent updates, deletions, or change data capture (CDC), while still being accessible for batch analytics.&lt;/li>
-&lt;li>&lt;strong>Use Cases:&lt;/strong>
-&lt;ul>
-&lt;li>Real-time data warehousing / OLAP.&lt;/li>
-&lt;li>Ingesting CDC streams (e.g., from databases).&lt;/li>
-&lt;li>Building machine learning feature stores that need fresh data.&lt;/li>
-&lt;li>Replacing Kappa architectures with a more manageable table abstraction.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>Strengths:&lt;/strong>
-&lt;ul>
-&lt;li>&lt;strong>True Streaming &amp;amp; Batch Unification:&lt;/strong> Natively handles both writers and readers.&lt;/li>
-&lt;li>&lt;strong>Efficient Upserts:&lt;/strong> Optimized for high-frequency inserts, updates, and deletes using merge-on-read strategies (similar to HBase/LSM-trees).&lt;/li>
-&lt;li>&lt;strong>Low Latency Updates:&lt;/strong> Achieves latency in the seconds-to-minutes range for data visibility.&lt;/li>
-&lt;li>&lt;strong>Strong Flink Integration:&lt;/strong> Developed with Apache Flink as a primary engine, offering first-class support via Flink SQL and DataStream API.&lt;/li>
-&lt;li>&lt;strong>ACID Transactions:&lt;/strong> Ensures data consistency across concurrent operations.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>Drawbacks:&lt;/strong>
-&lt;ul>
-&lt;li>Newer ecosystem compared to Iceberg.&lt;/li>
-&lt;li>Latency, while good, is not in the millisecond range like pure streaming systems.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>Origin:&lt;/strong> Originated at Alibaba, now at the Apache Software Foundation.&lt;/li>
-&lt;/ul>
-
-&lt;h2 id="2-fluss-ultra-low-latency-streaming-storage" data-numberify>2. Fluss: Ultra-Low-Latency Streaming Storage&lt;a class="anchor ms-1" href="#2-fluss-ultra-low-latency-streaming-storage" aria-label="Link to this section: 2. Fluss: Ultra-Low-Latency Streaming Storage">&lt;/a>&lt;/h2>
-&lt;ul>
-&lt;li>&lt;strong>In Simple Terms:&lt;/strong> Fluss is purpose-built &lt;strong>pure streaming storage&lt;/strong>, optimized for getting data in and out &lt;em>extremely&lt;/em> fast. It&amp;rsquo;s like a queryable, structured, columnar version of Kafka topics.&lt;/li>
-&lt;li>&lt;strong>Type:&lt;/strong> Real-time Optimized Streaming Storage.&lt;/li>
-&lt;li>&lt;strong>Designed For:&lt;/strong> Scenarios demanding the absolute lowest latency for stream ingestion and consumption.&lt;/li>
-&lt;li>&lt;strong>Use Cases:&lt;/strong>
-&lt;ul>
-&lt;li>Real-time monitoring and alerting.&lt;/li>
-&lt;li>Powering real-time dashboards and APIs.&lt;/li>
-&lt;li>Feeding data into stream processing jobs with minimal delay.&lt;/li>
-&lt;li>Serving as a high-speed buffer before data lands in Paimon or other storage.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>Strengths:&lt;/strong>
-&lt;ul>
-&lt;li>&lt;strong>Very Low Latency:&lt;/strong> Achieves millisecond-level latency for reads and writes.&lt;/li>
-&lt;li>&lt;strong>Columnar Streaming:&lt;/strong> Allows for efficient data access, including projection pushdown (reading only needed columns) directly on the stream.&lt;/li>
-&lt;li>&lt;strong>Native Flink Support:&lt;/strong> Designed to work seamlessly as a Flink source/sink.&lt;/li>
-&lt;li>&lt;strong>Structured Streaming:&lt;/strong> Unlike message queues, data has a defined schema.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>Drawbacks:&lt;/strong>
-&lt;ul>
-&lt;li>Not designed for analytical queries over long historical periods (it&amp;rsquo;s optimized for the &lt;em>stream&lt;/em>).&lt;/li>
-&lt;li>Doesn&amp;rsquo;t natively support updates/deletes or ACID transactions like table formats.&lt;/li>
-&lt;li>Limited ecosystem support beyond Flink currently (though intended for ASF donation).&lt;/li>
-&lt;li>No built-in catalog integration; schema defined within the processing job (e.g., Flink SQL DDL).&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>Origin:&lt;/strong> Originated at Ververica (derived from work at Alibaba).&lt;/li>
-&lt;/ul>
-
-&lt;h2 id="3-apache-iceberg-the-battle-tested-batch-lakehouse-standard" data-numberify>3. Apache Iceberg: The Battle-Tested Batch Lakehouse Standard&lt;a class="anchor ms-1" href="#3-apache-iceberg-the-battle-tested-batch-lakehouse-standard" aria-label="Link to this section: 3. Apache Iceberg: The Battle-Tested Batch Lakehouse Standard">&lt;/a>&lt;/h2>
-&lt;ul>
-&lt;li>&lt;strong>In Simple Terms:&lt;/strong> Iceberg is a widely adopted open table format primarily designed for &lt;strong>reliable, large-scale batch analytics&lt;/strong> on data lakes. It has been progressively adding streaming capabilities.&lt;/li>
-&lt;li>&lt;strong>Type:&lt;/strong> Lakehouse Table Storage (Batch-Optimized).&lt;/li>
-&lt;li>&lt;strong>Designed For:&lt;/strong> Managing large, relatively static datasets for SQL-based analytics and BI.&lt;/li>
-&lt;li>&lt;strong>Use Cases:&lt;/strong>
-&lt;ul>
-&lt;li>Building large-scale data lakes for BI and reporting (OLAP).&lt;/li>
-&lt;li>Replacing Hive tables with better reliability and performance.&lt;/li>
-&lt;li>Batch ETL/ELT processes.&lt;/li>
-&lt;li>Providing a stable, versioned dataset for diverse query engines.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>Strengths:&lt;/strong>
-&lt;ul>
-&lt;li>&lt;strong>Massive Ecosystem:&lt;/strong> Supported by Spark, Flink, Trino, Presto, Dremio, Snowflake, major cloud vendors, and many more.&lt;/li>
-&lt;li>&lt;strong>Robustness &amp;amp; Scalability:&lt;/strong> Handles petabyte-scale tables reliably.&lt;/li>
-&lt;li>&lt;strong>Advanced Features:&lt;/strong> Time travel, schema evolution guarantees, hidden partitioning, ACID transactions.&lt;/li>
-&lt;li>&lt;strong>Mature and Stable:&lt;/strong> Widely deployed in production environments.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>Drawbacks:&lt;/strong>
-&lt;ul>
-&lt;li>Streaming support is an addition, not its core design; update/CDC latencies are typically higher (minutes to hours) compared to Paimon.&lt;/li>
-&lt;li>Less optimized for high-frequency concurrent writes compared to stream-native formats.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>Origin:&lt;/strong> Created by Netflix, now a top-level Apache Software Foundation project.&lt;/li>
-&lt;/ul>
-
-&lt;h2 id="putting-it-all-together-the-streamhouse-architecture" data-numberify>Putting It All Together: The Streamhouse Architecture&lt;a class="anchor ms-1" href="#putting-it-all-together-the-streamhouse-architecture" aria-label="Link to this section: Putting It All Together: The Streamhouse Architecture">&lt;/a>&lt;/h2>
-&lt;p>These three technologies aren&amp;rsquo;t competitors; they are complementary components of a powerful, tiered Streamhouse architecture:&lt;/p>
-&lt;ol>
-&lt;li>&lt;strong>Ingestion &amp;amp; Real-time Access (Hot Layer):&lt;/strong> &lt;strong>Fluss&lt;/strong> acts as the high-speed ingestion point. Data arriving here is immediately available for millisecond-latency stream processing or real-time dashboards.&lt;/li>
-&lt;li>&lt;strong>Transactional &amp;amp; Unified Access (Warm Layer):&lt;/strong> Data flows from Fluss (or directly ingested) into &lt;strong>Paimon&lt;/strong>. Paimon provides durable, ACID-compliant tables supporting both real-time updates/CDC and batch/SQL queries with seconds-to-minutes freshness. This is the operational core for mixed workloads.&lt;/li>
-&lt;li>&lt;strong>Archival &amp;amp; Batch Analytics (Cold Layer):&lt;/strong> For long-term retention and cost-effective, large-scale batch analysis, data snapshots from Paimon (or potentially older Fluss data) can be periodically moved or archived into &lt;strong>Iceberg&lt;/strong>. Iceberg&amp;rsquo;s broad ecosystem support makes it ideal for BI tools and large analytical jobs that don&amp;rsquo;t require sub-minute freshness.&lt;/li>
-&lt;/ol>
-&lt;p>&lt;strong>Benefits of Integration:&lt;/strong>&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>Low Latency:&lt;/strong> Fluss ensures data is actionable instantly.&lt;/li>
-&lt;li>&lt;strong>Transactional Integrity:&lt;/strong> Paimon provides reliable, mutable tables for complex workloads.&lt;/li>
-&lt;li>&lt;strong>Scalable Analytics:&lt;/strong> Iceberg offers cost-effective, deep historical analysis with wide tooling support.&lt;/li>
-&lt;li>&lt;strong>Flexibility:&lt;/strong> Choose the right storage for the right job based on latency, query patterns, and cost.&lt;/li>
-&lt;/ul>
-
-&lt;h2 id="integration-with-flink-and-spark" data-numberify>Integration with Flink and Spark&lt;a class="anchor ms-1" href="#integration-with-flink-and-spark" aria-label="Link to this section: Integration with Flink and Spark">&lt;/a>&lt;/h2>
-&lt;ul>
-&lt;li>&lt;strong>Flink:&lt;/strong> Apache Flink shines in this architecture.
-&lt;ul>
-&lt;li>&lt;strong>Fluss &amp;amp; Paimon:&lt;/strong> Have native, first-class support in Flink. Flink SQL can treat both Fluss streams and Paimon tables as regular tables, enabling powerful unified queries across real-time and operational data.&lt;/li>
-&lt;li>&lt;strong>Iceberg:&lt;/strong> Has good Flink connector support for both batch and streaming reads/writes.&lt;/li>
-&lt;li>&lt;strong>Catalog Integration:&lt;/strong> Flink&amp;rsquo;s Catalog API works natively with Paimon (paimon catalog) and Iceberg (iceberg catalog), allowing unified metadata management. Fluss doesn&amp;rsquo;t use a catalog; its schema is defined in the job.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>Spark:&lt;/strong>
-&lt;ul>
-&lt;li>&lt;strong>Iceberg:&lt;/strong> Excellent, mature Spark support is a key strength of Iceberg.&lt;/li>
-&lt;li>&lt;strong>Paimon:&lt;/strong> Also provides Spark connectors for reading and writing Paimon tables, aiming for broad engine compatibility.&lt;/li>
-&lt;li>&lt;strong>Fluss:&lt;/strong> Less direct integration currently; data would typically flow &lt;em>through&lt;/em> Flink &lt;em>to&lt;/em> Spark or be read from Paimon/Iceberg by Spark.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-
-&lt;h2 id="real-time-user-activity-tracking-for-an-e-commerce-platform-scenario" data-numberify>Real-time User Activity Tracking for an E-commerce Platform Scenario&lt;a class="anchor ms-1" href="#real-time-user-activity-tracking-for-an-e-commerce-platform-scenario" aria-label="Link to this section: Real-time User Activity Tracking for an E-commerce Platform Scenario">&lt;/a>&lt;/h2>
-&lt;p>Imagine an e-commerce website that wants to track user actions (like clicks, page views, adding items to cart) in real-time. They have several goals:&lt;/p>
-&lt;ol>
-&lt;li>&lt;strong>Immediate Reaction:&lt;/strong> Trigger actions &lt;em>instantly&lt;/em> based on certain events (e.g., fraud detection on rapid clicks, real-time offer personalization).&lt;/li>
-&lt;li>&lt;strong>Operational Dashboard:&lt;/strong> Maintain an up-to-date view of user activity for the last few days, allowing analysts to query recent trends with reasonable latency (seconds to minutes). This data might need updates later (e.g., correcting event types).&lt;/li>
-&lt;li>&lt;strong>Long-term Analytics:&lt;/strong> Store all historical event data cost-effectively for large-scale batch analysis, BI reporting (e.g., monthly user engagement reports), and machine learning model training.&lt;/li>
-&lt;/ol>
-&lt;p>&lt;figure class="figure mx-auto d-block">&lt;picture>&lt;img class="img-fluid figure-img" alt="Flow diagram of events moving through Fluss, a Flink SQL job, Paimon and Iceberg on S3" src="https://jaehyeon.me/blog/2025-05-06-streamhouse-trio/streamhouse.png" loading="lazy" title="Hot, warm and cold layers" width="1155" height="576" />
-&lt;/picture>&lt;figcaption class="figure-caption">Hot, warm and cold layers&lt;/figcaption>
-&lt;/figure>
-
-&lt;/p>
-
-&lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
-&lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-07-17-self-service-data-platform-via-sql-gateway">Self-service Data Platform via a Multi-tenant SQL Gateway&lt;/a> - Apache Kyuubi provisioning Spark, Flink and Trino engines on demand over table layers like these.&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-16-odctl-open-data-stack">Introducing odctl: One CLI for a Local Open Data Stack&lt;/a> - a CLI that launches Kafka, Flink, Spark, Trino and Iceberg locally, for trying this architecture out.&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2023-11-02-stateful-stream-processing">Benefits and Opportunities of Stateful Stream Processing&lt;/a> - why streaming-first architectures pay off, the reasoning the Streamhouse rests on.&lt;/li>
-&lt;/ul>
-
-&lt;h2 id="conclusion" data-numberify>Conclusion&lt;a class="anchor ms-1" href="#conclusion" aria-label="Link to this section: Conclusion">&lt;/a>&lt;/h2>
-&lt;p>The Streamhouse concept, powered by technologies like Paimon, Fluss, and Iceberg, represents a significant step towards truly unified data architectures. By leveraging the specific strengths of each component - Fluss for speed, Paimon for unified transactional tables, and Iceberg for scalable batch analytics and archival – organizations can build platforms that are performant, flexible, and ready for both real-time demands and deep historical insights. This tiered approach, already common in large tech companies, is now becoming accessible to a wider audience through these powerful open-source projects.&lt;/p></content:encoded></item></channel></rss>
+&lt;p>This post detailed the creation of Kotlin Kafka producer and consumer applications for handling JSON order data. We covered project setup, data modeling, custom serialization, client logic with error handling, deployment against a local Kafka cluster using the &lt;em>Factor House Local&lt;/em> project with &lt;em>Kpow&lt;/em>.&lt;/p></content:encoded></item></channel></rss>
