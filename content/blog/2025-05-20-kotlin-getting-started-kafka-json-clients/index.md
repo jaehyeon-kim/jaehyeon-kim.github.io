@@ -13,9 +13,9 @@ tags:
   - Apache Kafka
   - Kotlin
   - Docker
-  - Kpow
-  - Factor House Local
-description: A Kotlin Kafka producer and consumer for order events, with custom JSON serialisers, admin helpers and a Gradle build, run on Factor House Local.
+  - Kafka UI
+  - odctl
+description: A Kotlin Kafka producer and consumer for order events, with custom JSON serialisers, admin helpers and a Gradle build, run on odctl.
 ---
 
 A Kafka producer application generates and sends order data, and a Kafka consumer application receives and processes those orders. This post explores that Kotlin-based Kafka project, detailing the construction and operation of both applications. We'll go through each component, from build configuration to message handling, to understand how they work together in an event-driven system.
@@ -30,7 +30,7 @@ A Kafka producer application generates and sends order data, and a Kafka consume
 
 ## Kafka Client Applications
 
-We will build producer and consumer apps using the [IntelliJ IDEA Community](https://www.jetbrains.com/idea/download/?section=windows) edition. The source code for the applications discussed in this post can be found in the _orders-json-clients_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/kotlin-examples). This project demonstrates a practical approach to developing event-driven systems with Kafka and Kotlin. Below, we'll explore the key components that make up these applications.
+We will build producer and consumer apps using the [IntelliJ IDEA Community](https://www.jetbrains.com/idea/download/?section=windows) edition. The source code for the applications discussed in this post can be found in the _orders-json-clients_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams). This project demonstrates a practical approach to developing event-driven systems with Kafka and Kotlin. Below, we'll explore the key components that make up these applications.
 
 ### Build Configuration
 
@@ -284,11 +284,11 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 object ProducerApp {
-    private val bootstrapAddress = System.getenv("BOOTSTRAP_ADDRESS") ?: "localhost:9092"
+    private val bootstrapAddress = System.getenv("BOOTSTRAP_ADDRESS") ?: "127.0.0.1:9092"
     private val inputTopicName = System.getenv("TOPIC_NAME") ?: "orders-json"
     private val delaySeconds = System.getenv("DELAY_SECONDS")?.toIntOrNull() ?: 5
     private const val NUM_PARTITIONS = 3
-    private const val REPLICATION_FACTOR: Short = 3
+    private const val REPLICATION_FACTOR: Short = 1 // odctl kafka-lite has one broker
     private val logger = KotlinLogging.logger { }
     private val faker = Faker()
 
@@ -387,7 +387,7 @@ import java.time.Duration
 import java.util.Properties
 
 object ConsumerApp {
-    private val bootstrapAddress = System.getenv("BOOTSTRAP_ADDRESS") ?: "localhost:9092"
+    private val bootstrapAddress = System.getenv("BOOTSTRAP_ADDRESS") ?: "127.0.0.1:9092"
     private val topicName = System.getenv("TOPIC_NAME") ?: "orders-json"
     private val logger = KotlinLogging.logger { }
     private const val MAX_RETRIES = 3
@@ -512,21 +512,20 @@ fun main(args: Array<String>) {
 
 ## Run Kafka Applications
 
-We begin by setting up our local Kafka environment using the [Factor House Local](https://github.com/factorhouse/factorhouse-local) project. This project conveniently provisions a Kafka cluster along with Kpow, a powerful tool for Kafka management and control, all managed via Docker Compose. Once our Kafka environment is running, we will start our Kotlin-based producer and consumer applications.
+We begin by setting up our local Kafka environment with [odctl](https://github.com/jaehyeon-kim/odctl), which provisions a Kafka cluster along with Kafka UI for browsing topics and schemas, all managed via Docker Compose. Once our Kafka environment is running, we will start our Kotlin-based producer and consumer applications.
 
-### Factor House Local
+### odctl
 
-To get our Kafka cluster and Kpow up and running, we'll first need to clone the project repository and navigate into its directory. Then, we can start the services using Docker Compose as shown below. **Note that we need to have a community license for Kpow to get started.** See [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project *README* for details on how to request a license and configure it before proceeding with the `docker compose` command.
+[odctl](https://github.com/jaehyeon-kim/odctl) starts a local data stack with Docker Compose. Its `kafka-lite` profile runs one Kafka broker, the Karapace schema registry and Kafka UI. Install odctl, clone the repository, and start the profile from its _order-streams_ folder, where the rest of the commands also run:
 
 ```bash
-git clone https://github.com/factorhouse/factorhouse-local.git
-cd factorhouse-local
-docker compose -f compose-kpow-community.yml up -d
+uv tool install odctl
+git clone https://github.com/jaehyeon-kim/benchtop.git
+cd benchtop/order-streams
+odctl up kafka-lite
 ```
 
-Once the services are initialized, we can access the Kpow user interface by navigating to `http://localhost:3000` in the web browser, where we observe the provisioned environment, including three Kafka brokers, one schema registry, and one Kafka Connect instance.
-
-![Kpow overview shows three brokers, five topics, 82 partitions and one schema registry](kpow-overview.png#center "Kpow overview of the local Kafka cluster")
+Once the services are initialized, Kafka UI is at `http://127.0.0.1:8086`, where we can browse the topics, their messages and the registered schemas.
 
 ### Launch Applications
 
@@ -539,29 +538,28 @@ Our Kotlin Kafka applications can be launched in a couple of ways, catering to d
 
 ```bash
 # 👉 With Gradle (Dev Mode)
-./gradlew run --args="producer"
-./gradlew run --args="consumer"
+./gradlew :orders-json-clients:run --args="producer"
+./gradlew :orders-json-clients:run --args="consumer"
 
 # 👉 Build Shadow (Fat) JAR:
 ./gradlew shadowJar
 
 # Resulting JAR:
-# build/libs/orders-json-clients-1.0.jar
+# orders-json-clients/build/libs/orders-json-clients-1.0.jar
 
 # 👉 Run the Fat JAR:
-java -jar build/libs/orders-json-clients-1.0.jar producer
-java -jar build/libs/orders-json-clients-1.0.jar consumer
+java -jar orders-json-clients/build/libs/orders-json-clients-1.0.jar producer
+java -jar orders-json-clients/build/libs/orders-json-clients-1.0.jar consumer
 ```
 
 For this post, we demonstrate starting the applications in development mode using Gradle. Once started, we see logs from both the producer sending messages and the consumer receiving them.
 
 ![Two terminal panes run the Gradle producer and consumer tasks of the project](kafka-json-apps.webp#center "Producer and consumer applications started in development mode")
 
-With the applications running and producing/consuming data, we can inspect the messages flowing through our `orders-json` topic using Kpow. In the Kpow UI, navigate to your topic. To correctly view the messages, we should configure the deserializers: set the **Key Deserializer** to *String* and the **Value Deserializer** to *JSON*. After applying these settings, click the *Search* button to view the messages.
+With the applications running and producing/consuming data, we can inspect the messages flowing through our `orders-json` topic using Kafka UI at http://127.0.0.1:8086. In Kafka UI, open **Topics**, select `orders-json` and go to the **Messages** tab. The keys and values are plain strings, so the default serdes show them as they are, and expanding a message shows its value as formatted JSON.
 
-![Kpow data inspect form set to the orders-json topic with String key and JSON value](message-view-01.png#center "Inspecting the orders-json topic in Kpow")
-![Kpow lists orders-json records showing order_id, bid_time, price, item and supplier](message-view-02.png#center "Order messages returned from the orders-json topic")
+![Kafka UI messages tab of the orders-json topic, with the newest order expanded to show order_id, bid_time, price, item and supplier](message-view.png#center "Order messages on the orders-json topic in Kafka UI")
 
 ## Conclusion
 
-This post detailed the creation of Kotlin Kafka producer and consumer applications for handling JSON order data. We covered project setup, data modeling, custom serialization, client logic with error handling, deployment against a local Kafka cluster using the *Factor House Local* project with *Kpow*.
+This post detailed the creation of Kotlin Kafka producer and consumer applications for handling JSON order data. We covered project setup, data modeling, custom serialization, client logic with error handling, deployment against a local Kafka cluster started with *odctl*.

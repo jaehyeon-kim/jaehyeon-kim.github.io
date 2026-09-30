@@ -14,8 +14,8 @@ tags:
   - Kafka Streams
   - Kotlin
   - Docker
-  - Kpow
-  - Factor House Local
+  - Kafka UI
+  - odctl
 description: Flink Table API in Kotlin states the supplier statistics as a declarative windowed aggregation over a DataStream, with late rows routed by hand.
 ---
 
@@ -39,9 +39,9 @@ We develop a Flink application that uses Flink's Table API and SQL-like expressi
 *   Splits the stream to route late-arriving records to a separate "skipped" topic for analysis.
 *   Sinks the aggregated results to a Kafka topic using the built-in `avro-confluent` format connector.
 
-The source code for the application discussed in this post can be found in the _orders-stats-flink_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/kotlin-examples).
+The source code for the application discussed in this post can be found in the _orders-stats-flink_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams).
 
-### The Build Configuration
+### Build Configuration
 
 The `build.gradle.kts` file sets up the project, its dependencies, and packaging. It's shared between the DataStream and Table API applications - see [the previous post](/blog/2025-06-10-kotlin-getting-started-flink-datastream) for the Flink application that uses the DataStream API.
 
@@ -140,8 +140,8 @@ tasks.named("build") {
 
 tasks.named<JavaExec>("run") {
     environment("TO_SKIP_PRINT", "false")
-    environment("BOOTSTRAP", "localhost:9092")
-    environment("REGISTRY_URL", "http://localhost:8081")
+    environment("BOOTSTRAP", "127.0.0.1:9092")
+    environment("REGISTRY_URL", "http://127.0.0.1:8081")
 }
 
 tasks.test {
@@ -442,8 +442,8 @@ object RowWatermarkStrategy {
             .forBoundedOutOfOrderness<Row>(java.time.Duration.ofSeconds(5))
             .withTimestampAssigner { row: Row, _ ->
                 try {
-                    // Get the field by index. Assumes bid_time is at index 1 and is Long.
-                    val timestamp = row.getField(1) as? Long
+                    // bid_time is at index 1, as an Instant (see TableApp's Row.of).
+                    val timestamp = (row.getField(1) as? java.time.Instant)?.toEpochMilli()
                     if (timestamp != null) {
                         timestamp
                     } else {
@@ -527,9 +527,9 @@ import java.time.format.DateTimeParseException
 
 object TableApp {
     private val toSkipPrint = System.getenv("TO_SKIP_PRINT")?.toBoolean() ?: true
-    private val bootstrapAddress = System.getenv("BOOTSTRAP") ?: "kafka-1:19092"
+    private val bootstrapAddress = System.getenv("BOOTSTRAP") ?: "127.0.0.1:9092"
     private val inputTopicName = System.getenv("TOPIC") ?: "orders-avro"
-    private val registryUrl = System.getenv("REGISTRY_URL") ?: "http://schema:8081"
+    private val registryUrl = System.getenv("REGISTRY_URL") ?: "http://127.0.0.1:8081"
     private val registryConfig =
         mapOf(
             "basic.auth.credentials.source" to "USER_INFO",
@@ -537,7 +537,7 @@ object TableApp {
         )
     private const val INPUT_SCHEMA_SUBJECT = "orders-avro-value"
     private const val NUM_PARTITIONS = 3
-    private const val REPLICATION_FACTOR: Short = 3
+    private const val REPLICATION_FACTOR: Short = 1 // odctl kafka-lite has one broker
     private val logger = KotlinLogging.logger {}
 
     // ObjectMapper for converting late data Map to JSON
@@ -779,59 +779,54 @@ fun main(args: Array<String>) {
 
 ## Run Flink Application
 
-As with the DataStream job in the [previous post](/blog/2025-06-10-kotlin-getting-started-flink-datastream), running the Table API application involves setting up a local Kafka environment from the [Factor House Local](https://github.com/factorhouse/factorhouse-local) project, starting the data producer, and then launching the Flink job with the correct argument.
+As with the DataStream job in the [previous post](/blog/2025-06-10-kotlin-getting-started-flink-datastream), running the Table API application involves setting up a local Kafka environment with [odctl](https://github.com/jaehyeon-kim/odctl), starting the data producer, and then launching the Flink job with the correct argument.
 
-### Factor House Local Setup
+### odctl
 
-To set up your local Kafka environment, follow these steps:
-1.  Clone the Factor House Local repository:
-    ```bash
-    git clone https://github.com/factorhouse/factorhouse-local.git
-    cd factorhouse-local
-    ```
-2.  Ensure your Kpow community license is configured (see the [README](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) for details).
-3.  Start the services:
-    ```bash
-    docker compose -f compose-kpow-community.yml up -d
-    ```
-Once initialized, Kpow will be accessible at `http://localhost:3000`, showing Kafka brokers, schema registry, and other components.
+[odctl](https://github.com/jaehyeon-kim/odctl) starts a local data stack with Docker Compose. Its `kafka-lite` profile runs one Kafka broker, the Karapace schema registry and Kafka UI. Install odctl, clone the repository, and start the profile from its _order-streams_ folder, where the rest of the commands also run:
 
-![Kpow with the Kafka brokers, schema registry and other components of the local setup](kpow-overview.png#center "Kpow with the Kafka brokers, schema registry and other components of the local setup")
+```bash
+uv tool install odctl
+git clone https://github.com/jaehyeon-kim/benchtop.git
+cd benchtop/order-streams
+odctl up kafka-lite
+```
+
+Once the services are initialized, Kafka UI is at `http://127.0.0.1:8086`, where we can browse the topics, their messages and the registered schemas.
 
 ### Start the Kafka Order Producer
 
 Next, start the Kafka data producer from the `orders-avro-clients` project (developed in [Part 2 of this series](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients/)) to populate the `orders-avro` topic. To properly test the application's handling of late events, it's crucial to run the producer with a randomized delay (up to 30 seconds).
 
-Navigate to the producer's project directory (`orders-avro-clients`) in the [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/kotlin-examples) and execute the following:
+From the _order-streams_ folder of the [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams), run the producer (`orders-avro-clients`):
 
 ```bash
-# Assuming you are in the root of the 'orders-avro-clients' project
-DELAY_SECONDS=30 ./gradlew run --args="producer"
+# From the order-streams folder
+DELAY_SECONDS=30 ./gradlew :orders-avro-clients:run --args="producer"
 ```
 
-This will start populating the `orders-avro` topic with Avro-encoded order messages. You can inspect these messages in Kpow. Ensure Kpow is configured with Key Deserializer: *String*, Value Deserializer: *AVRO*, and Schema Registry: *Local Schema Registry*.
+This will start populating the `orders-avro` topic with Avro-encoded order messages. You can inspect these messages in Kafka UI at http://127.0.0.1:8086. Open the `orders-avro` topic's **Messages** tab and set the **Value Serde** to *SchemaRegistry*, so the values are decoded with their schema from Karapace.
 
-![Kpow data inspect form for orders-avro with String key and AVRO value](orders-01.png#center "Kpow data inspect form for orders-avro with String key and AVRO value")
-![Avro order records on the orders-avro topic listed in Kpow](orders-02.png#center "Avro order records on the orders-avro topic listed in Kpow")
+![Kafka UI messages tab of the orders-avro topic with the SchemaRegistry value serde, the newest order expanded to show order_id, bid_time, price, item and supplier](orders.png#center "Avro order messages on the orders-avro topic in Kafka UI")
 
 ### Launch the Flink Application
 
-With the data pipeline ready, navigate to the `orders-stats-flink` project directory of the [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/kotlin-examples). This time, we'll launch the job by providing `table` as the command-line argument to trigger the declarative, Table API-based logic.
+With the data pipeline ready, run the `orders-stats-flink` application of the [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams/orders-stats-flink) from the same folder. This time, we'll launch the job by providing `table` as the command-line argument to trigger the declarative, Table API-based logic.
 
 The application can be run in two main ways:
 
 1.  **With Gradle (Development Mode)**: Ideal for development and quick testing.
     ```bash
-    ./gradlew run --args="table"
+    ./gradlew :orders-stats-flink:run --args="table"
     ```
 2.  **Running the Shadow JAR (Deployment Mode)**: For deploying the application as a standalone unit. First, build the fat JAR:
     ```bash
     ./gradlew shadowJar
     ```
-    This creates `build/libs/orders-stats-flink-1.0.jar`. Then run it:
+    This creates `orders-stats-flink/build/libs/orders-stats-flink-1.0.jar`. Then run it:
     ```bash
     java --add-opens=java.base/java.util=ALL-UNNAMED \
-      -jar build/libs/orders-stats-flink-1.0.jar table
+      -jar orders-stats-flink/build/libs/orders-stats-flink-1.0.jar table
     ```
 
 > 💡 To build and run the application locally, ensure that **JDK 17** is installed.
@@ -846,26 +841,21 @@ Our Flink application produces results to two topics:
 
 **1. Supplier Statistics (`orders-avro-ktl-stats`):**
 
-In Kpow, navigate to the `orders-avro-ktl-stats` topic. Configure Kpow to view these messages:
-*   **Key Deserializer:** *String*
-*   **Value Deserializer:** *AVRO*
-*   **Schema Registry:** *Local Schema Registry*
+In Kafka UI, open the `orders-avro-ktl-stats` topic's **Messages** tab. To view these messages, set:
+*   **Value Serde:** *SchemaRegistry*, which decodes each value with its schema from Karapace. The key is a plain string, which the default **Key Serde** shows as it is.
 
 You should see `SupplierStats` messages, each representing the total price and count of orders for a supplier within a 5-second (or 5000 millisecond) window. Notice the `window_start` and `window_end` fields.
 
-![Kpow data inspect form for the orders-avro-ktl-stats topic](stats-01.png#center "Kpow data inspect form for the orders-avro-ktl-stats topic")
-![SupplierStats records with supplier, window start and end, total price and count](stats-02.png#center "SupplierStats records with supplier, window start and end, total price and count")
+![Kafka UI messages tab of the orders-avro-ktl-stats topic with the SchemaRegistry value serde, the newest record expanded to show window_start, window_end, supplier, total_price and count](stats.png#center "Windowed supplier statistics on the orders-avro-ktl-stats topic")
 
 **2. Skipped (Late) Records (`orders-avro-ktl-skipped`):**
 
-Next, inspect the `orders-avro-ktl-skipped` topic in Kpow. Configure Kpow as follows:
-*   **Key Deserializer:** *String*
-*   **Value Deserializer:** *JSON*
+Next, open the `orders-avro-ktl-skipped` topic's **Messages** tab in Kafka UI:
+*   **Key Serde** and **Value Serde:** leave the defaults. Both are plain strings, and expanding a message shows its value as formatted JSON.
 
 These records were intercepted and rerouted by our custom `LateDataRouter` `ProcessFunction`. This manual step was necessary to separate late data before converting the stream to a `Table`, demonstrating a powerful pattern of blending Flink's APIs to solve complex requirements.
 
-![Kpow data inspect form for the orders-avro-ktl-skipped topic with a JSON value](skipped-01.png#center "Kpow data inspect form for the orders-avro-ktl-skipped topic with a JSON value")
-![Late order records routed to the skipped topic, listed in Kpow](skipped-02.png#center "Late order records routed to the skipped topic, listed in Kpow")
+![Kafka UI messages tab of the orders-avro-ktl-skipped topic, the newest record expanded to show the order fields and late set to true](skipped.png#center "Late order records on the orders-avro-ktl-skipped topic")
 
 ## Conclusion
 

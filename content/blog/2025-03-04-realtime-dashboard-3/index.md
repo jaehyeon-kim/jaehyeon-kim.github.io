@@ -27,7 +27,9 @@ A real-time monitoring dashboard connects to the WebSocket server from [Part 1](
 
 ## Next.js Frontend
 
-The Next.js dashboard processes and displays real-time *theLook eCommerce data*. It connects to the WebSocket server using the [*React useWebSocket*](https://github.com/robtaussig/react-use-websocket) package, while the UI is styled with [HeroUI (formerly NextUI)](https://www.heroui.com/) and [Tailwind CSS](https://tailwindcss.com/). Visualizations are powered by [Apache ECharts](https://github.com/hustcc/echarts-for-react). The source code for this post is available in this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos).
+![The Next.js dashboard reads the recent order items from the WebSocket server, which reads them from PostgreSQL](part-3.png#center "Architecture")
+
+The Next.js dashboard processes and displays real-time *theLook eCommerce data*. It connects to the WebSocket server using the [*React useWebSocket*](https://github.com/robtaussig/react-use-websocket) package, while the UI is styled with [HeroUI (formerly NextUI)](https://www.heroui.com/) and [Tailwind CSS](https://tailwindcss.com/). Visualizations are powered by [Apache ECharts](https://github.com/hustcc/echarts-for-react). The source code for this post is available in the **live-dashboard** folder of the [**benchtop**](https://github.com/jaehyeon-kim/benchtop/tree/main/live-dashboard) GitHub repository.
 
 ### Metric Component
 
@@ -41,7 +43,7 @@ We use a React component called `Metric` that displays a metric card with the fo
 The card's visual layout includes the label at the top, the formatted value in large text, and the delta change with an arrow beneath it.
 
 ```jsx
-// nextjs/src/components/metric.tsx
+// live-dashboard/nextjs/src/components/metric.tsx
 "use client";
 
 import {
@@ -86,8 +88,6 @@ export default function Metric({
             fill={arrowColor}
             xmlns="http://www.w3.org/2000/svg"
             color="inherit"
-            data-testid="stMetricDeltaIcon-Up"
-            className="e14lo1l1 st-emotion-cache-1ksdj5j ex0cdmw0"
           >
             <path fill="none" d="M0 0h24v24H0V0z"></path>
             <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"></path>
@@ -105,14 +105,12 @@ export default function Metric({
 Since I have yet to find an effective data manipulation library comparable to Python's Pandas, data processing is handled using custom objects and functions. The code primarily operates on arrays of `Record`s to compute sales metrics and generate visual representations. The `getMetrics` and `createMetricItems` functions are used to calculate current/delta metrics and construct an array of `MetricProp`s that can be added to the *Metric* component. Also, the `createOptionsItems` function is responsible for generating data visualizations, specifically bar charts that show revenue by categories such as country and traffic source.
 
 ```jsx
-// nextjs/src/lib/processing.tsx
-import { MetricProps } from "@/components/metric";
+// live-dashboard/nextjs/src/lib/processing.ts
+// Turns the WebSocket's records into metric cards and chart options, with no React.
+// The Streamlit dashboard does the same in sales/dashboard/metrics.py.
+import { EChartsOption } from "echarts-for-react";
 
-export interface Metrics {
-  num_orders: number;
-  num_order_items: number;
-  total_sales: number;
-}
+import { MetricProps } from "@/components/metric";
 
 export interface Record {
   user_id: string;
@@ -123,101 +121,55 @@ export interface Record {
   order_id: string;
   item_id: string;
   category: string;
+  cost: number;
   item_status: string;
   sale_price: number;
-  created_at: number;
+  created_at: string;
 }
 
-export const defaultMetrics: Metrics = {
-  num_orders: 0,
-  num_order_items: 0,
-  total_sales: 0,
+export interface Metrics {
+  num_orders: number;
+  num_order_items: number;
+  total_sales: number;
+}
+
+const LABELS: { [K in keyof Metrics]: string } = {
+  num_orders: "Number of Orders",
+  num_order_items: "Number of Order Items",
+  total_sales: "Total Sales",
 };
+const CHARTS = { country: "Country", traffic_source: "Traffic Source" }; // revenue grouped by
 
-export const defaultMetricItems: MetricProps[] = [
-  { label: "Number of Orders", value: 0, delta: 0, is_currency: false },
-  { label: "Number of Order Items", value: 0, delta: 0, is_currency: false },
-  { label: "Total Sales", value: 0, delta: 0, is_currency: true },
-];
+export const defaultMetrics: Metrics = { num_orders: 0, num_order_items: 0, total_sales: 0 };
 
-export function getMetrics(records: Record[]) {
-  const num_orders = [...new Set(records.map((r) => r.order_id))].length;
-  const num_order_items = [...new Set(records.map((r) => r.item_id))].length;
-  const total_sales = Math.round(
-    records.map((r) => Number(r.sale_price)).reduce((a, b) => a + b, 0)
-  );
+export function getMetrics(records: Record[]): Metrics {
   return {
-    num_orders: num_orders,
-    num_order_items: num_order_items,
-    total_sales: total_sales,
+    num_orders: new Set(records.map((r) => r.order_id)).size,
+    num_order_items: new Set(records.map((r) => r.item_id)).size,
+    total_sales: Math.round(records.reduce((sum, r) => sum + r.sale_price, 0)),
   };
 }
 
-export function createMetricItems(currMetrics: Metrics, prevMetrics: Metrics) {
-  const labels = [
-    { label: "Number of Orders", metric: "num_orders", is_currency: false },
-    {
-      label: "Number of Order Items",
-      metric: "num_order_items",
-      is_currency: false,
-    },
-    { label: "Total Sales", metric: "total_sales", is_currency: true },
-  ];
-  return labels.map((obj) => {
-    const label = obj.label;
-    const value = currMetrics[obj.metric as keyof Metrics];
-    const delta =
-      currMetrics[obj.metric as keyof Metrics] -
-      prevMetrics[obj.metric as keyof Metrics];
-    const is_currency = obj.is_currency;
-    return {
-      label,
-      value,
-      delta,
-      is_currency,
-    };
-  });
+export function createMetricItems(current: Metrics, previous: Metrics): MetricProps[] {
+  return (Object.keys(LABELS) as (keyof Metrics)[]).map((key) => ({
+    label: LABELS[key],
+    value: current[key],
+    delta: current[key] - previous[key],
+    is_currency: key === "total_sales",
+  }));
 }
 
-export function createOptionsItems(records: Record[]) {
-  const chartCols = [
-    { x: "country", y: "sale_price" },
-    { x: "traffic_source", y: "sale_price" },
-  ];
-  return chartCols.map((col) => {
-    // key is string but it throws the following error. Change the type to 'string | number'.
-    // Argument of type 'string | number' is not assignable to parameter of type 'string'.
-    // Type 'number' is not assignable to type 'string'.ts(2345)
-    const recordsMap = new Map<string | number, number>();
-    for (const r of records) {
-      recordsMap.set(
-        r[col.x as keyof Record],
-        (recordsMap.get(r[col.x as keyof Record]) || 0) +
-          Number(r[col.y as keyof Record])
-      );
-    }
-    const recordsItems = Array.from(recordsMap, ([x, y]) => ({ x, y })).sort(
-      (a, b) => (a.y > b.y ? -1 : 1)
-    );
-    const suffix = col.x
-      .split("_")
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
+export function createOptionsItems(records: Record[]): EChartsOption[] {
+  return (Object.keys(CHARTS) as (keyof typeof CHARTS)[]).map((column) => {
+    const revenue = new Map<string, number>();
+    for (const r of records) revenue.set(r[column], (revenue.get(r[column]) ?? 0) + r.sale_price);
+    const bars = [...revenue].sort((a, b) => b[1] - a[1]);
     return {
-      title: { text: "Revenue by ".concat(suffix) },
+      title: { text: `Revenue by ${CHARTS[column]}` },
+      grid: { containLabel: true }, // room for the rotated axis labels
+      xAxis: { type: "category", data: bars.map(([name]) => name), axisLabel: { rotate: 75 } },
       yAxis: { type: "value" },
-      xAxis: {
-        type: "category",
-        data: recordsItems.map((r) => r.x),
-        axisLabel: { show: true, rotate: 75 },
-      },
-      series: [
-        {
-          data: recordsItems.map((r) => Math.round(r.y)),
-          type: "bar",
-          colorBy: "data",
-        },
-      ],
+      series: [{ type: "bar", colorBy: "data", data: bars.map(([, value]) => Math.round(value)) }],
       tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
     };
   });
@@ -226,78 +178,50 @@ export function createOptionsItems(records: Record[]) {
 
 ### Application
 
-The main component builds a real-time eCommerce dashboard that connects to a WebSocket server at `ws://localhost:8000/ws` to fetch and display live data. It uses the *React useWebSocket* package (`react-use-websocket`) to manage the WebSocket connection, and whenever new data is received, it updates the state with the latest metrics and chart options. The data processing is handled by helper functions (`getMetrics`, `createMetricItems`, and `createOptionsItems`), which compute summary metrics and prepare visualization data. The UI dynamically updates to display key business metrics using the *Metric* component and interactive bar charts powered by *Apache ECharts* (`echarts-for-react`). A checkbox allows users to toggle the WebSocket connection on or off, giving them control over real-time updates.
+The main component builds a real-time eCommerce dashboard that connects to a WebSocket server at `ws://127.0.0.1:8000/ws` to fetch and display live data. A hook, `useDashboard`, uses the *React useWebSocket* package (`react-use-websocket`) to manage the WebSocket connection, and whenever new data is received, it updates the state with the latest metrics and chart options. The data processing is handled by helper functions (`getMetrics`, `createMetricItems`, and `createOptionsItems`), which compute summary metrics and prepare visualization data. The UI dynamically updates to display key business metrics using the *Metric* component and interactive bar charts powered by *Apache ECharts* (`echarts-for-react`). A checkbox allows users to toggle the WebSocket connection on or off, giving them control over real-time updates.
 
 ```jsx
-// nextjs/src/app/page.tsx
-"use client";
-
-import { useEffect, useState } from "react";
-import { Checkbox } from "@nextui-org/react";
-import ReactECharts, { EChartsOption } from "echarts-for-react";
+// live-dashboard/nextjs/src/lib/useDashboard.ts
+import { useEffect, useRef, useState } from "react";
+import { EChartsOption } from "echarts-for-react";
 import useWebSocket from "react-use-websocket";
 
-import Metric, { MetricProps } from "@/components/metric";
-import {
-  getMetrics,
-  createMetricItems,
-  defaultMetrics,
-  defaultMetricItems,
-  createOptionsItems,
-} from "@/lib/processing";
+import { MetricProps } from "@/components/metric";
+import { createMetricItems, createOptionsItems, defaultMetrics, getMetrics, Record } from "@/lib/processing";
 
-export default function Home() {
-  const [toConnect, toggleToConnect] = useState(false);
-  const [currMetrics, setCurrMetrics] = useState(defaultMetrics);
-  const [prevMetrics, setPrevMetrics] = useState(defaultMetrics);
-  const [metricItems, setMetricItems] = useState(defaultMetricItems);
-  const [chartOptions, setChartOptions] = useState([] as EChartsOption[]);
-
-  const { lastJsonMessage } = useWebSocket(
-    "ws://localhost:8000/ws",
-    {
-      share: false,
-      shouldReconnect: () => true,
-    },
-    toConnect
-  );
+// Follows the WebSocket while `connected`, and turns each message into cards and charts.
+export default function useDashboard(url: string, connected: boolean) {
+  const [metricItems, setMetricItems] = useState<MetricProps[]>(createMetricItems(defaultMetrics, defaultMetrics));
+  const [chartOptions, setChartOptions] = useState<EChartsOption[]>([]);
+  const previous = useRef(defaultMetrics);
+  const { lastJsonMessage } = useWebSocket<Record[]>(url, { share: false, shouldReconnect: () => true }, connected);
 
   useEffect(() => {
-    const records = JSON.parse(lastJsonMessage as string);
-    if (!!records) {
-      setPrevMetrics(currMetrics);
-      setCurrMetrics(getMetrics(records));
-      setMetricItems(createMetricItems(currMetrics, prevMetrics));
-      setChartOptions(createOptionsItems(records));
-    }
+    if (!lastJsonMessage) return;
+    const metrics = getMetrics(lastJsonMessage);
+    setMetricItems(createMetricItems(metrics, previous.current));
+    setChartOptions(createOptionsItems(lastJsonMessage));
+    previous.current = metrics;
   }, [lastJsonMessage]);
 
-  const createMetrics = (metricItems: MetricProps[]) => {
-    return metricItems.map((item, i) => {
-      return (
-        <Metric
-          key={i}
-          label={item.label}
-          value={item.value}
-          delta={item.delta}
-          is_currency={item.is_currency}
-        ></Metric>
-      );
-    });
-  };
+  return { metricItems, chartOptions };
+}
+```
 
-  const createCharts = (chartOptions: EChartsOption[]) => {
-    return chartOptions.map((option, i) => {
-      return (
-        <ReactECharts
-          key={i}
-          className="col-span-12 md:col-span-6"
-          option={option}
-          style={{ height: "500px" }}
-        />
-      );
-    });
-  };
+```jsx
+// live-dashboard/nextjs/src/app/page.tsx
+"use client";
+
+import { useState } from "react";
+import { Checkbox } from "@nextui-org/react";
+import ReactECharts from "echarts-for-react";
+
+import Metric from "@/components/metric";
+import useDashboard from "@/lib/useDashboard";
+
+export default function Home() {
+  const [connected, setConnected] = useState(false);
+  const { metricItems, chartOptions } = useDashboard("ws://127.0.0.1:8000/ws", connected);
 
   return (
     <div>
@@ -305,21 +229,21 @@ export default function Home() {
         <div className="flex m-2 justify-between items-center">
           <h1 className="text-4xl font-bold">theLook eCommerce Dashboard</h1>
         </div>
-        <div className="flex m-2 mt-5 justify-between items-center mt-5">
-          <Checkbox
-            color="primary"
-            onChange={() => toggleToConnect(!toConnect)}
-          >
+        <div className="flex m-2 mt-5 justify-between items-center">
+          <Checkbox color="primary" onChange={() => setConnected(!connected)}>
             Connect to WS Server
           </Checkbox>
-          ;
         </div>
       </div>
       <div className="grid grid-cols-12 gap-4 mt-5">
-        {createMetrics(metricItems)}
+        {metricItems.map((item, i) => (
+          <Metric key={i} {...item} />
+        ))}
       </div>
       <div className="grid grid-cols-12 gap-4 mt-5">
-        {createCharts(chartOptions)}
+        {chartOptions.map((option, i) => (
+          <ReactECharts key={i} className="col-span-12 md:col-span-6" option={option} style={{ height: "500px" }} />
+        ))}
       </div>
     </div>
   );
@@ -330,23 +254,47 @@ export default function Home() {
 
 ### Data Producer and WebSocket Server
 
-As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1), the data generator and WebSocket server can be deployed using Docker Compose with the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) by executing `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`.
+As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1), PostgreSQL is started with `odctl up postgres`, and the data generator and WebSocket server are started with `python -m sales.simulation.run` and `uvicorn sales.api.server:app --host 127.0.0.1 --port 8000`, each in its own terminal. Once started, the server can be checked with the WebSocket client of the [websockets](https://websockets.readthedocs.io/) package by executing `python -m websockets ws://127.0.0.1:8000/ws`, and its logs are printed in its terminal.
 
-![Split terminal creating the producer containers, then producer logs of order JSON and SQL queries](backend.gif#center "Data generator and WebSocket server started with Docker Compose")
+The client prints each message the server sends: a list of the order items of the last five minutes, here 39 records in the first message.
+
+```bash
+python -m websockets ws://127.0.0.1:8000/ws
+```
+
+```text
+Connected to ws://127.0.0.1:8000/ws.
+< [{"user_id":"427f5544-f594-4127-826e-912dc0dd970e","age":40,"gender":"M","country":"China","traffic_source":"Search","order_id":"e8c140bd-087a-4dfe-ac01-29f40a36a27e","item_id":"40deff28-0310-49ed-b11b-fdf0a3dabb24","category":"Active","cost":24.7,"item_status":"Shipped","sale_price":55.04,"created_at":"2026-09-30T13:57:06.948553+00:00"}, ...]
+```
+
+The server logs how many records it sends every five seconds:
+
+```text
+INFO:     Started server process [...]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:54478 - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     Sending 39 records
+INFO:     Sending 54 records
+INFO:     Sending 67 records
+```
 
 ### Frontend Dashboard
 
-The dashboard can be started in development mode as shown below. Once started, it can be accessed in a browser at *http://localhost:3000*.
+The dashboard can be started in development mode as shown below. Once started, it can be accessed in a browser at *http://127.0.0.1:3000*.
 
 ```bash
 ## install pnpm if not done
 # https://pnpm.io/installation
 
 ## install dependent packages
+$ cd nextjs
 $ pnpm install
 
 ## start the app
 $ pnpm dev
 ```
 
-![Order count, item count and sales cards above bar charts of revenue by country and traffic source](featured.gif#center "theLook eCommerce dashboard updating live from the WebSocket server")
+![Next.js dashboard with order, item and sales cards above bar charts of revenue by country and by traffic source](nextjs-dashboard.png#center "Next.js dashboard connected to the WebSocket server")

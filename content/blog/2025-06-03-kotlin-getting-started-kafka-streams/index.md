@@ -14,8 +14,8 @@ tags:
   - Kafka Streams
   - Kotlin
   - Docker
-  - Kpow
-  - Factor House Local
+  - Kafka UI
+  - odctl
 description: Kafka Streams in Kotlin aggregates Avro order events into tumbling window supplier statistics and handles late records with a custom extractor.
 ---
 
@@ -38,9 +38,9 @@ This project showcases a Kafka Streams application that:
 *   Aggregates order data to compute supplier statistics (total price and count) within defined time windows.
 *   Outputs the calculated statistics and late records to separate Kafka topics.
 
-The source code for the application discussed in this post can be found in the _orders-stats-streams_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/kotlin-examples).
+The source code for the application discussed in this post can be found in the _orders-stats-streams_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams).
 
-### The Build Configuration
+### Build Configuration
 
 The `build.gradle.kts` file orchestrates the build, dependencies, and packaging of our Kafka Streams application.
 
@@ -138,9 +138,9 @@ tasks.named("build") {
 }
 
 tasks.named<JavaExec>("run") {
-    environment("BOOTSTRAP", "localhost:9092")
+    environment("BOOTSTRAP", "127.0.0.1:9092")
     environment("TOPIC", "orders-avro")
-    environment("REGISTRY_URL", "http://localhost:8081")
+    environment("REGISTRY_URL", "http://127.0.0.1:8081")
 }
 
 tasks.test {
@@ -467,9 +467,9 @@ import java.time.Duration
 import java.util.Properties
 
 object StreamsApp {
-    private val bootstrapAddress = System.getenv("BOOTSTRAP") ?: "kafka-1:19092"
+    private val bootstrapAddress = System.getenv("BOOTSTRAP") ?: "127.0.0.1:9092"
     private val inputTopicName = System.getenv("TOPIC") ?: "orders-avro"
-    private val registryUrl = System.getenv("REGISTRY_URL") ?: "http://schema:8081"
+    private val registryUrl = System.getenv("REGISTRY_URL") ?: "http://127.0.0.1:8081"
     private val registryConfig =
         mapOf(
             "schema.registry.url" to registryUrl,
@@ -479,7 +479,7 @@ object StreamsApp {
     private val windowSize = Duration.ofSeconds(5)
     private val gracePeriod = Duration.ofSeconds(5)
     private const val NUM_PARTITIONS = 3
-    private const val REPLICATION_FACTOR: Short = 3
+    private const val REPLICATION_FACTOR: Short = 1 // odctl kafka-lite has one broker
     private val logger = KotlinLogging.logger {}
 
     // ObjectMapper for converting late source to JSON
@@ -655,58 +655,53 @@ fun main() {
 
 ## Run Kafka Streams Application
 
-To see our Kafka Streams application in action, we first need a running Kafka environment. We'll use the [Factor House Local](https://github.com/factorhouse/factorhouse-local) project, which provides a Docker Compose setup for a Kafka cluster and Kpow for monitoring. Then, we'll start a data producer (from our previous blog post example) to generate input order events, and finally, launch our Kafka Streams application.
+To see our Kafka Streams application in action, we first need a running Kafka environment. We'll use [odctl](https://github.com/jaehyeon-kim/odctl), which provides a Docker Compose setup for a Kafka cluster and Kafka UI for monitoring. Then, we'll start a data producer (from our previous blog post example) to generate input order events, and finally, launch our Kafka Streams application.
 
-### Factor House Local Setup
+### odctl
 
-If you haven't already, set up your local Kafka environment:
-1.  Clone the Factor House Local repository:
-    ```bash
-    git clone https://github.com/factorhouse/factorhouse-local.git
-    cd factorhouse-local
-    ```
-2.  Ensure your Kpow community license is configured (see the [README](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) for details).
-3.  Start the services:
-    ```bash
-    docker compose -f compose-kpow-community.yml up -d
-    ```
-Once initialized, Kpow will be accessible at `http://localhost:3000`, showing Kafka brokers, schema registry, and other components.
+[odctl](https://github.com/jaehyeon-kim/odctl) starts a local data stack with Docker Compose. Its `kafka-lite` profile runs one Kafka broker, the Karapace schema registry and Kafka UI. Install odctl, clone the repository, and start the profile from its _order-streams_ folder, where the rest of the commands also run:
 
-![Kpow overview shows three brokers, five topics, 82 partitions and one schema registry](kpow-overview.png#center "Kpow overview of the local Kafka cluster")
+```bash
+uv tool install odctl
+git clone https://github.com/jaehyeon-kim/benchtop.git
+cd benchtop/order-streams
+odctl up kafka-lite
+```
+
+Once the services are initialized, Kafka UI is at `http://127.0.0.1:8086`, where we can browse the topics, their messages and the registered schemas.
 
 ### Start the Kafka Order Producer
 
 Our Kafka Streams application consumes order data from the `orders-avro` topic. We'll use the Kafka producer developed in [Part 2 of this series](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients/) to generate this data. To effectively test our stream application's handling of event time and late records, we'll configure the producer to introduce a variable delay (up to 15 seconds) in the `bid_time` of the generated orders.
 
-Navigate to the directory of the producer application (_orders-avro-clients_ from the [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/kotlin-examples)) and run:
+From the _order-streams_ folder of the [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams), run the producer application (_orders-avro-clients_):
 
 ```bash
-# Assuming you are in the root of the 'orders-avro-clients' project
-DELAY_SECONDS=15 ./gradlew run --args="producer"
+# From the order-streams folder
+DELAY_SECONDS=15 ./gradlew :orders-avro-clients:run --args="producer"
 ```
 
-This will start populating the `orders-avro` topic with Avro-encoded order messages. You can inspect these messages in Kpow. For the `orders-avro` topic, ensure Kpow is configured with Key Deserializer: *String*, Value Deserializer: *AVRO*, and Schema Registry: *Local Schema Registry*.
+This will start populating the `orders-avro` topic with Avro-encoded order messages. You can inspect these messages in Kafka UI at http://127.0.0.1:8086. Open the `orders-avro` topic's **Messages** tab and set the **Value Serde** to *SchemaRegistry*, so the values are decoded with their schema from Karapace.
 
-![Kpow data inspect form set to the orders-avro topic with the AVRO value deserializer](orders-01.png#center "Inspecting the orders-avro topic in Kpow")
-![Kpow lists orders-avro records showing order_id, bid_time, price, item and supplier](orders-02.png#center "Avro order messages on the orders-avro topic")
+![Kafka UI messages tab of the orders-avro topic with the SchemaRegistry value serde, the newest order expanded to show order_id, bid_time, price, item and supplier](orders.png#center "Avro order messages on the orders-avro topic in Kafka UI")
 
 ### Launch the Kafka Streams Application
 
-With input data flowing, we can now launch our `orders-stats-streams` Kafka Streams application. Navigate to its project directory (_orders-stats-streams_ from the [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/kotlin-examples)).
+With input data flowing, we can now launch our `orders-stats-streams` Kafka Streams application. It is the _orders-stats-streams_ folder of the [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams/orders-stats-streams), and it runs from the same _order-streams_ folder.
 
 The application can be run in two main ways:
 
 1.  **With Gradle (Development Mode)**: Ideal for development and quick testing.
     ```bash
-    ./gradlew run
+    ./gradlew :orders-stats-streams:run
     ```
 2.  **Running the Shadow JAR (Deployment Mode)**: For deploying the application as a standalone unit. First, build the fat JAR:
     ```bash
     ./gradlew shadowJar
     ```
-    This creates `build/libs/orders-stats-streams-1.0.jar`. Then run it:
+    This creates `orders-stats-streams/build/libs/orders-stats-streams-1.0.jar`. Then run it:
     ```bash
-    java -jar build/libs/orders-stats-streams-1.0.jar
+    java -jar orders-stats-streams/build/libs/orders-stats-streams-1.0.jar
     ```
 
 > 💡 To build and run the application locally, ensure that **JDK 17** is installed.
@@ -721,31 +716,26 @@ Our Kafka Streams application produces results to two topics:
 
 **1. Supplier Statistics (`orders-avro-stats`):**
 
-In Kpow, navigate to the `orders-avro-stats` topic. Configure Kpow to view these messages:
-*   **Key Deserializer:** *String*
-*   **Value Deserializer:** *AVRO*
-*   **Schema Registry:** *Local Schema Registry*
+In Kafka UI, open the `orders-avro-stats` topic's **Messages** tab. To view these messages, set:
+*   **Value Serde:** *SchemaRegistry*, which decodes each value with its schema from Karapace. The key is a plain string, which the default **Key Serde** shows as it is.
 
 You should see `SupplierStats` messages, each representing the total price and count of orders for a supplier within a 5-second window. Notice the `window_start` and `window_end` fields.
 
-![Kpow data inspect form set to the orders-avro-stats topic with the AVRO value deserializer](stats-01.png#center "Inspecting the orders-avro-stats output topic")
-![Kpow lists supplier stats records with window start and end, total price and count](stats-02.png#center "Windowed supplier statistics on the orders-avro-stats topic")
+![Kafka UI messages tab of the orders-avro-stats topic with the SchemaRegistry value serde, the newest record expanded to show window_start, window_end, supplier, total_price and count](stats.png#center "Windowed supplier statistics on the orders-avro-stats topic")
 
 **2. Skipped (Late) Records (`orders-avro-skipped`):**
 
-Next, inspect the `orders-avro-skipped` topic in Kpow. Configure Kpow as follows:
-*   **Key Deserializer:** *String*
-*   **Value Deserializer:** *JSON*
+Next, open the `orders-avro-skipped` topic's **Messages** tab in Kafka UI:
+*   **Key Serde** and **Value Serde:** leave the defaults. Both are plain strings, and expanding a message shows its value as formatted JSON.
 
 Here, you'll find the original order records that were deemed "late" by our `LateRecordProcessor`. These messages have an additional `late: true` field, confirming they were routed by our custom logic.
 
-![Kpow data inspect form set to the orders-avro-skipped topic with the JSON value deserializer](skipped-01.png#center "Inspecting the orders-avro-skipped topic")
-![Kpow lists 16 skipped order records, each carrying a late field set to true](skipped-02.png#center "Late order records routed to the skipped topic")
+![Kafka UI messages tab of the orders-avro-skipped topic, the newest record expanded to show the order fields and late set to true](skipped.png#center "Late order records on the orders-avro-skipped topic")
 
-We can also track the performance of the application by filtering its consumer group (`orders-avro-stats-kafka-streams`) in the **Consumers** section. This displays key metrics like group state, assigned members, read throughput, and lag:
+We can also track the application through its consumer group, `orders-avro-stats-kafka-streams`, in Kafka UI's **Consumers** page. It shows the group's state, its members, the topics and partitions assigned to it, and the lag on each topic:
 
-![Kpow consumer group orders-avro-stats-kafka-streams is stable with one member and lag 24](consumer-group-01.png#center "Consumer group of the Kafka Streams application")
+![Kafka UI consumer group page of orders-avro-stats-kafka-streams, stable with one member, and the lag on orders-avro and the repartition topic](consumer-group.png#center "Consumer group of the Kafka Streams application")
 
 ## Conclusion
 
-In this post, we've dived into Kafka Streams, building a Kotlin application that performs real-time aggregation of supplier order data. We've seen how to leverage event-time processing with a custom `TimestampExtractor` and how to proactively manage late-arriving data using the Processor API with a custom `LateRecordProcessor`. By routing late data to a separate topic and outputting clean, windowed statistics, this application demonstrates a practical approach to building resilient and insightful stream processing pipelines directly with Kafka. The use of Avro ensures data integrity, while Kpow provides excellent visibility into the streams and topics.
+In this post, we've dived into Kafka Streams, building a Kotlin application that performs real-time aggregation of supplier order data. We've seen how to leverage event-time processing with a custom `TimestampExtractor` and how to proactively manage late-arriving data using the Processor API with a custom `LateRecordProcessor`. By routing late data to a separate topic and outputting clean, windowed statistics, this application demonstrates a practical approach to building resilient and insightful stream processing pipelines directly with Kafka. The use of Avro ensures data integrity, while Kafka UI provides excellent visibility into the streams and topics.

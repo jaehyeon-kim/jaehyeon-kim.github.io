@@ -28,451 +28,366 @@ A data generating app is created with Python, and it ingests the [theLook eComme
 
 <!--more-->
 
-## Docker Compose Services
+## Services
 
-We have three docker-compose services, and they are illustrated separately below. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-demos).
+![The simulation writes to PostgreSQL, the WebSocket server sends the recent order items on /ws, and a terminal client prints them](part-1.png#center "Architecture")
+
+We have three services, and they are illustrated separately below. The source of this post can be found in the **live-dashboard** folder of the [**benchtop**](https://github.com/jaehyeon-kim/benchtop/tree/main/live-dashboard) GitHub repository. The development environment can be constructed as follows:
+
+```bash
+$ git clone https://github.com/jaehyeon-kim/benchtop.git
+$ cd benchtop/live-dashboard
+$ uv venv
+$ source .venv/bin/activate
+(.venv) $ uv pip install -r requirements.txt
+```
 
 ### PostgreSQL
 
-A PostgreSQL database server is configured with persistent storage, automatic initialization, and a health check. The health check is set up so that the remaining services wait until the database is ready.
+A PostgreSQL database server is started with [odctl](https://github.com/jaehyeon-kim/odctl), which runs it with Docker Compose on port 5432.
 
-```yaml
-# producer/docker-compose.yml
-version: "3"
-services:
-  postgres:
-    image: postgres:16
-    container_name: postgres
-    ports:
-      - 5432:5432
-    volumes:
-      - ./config/:/docker-entrypoint-initdb.d
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: develop
-      POSTGRES_USER: develop
-      POSTGRES_PASSWORD: password
-      PGUSER: develop
-      TZ: Australia/Sydney
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U develop"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-...
-volumes:
-  postgres_data:
-    driver: local
-    name: postgres_data
+```bash
+(.venv) $ odctl up postgres
 ```
 
-The bootstrap script creates a dedicated schema named *ecommerce* and sets the schema as the default search path.
+The data generator creates a dedicated schema named *dashboard* and its tables when it starts.
 
-```sql
--- producer/config/postgres/bootstrap.sql
-CREATE SCHEMA ecommerce;
-GRANT ALL ON SCHEMA ecommerce TO develop;
+```python
+# live-dashboard/sales/stores/postgres.py
+TABLES = ("products", "users", "orders", "order_items")
+UPSERT_KEYS = {"orders": ["id"], "order_items": ["id"]}  # rows whose status changes
 
--- change search_path on a connection-level
-SET search_path TO ecommerce;
-
--- change search_path on a database-level
-ALTER database "develop" SET search_path TO ecommerce;
+_DDL = f"""
+CREATE SCHEMA IF NOT EXISTS {SCHEMA};
+CREATE TABLE IF NOT EXISTS {SCHEMA}.products (id BIGINT PRIMARY KEY, name TEXT,
+    category TEXT, department TEXT, retail_price FLOAT8, cost FLOAT8);
+CREATE TABLE IF NOT EXISTS {SCHEMA}.users (id TEXT PRIMARY KEY, age INT, gender TEXT,
+    country TEXT, traffic_source TEXT, created_at TEXT);
+CREATE TABLE IF NOT EXISTS {SCHEMA}.orders (id TEXT PRIMARY KEY, user_id TEXT,
+    status TEXT, num_of_item INT, created_at TEXT);
+CREATE TABLE IF NOT EXISTS {SCHEMA}.order_items (id TEXT PRIMARY KEY, order_id TEXT,
+    user_id TEXT, product_id BIGINT, status TEXT, sale_price FLOAT8, created_at TEXT);
+CREATE TABLE IF NOT EXISTS {PARAMS_TABLE} (id SERIAL PRIMARY KEY,
+    param_path VARCHAR(255) NOT NULL, param_value TEXT NOT NULL,
+    is_applied BOOLEAN DEFAULT FALSE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+"""
 ```
 
 ### Data Generator
 
-The following Dockerfile is created for the data generation app and WebSocket server. It sets up a lightweight Python 3.10 environment for an application. It copies and installs dependencies from `requirements.txt`, then creates a dedicated **user** (`app`) with a home directory (`/home/app`) for security. The container runs as the `app` user instead of root, with `/home/app` set as the working directory.
+The data generator is a [dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) simulation of the shop, and it runs in its own terminal. It connects to the PostgreSQL database with the settings in `sales/core/config.py`, and runs until it is stopped (`--minutes` stops it after that many minutes).
 
-```dockerfile
-# producer/Dockerfile
-FROM python:3.10-slim
-
-## install dependent packages
-COPY requirements.txt requirements.txt
-
-RUN pip install -r requirements.txt
-
-## create a user
-RUN useradd app && mkdir /home/app \
-    && chown app:app /home/app
-
-USER app
-WORKDIR /home/app
-```
-
-The data generation app builds from the local Dockerfile, runs as `datagen`, and connects to the PostgreSQL database using environment variables for credentials. The container executes `generator.py` with a 0.5-second delay between iterations and runs indefinitely (`--max_iter -1`). It mounts the current directory to `/home/app` for access to scripts and dependencies. The service starts only after the database is healthy, ensuring proper database availability.
-
-```yaml
-# producer/docker-compose.yml
-services:
-...
-  datagen:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: datagen
-    environment:
-      DB_USER: develop
-      DB_PASS: password
-      DB_HOST: postgres
-      DB_NAME: develop
-    command:
-      - python
-      - generator.py
-      - --wait_for
-      - "0.5"
-      - --max_iter
-      - "-1"
-    volumes:
-      - .:/home/app
-    depends_on:
-      postgres:
-        condition: service_healthy
-...
+```bash
+(.venv) $ python -m sales.simulation.run
 ```
 
 #### Data Generator Source
 
-The *theLook eCommerce* dataset consists of seven entities, five of which are dynamically generated. In each iteration, a *user* record is created, associated with zero or more orders. Each *order*, in turn, generates zero or more order items. Finally, each *order item* produces zero or more *event* and *inventory item* records. Once all records are generated, they are ingested into the corresponding database tables using pandas' `to_sql` method.
+The *theLook eCommerce* dataset is reduced to four entities, three of which are dynamically generated. Visitors arrive at random, view a few pages, and some buy. A buyer is a new or a returning *user*, and each purchase creates an *order* with one or more *order items*. Each order waits for a warehouse picker, then ships and completes, or is cancelled when no picker comes in time. Every change of status updates the order and its items. dynamic-des's `PostgresEgress` writes each row to its table, and `PostgresIngress` applies parameter changes while the simulation runs.
 
 ```python
-# producer/generator.py
+# live-dashboard/sales/simulation/run.py
+"""The shop as a discrete-event model in dynamic-des, run in real time into PostgreSQL.
+
+Visitors arrive and browse, and some buy. Each order waits for a picker, ships and
+completes, or is cancelled when no picker comes in time. Every rate, time and chance is
+a registry parameter, so `sales.simulation.control` can change it while the model runs.
+"""
+
 import argparse
-import time
+import asyncio
 import logging
+from datetime import UTC, datetime, timedelta
 
-import pandas as pd
+from dynamic_des import PostgresEgress, PostgresIngress, SimulationContext
 
-from src.models import User
-from src.utils import create_connection, insert_to_db, Connection, generate_from_csv
+from sales.core.config import (
+    ARRIVALS,
+    CHANCES,
+    DSN,
+    MAX_PICKERS,
+    PARAMS_TABLE,
+    PICKERS,
+    SCHEMA,
+    SERVICES,
+    SIM_ID,
+)
+from sales.core.models import User
+from sales.simulation.catalogue import products
+from sales.simulation.shop import basket, new_user, with_status
+from sales.stores import postgres
 
-extraneous_headers = [
-    "event_type",
-    "ip_address",
-    "browser",
-    "traffic_source",
-    "session_id",
-    "sequence_number",
-    "uri",
-    "is_sold",
-]
+
+def _wait(app: SimulationContext, service: str):
+    """Returns a timeout drawn from a service's live distribution."""
+    config = app.env.registry.get_config(f"{SIM_ID}.service.{service}")
+    return app.env.timeout(app.sampler.sample(config))
 
 
-def write_dynamic_data(
-    conn: Connection, schema_name: str = "ecommerce", if_exists: bool = "replace"
-):
-    tbl_map = {
-        "users": [],
-        "orders": [],
-        "order_items": [],
-        "inventory_items": [],
-        "events": [],
-    }
-    user = User()
-    logging.info(f"start to create user events - user id: {user.id}")
-    tbl_map["users"].extend([user.asdict(["orders"])])
-    orders = user.orders
-    tbl_map["orders"].extend([o.asdict(["order_items"]) for o in orders])
-    for order in orders:
-        order_items = order.order_items
-        tbl_map["order_items"].extend(
-            [
-                o.asdict(["events", "inventory_items"] + extraneous_headers)
-                for o in order_items
-            ]
+def _chance(app: SimulationContext, name: str) -> bool:
+    """Returns True with the probability of a chance variable's live value."""
+    return (
+        app.sampler.rng.random()
+        < app.env.registry.get(f"{SIM_ID}.variables.{name}").value
+    )
+
+
+def build(seed: int | None = None, start: datetime | None = None) -> SimulationContext:
+    """
+    Builds the shop's model: its parameters, its pickers and its processes.
+
+    Args:
+        seed (int, optional): The seed for every random choice. None varies them.
+        start (datetime, optional): The simulated start time, in UTC. Defaults to now.
+
+    Returns:
+        SimulationContext: The model, ready for egress, ingress and `run`.
+    """
+    start = start or datetime.now(UTC)
+    app = SimulationContext(
+        SIM_ID,
+        factor=1.0,
+        random_seed=seed,
+        logical_start_time=start.replace(tzinfo=None),
+    )
+    for name, rate in ARRIVALS.items():
+        app.add_arrival(name, dist="exponential", rate=rate)
+    for name, (mean, std) in SERVICES.items():
+        app.add_service(name, dist="lognormal", mean=mean, std=std)
+    app.add_resource("pickers", current_cap=PICKERS, max_cap=MAX_PICKERS)
+    for name, chance in CHANCES.items():
+        app.add_variable(name, chance)
+    catalogue, users = products(), list[User]()
+
+    def now() -> str:
+        """Returns the simulated time, in UTC, as ISO 8601 text."""
+        return (start + timedelta(seconds=app.env.now)).isoformat()
+
+    def publish(rows) -> None:
+        """Writes rows to their tables."""
+        for row in rows:
+            app.env.publish_event(row.table, row.model_dump())
+
+    @app.arrival_loop("visitor")
+    def visitors(ctx):
+        """Writes the catalogue, then starts a visit at each visitor arrival."""
+        publish(catalogue)
+        while True:
+            yield ctx.wait_for_arrival("visitor")
+            ctx.spawn(visit())
+
+    def visit():
+        """One visitor: a few page views, then possibly an order."""
+        rng = app.sampler.rng
+        user = (
+            users[int(rng.integers(len(users)))]
+            if users and _chance(app, "returning")
+            else None
         )
-        for order_item in order_items:
-            tbl_map["inventory_items"].extend(
-                [i.asdict() for i in order_item.inventory_items]
-            )
-            tbl_map["events"].extend([e.asdict() for e in order_item.events])
+        for _ in range(int(rng.integers(2, 6))):
+            yield _wait(app, "page_view")
+        if not _chance(app, "buy"):
+            return
+        if user is None:
+            user = new_user(rng, now())
+            users.append(user)
+            publish([user])
+        order, items = basket(rng, user, catalogue, now())
+        publish([order, *items])
+        app.spawn(fulfil([order, *items]))
 
-    for tbl in tbl_map:
-        df = pd.DataFrame(tbl_map[tbl])
-        if len(df) > 0:
-            logging.info(f"{if_exists} records, table - {tbl}, # records - {len(df)}")
-            insert_to_db(
-                df=df,
-                tbl_name=tbl,
-                schema_name=schema_name,
-                conn=conn,
-                if_exists=if_exists,
-            )
-        else:
-            logging.info(
-                f"skip records as no user event, table - {tbl}, # records - {len(df)}"
-            )
+    def fulfil(rows):
+        """One order: wait for a picker or give up, then pack, ship and complete."""
+        with app.get_resource("pickers").request() as picker:
+            waited = yield picker | _wait(app, "patience")
+            if picker not in waited:
+                publish(with_status(rows, "Cancelled"))
+                return
+            yield _wait(app, "pick")
+        publish(with_status(rows, "Shipped"))
+        yield _wait(app, "transit")
+        publish(with_status(rows, "Complete"))
+        if _chance(app, "return"):
+            yield _wait(app, "return_after")
+            publish(with_status(rows, "Returned"))
 
-
-def write_static_data(
-    conn: Connection, schema_name: str = "ecommerce", if_exists: bool = "replace"
-):
-    tbl_map = {
-        "products": generate_from_csv("products.csv"),
-        "dist_centers": generate_from_csv("distribution_centers.csv"),
-    }
-    for tbl in tbl_map:
-        df = pd.DataFrame(tbl_map[tbl])
-        if len(df) > 0:
-            logging.info(f"{if_exists} records, table - {tbl}, # records - {len(df)}")
-            insert_to_db(
-                df=df,
-                tbl_name=tbl,
-                schema_name=schema_name,
-                conn=conn,
-                if_exists=if_exists,
-            )
-        else:
-            logging.info(f"skip writing, table - {tbl}, # records - {len(df)}")
+    return app
 
 
-def main(wait_for: float, max_iter: int, if_exists: str):
-    conn = create_connection()
-    write_static_data(conn=conn, if_exists="replace")
-    curr_iter = 0
-    while True:
-        write_dynamic_data(conn=conn, if_exists=if_exists)
-        time.sleep(wait_for)
-        curr_iter += 1
-        if max_iter > 0 and curr_iter >= max_iter:
-            logging.info(f"stop generating records after {curr_iter} iterations")
-            break
+def run(minutes: float | None = None, seed: int | None = None) -> None:
+    """
+    Runs the shop in real time, writing every row to PostgreSQL.
+
+    Args:
+        minutes (float, optional): How long to run. None runs until interrupted.
+        seed (int, optional): The seed for every random choice.
+    """
+    asyncio.run(postgres.create_tables())
+    app = build(seed)
+    app.add_ingress(PostgresIngress(DSN, table_name=PARAMS_TABLE))
+    app.with_batching(batch_size=4, flush_interval=1.0)  # a few rows arrive a second
+    for table in postgres.TABLES:
+        # Bare table names, found through the connection's search path.
+        egress = PostgresEgress(
+            DSN,
+            table_name=table,
+            upsert_keys=postgres.UPSERT_KEYS.get(table),
+            server_settings={"search_path": SCHEMA},
+        )
+        app.add_egress(egress, when=lambda r, t=table: r.get("key") == t)
+    app.run(until=minutes * 60 if minutes else None)
 
 
 if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.INFO)
-    logging.info("Generate theLook eCommerce data...")
-
-    parser = argparse.ArgumentParser(description="Generate theLook eCommerce data")
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
+    parser = argparse.ArgumentParser(description="Runs the shop in real time.")
     parser.add_argument(
-        "--if_exists",
-        "-i",
-        type=str,
-        default="append",
-        choices=["fail", "replace", "append"],
-        help="The time to wait before generating new user records",
+        "--minutes", type=float, help="how long to run (default: forever)"
     )
-    parser.add_argument(
-        "--wait_for",
-        "-w",
-        type=float,
-        default=1,
-        help="The time to wait before generating new user records",
-    )
-    parser.add_argument(
-        "--max_iter",
-        "-m",
-        type=int,
-        default=-1,
-        help="The maxium number of iterations to generate user records",
-    )
+    parser.add_argument("--seed", type=int, help="seed for the random choices")
     args = parser.parse_args()
-    logging.info(args)
-    main(args.wait_for, args.max_iter, if_exists=args.if_exists)
+    run(args.minutes, args.seed)
 ```
 
-In the following example, we see data is generated in every two seconds (`-w 2`).
+In the following example, the simulation starts and connects to each table.
 
 ```bash
-$ python data_gen.py -w 2
-INFO:root:Generate theLook eCommerce data...
-INFO:root:Namespace(if_exists='append', wait_for=2.0, max_iter=-1)
-INFO:root:replace records, table - products, # records - 29120
-INFO:root:replace records, table - dist_centers, # records - 10
-INFO:root:start to create user events - user id: 2a444cd4-aa70-4247-b1c1-9cf9c8cc1924
-INFO:root:append records, table - users, # records - 1
-INFO:root:append records, table - orders, # records - 1
-INFO:root:append records, table - order_items, # records - 2
-INFO:root:append records, table - inventory_items, # records - 5
-INFO:root:append records, table - events, # records - 14
-INFO:root:start to create user events - user id: 7d40f7f8-c022-4104-a1a0-9228da07fbe4
-INFO:root:append records, table - users, # records - 1
-INFO:root:skip records as no user event, table - orders, # records - 0
-INFO:root:skip records as no user event, table - order_items, # records - 0
-INFO:root:skip records as no user event, table - inventory_items, # records - 0
-INFO:root:skip records as no user event, table - events, # records - 0
-INFO:root:start to create user events - user id: 45f8469c-3e79-40ee-9639-1cb17cd98132
-INFO:root:append records, table - users, # records - 1
-INFO:root:skip records as no user event, table - orders, # records - 0
-INFO:root:skip records as no user event, table - order_items, # records - 0
-INFO:root:skip records as no user event, table - inventory_items, # records - 0
-INFO:root:skip records as no user event, table - events, # records - 0
-INFO:root:start to create user events - user id: 839e353f-07ee-4d77-b1de-2f1af9b12501
-INFO:root:append records, table - users, # records - 1
-INFO:root:append records, table - orders, # records - 2
-INFO:root:append records, table - order_items, # records - 3
-INFO:root:append records, table - inventory_items, # records - 9
-INFO:root:append records, table - events, # records - 19
+(.venv) $ python -m sales.simulation.run
+2026-09-30 22:44:19,294 dynamic_des.core.context Building SimulationContext for 'sales'...
+2026-09-30 22:44:19,295 dynamic_des.core.context Simulation engine started.
+2026-09-30 22:44:19,627 dynamic_des.connectors.egress.postgres PostgresEgress connected to order_items
+2026-09-30 22:44:19,627 dynamic_des.connectors.egress.postgres PostgresEgress connected to users
+2026-09-30 22:44:19,627 dynamic_des.connectors.egress.postgres PostgresEgress connected to orders
+2026-09-30 22:44:19,627 dynamic_des.connectors.egress.postgres PostgresEgress connected to products
 ```
 
-When the data gets ingested into the database, we see the following tables are created in the *ecommerce* schema.
+When the data gets ingested into the database, we see the following tables are created in the *dashboard* schema.
 
-![Entity diagram of the ecommerce schema with users, orders, order_items, products, events, inventory_items and dist_centers, and the columns of each](diagram.png#center "Tables created in the ecommerce schema")
+| Table | One row per |
+|---|---|
+| `products` | product: 260, from 26 categories, 2 departments and 5 brands |
+| `users` | customer, with age, gender, country and traffic source |
+| `orders` | order, with its status and number of items |
+| `order_items` | product in an order, with its status and sale price |
 
 ### WebSocket Server
 
-This WebSocket server runs a FastAPI-based API using `uvicorn`. It builds from the local Dockerfile, exposing port 8000, and connects to the PostgreSQL database with credentials and configuration variables. The service processes data with a 5-minute lookback window and refreshes every 5 seconds. The working directory is mounted for access to code, and the service starts only after PostgreSQL is healthy, ensuring database readiness. 
+This WebSocket server runs a FastAPI-based API using `uvicorn`, in its own terminal, on port 8000. It connects to the PostgreSQL database with the settings in `sales/core/config.py`. The service processes data with a 5-minute lookback window and refreshes every 5 seconds.
 
-```yaml
-# producer/docker-compose.yml
-services:
-...
-  producer:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: producer
-    ports:
-      - "8000:8000"
-    environment:
-      DB_USER: develop
-      DB_PASS: password
-      DB_HOST: postgres
-      DB_NAME: develop
-      LOOKBACK_MINUTES: "5"
-      REFRESH_SECONDS: "5"
-    command:
-      - uvicorn
-      - api:app
-      - --host
-      - "0.0.0.0"
-      - --port
-      - "8000"
-    volumes:
-      - .:/home/app
-    depends_on:
-      postgres:
-        condition: service_healthy
-...
+```bash
+(.venv) $ uvicorn sales.api.server:app --host 127.0.0.1 --port 8000
 ```
 
 #### WebSocket Server Source
 
-This FastAPI WebSocket server streams real-time data from a PostgreSQL database. It connects using *SQLAlchemy*, fetches order-related data with a configurable *lookback window*, and sends updates every few seconds as defined by *refresh seconds*. A WebSocket manager handles multiple connections, converting database results into JSON before streaming them. The app continuously queries the database, sending fresh data to connected clients until they disconnect. Logging ensures visibility into connections, queries, and errors.
+This FastAPI WebSocket server streams real-time data from a PostgreSQL database. It connects using *asyncpg*, fetches order-related data with a configurable *lookback window*, and sends updates every few seconds as defined by *refresh seconds*. Each update is a JSON list of records. The app continuously queries the database, sending fresh data to the connected client until it disconnects. Logging ensures visibility into connections and queries.
 
 ```python
-# producer/api.py
-import os
-import logging
-import asyncio
+# live-dashboard/sales/api/server.py
+"""Sends the recent order items to the dashboards over a WebSocket.
 
-from sqlalchemy import create_engine, Engine, Connection
-import pandas as pd
+Every `REFRESH_SECONDS`, `/ws` sends the order items of the last `LOOKBACK_MINUTES`,
+with their users and products, as a JSON list of records.
+
+Run: uvicorn sales.api.server:app --host 127.0.0.1 --port 8000
+"""
+
+import asyncio
+import logging
+
+import asyncpg
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
-logging.basicConfig(level=logging.INFO)
+from sales.core.config import DSN, LOOKBACK_MINUTES, REFRESH_SECONDS
+from sales.stores import postgres
 
-try:
-    LOOKBACK_MINUTES = int(os.getenv("LOOKBACK_MINUTES", "5"))
-    REFRESH_SECONDS = int(os.getenv("REFRESH_SECONDS", "5"))
-except ValueError:
-    LOOKBACK_MINUTES = 5
-    REFRESH_SECONDS = 5
-
-
-def get_db_engine() -> Engine:
-    """Creates and returns a SQLAlchemy engine."""
-    user = os.getenv("DB_USER", "develop")
-    password = os.getenv("DB_PASS", "password")
-    host = os.getenv("DB_HOST", "localhost")
-    db_name = os.getenv("DB_NAME", "develop")
-
-    try:
-        return create_engine(
-            f"postgresql+psycopg2://{user}:{password}@{host}/{db_name}", echo=True
-        )
-    except Exception as e:
-        logging.error(f"Database connection error: {e}")
-        raise
-
-
-def fetch_data(conn: Connection, minutes: int = 0):
-    """Fetches data from the database with an optional lookback filter."""
-    sql = """
-    SELECT
-        u.id AS user_id
-        , u.age
-        , u.gender
-        , u.country
-        , u.traffic_source
-        , o.order_id
-        , o.id AS item_id
-        , p.category
-        , p.cost
-        , o.status AS item_status
-        , o.sale_price
-        , o.created_at
-    FROM users AS u
-    JOIN order_items AS o ON u.id = o.user_id
-    JOIN products AS p ON p.id = o.product_id
-    """
-    if minutes > 0:
-        sql = f"{sql} WHERE o.created_at >= current_timestamp - interval '{minutes} minute'"
-    else:
-        sql = f"{sql} LIMIT 1"
-    try:
-        return pd.read_sql(sql=sql, con=conn)
-    except Exception as e:
-        logging.error(f"Error reading from database: {e}")
-        return pd.DataFrame()
-
-
+logger = logging.getLogger("uvicorn.error")
 app = FastAPI()
 
 
-class ConnectionManager:
-    """Manages WebSocket connections."""
-
-    def __init__(self):
-        self.active_connections: list[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
-        logging.info(f"New WebSocket connection: {websocket.client}")
-
-    def disconnect(self, websocket: WebSocket):
-        if websocket in self.active_connections:
-            self.active_connections.remove(websocket)
-            logging.info(f"WebSocket disconnected: {websocket.client}")
-
-    async def send_data(self, df: pd.DataFrame, websocket: WebSocket):
-        """Converts DataFrame to JSON and sends it via WebSocket."""
-        if not df.empty:
-            await websocket.send_json(df.to_json(orient="records"))
-
-
-manager = ConnectionManager()
-
-
 @app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    """Handles WebSocket connections and continuously streams data."""
-    await manager.connect(websocket)
+async def stream(websocket: WebSocket) -> None:
+    """
+    Sends the recent order items every `REFRESH_SECONDS`, until the client leaves.
 
-    engine = get_db_engine()
-
+    Args:
+        websocket (WebSocket): The client.
+    """
+    await websocket.accept()
+    conn = await asyncpg.connect(DSN)
     try:
-        with engine.connect() as conn:
-            while True:
-                df = fetch_data(conn, LOOKBACK_MINUTES)
-                logging.info(f"Fetched {df.shape[0]} records from database")
-                await manager.send_data(df, websocket)
-                await asyncio.sleep(REFRESH_SECONDS)
+        while True:
+            records = await postgres.recent_items(conn, LOOKBACK_MINUTES)
+            logger.info("Sending %d records", len(records))
+            await websocket.send_json(records)
+            await asyncio.sleep(REFRESH_SECONDS)
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
-    except Exception as e:
-        logging.error(f"WebSocket error: {e}")
+        logger.info("Client disconnected")
     finally:
-        engine.dispose()
+        await conn.close()
+```
+
+The query and the function that runs it are in the store module.
+
+```python
+# live-dashboard/sales/stores/postgres.py
+# The order items of the last $1 minutes, with their users and products.
+# clock_timestamp() is the time now; current_timestamp would stay at the transaction's start.
+RECENT_ITEMS = f"""
+SELECT u.id AS user_id, u.age, u.gender, u.country, u.traffic_source,
+    o.order_id, o.id AS item_id, p.category, p.cost, o.status AS item_status,
+    o.sale_price, o.created_at
+FROM {SCHEMA}.order_items AS o
+JOIN {SCHEMA}.users AS u ON u.id = o.user_id
+JOIN {SCHEMA}.products AS p ON p.id = o.product_id
+WHERE o.created_at::timestamptz >= clock_timestamp() - make_interval(mins => $1)
+"""
+```
+
+```python
+# live-dashboard/sales/stores/postgres.py
+async def recent_items(conn: asyncpg.Connection, minutes: int) -> list[dict]:
+    """
+    Reads the order items of the last `minutes`, with their users and products.
+
+    Args:
+        conn (asyncpg.Connection): An open connection.
+        minutes (int): The lookback window.
+
+    Returns:
+        list[dict]: One record per order item.
+    """
+    return [dict(row) for row in await conn.fetch(RECENT_ITEMS, minutes)]
 ```
 
 ## Deploy Services
 
-The Docker Compose services can be deployed using the command `docker-compose -f producer/docker-compose.yml up -d`. Once started, the server can be checked with a [WebSocket client](https://github.com/lewoudar/ws/) by executing `ws listen ws://localhost:8000/ws`, and its logs can be monitored by running `docker logs -f producer`.  
+The services are started with the commands above: PostgreSQL first, then the data generator and the WebSocket server, each in its own terminal. Once started, the server can be checked with the WebSocket client of the [websockets](https://websockets.readthedocs.io/) package, which is installed with uvicorn, by executing `python -m websockets ws://127.0.0.1:8000/ws`, and its logs are printed in its terminal.  
 
-![Terminal recording with the WebSocket client on the left printing streamed order JSON, and the server log on the right running the users, order_items and products join every five minutes](featured.gif#center "WebSocket server streaming records to a connected client")
+The client prints each message the server sends: a list of the order items of the last five minutes, here 39 records in the first message.
+
+```bash
+python -m websockets ws://127.0.0.1:8000/ws
+```
+
+```text
+Connected to ws://127.0.0.1:8000/ws.
+< [{"user_id":"427f5544-f594-4127-826e-912dc0dd970e","age":40,"gender":"M","country":"China","traffic_source":"Search","order_id":"e8c140bd-087a-4dfe-ac01-29f40a36a27e","item_id":"40deff28-0310-49ed-b11b-fdf0a3dabb24","category":"Active","cost":24.7,"item_status":"Shipped","sale_price":55.04,"created_at":"2026-09-30T13:57:06.948553+00:00"}, ...]
+```
+
+The server logs how many records it sends every five seconds:
+
+```text
+INFO:     Started server process [...]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:54478 - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     Sending 39 records
+INFO:     Sending 54 records
+INFO:     Sending 67 records
+```
 
 ## Related posts
 

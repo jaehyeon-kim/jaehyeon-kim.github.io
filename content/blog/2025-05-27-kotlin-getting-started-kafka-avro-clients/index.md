@@ -13,8 +13,8 @@ tags:
   - Apache Kafka
   - Kotlin
   - Docker
-  - Kpow
-  - Factor House Local
+  - Kafka UI
+  - odctl
 description: Avro and Schema Registry replace hand written JSON codecs in a Kotlin Kafka producer and consumer, with generated classes and graceful shutdown.
 ---
 
@@ -34,9 +34,9 @@ This project demonstrates two primary Kafka client applications:
 *   A **Producer Application** responsible for generating `Order` messages and publishing them to a Kafka topic using Avro serialization.
 *   A **Consumer Application** designed to subscribe to the same Kafka topic, deserialize the Avro messages, and process them, including retry logic and graceful handling of shutdowns.
 
-Both applications are packaged into a single executable JAR, and their execution mode (producer or consumer) is determined by a command-line argument. The source code for the applications discussed in this post can be found in the _orders-avro-clients_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/streaming-demos/tree/main/kotlin-examples).
+Both applications are packaged into a single executable JAR, and their execution mode (producer or consumer) is determined by a command-line argument. The source code for the applications discussed in this post can be found in the _orders-avro-clients_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams).
 
-### The Build Configuration
+### Build Configuration
 
 The `build.gradle.kts` file is the heart of our project's build process, defining plugins, dependencies, and custom tasks.
 
@@ -250,7 +250,7 @@ fun verifyKafkaConnection(bootstrapAddress: String) {
 }
 ```
 
-### The Kafka Producer
+### Kafka Producer
 
 The `ProducerApp` object is responsible for generating and sending `Order` messages to Kafka.
 
@@ -296,12 +296,12 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 object ProducerApp {
-    private val bootstrapAddress = System.getenv("BOOTSTRAP") ?: "localhost:9092"
+    private val bootstrapAddress = System.getenv("BOOTSTRAP") ?: "127.0.0.1:9092"
     private val inputTopicName = System.getenv("TOPIC_NAME") ?: "orders-avro"
-    private val registryUrl = System.getenv("REGISTRY_URL") ?: "http://localhost:8081"
+    private val registryUrl = System.getenv("REGISTRY_URL") ?: "http://127.0.0.1:8081"
     private val delaySeconds = System.getenv("DELAY_SECONDS")?.toIntOrNull() ?: 5
     private const val NUM_PARTITIONS = 3
-    private const val REPLICATION_FACTOR: Short = 3
+    private const val REPLICATION_FACTOR: Short = 1 // odctl kafka-lite has one broker
     private val logger = KotlinLogging.logger {}
     private val faker = Faker()
 
@@ -367,7 +367,7 @@ object ProducerApp {
 }
 ```
 
-### The Kafka Consumer
+### Kafka Consumer
 
 The `ConsumerApp` object consumes `Order` messages from Kafka, deserializes them, and processes them.
 
@@ -420,9 +420,9 @@ import java.util.Properties
 import kotlin.use
 
 object ConsumerApp {
-    private val bootstrapAddress = System.getenv("BOOTSTRAP") ?: "localhost:9092"
+    private val bootstrapAddress = System.getenv("BOOTSTRAP") ?: "127.0.0.1:9092"
     private val topicName = System.getenv("TOPIC") ?: "orders-avro"
-    private val registryUrl = System.getenv("REGISTRY_URL") ?: "http://localhost:8081"
+    private val registryUrl = System.getenv("REGISTRY_URL") ?: "http://127.0.0.1:8081"
     private val logger = KotlinLogging.logger { }
     private const val MAX_RETRIES = 3
     private const val ERROR_THRESHOLD = -1
@@ -517,7 +517,7 @@ object ConsumerApp {
 }
 ```
 
-### The Application Entry Point
+### Application Entry Point
 
 The `Main.kt` file contains the `main` function, which serves as the entry point for the packaged application.
 
@@ -551,21 +551,20 @@ fun main(args: Array<String>) {
 
 ## Run Kafka Applications
 
-We begin by setting up our local Kafka environment using the [Factor House Local](https://github.com/factorhouse/factorhouse-local) project. This project conveniently provisions a Kafka cluster along with Kpow, a powerful tool for Kafka management and control, all managed via Docker Compose. Once our Kafka environment is running, we will start our Kotlin-based producer and consumer applications.
+We begin by setting up our local Kafka environment with [odctl](https://github.com/jaehyeon-kim/odctl), which provisions a Kafka cluster along with Kafka UI for browsing topics and schemas, all managed via Docker Compose. Once our Kafka environment is running, we will start our Kotlin-based producer and consumer applications.
 
-### Factor House Local
+### odctl
 
-To get our Kafka cluster and Kpow up and running, we'll first need to clone the project repository and navigate into its directory. Then, we can start the services using Docker Compose as shown below. **Note that we need to have a community license for Kpow to get started.** See [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project *README* for details on how to request a license and configure it before proceeding with the `docker compose` command.
+[odctl](https://github.com/jaehyeon-kim/odctl) starts a local data stack with Docker Compose. Its `kafka-lite` profile runs one Kafka broker, the Karapace schema registry and Kafka UI. Install odctl, clone the repository, and start the profile from its _order-streams_ folder, where the rest of the commands also run:
 
 ```bash
-git clone https://github.com/factorhouse/factorhouse-local.git
-cd factorhouse-local
-docker compose -f compose-kpow-community.yml up -d
+uv tool install odctl
+git clone https://github.com/jaehyeon-kim/benchtop.git
+cd benchtop/order-streams
+odctl up kafka-lite
 ```
 
-Once the services are initialized, we can access the Kpow user interface by navigating to `http://localhost:3000` in the web browser, where we observe the provisioned environment, including three Kafka brokers, one schema registry, and one Kafka Connect instance.
-
-![Kpow with three Kafka brokers, one schema registry and one Kafka Connect instance](kpow-overview.png#center "Kpow with three Kafka brokers, one schema registry and one Kafka Connect instance")
+Once the services are initialized, Kafka UI is at `http://127.0.0.1:8086`, where we can browse the topics, their messages and the registered schemas.
 
 ### Launch Applications
 
@@ -578,33 +577,32 @@ Our Kotlin Kafka applications can be launched in a couple of ways, catering to d
 
 ```bash
 # 👉 With Gradle (Dev Mode)
-./gradlew run --args="producer"
-./gradlew run --args="consumer"
+./gradlew :orders-avro-clients:run --args="producer"
+./gradlew :orders-avro-clients:run --args="consumer"
 
 # 👉 Build Shadow (Fat) JAR:
 ./gradlew shadowJar
 
 # Resulting JAR:
-# build/libs/orders-avro-clients-1.0.jar
+# orders-avro-clients/build/libs/orders-avro-clients-1.0.jar
 
 # 👉 Run the Fat JAR:
-java -jar build/libs/orders-avro-clients-1.0.jar producer
-java -jar build/libs/orders-avro-clients-1.0.jar consumer
+java -jar orders-avro-clients/build/libs/orders-avro-clients-1.0.jar producer
+java -jar orders-avro-clients/build/libs/orders-avro-clients-1.0.jar consumer
 ```
 
 For this post, we demonstrate starting the applications in development mode using Gradle. Once started, we see logs from both the producer sending messages and the consumer receiving them.
 
 ![Producer and consumer logs side by side as Avro order messages are sent and received](kafka-avro-apps.webp#center "Producer and consumer logs side by side as Avro order messages are sent and received")
 
-Within the Kpow interface, we can check that a new schema, `orders-avro-value`, is now registered with the *Local Schema Registry*.
+In Kafka UI at http://127.0.0.1:8086, the **Schema Registry** page shows that a new schema, `orders-avro-value`, is now registered in Karapace, the schema registry.
 
-![Kpow listing the orders-avro-value schema in the Local Schema Registry](schema-registry.png#center "Kpow listing the orders-avro-value schema in the Local Schema Registry")
+![Kafka UI schema registry page listing the orders-avro-value subject as an Avro schema, version 1](schema-registry.png#center "The orders-avro-value schema in Kafka UI")
 
-With the applications actively producing and consuming Avro data, Kpow enables inspection of messages on the `orders-avro` topic. In the Kpow UI, navigate to this topic. To correctly view the Avro messages, configure the deserialization settings as follows: set the **Key Deserializer** to *String*, choose *AVRO* for the **Value Deserializer**, and ensure the **Schema Registry** selection is set to *Local Schema Registry*. After applying these configurations, click the Search button to display the messages.
+With the applications actively producing and consuming Avro data, Kafka UI enables inspection of messages on the `orders-avro` topic. In Kafka UI, open **Topics**, select `orders-avro` and go to the **Messages** tab. To decode the Avro values, set the **Value Serde** to *SchemaRegistry*, which reads each value's schema from Karapace. The key is a plain string, which the default **Key Serde** shows as it is.
 
-![Kpow data inspect form with String key, AVRO value and Local Schema Registry](message-view-01.png#center "Kpow data inspect form with String key, AVRO value and Local Schema Registry")
-![Order records on orders-avro with order id, bid time, price, item and supplier](message-view-02.png#center "Order records on orders-avro with order id, bid time, price, item and supplier")
+![Kafka UI messages tab of the orders-avro topic with the SchemaRegistry value serde, the newest order expanded to show order_id, bid_time, price, item and supplier](message-view.png#center "Avro order messages on the orders-avro topic in Kafka UI")
 
 ## Conclusion
 
-In this post, we successfully built robust Kafka producer and consumer applications in Kotlin, using Avro for schema-enforced data serialization and Gradle for an efficient build process. We demonstrated practical deployment with a local Kafka setup via the *Factor House Local* project with Kpow, showcasing a complete workflow for developing type-safe, resilient data pipelines with Kafka and a Schema Registry.
+In this post, we successfully built robust Kafka producer and consumer applications in Kotlin, using Avro for schema-enforced data serialization and Gradle for an efficient build process. We demonstrated practical deployment with a local Kafka setup started with *odctl*, showcasing a complete workflow for developing type-safe, resilient data pipelines with Kafka and a Schema Registry.

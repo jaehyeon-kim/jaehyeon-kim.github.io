@@ -37,21 +37,21 @@ To move from prototype to production, we split the application into two distinct
 *   **Flink (Training):** A stateful streaming application. It consumes feedback events, updates the model parameters (LinUCB matrices $A$ and $b$), and pushes the inverted matrices back to Valkey.
     *   ❗ Unlike *Part 1*, where training relied on [`MABWiser`](https://github.com/fidelity/mabwiser), here it is performed via explicit matrix operations.
 *   **Valkey (Model Store):** Stores the latest model parameters ($A^{-1}$ and $b$) for low-latency access by the client.
-    *   ❗ Valkey is a fork of Redis and speaks the same wire protocol, so the client still uses `redis-py` and the Flink sink still uses Jedis. The architecture diagram below labels this component *Redis* for that reason; the two are interchangeable here.
+    *   ❗ Valkey is a fork of Redis and speaks the same wire protocol, so the client still uses `redis-py` and the Flink sink still uses Jedis.
 
 > **📂 Source Code for the Post**
 > 
-> The source code for this post is available in the **product-recommender** folder of the [streaming-demos](https://github.com/jaehyeon-kim/streaming-demos) GitHub repository.  
+> The source code for this post is available in the **product-recommender** folder of the [benchtop](https://github.com/jaehyeon-kim/benchtop) GitHub repository.  
 
-![Prototyping stage above an event driven layer of Python serving, Kafka transport, Flink training and Valkey model store](featured.gif#center "Architecture")
+![The live client sends feedback to Kafka, the Flink job trains the models from it and from the history in SeaweedFS, and writes them to Valkey for the client to read](part-2.png#center "Architecture")
 
 ## Flink Application Design
 
-The [Flink job (`recsys-trainer`)](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-recommender/recsys-trainer) ties these concepts together using a few specific patterns.
+The [Flink job (`recsys-trainer`)](https://github.com/jaehyeon-kim/benchtop/tree/main/product-recommender/recsys-trainer) ties these concepts together using a few specific patterns.
 
 ### Stateful Model Training
 
-The core challenge in distributed online learning is managing state. The [`LinUCBUpdater` function](https://github.com/jaehyeon-kim/streaming-demos/blob/main/product-recommender/recsys-trainer/src/main/kotlin/me/jaehyeon/topology/processing/LinUCBUpdater.kt) in the Flink trainer acts as the system's memory. It implements a **disjoint LinUCB** model, meaning it maintains a completely independent set of matrices for **each unique product**.
+The core challenge in distributed online learning is managing state. The [`LinUCBUpdater` function](https://github.com/jaehyeon-kim/benchtop/blob/main/product-recommender/recsys-trainer/src/main/kotlin/me/jaehyeon/topology/processing/LinUCBUpdater.kt) in the Flink trainer acts as the system's memory. It implements a **disjoint LinUCB** model, meaning it maintains a completely independent set of matrices for **each unique product**.
 
 ❗The matrices are used to calculate scores for making recommendations.
 
@@ -81,7 +81,7 @@ To solve this, we use Flink timers to buffer updates. The model state ($A$ and $
 
 ### Scalable Inference Logic
 
-The Python client ([`eda_recommender.py`](https://github.com/jaehyeon-kim/streaming-demos/blob/main/product-recommender/recsys-engine/eda_recommender.py)) is responsible for ranking items. It uses the **Upper Confidence Bound (UCB)** formula to balance exploiting known good items and exploring uncertain ones.
+The Python client ([`recommender/run/live.py`](https://github.com/jaehyeon-kim/benchtop/blob/main/product-recommender/recommender/run/live.py)) is responsible for ranking items. It uses the **Upper Confidence Bound (UCB)** formula to balance exploiting known good items and exploring uncertain ones.
 
 For a given user context vector $x$ and product $a$, the score is calculated as:
 
@@ -93,7 +93,7 @@ This is the standard Linear Regression prediction. It asks: *"Based on historica
 **Exploration ($\alpha \sqrt{x^T A_a^{-1} x}$)**  
 *    **Familiar User:** If we have seen this user type many times, the matrix $A$ accumulates repeated contributions of $x x^T$. This increases the magnitude of $A$ in those feature directions. Because the exploration term depends on $x^T A^{-1} x$, a larger $A$ leads to a smaller quadratic form, shrinking the confidence bound. The model therefore relies more on exploitation.
 *    **Cold Start:** If we have rarely (or never) observed this feature pattern, $A$ remains close to its initial regularized identity matrix. After inversion, these directions yield larger values of $x^T A^{-1} x$, increasing the confidence bound and encouraging exploration to reduce uncertainty.
-* ❗ $\alpha$ is a hyperparameter and it is set to 0.1 as determined in *Part 1*.
+* ❗ $\alpha$ is a hyperparameter and it is set to 1.0, the value used in *Part 1*.
 
 ### Hybrid Source for Warm Start
 
@@ -108,7 +108,7 @@ We implement a custom Sink using the Sink V2 API and Jedis. This allows us to pe
 
 ## Recommender Simulation Design
 
-To validate the architecture without live user traffic, we designed a Python client (`eda_recommender.py`) that simulates the entire lifecycle of a recommendation request. This script plays two roles simultaneously: it acts as the **Recommendation Service** (serving predictions) and the **User** (providing feedback).
+To validate the architecture without live user traffic, we designed a Python client (`recommender/run/live.py`) that simulates the entire lifecycle of a recommendation request. This script plays two roles simultaneously: it acts as the **Recommendation Service** (serving predictions) and the **User** (providing feedback).
 
 ### Serving Logic
 
@@ -137,16 +137,16 @@ We use [**odctl**](https://github.com/jaehyeon-kim/odctl) to orchestrate the inf
 `odctl` is installed alongside the other Python dependencies in `requirements.txt`, so the *Part 1* environment already covers it. It needs Docker running, ideally with 8GB or more allocated.
 
 ```bash
-git clone https://github.com/jaehyeon-kim/streaming-demos.git
-cd streaming-demos
+git clone https://github.com/jaehyeon-kim/benchtop.git
+cd benchtop/product-recommender
 
 uv python install 3.11
 uv venv --python 3.11 venv
 source venv/bin/activate
-uv pip install -r product-recommender/requirements.txt
+uv pip install -r requirements.txt
 ```
 
-Every command from here on runs from the repository root, as in *Part 1*.
+Every command from here on runs from the `product-recommender` folder, as in *Part 1*.
 
 ### Build and Launch
 
@@ -156,17 +156,16 @@ We bootstrap the environment by generating training data, building the Flink JAR
 
 ```bash
 # Generate Bootstrap Data (skip if already done in Part 1)
-python product-recommender/recsys-engine/prepare_data.py
+python -m recommender.run.prepare
 
 # Build Flink Application (Shadow Jar)
-(cd product-recommender/recsys-trainer && ./gradlew shadowJar)
+(cd recsys-trainer && ./gradlew shadowJar)
 
 # Launch Kafka, Flink and Valkey
-odctl init
 odctl up kafka-lite flink-full valkey
 ```
 
-`odctl init` copies the Compose files and configuration into a local `.odctl/` folder, which you can edit to customise the stack. Dependencies then resolve themselves: `flink-full` quietly pulls in PostgreSQL, SeaweedFS (S3), and the Iceberg REST catalog before starting the compute engines. Run `odctl ps --all` to see everything that came up.
+Dependencies resolve themselves: `flink-full` quietly pulls in PostgreSQL, SeaweedFS (S3), and the Iceberg REST catalog before starting the compute engines. Run `odctl ps --all` to see everything that came up.
 
 | Service | URL |
 | :--- | :--- |
@@ -180,7 +179,7 @@ odctl up kafka-lite flink-full valkey
 `odctl` provides a Flink **session cluster** rather than running the job in application mode, so the JAR is submitted to the already-running cluster:
 
 ```bash
-./product-recommender/submit-job.sh
+./submit-job.sh
 ```
 
 The script does three things: it uploads `training_log.csv` to SeaweedFS, copies the fat JAR into the JobManager container, and calls `flink run -d`.
@@ -198,7 +197,7 @@ To visualize the system in action, open two terminals.
 Run the Python script. It acts as the user, receiving recommendations and sending feedback (clicks) to Kafka.
 
 ```bash
-python product-recommender/recsys-engine/eda_recommender.py
+python -m recommender.run.live
 ```
 
 **Terminal 2: Trainer**

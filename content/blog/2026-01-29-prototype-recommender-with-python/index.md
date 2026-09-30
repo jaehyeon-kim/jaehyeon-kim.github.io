@@ -46,7 +46,7 @@ CMAB performs well in **data streaming environments**. Integrated with platforms
 
 In this series, **Part 1** (*this post*) builds a complete **Python prototype** to validate the algorithm and simulate user behavior. [**Part 2**](/blog/2026-02-23-productionize-recommender-with-eda/) will scale this to a distributed, event-driven architecture.
 
-![Flow from raw products and synthetic users through feature generation, bandit history simulation, offline policy evaluation and live simulation](featured.gif#center "Architecture")
+![Data preparation writes the data folder, which the offline policy evaluation and the local simulation read](part-1.png#center "Architecture")
 
 ## Tech Stack
 
@@ -67,12 +67,12 @@ We use [**uv**](https://docs.astral.sh/uv/) for Python environment management. T
 The development environment can be constructed as follows:
 
 ```bash
-$ git clone https://github.com/jaehyeon-kim/streaming-demos.git
-$ cd streaming-demos
+$ git clone https://github.com/jaehyeon-kim/benchtop.git
+$ cd benchtop/product-recommender
 $ uv python install 3.11
 $ uv venv --python 3.11 venv
 $ source venv/bin/activate
-(venv) $ uv pip install -r product-recommender/requirements.txt
+(venv) $ uv pip install -r requirements.txt
 (venv) $ uv pip list | grep -E "mab|wiser|flair|panda|numpy|scikit|faker"
 # Using Python 3.11.15 environment at: venv
 # faker                              40.36.0
@@ -87,7 +87,7 @@ $ source venv/bin/activate
 
 > **📂 Source Code for the Post**
 > 
-> The source code for this post is available in the **product-recommender** folder of the [streaming-demos](https://github.com/jaehyeon-kim/streaming-demos) GitHub repository.  
+> The source code for this post is available in the **product-recommender** folder of the [benchtop](https://github.com/jaehyeon-kim/benchtop) GitHub repository.  
 
 ## Data Generation
 
@@ -136,10 +136,10 @@ Bandit algorithms operate on numerical vectors, not raw text. In other words, th
 
 | product_id | txt_0      | txt_1      | txt_2       | txt_3      | txt_4       | txt_5       | txt_6       | txt_7       | txt_8       | txt_9       | cat_Appetizers & Sides | cat_Aussie Pub Classics | cat_Burgers & Sandwiches | cat_Drinks & Desserts | cat_Mexican Specialties | cat_Pasta & Risotto | cat_Pizzas | cat_Salads & Healthy Options | is_coffee | price |
 |------------|------------|------------|-------------|------------|-------------|-------------|-------------|-------------|-------------|-------------|------------------------|--------------------------|---------------------------|------------------------|--------------------------|----------------------|------------|------------------------------|-----------|-------|
-| 8          | 0.3354452  | 0.36037982 | -0.04443971 | 0.14370468 | -0.19956689 | -0.17493485 | -0.18741444 | -0.02776922 | -0.07173516 | -0.11751403 | 0                      | 0                        | 1                         | 0                      | 0                        | 0                    | 0          | 0                            | 0         | 0.3887 |
-| 42         | 0.3015529  | 0.28032377 | 0.03035132  | 0.21287075 | 0.04236558  | -0.054545   | -0.10349114 | -0.13550489 | -0.04504355 | -0.22817583 | 0                      | 0                        | 0                         | 0                      | 0                        | 0                    | 1          | 0                            | 0         | 0.5832 |
-| 61         | 0.53950787 | -0.020039  | -0.36858445 | -0.10636957| 0.00259933  | 0.15990224  | 0.04153050  | 0.11348728  | -0.02482079 | -0.23463035 | 0                      | 1                        | 0                         | 0                      | 0                        | 0                    | 0          | 0                            | 0         | 0.6110 |
-| 101        | 0.20630628 | -0.04121789| 0.11134595  | -0.2160106 | 0.00511632  | -0.20131038 | 0.05482014  | -0.19734132 | 0.35356910  | 0.23985470  | 0                      | 0                        | 0                         | 0                      | 1                        | 0                    | 0          | 0                            | 0         | 0.2765 |
+| 8          | 0.33545566 | -0.36038476 | 0.04443859  | 0.1437323  | 0.19954793  | -0.17493221 | 0.18742238  | 0.027762778 | -0.07173552 | -0.11753924 | 0                      | 0                        | 1                         | 0                      | 0                        | 0                    | 0          | 0                            | 0         | 0.3887 |
+| 42         | 0.30156243 | -0.28032556 | -0.030351626 | 0.21286383 | -0.04239631 | -0.05454497 | 0.10349816  | 0.13551421  | -0.045043208 | -0.22818978 | 0                      | 0                        | 0                         | 0                      | 0                        | 0                    | 1          | 0                            | 0         | 0.5832 |
+| 61         | 0.53952336 | 0.020042256 | 0.36858454  | -0.10636381 | -0.0025809025 | 0.15991136  | -0.041545305 | -0.11347411 | -0.024828108 | -0.23473465 | 0                      | 1                        | 0                         | 0                      | 0                        | 0                    | 0          | 0                            | 0         | 0.6110 |
+| 101        | 0.20631199 | 0.04121668 | -0.11134566 | -0.21601778 | -0.0050910884 | -0.20131046 | -0.054801166 | 0.19731943  | 0.35357264  | 0.2399257   | 0                      | 0                        | 0                         | 0                      | 1                        | 0                    | 0          | 0                            | 0         | 0.2765 |
 
 
 **Sample Processed User Features:**
@@ -163,7 +163,7 @@ We also inject **Dynamic Context** features like **Time of Day** and **Day of We
 
 ### Simulation Logic
 
-The simulation is implemented as a class `GroundTruth`, and we define specific rules that govern user behaviour:
+The simulation is implemented as two functions, `click_probability` and `will_click`, and we define specific rules that govern user behaviour:
 
 * Start from a low base logit (−2.5) to model generally low click probability.
 * **Rule 1: Morning coffee preference:** if the user is browsing in the morning and the item is a *coffee* product, add a strong positive boost to the score.
@@ -173,53 +173,54 @@ The simulation is implemented as a class `GroundTruth`, and we define specific r
 * Convert the final logit score into a click probability using a sigmoid function, then sample a Bernoulli trial to simulate whether a click occurs.
 
 ```python
-# product-recommender/recsys-engine/src/bandit_simulator.py
-class GroundTruth:
+# product-recommender/recommender/engine/simulation.py
+def click_probability(user_ctx: dict, item_ctx: dict) -> float:
     """
-    The HIDDEN FORMULA (Ground Truth) for click simulation.
-    Determines user click behavior based on context and item features.
+    Returns the chance that a user clicks an item: the hidden formula the bandit learns.
+
+    Args:
+        user_ctx (dict): The user and time features.
+        item_ctx (dict): The product features.
+
+    Returns:
+        float: The click probability, from 0 to 1.
     """
+    score = -2.5  # the base logit, a low probability
 
-    @staticmethod
-    def calculate_probability(user_ctx: dict, item_ctx: dict) -> float:
-        """
-        Computes the probability that a user clicks an item.
-        Uses logistic regression-style scoring with domain-specific rules.
-        """
-        score = -2.5  # Base logit: starts with a low probability
+    # Rule 1: Morning Coffee
+    if user_ctx.get("is_morning") == 1 and item_ctx.get("is_coffee") == 1:
+        score += 2.5
 
-        # Rule 1: Morning Coffee
-        # Users are more likely to click coffee in the morning
-        if user_ctx.get("is_morning") == 1 and item_ctx.get("is_coffee") == 1:
-            score += 2.5
+    # Rule 2: Weekend Comfort Food
+    if user_ctx.get("is_weekend") == 1 and (
+        item_ctx.get("cat_Pizzas") == 1 or item_ctx.get("cat_Burgers & Sandwiches") == 1
+    ):
+        score += 1.8
 
-        # Rule 2: Weekend Comfort Food
-        # Users tend to choose Pizza or Burgers on weekends
-        if user_ctx.get("is_weekend") == 1:
-            if item_ctx.get("cat_Pizzas") == 1 or item_ctx.get("cat_Burgers & Sandwiches") == 1:
-                score += 1.8
+    # Rule 3: Budget Constraint (age and price are scaled from 0 to 1)
+    if user_ctx.get("age", 0.5) < 0.25 and item_ctx.get("price", 0.5) > 0.8:
+        score -= 3.0
 
-        # Rule 3: Budget Constraint
-        # Young users (<25 years) avoid expensive items (normalized price > 0.8)
-        user_age = user_ctx.get("age", 0.5)  # normalized age 0-1
-        item_price = item_ctx.get("price", 0.5)  # normalized price 0-1
-        if user_age < 0.25 and item_price > 0.8:
-            score -= 3.0
+    # Rule 4: Traffic Bias
+    if user_ctx.get("traffic_source_Search") == 1:
+        score += 0.5
 
-        # Rule 4: Traffic Bias
-        # Users arriving via Search have a slightly higher propensity to click
-        if user_ctx.get("traffic_source_Search") == 1:
-            score += 0.5
+    return 1 / (1 + np.exp(-score))
 
-        # Convert logit score to probability using sigmoid function
-        return 1 / (1 + np.exp(-score))
 
-    def will_click(self, user_ctx: dict, item_ctx: dict, fake: Faker) -> int:
-        """
-        Simulates a Bernoulli trial (click = 1, no click = 0) based on probability.
-        """
-        prob = self.calculate_probability(user_ctx, item_ctx)
-        return 1 if fake.random.random() < prob else 0
+def will_click(user_ctx: dict, item_ctx: dict, fake: Faker) -> int:
+    """
+    Decides whether a user clicks an item, with the formula's probability.
+
+    Args:
+        user_ctx (dict): The user and time features.
+        item_ctx (dict): The product features.
+        fake (Faker): The seeded Faker, whose random generator decides.
+
+    Returns:
+        int: 1 for a click, 0 for none.
+    """
+    return 1 if fake.random.random() < click_probability(user_ctx, item_ctx) else 0
 ```
 
 ### Data Preparation
@@ -228,10 +229,10 @@ We generate 10,000 historical events to serve as our "Offline Training" dataset.
 
 Because the user and product are matched randomly (not by a recommender), the **Average Click Rate (CTR)** is naturally low. In this example, it is around **13.65%**, and this serves as our baseline.
 
-💡 There are three main scripts for this post: `prepare_data.py` for feature engineering and bandit history simulation, `evalue.py` for offline policy evaluation, and `local_recommender.py` for running product recommendation locally. Each script accepts a `--seed` argument, which defaults to *1237*. As long as the seed remains the same, running the scripts will produce identical outputs.
+💡 There are three main scripts for this post: `recommender.run.prepare` for feature engineering and bandit history simulation, `recommender.run.evaluate` for offline policy evaluation, and `recommender.run.local` for running product recommendation locally. Each script accepts a `--seed` argument, which defaults to *1237*. As long as the seed remains the same, running the scripts will produce identical outputs.
 
 ```bash
-(venv) $ python product-recommender/recsys-engine/prepare_data.py
+(venv) $ python -m recommender.run.prepare
 [2026-01-26 19:16:09] INFO    : Generating 1000 synthetic users...
 [2026-01-26 19:16:09] INFO    : Saved raw users to: .../users.csv
 [2026-01-26 19:16:09] INFO    : Starting Feature Engineering...
@@ -281,7 +282,7 @@ This algorithm excels because it balances two competing goals:
 This allows LinUCB to discover high-value opportunities that the conservative LinGreedy model misses.
 
 ```bash
-(venv) $ python product-recommender/recsys-engine/evaluate.py
+(venv) $ python -m recommender.run.evaluate
 Running Benchmark... (This trains and scores all models automatically)
 --------------------------------------------------------------------------------
 Available Metrics: ['AUC(score)@5', 'CTR(score)@5', 'Precision@5', 'Recall@5']
@@ -303,11 +304,11 @@ The benchmark does **not** test on every single row of your history. It uses a t
 
 Here is exactly how `mab2rec` calculates that **20.5%**:
 
-1.  **The Log (History):** Contains a mix of "Good Decisions" and "Bad Decisions" because it was generated randomly.
+1.  **Log (History):** Contains a mix of "Good Decisions" and "Bad Decisions" because it was generated randomly.
     *   Row A: Morning User $\to$ Show **Pizza** $\to$ **No Click** (Bad Random Choice)
     *   Row B: Morning User $\to$ Show **Coffee** $\to$ **Click** (Lucky Random Choice)
 
-2.  **The Test (LinUCB):** The model is smart. It knows Morning users want Coffee.
+2.  **Test (LinUCB):** The model is smart. It knows Morning users want Coffee.
     *   For Row A, LinUCB says: *"I would recommend **Coffee**."*
         *   **Mismatch!** The history shows Pizza. We cannot know what would have happened if we showed Coffee. **This row is IGNORED.**
     *   For Row B, LinUCB says: *"I would recommend **Coffee**."*
@@ -330,13 +331,13 @@ We simulate a sequence of user visits:
 1.  **User Arrival:** Pick a random user from the pool.
 2.  **Contextualize:** Inject a simulated timestamp (e.g., varying between Mon 08:00 AM and Sat 09:00 PM). This is the key "Context" the model must react to.
 3.  **Recommend:** LinUCB calculates scores for all 200 products and returns the Top 5.
-4.  **Reaction:** The `GroundTruth` Oracle decides if the user clicks.
+4.  **Reaction:** The `will_click` Oracle decides if the user clicks.
 5.  **Online Update:** We call `model.partial_fit()`. **This updates the matrices ($A$ and $b$) instantly.** The very next recommendation will reflect this new learning.
 
 Here is a sample of 30 recommendation records from the local simulation.
 
 ```bash
-(venv) $ python product-recommender/recsys-engine/local_recommender.py 
+(venv) $ python -m recommender.run.local
 [2026-02-05 15:47:43] INFO    : Loaded 1000 users
 [2026-02-05 15:47:43] INFO    : Loading artifacts...
 [2026-02-05 15:47:48] INFO    : Loaded 200 products.
@@ -402,7 +403,7 @@ The model correctly switches strategies based on the hour, even distinguishing "
 #### Perfect Recommendation, No Interaction (Realism)
 
 *   **User 0275 (Wed 11:10):** The model recommended `189` (Flat White). However, the user ignored it, and the result was ❌ (No Reward).
-*   **Why?** This mimics real life. Even if the recommendation is perfect, users don't always convert. In the `GroundTruth`, the probability caps at ~50% (sigmoid of 0). This "Bad Luck" outcome confirms your evaluation pipeline is honest.
+*   **Why?** This mimics real life. Even if the recommendation is perfect, users don't always convert. In `click_probability`, the probability caps at ~50% (sigmoid of 0). This "Bad Luck" outcome confirms your evaluation pipeline is honest.
 
 ### Conclusion
 
