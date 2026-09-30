@@ -229,11 +229,10 @@ $$ \text{LinUCB: Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{&#
 The whole stack comes up with [`odctl`](https://github.com/jaehyeon-kim/odctl) &lt;!-- .element: target=&#34;_blank&#34; --&gt;, a CLI for the Open Data Stack.
 
 ```bash
-# all from the repo root
-odctl init
+# all from benchtop/product-recommender
 odctl up kafka-lite flink-full valkey     # Kafka, Flink, Valkey (&#43; deps)
-./product-recommender/submit-job.sh       # upload CSV, ship JAR, flink run
-python product-recommender/recsys-engine/eda_recommender.py
+./submit-job.sh                           # upload CSV, ship JAR, flink run
+python -m recommender.run.live
 ```
 &lt;!-- .element: style=&#34;font-size: 0.45em;&#34; --&gt;
 
@@ -289,7 +288,7 @@ Bridging the gap between Data Science and Data Engineering.
 
 **Code &amp; Resources:**
 
-- [GitHub Repository](https://github.com/jaehyeon-kim/streaming-demos/tree/main/product-recommender) &lt;!-- .element: target=&#34;_blank&#34; --&gt;
+- [GitHub Repository](https://github.com/jaehyeon-kim/benchtop/tree/main/product-recommender) &lt;!-- .element: target=&#34;_blank&#34; --&gt;
 - Blog Posts: [Part 1: Prototype](https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/) &lt;!-- .element: target=&#34;_blank&#34; --&gt; | [Part 2: Productionization](https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/) &lt;!-- .element: target=&#34;_blank&#34; --&gt;
 - [Youtube Playlist](https://youtube.com/playlist?list=PLrISYKWzp0eTTAbkhahnuyLOBlesOY5vN&amp;si=ML-G-oYqJaMD9fnY) &lt;!-- .element: target=&#34;_blank&#34; --&gt;
 &lt;/div&gt;
