@@ -11,7 +11,7 @@ categories:
   - Data Analysis
 tags:
   - R
-description: Part IV of tree based methods in R series. 3 R packages for classification analysis are compared - rpart, caret and mlr packages.
+description: "Compare three R packages for classification trees, rpart, caret and mlr, on the Carseats data used in the earlier parts."
 ---
 
 * [Part I](/blog/2015-02-01-tree-based-methods-1)

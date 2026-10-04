@@ -1,8 +1,8 @@
 ---
-title: "Introducing odctl: One CLI for a Local Open Data Stack"
+title: "Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI"
 date: 2026-07-16
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 categories:
@@ -18,7 +18,7 @@ tags:
   - Apache Iceberg
   - Python
 description: |
-  odctl is a CLI on PyPI that launches Kafka, Flink, Spark, Trino, Iceberg, Airflow and an MLOps and observability suite as one local stack.
+  Running Kafka, Flink, Spark, Trino, Iceberg and Airflow together on a laptop: one CLI starts them as a single local stack, with MLOps and observability tools.
 ---
 
 Anyone who has tried to stand up a realistic data platform on their laptop knows the pain. You want Kafka talking to Flink, Spark writing to Iceberg, Trino querying the result, and maybe a catalog and a lineage tool watching over all of it. What you actually get is an afternoon lost to dependency conflicts, port clashes, and a Docker Compose file that grows a new bug every time you touch it.

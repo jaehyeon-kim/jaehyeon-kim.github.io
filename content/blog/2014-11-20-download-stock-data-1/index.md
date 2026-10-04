@@ -11,12 +11,12 @@ categories:
   - Data Analysis
 tags:
   - R
-description: This article illustrates how to download stock price data files from Google, save it into a local drive and merge them into a single data frame.
+description: "Download stock price files in R, save them to a local folder and merge them into one data frame. The Google endpoint the script used has since been retired."
 ---
 
-> **Status, September 2026.** Google retired the `finance/historical` CSV endpoint that this script downloads from, so the download step no longer returns data. The folder creation, error handling and merge patterns still hold if you point them at a price source that is still published.
-
 Stock price data files are downloaded from Google, saved into a local drive and merged into a single data frame. This script is slightly modified from a script which downloads RStudio package download log data. The original source can be found [here](https://github.com/hadley/cran-logs-dplyr/blob/master/1-download.r).  
+
+> **Status, September 2026.** Google retired the `finance/historical` CSV endpoint that this script downloads from, so the download step no longer returns data. The folder creation, error handling and merge patterns still hold if you point them at a price source that is still published.
 
 ## R Packages Used
 

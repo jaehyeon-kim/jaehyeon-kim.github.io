@@ -2,7 +2,7 @@
 title: Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1 Data Producer
 date: 2025-02-18
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:
@@ -15,6 +15,7 @@ tags:
   - Python
   - Docker
   - WebSocket
+  - Benchtop
 description: A Python generator loads theLook eCommerce data into PostgreSQL, and a FastAPI WebSocket server queries it on a timer to serve live dashboards.
 ---
 
@@ -32,7 +33,7 @@ A data generating app is created with Python, and it ingests the [theLook eComme
 
 ![The simulation writes to PostgreSQL, the WebSocket server sends the recent order items on /ws, and a terminal client prints them](part-1.png#center "Architecture")
 
-We have three services, and they are illustrated separately below. The source of this post can be found in the **live-dashboard** folder of the [**benchtop**](https://github.com/jaehyeon-kim/benchtop/tree/main/live-dashboard) GitHub repository. The development environment can be constructed as follows:
+We have three services, and they are illustrated separately below. The source of this post can be found in the **live-dashboard** folder of the [**benchtop**](https://github.com/jaehyeon-kim/benchtop/tree/main/live-dashboard) GitHub repository. It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone. The development environment can be constructed as follows:
 
 ```bash
 $ git clone https://github.com/jaehyeon-kim/benchtop.git

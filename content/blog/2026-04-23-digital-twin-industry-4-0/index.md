@@ -2,7 +2,7 @@
 title: "Why Digital Twins Are Rewiring Industry 4.0"
 date: 2026-04-22
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:
@@ -17,8 +17,11 @@ tags:
   - dynamic-des
   - SimPy
   - Python
-description: Compare the architectural layers that separate a traditional simulation, an operational digital twin and an event-driven hybrid pipeline.
+description: |
+  Why a simulation is not a digital twin: the layers that separate an offline model, an operational twin and an event-driven hybrid of the two.
 ---
+
+A simulation and a digital twin are often treated as the same thing, but they are built differently. A traditional simulation runs offline on assumed inputs. An operational digital twin stays aligned with one real system as it changes. This post walks through the layers that separate the two, and an event-driven hybrid that combines them.
 
 ## Beyond CAD Models
 
@@ -78,4 +81,10 @@ Organizations shouldn't have to choose between an isolated simulation and an ope
 
 But if you want to implement an event-driven architecture where a running mathematical model ingests Kafka streams and alters its parameters on the fly without stopping, you face a complex I/O challenge.
 
-One purpose-built approach to solving this specific pattern is the [**`dynamic-des`**](https://github.com/jaehyeon-kim/dynamic-des) package. In [Part 2](/blog/2026-04-28-digital-twin-dynamic-des/) of this series, we will look at how this open-source tool uses a Switchboard pattern and dynamic mutable resources to turn a static SimPy script into a synchronized, event-driven engine.
+One purpose-built approach to solving this specific pattern is the [**`dynamic-des`**](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/)) package. In [Part 2](/blog/2026-04-28-digital-twin-dynamic-des/) of this series, we will look at how this open-source tool uses a Switchboard pattern and dynamic mutable resources to turn a static SimPy script into a synchronized, event-driven engine.
+
+## Related posts
+
+* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect) - a dynamic-des simulation of an online shop feeding a change data capture pipeline
+* [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql) - a dynamic-des simulation of a mobile game feeding Flink SQL leaderboards
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system) - dynamic-des generating the lakehouse data that an agent queries

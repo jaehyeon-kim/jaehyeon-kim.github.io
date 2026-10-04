@@ -2,7 +2,7 @@
 title: Calculate K Most Frequent Words and Max Word Length - Apache Beam Python Examples Part 1
 date: 2024-07-04
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:

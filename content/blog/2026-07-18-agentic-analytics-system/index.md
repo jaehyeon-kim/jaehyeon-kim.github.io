@@ -19,7 +19,7 @@ tags:
   - dynamic-des
   - odctl
 description: |
-  A local open source proof of concept that puts a semantic layer between a language model and an Iceberg lakehouse, using Strands, WrenAI and Trino.
+  Stopping a language model from inventing SQL over a lakehouse: a semantic layer between the model and Iceberg tables, built with Strands, WrenAI and Trino.
 ---
 Generative AI has made conversational analytics feel within reach, yet direct text-to-SQL systems remain hard to operate reliably. A database schema tells you the tables, columns, and types, but it says nothing about which datasets are canonical, which join paths are approved, how a governed metric is calculated, or what the business actually means by "revenue" or "active customer". Ask a language model to infer all of that from raw tables and, sooner or later, it will confidently invent an answer.
 
@@ -49,7 +49,7 @@ The diagram above traces a request end to end, and the table below maps each com
 | Historical Data | Trino / Apache Iceberg | Distributed SQL over an open table format |
 | Object Storage | SeaweedFS | Local S3-compatible backend for Iceberg data |
 
-The infrastructure is launched with [`odctl`](https://github.com/jaehyeon-kim/odctl), and the sample e-commerce dataset (customers, products, orders, order items, payments, returns) is generated with [`dynamic-des`](https://github.com/jaehyeon-kim/dynamic-des) running a fast-forward clock and writing Parquet straight to SeaweedFS. Both projects earn their keep here: one stands up the platform, the other fills it with realistic data in seconds.
+The infrastructure is launched with [`odctl`](https://github.com/jaehyeon-kim/odctl), and the sample e-commerce dataset (customers, products, orders, order items, payments, returns) is generated with [`dynamic-des`](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/latest/getting-started/)) running a fast-forward clock and writing Parquet straight to SeaweedFS. Both projects earn their keep here: one stands up the platform, the other fills it with realistic data in seconds.
 
 ## Two Layers That Keep the Model Honest
 
@@ -83,9 +83,11 @@ Measuring an agent means judging both its decision-making and its safety. The re
 
 ## Related posts
 
-* [Introducing odctl: One CLI for a Local Open Data Stack](/blog/2026-07-16-odctl-open-data-stack) - the CLI that starts the local open source stack this system runs on
-* [One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES v0.8.1](/blog/2026-05-25-dynamic-des-parquet-support) - generating the batch Parquet and live streaming data such a stack reads
+* [Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI](/blog/2026-07-16-odctl-open-data-stack) - the CLI that starts the local open source stack this system runs on
+* [One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES](/blog/2026-05-25-dynamic-des-parquet-support) - generating the batch Parquet and live streaming data such a stack reads
 * [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning) - the real-time side that this batch-only phase leaves for later
+* [Meet the Streamhouse Trio - Paimon, Fluss, and Iceberg for Unified Data Architectures](/blog/2025-05-06-streamhouse-trio) - compares Paimon, Fluss and Iceberg as table layers for streaming and batch
+* [Self-service Data Platform via a Multi-tenant SQL Gateway](/blog/2025-07-17-self-service-data-platform-via-sql-gateway) - a multi-tenant SQL gateway that starts Spark, Flink and Trino engines on demand over tables like these
 
 ## Where This Is Going
 

@@ -2,7 +2,7 @@
 title: Cache Data on Apache Beam Pipelines Using a Shared Object
 date: 2024-08-22
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 # series:

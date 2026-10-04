@@ -14,6 +14,7 @@ tags:
   - Python
   - Streamlit
   - WebSocket
+  - Benchtop
 description: Streamlit and Apache ECharts draw a live sales dashboard that reads order counts and revenue by country from a FastAPI WebSocket server.
 ---
 
@@ -29,7 +30,7 @@ A real-time monitoring dashboard is developed using [Streamlit](https://streamli
 
 ![The Streamlit dashboard reads the recent order items from the WebSocket server, which reads them from PostgreSQL](part-2.png#center "Architecture")
 
-This Streamlit dashboard is designed to process and display real-time *theLook eCommerce data* using plain Python for data manipulation, Streamlit's built-in *metric* component for KPIs, and *Apache ECharts* for visualizations. The source code for this post can be found in the **live-dashboard** folder of the [**benchtop**](https://github.com/jaehyeon-kim/benchtop/tree/main/live-dashboard) GitHub repository.
+This Streamlit dashboard is designed to process and display real-time *theLook eCommerce data* using plain Python for data manipulation, Streamlit's built-in *metric* component for KPIs, and *Apache ECharts* for visualizations. The source code for this post can be found in the **live-dashboard** folder of the [**benchtop**](https://github.com/jaehyeon-kim/benchtop/tree/main/live-dashboard) GitHub repository. It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.
 
 ### Components
 

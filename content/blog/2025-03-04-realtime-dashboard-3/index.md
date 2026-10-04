@@ -14,6 +14,7 @@ tags:
   - Next.js
   - React
   - WebSocket
+  - Benchtop
 description: Next.js and React with Apache ECharts show the same live order and revenue metrics, reading from the FastAPI WebSocket server in the browser.
 ---
 
@@ -29,7 +30,7 @@ A real-time monitoring dashboard connects to the WebSocket server from [Part 1](
 
 ![The Next.js dashboard reads the recent order items from the WebSocket server, which reads them from PostgreSQL](part-3.png#center "Architecture")
 
-The Next.js dashboard processes and displays real-time *theLook eCommerce data*. It connects to the WebSocket server using the [*React useWebSocket*](https://github.com/robtaussig/react-use-websocket) package, while the UI is styled with [HeroUI (formerly NextUI)](https://www.heroui.com/) and [Tailwind CSS](https://tailwindcss.com/). Visualizations are powered by [Apache ECharts](https://github.com/hustcc/echarts-for-react). The source code for this post is available in the **live-dashboard** folder of the [**benchtop**](https://github.com/jaehyeon-kim/benchtop/tree/main/live-dashboard) GitHub repository.
+The Next.js dashboard processes and displays real-time *theLook eCommerce data*. It connects to the WebSocket server using the [*React useWebSocket*](https://github.com/robtaussig/react-use-websocket) package, while the UI is styled with [HeroUI (formerly NextUI)](https://www.heroui.com/) and [Tailwind CSS](https://tailwindcss.com/). Visualizations are powered by [Apache ECharts](https://github.com/hustcc/echarts-for-react). The source code for this post is available in the **live-dashboard** folder of the [**benchtop**](https://github.com/jaehyeon-kim/benchtop/tree/main/live-dashboard) GitHub repository. It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.
 
 ### Metric Component
 

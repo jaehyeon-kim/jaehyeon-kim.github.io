@@ -19,9 +19,9 @@ tags:
 description: Develop and test AWS applications against LocalStack, a mocking framework that runs AWS services on a local machine, demonstrated with a web service.
 ---
 
-> **Status, September 2026.** The Lambda function below is created with the `python3.6` runtime, which AWS stopped supporting, so the deployment commands fail as written. Use a currently supported Python runtime and a current LocalStack release, whose service endpoints also differ from the per-service ports used here.
-
 [LocalStack](https://github.com/localstack/localstack) provides an easy-to-use test/mocking framework for developing AWS applications. In this post, I'll demonstrate how to utilize LocalStack for development using a web service.
+
+> **Status, September 2026.** The Lambda function below is created with the `python3.6` runtime, which AWS stopped supporting, so the deployment commands fail as written. Use a currently supported Python runtime and a current LocalStack release, whose service endpoints also differ from the per-service ports used here.
 
 Specifically a simple web service built with [Flask-RestPlus](https://flask-restplus.readthedocs.io/en/stable/) is used. It supports simple CRUD operations against a database table. It is set that SQS and Lambda are used for creating and updating a record. When a _POST_ or _PUT_ request is made, the service sends a message to a SQS queue and directly returns _204_ reponse. Once a message is received, a Lambda function is invoked and a relevant database operation is performed. 
 

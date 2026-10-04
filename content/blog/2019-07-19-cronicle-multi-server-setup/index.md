@@ -12,7 +12,7 @@ categories:
 tags: 
   - Cronicle
   - Docker
-description: Cronicle is a multi-server task scheduler and runner. In this post, multi-server configuration of Cronicle will be demonstrated with Docker and Nginx as load balancer.
+description: "Keep the Cronicle job scheduler running when its master server fails: a master and a backup server on Docker, behind Nginx as the load balancer."
 ---
 
 Accroding to the [project GitHub repository](https://github.com/jhuckaby/Cronicle), 

@@ -2,7 +2,7 @@
 title: Flink DataStream API - Scalable Event Processing for Supplier Stats
 date: 2025-06-10
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:
@@ -12,10 +12,12 @@ categories:
 tags: 
   - Apache Kafka
   - Kafka Streams
+  - Apache Flink
   - Kotlin
   - Docker
   - Kafka UI
   - odctl
+  - Benchtop
 description: Flink DataStream API in Kotlin computes the same supplier statistics, using watermarks for event time and side outputs to collect late order events.
 ---
 
@@ -38,7 +40,7 @@ We develop a Flink DataStream application designed for scalable, real-time event
 *   Leverages Flink's side-output mechanism to gracefully handle and route late-arriving records to a separate topic.
 *   Serializes the resulting supplier statistics and late records back to Kafka, using Avro and JSON respectively.
 
-The source code for the application discussed in this post can befound in the _orders-stats-flink_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams).
+The source code for the application discussed in this post can befound in the _orders-stats-flink_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams). It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.
 
 ### Build Configuration
 
@@ -790,6 +792,10 @@ Next, open the `orders-avro-kds-skipped` topic's **Messages** tab in Kafka UI:
 These records are the ones that arrived too late to be included in their windows, even after the `allowedLateness` period. They were captured using Flink's powerful `.sideOutputLateData()` function and then converted to JSON with a `"late": true` field for confirmation.
 
 ![Kafka UI messages tab of the orders-avro-kds-skipped topic, the newest record expanded to show the order fields and late set to true](skipped.png#center "Late order records on the orders-avro-kds-skipped topic")
+
+## Related posts
+
+* [Stream Processing with Flink in Kotlin](/blog/2025-12-10-streaming-processing-with-flink-in-kotlin) - the examples from the book Stream Processing with Apache Flink, ported to Kotlin with the same DataStream API
 
 ## Conclusion
 

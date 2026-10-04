@@ -2,7 +2,7 @@
 title: Pipeline, Notebook, SQL and DataFrame - Apache Beam Local Development with Python Part 1
 date: 2024-03-28
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:

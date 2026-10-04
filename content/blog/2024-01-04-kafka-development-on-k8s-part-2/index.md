@@ -20,6 +20,8 @@ tags:
 description: Send and read Kafka topic records from Python client applications built with the kafka-python package and deployed on Kubernetes.
 ---
 
+Apache Kafka has five [core APIs](https://kafka.apache.org/documentation/#api), and we can develop applications to send/read streams of data to/from topics in a Kafka cluster using the producer and consumer APIs. While the main Kafka project maintains only the Java APIs, there are several [open source projects](https://cwiki.apache.org/confluence/display/KAFKA/Clients#Clients-Python) that provide the Kafka client APIs in Python. In this post, we discuss how to develop Kafka client applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package on Kubernetes.
+
 [**UPDATE 2025-10-01**]
 
 Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
@@ -31,8 +33,6 @@ For example:
 * `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
 
 ---
-
-Apache Kafka has five [core APIs](https://kafka.apache.org/documentation/#api), and we can develop applications to send/read streams of data to/from topics in a Kafka cluster using the producer and consumer APIs. While the main Kafka project maintains only the Java APIs, there are several [open source projects](https://cwiki.apache.org/confluence/display/KAFKA/Clients#Clients-Python) that provide the Kafka client APIs in Python. In this post, we discuss how to develop Kafka client applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package on Kubernetes.
 
 
 * [Part 1 Cluster Setup](/blog/2023-12-21-kafka-development-on-k8s-part-1)

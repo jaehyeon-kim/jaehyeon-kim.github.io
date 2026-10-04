@@ -11,7 +11,7 @@ categories:
   - Data Analysis
 tags:
   - R
-description: Setting up random seed is important for reproducibility of analysis. In this post, we discuss how to generate random seed using the caret package.
+description: "Make caret results reproducible when a model trains in parallel on Windows or Linux, by setting the random seeds caret uses."
 ---
 
 A short while ago I had a chance to perform analysis using the **caret** package. One of the requirements is to run it parallelly and to work in both Windows and Linux. The requirement can be met by using the **parallel** and **doParallel** packages as the **caret** package trains a model using the **foreach** package if clusters are registered by the **doParallel** package - further details about how to implement parallel processing on a single machine can be found in earlier posts ([Link 1](/blog/2015-02-01-tree-based-methods-1), [Link 2](/blog/2015-02-08-tree-based-methods-2) and [Link 3](/blog/2015-02-14-tree-based-methods-3)). While it is relatively straightforward to train a model across multiple clusters using the **caret** package, setting up random seeds may be a bit tricky. As analysis can be more reproducible by random seeds, a way of setting them up is illustrated using a simple function in this post.

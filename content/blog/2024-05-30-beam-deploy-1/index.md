@@ -2,7 +2,7 @@
 title: Deploy Python Stream Processing App on Kubernetes - Part 1 PyFlink Application
 date: 2024-05-30
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:

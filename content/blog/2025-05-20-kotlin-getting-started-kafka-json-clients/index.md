@@ -15,6 +15,7 @@ tags:
   - Docker
   - Kafka UI
   - odctl
+  - Benchtop
 description: A Kotlin Kafka producer and consumer for order events, with custom JSON serialisers, admin helpers and a Gradle build, run on odctl.
 ---
 
@@ -30,7 +31,7 @@ A Kafka producer application generates and sends order data, and a Kafka consume
 
 ## Kafka Client Applications
 
-We will build producer and consumer apps using the [IntelliJ IDEA Community](https://www.jetbrains.com/idea/download/?section=windows) edition. The source code for the applications discussed in this post can be found in the _orders-json-clients_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams). This project demonstrates a practical approach to developing event-driven systems with Kafka and Kotlin. Below, we'll explore the key components that make up these applications.
+We will build producer and consumer apps using the [IntelliJ IDEA Community](https://www.jetbrains.com/idea/download/?section=windows) edition. The source code for the applications discussed in this post can be found in the _orders-json-clients_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams). It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone. This project demonstrates a practical approach to developing event-driven systems with Kafka and Kotlin. Below, we'll explore the key components that make up these applications.
 
 ### Build Configuration
 

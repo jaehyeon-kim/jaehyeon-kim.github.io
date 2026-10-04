@@ -2,7 +2,7 @@
 title: "Current London 2026: Building End-to-End Data Lineage"
 date: 2026-05-22
 draft: false
-featured: false
+featured: true
 comment: true
 toc: false
 categories:
@@ -13,12 +13,11 @@ tags:
   - Apache Spark
   - OpenLineage
   - Data Lineage
-description: "A comprehensive walkthrough from my session at Current London 2026 on capturing and visualizing data lineage across a production-style data stack."
+description: |
+  Tracking data across Kafka, Flink and Spark pipelines with OpenLineage, to show where each dataset came from and what reads it. Slides from my Current London 2026 session.
 ---
 
-This week, I traveled to London to speak at Current 2026. In addition to connecting with fellow data practitioners, I presented a session on a common architectural challenge: tracking the complete lifecycle of data.
-
-In modern data ecosystems, understanding data provenance, transformation steps, and final destinations is necessary for governance and root-cause analysis. My session, [**Building End-to-End Data Lineage with Kafka, Flink, and Spark**](https://current.confluent.io/london/sessions#session-SESS-70), detailed a way to capture this metadata across parallel pipelines using [OpenLineage](https://openlineage.io/).
+When a number in a report looks wrong, the first question is where it came from, and the next is what else a change will break. Answering both needs data lineage: a record of which jobs read and wrote which datasets, across every system the data passes through. At Current London 2026 I presented a session on this, [**Building End-to-End Data Lineage with Kafka, Flink, and Spark**](https://current.confluent.io/london/sessions#session-SESS-70), which captures that metadata across parallel pipelines using [OpenLineage](https://openlineage.io/).
 
 ## Presentation Slides
 
@@ -55,7 +54,7 @@ Visualizing this multi-path journey, including column-level details, was achieve
 
 * [Setup Local Development Environment for Apache Flink and Spark Using EMR Container Images](/blog/2023-12-07-flink-spark-local-dev) - a local Flink and Spark environment of the kind this lineage work instruments.
 * [Self-service Data Platform via a Multi-tenant SQL Gateway](/blog/2025-07-17-self-service-data-platform-via-sql-gateway) - Apache Kyuubi giving on-demand Spark, Flink and Trino engines with central governance.
-* [Introducing odctl: One CLI for a Local Open Data Stack](/blog/2026-07-16-odctl-open-data-stack) - a CLI that starts Kafka, Flink, Spark, Trino, Iceberg and observability tooling as one local stack.
+* [Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI](/blog/2026-07-16-odctl-open-data-stack) - a CLI that starts Kafka, Flink, Spark, Trino, Iceberg and observability tooling as one local stack.
 
 ## Moving Forward
 

@@ -15,6 +15,7 @@ tags:
   - Docker
   - Kafka UI
   - odctl
+  - Benchtop
 description: Avro and Schema Registry replace hand written JSON codecs in a Kotlin Kafka producer and consumer, with generated classes and graceful shutdown.
 ---
 
@@ -34,7 +35,7 @@ This project demonstrates two primary Kafka client applications:
 *   A **Producer Application** responsible for generating `Order` messages and publishing them to a Kafka topic using Avro serialization.
 *   A **Consumer Application** designed to subscribe to the same Kafka topic, deserialize the Avro messages, and process them, including retry logic and graceful handling of shutdowns.
 
-Both applications are packaged into a single executable JAR, and their execution mode (producer or consumer) is determined by a command-line argument. The source code for the applications discussed in this post can be found in the _orders-avro-clients_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams).
+Both applications are packaged into a single executable JAR, and their execution mode (producer or consumer) is determined by a command-line argument. The source code for the applications discussed in this post can be found in the _orders-avro-clients_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams). It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.
 
 ### Build Configuration
 

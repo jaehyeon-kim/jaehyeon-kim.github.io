@@ -2,7 +2,7 @@
 title: "Slides as Code: Integrating Reveal.js into my Hugo Blog"
 date: 2026-03-09
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 categories:

@@ -2,7 +2,7 @@
 title: Building Apache Flink Applications in Python
 date: 2023-10-19
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 # series:

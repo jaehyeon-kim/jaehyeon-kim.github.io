@@ -15,7 +15,7 @@ tags:
   - Apache Airflow
   - Docker
   - Python
-description: In this post, it is demonstrated how AWS Lambda can be integrated with Apache Airflow using a custom operator inspired by the ECS Operator.
+description: "Run frequent Apache Airflow tasks on AWS Lambda instead of Celery workers or ECS, with a custom operator modelled on the ECS operator."
 ---
 
 [Apache Airflow](https://airflow.apache.org/) is a popular open-source workflow management platform. Typically tasks run remotely by [Celery](https://www.celeryproject.org/) workers for scalability. In AWS, however, scalability can also be achieved using serverless computing services in a simpler way. For example, the [ECS Operator](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/operators/ecs.html) allows to run _dockerized_ tasks and, with the _Fargate_ launch type, they can run in a serverless environment.

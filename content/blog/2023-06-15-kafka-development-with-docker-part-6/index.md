@@ -20,6 +20,8 @@ tags:
 description: Schema registry support added to a Kafka Connect ingestion pipeline, so the source and sink connectors serialise through AWS Glue Schema Registry.
 ---
 
+In [Part 3](/blog/2023-05-25-kafka-development-with-docker-part-3), we developed a data ingestion pipeline with fake online order data using Kafka Connect source and sink connectors. Schemas are not enabled on both of them as there was not an integrated schema registry. Later we discussed how producers and consumers to Kafka topics can use schemas to ensure data consistency and compatibility as schemas evolve in [Part 5](/blog/2023-06-08-kafka-development-with-docker-part-5). In this post, I'll demonstrate how to enhance the existing data ingestion pipeline by integrating [*AWS Glue Schema Registry*](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html).
+
 [**UPDATE 2025-10-01**]
 
 Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
@@ -31,8 +33,6 @@ For example:
 * `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
 
 ---
-
-In [Part 3](/blog/2023-05-25-kafka-development-with-docker-part-3), we developed a data ingestion pipeline with fake online order data using Kafka Connect source and sink connectors. Schemas are not enabled on both of them as there was not an integrated schema registry. Later we discussed how producers and consumers to Kafka topics can use schemas to ensure data consistency and compatibility as schemas evolve in [Part 5](/blog/2023-06-08-kafka-development-with-docker-part-5). In this post, I'll demonstrate how to enhance the existing data ingestion pipeline by integrating [*AWS Glue Schema Registry*](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html).
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)

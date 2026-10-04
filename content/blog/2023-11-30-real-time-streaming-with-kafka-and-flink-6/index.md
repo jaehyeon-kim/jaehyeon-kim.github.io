@@ -19,6 +19,8 @@ tags:
 description: Ingest records from a Kafka topic into a DynamoDB table using the Camel DynamoDB sink connector, defined and run on Kafka Connect.
 ---
 
+[Kafka Connect](https://kafka.apache.org/documentation/#connect) is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It makes it simple to quickly define connectors that move large collections of data into and out of Kafka. In this lab, we will discuss how to create a data pipeline that ingests data from a Kafka topic into a DynamoDB table using the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/3.20.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html).
+
 [**UPDATE 2025-10-01**]
 
 Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
@@ -30,8 +32,6 @@ For example:
 * `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
 
 ---
-
-[Kafka Connect](https://kafka.apache.org/documentation/#connect) is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It makes it simple to quickly define connectors that move large collections of data into and out of Kafka. In this lab, we will discuss how to create a data pipeline that ingests data from a Kafka topic into a DynamoDB table using the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/3.20.x/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html).
 
 * [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
 * [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2)

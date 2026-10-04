@@ -15,12 +15,12 @@ tags:
   - Amazon API Gateway
   - Python
   - R
-description: In this post, I'll demonstrate how to test and develop a logistic regression model developed in R. Also the model will be packaged for AWS Lambda.
+description: "Package a logistic regression model built in R so it can run on AWS Lambda, after testing it locally."
 ---
 
-> **Status, September 2026.** The AWS Lambda Python 2.7 runtime used here is past end of support, and the console blueprint flow the packaging steps follow has been retired. Use a supported Python runtime and a current packaging approach instead.
-
 Let say you've got a prediction model built in R and you'd like to *productionize* it, for example, by serving it in a web application. One way is exposing the model through an API that returns the predicted result as a web service. However there are many issues. Firstly R is not a language for API development although there may be some ways - eg the [plumber](https://github.com/trestletech/plumber) package. More importantly developing an API is not the end of the story as the API can't be served in a production system if it is not *deployed/managed/upgraded/patched/...* appropriately in a server or if it is not *scalable*, *protected via authentication/authorization* and so on. Therefore it requires quite a vast range of skill sets that cover both development and DevOps (engineering). 
+
+> **Status, September 2026.** The AWS Lambda Python 2.7 runtime used here is past end of support, and the console blueprint flow the packaging steps follow has been retired. Use a supported Python runtime and a current packaging approach instead.
 
 A developer can be relieved from the overwhelming DevOps stuff if his/her model is deployed in a **serverless** environment that is provided by cloud computing companies - Amazon Web Service, Microsoft Azure, Google Cloud Platform and IBM OpenWhisk. They provide *FaaS* ([Function as a Service](https://en.wikipedia.org/wiki/Function_as_a_Service)) and, simply put, it allows to run code on demand without provisioning or managing servers. Furthermore an application can be developed/managed in a more efficient way if the workflow is streamlined by **events**. Let say the model has to be updated periodically. It requires to save new raw data into a place, to export it to a database, to manipulate and save it back to another place for modelling... This kind of workflow can be efficiently managed by events where a function is configured to subscribe a specific event and its code is run accordingly. In this regards, I find there is a huge potential for **serverless** **event-driven** architecture in data product development.
 

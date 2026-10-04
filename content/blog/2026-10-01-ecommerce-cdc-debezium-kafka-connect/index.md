@@ -9,7 +9,7 @@ categories:
   - Data Engineering
   - Open Source
 tags:
-  - Change Data Capture
+  - Change Data Capture (CDC)
   - Debezium
   - Kafka Connect
   - Apache Kafka
@@ -17,15 +17,16 @@ tags:
   - SeaweedFS
   - odctl
   - dynamic-des
+  - Benchtop
 description: |
-  A dynamic-des simulation runs an online shop on PostgreSQL. Debezium streams every insert and update to Kafka, and an S3 sink saves the changes as files, all on a local odctl stack.
+  Capturing every insert and update in PostgreSQL without changing the application: Debezium streams the changes to Kafka, and an S3 sink connector saves them as files.
 ---
 
 Most databases change all day: users sign up, orders are placed, and each order moves from one status to the next. Change data capture (CDC) turns those changes into a stream of events that other systems can read as they happen. In this post, a simulated online shop writes to PostgreSQL in real time, Debezium streams every change to Kafka, and a sink connector saves the changes as files in object storage. Everything runs on your own machine.
 
 <!--more-->
 
-The shop's data model follows the [theLook eCommerce](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) dataset. The source code is in [benchtop/ecommerce-cdc](https://github.com/jaehyeon-kim/benchtop/tree/main/ecommerce-cdc).
+The shop's data model follows the [theLook eCommerce](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) dataset. The source code is in [benchtop/ecommerce-cdc](https://github.com/jaehyeon-kim/benchtop/tree/main/ecommerce-cdc). It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.
 
 ## What You Will Build
 
@@ -38,7 +39,7 @@ To start again at any point, `python -m ecommerce.stores.cleanup` removes everyt
 
 ## Architecture
 
-![](architecture.png)
+![Architecture: a simulated shop writes to PostgreSQL, Debezium streams the changes to Kafka, and an S3 sink saves them as files](architecture.png)
 
 The data moves in one direction: a simulation writes to PostgreSQL, Debezium reads the changes into Kafka topics, and the S3 sink writes the topics to files in SeaweedFS.
 
@@ -49,7 +50,7 @@ The data moves in one direction: a simulation writes to PostgreSQL, Debezium rea
 - **A replication slot** is PostgreSQL's record of how far a reader has got in the WAL. PostgreSQL keeps the part of the WAL the slot has not read yet, so Debezium can stop and carry on without losing a change.
 - **A publication** names the tables whose changes PostgreSQL sends. odctl's PostgreSQL has a publication, `cdc_pub`, that covers every table in the `cdc` schema.
 - **Aiven's S3 sink** is a sink connector. It reads the topics and writes their events to files in SeaweedFS, an object store with the same API as Amazon S3.
-- **dynamic-des** runs the simulation, a discrete-event model of the shop. [dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) is a Python library for simulations that stream their output.
+- **dynamic-des** runs the simulation, a discrete-event model of the shop. [dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/latest/architecture/connectors/)) is a Python library for simulations that stream their output.
 
 The simulation writes six tables in PostgreSQL's `cdc` schema:
 
@@ -439,3 +440,9 @@ odctl down --all --volumes          # answer y; --volumes also deletes the data
 deactivate
 rm -rf .venv
 ```
+
+## Related posts
+
+* [Change Data Capture (CDC) Local Development with PostgreSQL, Debezium Server and Pub/Sub Emulator](/blog/2024-11-07-cdc-local-dev) - change data capture from PostgreSQL with Debezium Server and a Pub/Sub emulator instead of Kafka Connect
+* [Data Lake Demo using Change Data Capture (CDC) on AWS - Part 1 Local Development](/blog/2021-12-05-datalake-demo-part1) - an earlier local setup with Debezium and an S3 sink connector on Kafka Connect, the start of a data lake series
+* [Defining Data-Streaming Simulations in YAML, Without Writing Python](/blog/2026-10-06-simulations-in-yaml-dynamic-des) - the simulation library that runs the shop, now configurable in plain YAML

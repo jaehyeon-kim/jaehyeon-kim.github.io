@@ -18,6 +18,7 @@ tags:
   - Contextual Bandits
   - Online Machine Learning
   - Recommender System
+  - Benchtop
 description: Apache Flink, Kafka and Valkey turn a contextual bandit recommender into an event driven service with stateful training and low latency inference.
 math: true # This post renders maths, so it needs the KaTeX bundle.
 ---
@@ -41,7 +42,7 @@ To move from prototype to production, we split the application into two distinct
 
 > **📂 Source Code for the Post**
 > 
-> The source code for this post is available in the **product-recommender** folder of the [benchtop](https://github.com/jaehyeon-kim/benchtop) GitHub repository.  
+> The source code for this post is available in the **product-recommender** folder of the [benchtop](https://github.com/jaehyeon-kim/benchtop) GitHub repository. It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.  
 
 ![The live client sends feedback to Kafka, the Flink job trains the models from it and from the history in SeaweedFS, and writes them to Valkey for the client to read](part-2.png#center "Architecture")
 
@@ -231,6 +232,10 @@ odctl down kafka-lite flink-full valkey
 ```
 
 Add `--volumes` to also remove `odctl-shared-deps`, the named volume holding the downloaded connector JARs. The next `odctl up` then re-runs the init container to repopulate it.
+
+## Related posts
+
+* [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning) - online machine learning on Flink and Kafka for an industrial digital twin, with drift detection and a shadow mode router
 
 ## Conclusion
 

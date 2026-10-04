@@ -17,9 +17,9 @@ tags:
   - rApache
 description: Deploy plumber, RServe and rApache APIs in Docker containers, then compare the three R API options on example requests and response performance.
 ---
-> **Status, September 2026.** This post deploys the APIs on R 3.4 through the `rocker/r-ver:3.4` image, and the rApache and Rserve builds it performs are pinned to versions that are no longer current. Use a current R image and serve the function with plumber instead.
-
 In [Part I](/blog/2017-11-18-api-development-with-r-1), it is discussed how to serve an R function with _plumber_, _Rserve_ and _rApache_. In this post, the APIs are deployed in a Docker container and, after showing example requests, their performance is compared. The [rocker/r-ver:3.4](https://hub.docker.com/r/rocker/r-ver/) is used as the base image and each of the APIs is added to it. For simplicity, the APIs are served by [Supervisor](https://supervisord.org/). For performance testing, [Locust](https://locust.io/) is used. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/r-api-demo).
+
+> **Status, September 2026.** This post deploys the APIs on R 3.4 through the `rocker/r-ver:3.4` image, and the rApache and Rserve builds it performs are pinned to versions that are no longer current. Use a current R image and serve the function with plumber instead.
 
 ## Deployment
 

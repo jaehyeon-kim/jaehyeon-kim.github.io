@@ -2,7 +2,7 @@
 title: "Learning MLOps with a Feature Store: A New Series"
 date: 2026-09-28
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:
@@ -20,10 +20,10 @@ tags:
   - odctl
   - dynamic-des
 description: |
-  I am teaching myself MLOps with Jim Dowling's book on feature stores, and rebuilding its three hands-on projects with open-source tools on a local odctl stack.
+  Learning MLOps hands-on: the three projects from Jim Dowling's feature store book, rebuilt with open source tools that run locally.
 ---
 
-I am teaching myself MLOps with Jim Dowling's [*Building Machine Learning Systems with a Feature Store*](https://www.oreilly.com/library/view/building-machine-learning/9781098165222/). This series follows that work: I rebuild the book's hands-on projects with open-source tools, running on my laptop.
+Learning MLOps one tool at a time leaves out the hard part: how features, training and serving fit together as one system. This series learns it by building complete systems. I follow Jim Dowling's [*Building Machine Learning Systems with a Feature Store*](https://www.oreilly.com/library/view/building-machine-learning/9781098165222/) and rebuild its hands-on projects with open-source tools, running on my laptop.
 
 <!--more-->
 
@@ -59,7 +59,7 @@ The book builds its projects on Hopsworks, a platform from the author's company 
 | Scheduling the pipelines | Apache Airflow |
 | Streaming features | Apache Kafka and Apache Flink |
 
-All of them run locally with [odctl](https://github.com/jaehyeon-kim/odctl), a command-line tool I built that starts an open data stack with Docker Compose, as introduced in an [earlier post](/blog/2026-07-16-odctl-open-data-stack/). The data comes from simulations built with [dynamic-des](https://github.com/jaehyeon-kim/dynamic-des), a Python library I built for discrete-event simulations that stream their output to Kafka, files and Iceberg. So every project runs offline, and nothing needs a cloud account.
+All of them run locally with [odctl](https://github.com/jaehyeon-kim/odctl), a command-line tool I built that starts an open data stack with Docker Compose, as introduced in an [earlier post](/blog/2026-07-16-odctl-open-data-stack/). The data comes from simulations built with [dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/latest/guides/backfill-then-live/)), a Python library I built for discrete-event simulations that stream their output to Kafka, files and Iceberg. So every project runs offline, and nothing needs a cloud account.
 
 ## What Comes Next
 

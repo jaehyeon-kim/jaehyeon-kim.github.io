@@ -16,9 +16,9 @@ cevo: 26
 description: Render multiple pages in an open source R Shiny application with htmlOutput and renderUI, including login and registration backed by a SQLite database.
 ---
 
-> **Status, September 2026.** The multi-page rendering shown here is a workaround for Shiny Open Source as it stood in 2016, so the package versions, the SQLite login flow and the linked example application are all historical. Check the current Shiny documentation before reusing any of it.
-
 R Shiny applications are served as a single page application and it is not built to render multiple pages. There are benefits of rendering multiple pages such as code management and implement authentication. In this page, we discuss how to implement multi-page rendering in a Shiny app.
+
+> **Status, September 2026.** The multi-page rendering shown here is a workaround for Shiny Open Source as it stood in 2016, so the package versions, the SQLite login flow and the linked example application are all historical. Check the current Shiny documentation before reusing any of it.
 
 As indicated above, Shiny is not designed to render multiple pages and, in general, the UI is rendered on the fly as defined in *ui.R* or *app.R*. However this is not the only way as the UI can be rendered as a html output using `htmlOutput()` in *ui.R* and `renderUI()` in *server.R*. In this post, rendering multiple pages will be illustrated using an [**example application**](https://github.com/jaehyeon-kim/shiny-multipage).
 

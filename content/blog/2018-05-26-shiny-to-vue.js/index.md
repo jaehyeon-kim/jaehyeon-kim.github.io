@@ -17,9 +17,9 @@ tags:
 description: Render htmlwidgets inside a Vue.js application, then replace those widgets with native JavaScript libraries for performance async Shiny cannot reach.
 ---
 
-> **Status, September 2026.** This post works around open source Shiny handling one user session's requests one after another. Shiny now provides `ExtendedTask`, which unblocks the session that started a long running operation, so rewriting an app in a JavaScript framework is no longer needed for that reason alone.
-
 In the [last post](/blog/2018-05-19-asyn-shiny-and-its-limitation), the async feature of Shiny was discussed. Although it is a remarkable step forward to web development in R, it is not to the full extent that a Javascript application can bring. In fact, (long running) requests of a user (or session) are not impacted by those of other users (or sessions) but, for a given user, all requests are handled sequentially. On the other hand, it is not the case for a Javascript-backed app where all requests are processed asynchronously.
+
+> **Status, September 2026.** This post works around open source Shiny handling one user session's requests one after another. Shiny now provides `ExtendedTask`, which unblocks the session that started a long running operation, so rewriting an app in a JavaScript framework is no longer needed for that reason alone.
 
 Although Javascript helps develop a more performant web app, for a Shiny developer, the downside is that key features that Shiny provides are no longer available. Some of them are built-in data binding, event handling and state management. For example, think about what `reactive*()` and `observe*()` do in a Shiny app. Although it is possible to implement those with plain Javascript or JQuery, it can be *problemsome* due to the aysnc nature of Javascript (eg [Callback Hell](https://callbackhell.com/)) or it may be ending up with a slow app (eg [Why do developers think the DOM is slow?](https://www.reddit.com/r/javascript/comments/6115ay/why_do_developers_think_the_dom_is_slow/)).
 

@@ -1,8 +1,8 @@
 ---
-title: "One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES v0.8.1"
+title: "One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES"
 date: 2026-05-25
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:
@@ -19,7 +19,8 @@ tags:
   - dynamic-des
   - SimPy
   - Python
-description: Dynamic DES v0.8.1 adds data lake integration, so one SimPy codebase writes batch Parquet data for ML training and streams live Kafka events.
+description: |
+  One simulation that writes Parquet for model training and streams Kafka events for live inference, so training and serving use the same simulation code.
 ---
 
 Training a machine learning model on simulated data is straightforward until you try to deploy it. The disconnect usually happens at the pipeline level: training requires massive, historical batch data (like Parquet files in an S3 bucket), but production inference requires real-time, event-driven streams (like Kafka or Redis). 
@@ -52,12 +53,13 @@ This provides an end-to-end data engineering toolkit for simulation-based Machin
 ## Related posts
 
 * [Building an Event-Driven Hybrid Digital Twin with dynamic-des](/blog/2026-04-28-digital-twin-dynamic-des) - the earlier release that turns a static SimPy model into a synchronized forecasting engine
-* [Dynamic DES v0.11.1: A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors) - the later release, which adds a declarative API and native Postgres and Redis connectors
+* [Dynamic DES: A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors) - the later release, which adds a declarative API and native Postgres and Redis connectors
 * [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning) - the Flink pipeline that learns online from the kind of stream this simulation feeds
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system) - the fast-forward clock used to fill an Iceberg lakehouse with Parquet data that an agent queries
 
 ## Try it out
 
 The v0.8.1 release and the new storage connectors are available now. You can view the source code and run the historical data generation example below.
 
 * **GitHub Repository:** [jaehyeon-kim/dynamic-des](https://github.com/jaehyeon-kim/dynamic-des)
-* **Documentation & Examples:** [Historical Data Generation Guide](https://jaehyeon.me/dynamic-des/latest/examples/imperative/history/)
+* **Documentation & Examples:** [Backfill Then Go Live guide](https://jaehyeon.me/dynamic-des/latest/guides/backfill-then-live/)

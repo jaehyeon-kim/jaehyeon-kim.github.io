@@ -11,7 +11,7 @@ categories:
   - Development
 tags: 
   - R
-description: In this post, a way to overcome one of R's limitations of lack of multi-threading is discussed by job queuing using the jobqueue package
+description: "Keep an R session responsive while long computations run in the background, by queuing them with the jobqueue package."
 ---
 
 Job queuing using the [jobqueue package](https://jobqueue.r-forge.r-project.org/), a generic asynchronous job queue implementation for R, is a way to overcome one of R's limitations (**lack of multi-threading**). See the package description below.

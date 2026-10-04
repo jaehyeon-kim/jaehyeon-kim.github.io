@@ -16,9 +16,9 @@ tags:
 description: Set up a two node Spark standalone cluster on VirtualBox Ubuntu guests, covering machine preparation, copying the VDI image and password-less SSH.
 ---
 
-> **Status, September 2026.** The Spark 1.6.0 download link used below no longer resolves, so the cluster cannot be built by following these commands as written. Download a current Spark release instead and adjust the paths and configuration file names to match it.
-
 We discuss how to set up a Spark cluser between 2 Ubuntu guests. Firstly it begins with machine preparation. Once a machine is baked, its image file (*VDI*) is be copied for the second one. Then how to launch a cluster by [standalone mode](https://spark.apache.org/docs/latest/spark-standalone.html) is discussed. Let's get started.
+
+> **Status, September 2026.** The Spark 1.6.0 download link used below no longer resolves, so the cluster cannot be built by following these commands as written. Download a current Spark release instead and adjust the paths and configuration file names to match it.
 
 ## Machine preparation 
 

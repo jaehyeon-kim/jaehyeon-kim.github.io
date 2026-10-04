@@ -14,9 +14,9 @@ tags:
 description: Download stock price data from Google in R and merge it into one data frame in memory, avoiding the slower route of saving each file to a local drive.
 ---
 
-> **Status, September 2026.** Google retired the `finance/historical` CSV endpoint that the URLs here point at, so reading those URLs no longer returns data. The in-memory read and merge pattern still holds if you point it at a price source that is still published.
-
 In an [earlier article](/blog/2014-11-20-download-stock-data-1), a way to download stock price data files from Google, save it into a local drive and merge them into a single data frame. If files are not large, however, it wouldn't be effective and, in this article, files are downloaded and merged internally.
+
+> **Status, September 2026.** Google retired the `finance/historical` CSV endpoint that the URLs here point at, so reading those URLs no longer returns data. The in-memory read and merge pattern still holds if you point it at a price source that is still published.
 
 ## R Packages Used
 

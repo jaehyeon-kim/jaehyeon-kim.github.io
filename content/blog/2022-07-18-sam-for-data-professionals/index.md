@@ -2,7 +2,7 @@
 title: Serverless Application Model (SAM) for Data Professionals
 date: 2022-07-18
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 # series:
@@ -18,9 +18,9 @@ tags:
 cevo: 14
 description: Build a serverless data processing app with AWS SAM. A Lambda function runs when an S3 object is created and gets its third party packages from a layer.
 ---
-> **Status, September 2026.** The `python3.7` runtime declared for the Lambda layer below reached end of support in AWS Lambda on 4 December 2023, and the `python3.8` function runtime followed on 14 October 2024. Build the layer and the function on a supported Python runtime such as `python3.13`.
-
 [AWS Lambda](https://aws.amazon.com/lambda/) provides serverless computing capabilities, and it can be used for performing validation or light processing/transformation of data. Moreover, with its integration with more than 140 AWS services, it facilitates building complex systems employing [event-driven architectures](https://docs.aws.amazon.com/lambda/latest/operatorguide/event-driven-architectures.html). There are many ways to build serverless applications and one of the most efficient ways is using specialised frameworks such as the [AWS Serverless Application Model (SAM)](https://aws.amazon.com/serverless/sam/) and [Serverless Framework](https://www.serverless.com/framework/docs). In this post, I’ll demonstrate how to build a serverless data processing application using SAM.
+
+> **Status, September 2026.** The `python3.7` runtime declared for the Lambda layer below reached end of support in AWS Lambda on 4 December 2023, and the `python3.8` function runtime followed on 14 October 2024. Build the layer and the function on a supported Python runtime such as `python3.13`.
 
 
 ## Architecture

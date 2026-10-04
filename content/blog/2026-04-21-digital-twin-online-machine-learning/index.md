@@ -46,7 +46,7 @@ Here is an overview of the architecture and the engineering challenges solved al
 
 The project is split into three highly decoupled domains:
 
-1. **Digital Twin (Python):** Utilizing the [Dynamic DES](https://github.com/jaehyeon-kim/dynamic-des) Python package, this layer generates synthetic rolling events, applies simulated mechanical wear, calculates theoretical/actual physics, and pushes the data to Kafka.
+1. **Digital Twin (Python):** Utilizing the [Dynamic DES](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/latest/getting-started/)) Python package, this layer generates synthetic rolling events, applies simulated mechanical wear, calculates theoretical/actual physics, and pushes the data to Kafka.
 2. **Message Broker (Kafka):** Handles the asynchronous, high-throughput streaming of prediction requests and delayed ground-truth target forces.
 3. **Stream Processor (Flink/Kotlin):** The core engine. It aligns asynchronous streams, trains the machine learning models dynamically, evaluates safety guardrails, and sinks metrics to ClickHouse for evaluation in real-time.
 
@@ -141,9 +141,10 @@ Simulates a pristine factory state, such as immediately after a maintenance shif
 ## Related posts
 
 * [Building an Event-Driven Hybrid Digital Twin with dynamic-des](/blog/2026-04-28-digital-twin-dynamic-des) - the simulation package behind the twin, built on the Switchboard pattern and dynamic topic routing.
-* [Dynamic DES v0.11.1: A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors) - the later release that adds a declarative API and native Postgres and Redis connectors.
+* [Dynamic DES: A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors) - the later release that adds a declarative API and native Postgres and Redis connectors.
 * [Why Digital Twins Are Rewiring Industry 4.0](/blog/2026-04-23-digital-twin-industry-4-0) - the architectural layers that separate a traditional simulation from an event-driven hybrid pipeline.
 * [Stream Processing with Flink in Kotlin](/blog/2025-12-10-streaming-processing-with-flink-in-kotlin) - more Flink examples in Kotlin, the language this pipeline is written in.
+* [Productionizing an Online Product Recommender using Event Driven Architecture](/blog/2026-02-23-productionize-recommender-with-eda) - a contextual bandit recommender trained and served online with Flink, Kafka and Valkey.
 
 ## Conclusion
 

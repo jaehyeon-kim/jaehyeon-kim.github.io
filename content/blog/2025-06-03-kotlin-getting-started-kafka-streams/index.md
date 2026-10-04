@@ -2,7 +2,7 @@
 title: Kafka Streams - Lightweight Real-Time Processing for Supplier Stats
 date: 2025-06-03
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:
@@ -16,6 +16,7 @@ tags:
   - Docker
   - Kafka UI
   - odctl
+  - Benchtop
 description: Kafka Streams in Kotlin aggregates Avro order events into tumbling window supplier statistics and handles late records with a custom extractor.
 ---
 
@@ -38,7 +39,7 @@ This project showcases a Kafka Streams application that:
 *   Aggregates order data to compute supplier statistics (total price and count) within defined time windows.
 *   Outputs the calculated statistics and late records to separate Kafka topics.
 
-The source code for the application discussed in this post can be found in the _orders-stats-streams_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams).
+The source code for the application discussed in this post can be found in the _orders-stats-streams_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams). It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.
 
 ### Build Configuration
 

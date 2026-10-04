@@ -2,7 +2,7 @@
 title: "Building an Event-Driven Hybrid Digital Twin with dynamic-des"
 date: 2026-04-29
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:
@@ -19,7 +19,8 @@ tags:
   - dynamic-des
   - SimPy
   - Python
-description: Turn a static model into a synchronized forecasting engine with dynamic-des, using the Switchboard pattern, mutable resources and dynamic topic routing.
+description: |
+  Keeping a simulation in step with live data: change a running SimPy model's parameters from Kafka and stream its events out, so it acts as a digital twin.
 ---
 
 ## Asynchronous Gap
@@ -30,7 +31,7 @@ If you have ever tried to build one of these systems from scratch, you immediate
 
 Standard simulation clocks (like those in traditional SimPy implementations) are logically synchronous and not designed to handle high-frequency asynchronous I/O without explicit decoupling. They step through logical time deterministically. Real-world telemetry (like a Kafka stream or a Redis Pub/Sub channel) is asynchronous and non-deterministic in arrival timing and ordering at the system level. If you naively wire a live data feed directly into a standard simulation loop, you will stall the simulation loop while awaiting network I/O. The simulation drifts from real-world time, making your live twin useless.
 
-To solve this, the compute layer must be explicitly decoupled from the network layer. This is the exact design problem the open-source [**`dynamic-des`**](https://github.com/jaehyeon-kim/dynamic-des) package addresses.
+To solve this, the compute layer must be explicitly decoupled from the network layer. This is the exact design problem the open-source [**`dynamic-des`**](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/latest/architecture/environment/)) package addresses.
 
 ## Core Architecture: Switchboard Pattern
 
@@ -221,3 +222,9 @@ By decoupling network I/O from the simulation clock, enforcing strict data schem
 This enables a new class of systems beyond static models and passive dashboards. You can build resilient, synchronized forecasting engines that adapt to reality the moment it changes.
 
 To explore the source code, view the full API documentation, or test out the zero-setup Docker examples, check out the [**`dynamic-des` repository on GitHub**](https://github.com/jaehyeon-kim/dynamic-des).
+
+## Related posts
+
+* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect) - the library running an online shop on PostgreSQL, with Debezium streaming every change
+* [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql) - the library playing a mobile game, with Flink SQL keeping leaderboards up to date
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system) - the library generating Parquet data for an Iceberg lakehouse that an agent queries

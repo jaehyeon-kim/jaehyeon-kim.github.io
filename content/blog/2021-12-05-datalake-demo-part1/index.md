@@ -2,7 +2,7 @@
 title: Data Lake Demo using Change Data Capture (CDC) on AWS - Part 1 Local Development
 date: 2021-12-05
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:
@@ -558,6 +558,7 @@ We can see the output file includes 4 JSON objects where the first object has NU
 ## Related posts
 
 * [Change Data Capture (CDC) Local Development with PostgreSQL, Debezium Server and Pub/Sub Emulator](/blog/2024-11-07-cdc-local-dev) - a later take on local CDC that uses Debezium Server instead of Kafka Connect.
+* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect) - a recent version of this setup, with Debezium and an S3 sink connector capturing changes from a simulated online shop.
 
 ## Conclusion
 

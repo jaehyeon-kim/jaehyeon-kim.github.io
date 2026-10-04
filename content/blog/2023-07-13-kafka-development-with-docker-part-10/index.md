@@ -18,6 +18,8 @@ tags:
 description: Authenticate Kafka clients with SASL instead of client certificates, with Java and Python client examples of the SASL mechanisms.
 ---
 
+In the previous post, we discussed TLS (SSL or TLS/SSL) authentication to improve security. It enforces two-way verification where a client certificate is verified by Kafka brokers. Client authentication can also be enabled by [Simple Authentication and Security Layer (SASL)](https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer), and we will discuss how to implement SASL authentication with Java and Python client examples in this post.
+
 [**UPDATE 2025-10-01**]
 
 Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
@@ -29,8 +31,6 @@ For example:
 * `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
 
 ---
-
-In the previous post, we discussed TLS (SSL or TLS/SSL) authentication to improve security. It enforces two-way verification where a client certificate is verified by Kafka brokers. Client authentication can also be enabled by [Simple Authentication and Security Layer (SASL)](https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer), and we will discuss how to implement SASL authentication with Java and Python client examples in this post.
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)

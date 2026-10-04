@@ -17,6 +17,8 @@ tags:
 description: The Apache Beam portability layer explained, with bash scripts that manage local Flink and Kafka clusters and a streaming pipeline on the Flink Runner.
 ---
 
+In this series, we discuss local development of [Apache Beam](https://beam.apache.org/) pipelines using Python. In the previous posts, we mainly talked about Batch pipelines with/without Beam SQL. Beam pipelines are portable between batch and streaming semantics, and we will discuss streaming pipeline development in this and the next posts. While there are multiple Beam Runners, not every Runner supports Python or some Runners have too limited features in streaming semantics - see [Beam Capability Matrix](https://beam.apache.org/documentation/runners/capability-matrix/) for details. So far, the Apache Flink and Google Cloud Dataflow Runners are the best options, and we will use the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) in this series. This post begins with demonstrating the *portability layer* of Apache Beam as it helps understand (1) how a pipeline developed by the Python SDK can be executed in the Flink Runner that only understands Java JAR and (2) how multiple SDKs can be used in a single pipeline. Then we discuss how to start up/tear down local Flink and Kafka clusters using bash scripts. Finally, we end up demonstrating a simple streaming pipeline, which reads and writes website visit logs from and to Kafka topics.
+
 [**UPDATE 2025-10-01**]
 
 Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
@@ -28,8 +30,6 @@ For example:
 * `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
 
 ---
-
-In this series, we discuss local development of [Apache Beam](https://beam.apache.org/) pipelines using Python. In the previous posts, we mainly talked about Batch pipelines with/without Beam SQL. Beam pipelines are portable between batch and streaming semantics, and we will discuss streaming pipeline development in this and the next posts. While there are multiple Beam Runners, not every Runner supports Python or some Runners have too limited features in streaming semantics - see [Beam Capability Matrix](https://beam.apache.org/documentation/runners/capability-matrix/) for details. So far, the Apache Flink and Google Cloud Dataflow Runners are the best options, and we will use the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) in this series. This post begins with demonstrating the *portability layer* of Apache Beam as it helps understand (1) how a pipeline developed by the Python SDK can be executed in the Flink Runner that only understands Java JAR and (2) how multiple SDKs can be used in a single pipeline. Then we discuss how to start up/tear down local Flink and Kafka clusters using bash scripts. Finally, we end up demonstrating a simple streaming pipeline, which reads and writes website visit logs from and to Kafka topics.
 
 * [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1)
 * [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2)

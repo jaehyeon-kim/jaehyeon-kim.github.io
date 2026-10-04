@@ -16,6 +16,8 @@ tags:
 description: Kafka producer and consumer applications written in Python with kafka-python, one of several open source alternatives to the Java clients.
 ---
 
+In the previous post, we discussed [Kafka Connect](https://kafka.apache.org/documentation/#connect) to stream data to/from a Kafka cluster. Kafka also includes the [Producer/Consumer APIs](https://kafka.apache.org/documentation/#api) that allow client applications to send/read streams of data to/from topics in a Kafka cluster. While the main Kafka project maintains only the Java clients, there are several [open source projects](https://cwiki.apache.org/confluence/display/KAFKA/Clients#Clients-Python) that provide the Kafka client APIs in Python. In this post, I'll demonstrate how to develop producer/consumer applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package.
+
 [**UPDATE 2025-10-01**]
 
 Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
@@ -27,8 +29,6 @@ For example:
 * `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
 
 ---
-
-In the previous post, we discussed [Kafka Connect](https://kafka.apache.org/documentation/#connect) to stream data to/from a Kafka cluster. Kafka also includes the [Producer/Consumer APIs](https://kafka.apache.org/documentation/#api) that allow client applications to send/read streams of data to/from topics in a Kafka cluster. While the main Kafka project maintains only the Java clients, there are several [open source projects](https://cwiki.apache.org/confluence/display/KAFKA/Clients#Clients-Python) that provide the Kafka client APIs in Python. In this post, I'll demonstrate how to develop producer/consumer applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package.
 
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)

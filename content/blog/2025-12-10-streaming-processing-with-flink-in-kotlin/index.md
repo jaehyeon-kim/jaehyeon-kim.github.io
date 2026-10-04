@@ -147,6 +147,7 @@ To launch the apps, use the `run` task and set the desired main class with the `
 * [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning) - a larger Flink and Kotlin application, adding online machine learning
 * [Kafka, Flink and DynamoDB for Real Time Fraud Detection](/blog/2023-08-10-fraud-detection-part-1) - a Flink application built locally on Docker with Kafka and DynamoDB
 * [Getting Started with PyFlink on AWS](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1) - the Python API whose limits led to this Kotlin rewrite, shown against a local Kafka cluster
+* [Flink DataStream API - Scalable Event Processing for Supplier Stats](/blog/2025-06-10-kotlin-getting-started-flink-datastream) - the DataStream API in Kotlin applied to Avro order events from Kafka, with watermarks and late records
 
 ## Conclusion
 

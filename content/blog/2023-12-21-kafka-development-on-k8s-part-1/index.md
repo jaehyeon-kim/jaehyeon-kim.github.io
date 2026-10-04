@@ -2,7 +2,7 @@
 title: Kafka Development on Kubernetes - Part 1 Cluster Setup
 date: 2023-12-21
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:

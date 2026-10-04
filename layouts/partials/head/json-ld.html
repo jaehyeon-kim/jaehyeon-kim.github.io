@@ -1,0 +1,34 @@
+{{- /*
+  schema.org structured data. Posts in the main sections get a BlogPosting, so search
+  engines can read the headline, dates, author and image without parsing the page.
+  The home page gets the Person it belongs to. Built as a dict and passed through
+  jsonify, so titles and descriptions are escaped as JSON rather than by hand.
+  Called from hooks/head-end.html.
+*/ -}}
+{{- $author := dict "@type" "Person" "name" site.Author.name "url" site.BaseURL }}
+{{- if and .IsPage (in site.Params.mainSections .Section) }}
+  {{- $data := dict
+    "@context" "https://schema.org"
+    "@type" "BlogPosting"
+    "headline" .Title
+    "description" (trim (.Description | default .Summary | plainify) " \n")
+    "datePublished" (.Date.Format "2006-01-02T15:04:05Z07:00")
+    "dateModified" (.Lastmod.Format "2006-01-02T15:04:05Z07:00")
+    "author" $author
+    "url" .Permalink
+    "mainEntityOfPage" .Permalink
+  }}
+  {{- with partialCached "functions/featured-img" . . }}
+    {{- $data = merge $data (dict "image" .Permalink) }}
+  {{- end }}
+  {{- with .Params.tags }}
+    {{- $data = merge $data (dict "keywords" .) }}
+  {{- end }}
+<script type="application/ld+json">{{ $data | jsonify | safeJS }}</script>
+{{- else if .IsHome }}
+  {{- $sameAs := slice }}
+  {{- with site.Author.social.github }}{{ $sameAs = $sameAs | append (printf "https://github.com/%s" .) }}{{ end }}
+  {{- with site.Author.social.linkedin }}{{ $sameAs = $sameAs | append (printf "https://www.linkedin.com/in/%s" .) }}{{ end }}
+  {{- $data := merge (dict "@context" "https://schema.org" "description" site.Author.bio "sameAs" $sameAs) $author }}
+<script type="application/ld+json">{{ $data | jsonify | safeJS }}</script>
+{{- end }}

@@ -1,5 +1,5 @@
 ---
-title: "Live Game Leaderboards with Kafka, Flink SQL and a Discrete-Event Simulation"
+title: "Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL"
 date: 2026-10-02
 draft: false
 featured: true
@@ -16,15 +16,16 @@ tags:
   - NiceGUI
   - odctl
   - dynamic-des
+  - Benchtop
 description: |
-  A dynamic-des simulation plays a mobile game and sends each score to Kafka. Four Flink SQL jobs keep four top 10 leaderboards up to date in PostgreSQL, and a NiceGUI dashboard shows them as they change.
+  Keeping top 10 leaderboards up to date as game scores arrive: four Flink SQL jobs read the scores from Kafka and keep the rankings in PostgreSQL, and a web dashboard shows them as they change.
 ---
 
 A mobile game produces a score every time a player finishes a round, and players expect the leaderboards to move as they play. In this post, a simulation plays the game and sends each score to Kafka. Four Flink SQL jobs keep four top 10 leaderboards up to date in PostgreSQL, and a web dashboard shows them as they change. Everything runs on your own machine.
 
 <!--more-->
 
-The source code is in [benchtop/game-leaderboard](https://github.com/jaehyeon-kim/benchtop/tree/main/game-leaderboard).
+The source code is in [benchtop/game-leaderboard](https://github.com/jaehyeon-kim/benchtop/tree/main/game-leaderboard). It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.
 
 ## What You Will Build
 
@@ -47,9 +48,9 @@ The four leaderboards:
 
 ## Architecture
 
-![](architecture.png)
+![Architecture: a simulated game sends scores to Kafka, Flink SQL jobs keep leaderboards in PostgreSQL, and a dashboard shows them](architecture.png)
 
-1. **Events.** A simulation built with [dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) plays the game in real time. dynamic-des is a Python library for simulations that stream their output. Each score is published to the Kafka topic `game-scores` in Avro, a compact binary format whose schema is kept in a schema registry.
+1. **Events.** A simulation built with [dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/latest/getting-started/)) plays the game in real time. dynamic-des is a Python library for simulations that stream their output. Each score is published to the Kafka topic `game-scores` in Avro, a compact binary format whose schema is kept in a schema registry.
 2. **Leaderboards.** Four Flink SQL jobs, one per leaderboard, read the topic and compute the leaderboards. Flink is a stream processor. It keeps each query's result up to date as events arrive, rather than running the query once.
 3. **Storage.** Each job writes its leaderboard to a PostgreSQL table with one row per rank. When the team or player at a rank changes, Flink updates that row.
 4. **Dashboard.** A [NiceGUI](https://nicegui.io/) web page reads the four tables and redraws them every 2 seconds. NiceGUI is a Python library for web pages. The page shows the current leaderboards as soon as it opens, because the tables always hold the latest state.
@@ -439,3 +440,9 @@ odctl down --all --volumes          # answer y; --volumes also deletes the data
 deactivate
 rm -rf .venv
 ```
+
+## Related posts
+
+* [Run Flink SQL Cookbook in Docker](/blog/2025-04-15-sql-cookbook) - more Flink SQL queries, from simple selects to windows and joins, run on a local cluster
+* [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](/blog/2025-06-17-kotlin-getting-started-flink-table) - a windowed aggregation over Kafka records with the Flink Table API, the code form of these SQL queries
+* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect) - another Benchtop project on the same simulation library, streaming database changes from PostgreSQL to Kafka

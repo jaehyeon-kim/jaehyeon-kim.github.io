@@ -1,8 +1,8 @@
 ---
-title: "Dynamic DES v0.11.1: A Declarative API with Postgres and Redis Connectors"
+title: "Dynamic DES: A Declarative API with Postgres and Redis Connectors"
 date: 2026-07-17
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:
@@ -19,10 +19,11 @@ tags:
   - Redis
   - PostgreSQL
   - Python
-description: Dynamic DES v0.11.1 adds a declarative SimulationContext API, native Postgres and Redis ingress and egress connectors, and broader object storage.
+description: |
+  Generating test data that changes while it runs: SimPy simulations written with a declarative API that read settings from and write events to PostgreSQL and Redis.
 ---
 
-A while back I wrote about [Dynamic DES v0.8.1](/blog/2026-05-25-dynamic-des-parquet-support/) and its native Data Lake integration, using one SimPy codebase for both batch training and live inference. Several releases later, the project has grown in two directions that matter for anyone building event-driven digital twins: a cleaner authoring experience, and more places to send and receive data.
+Simulated data is most useful when the code that produces it is easy to read, and when it reaches the same places as production data, such as a PostgreSQL table or a Redis stream. Since I wrote about [Dynamic DES v0.8.1](/blog/2026-05-25-dynamic-des-parquet-support/) and its data lake support, the project has grown in both directions: a cleaner way to write a simulation, and more places to send and receive data.
 
 Here is what changed on the way to **v0.11.1**.
 
@@ -121,6 +122,11 @@ Events carry discrete lifecycle transitions such as a task arriving, queuing, or
 ## Stability
 
 The v0.11.1 patch closed out threading race conditions in the egress providers during environment teardown. When a simulation shuts down, the background I/O threads now drain and stop cleanly instead of racing the main thread, which matters for both test suites and long-running twins.
+
+## Related posts
+
+* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect) - the Postgres connector in use: a simulated shop writes its tables, and Debezium streams every change to Kafka
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system) - the library generating a lakehouse dataset that an agent queries through a semantic layer
 
 ## Try It Out
 

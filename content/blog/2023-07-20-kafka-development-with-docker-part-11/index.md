@@ -17,6 +17,8 @@ tags:
 description: Control user access to Kafka resources with authorization rules, keeping SASL for client authentication, with Java and Python client examples.
 ---
 
+In the previous posts, we discussed how to implement client authentication by TLS (SSL or TLS/SSL) and SASL authentication. One of the key benefits of client authentication is achieving user access control. Kafka ships with a pluggable, out-of-the box authorization framework, which is configured with the *authorizer.class.name* property in the server configuration and stores Access Control Lists (ACLs) in the cluster metadata (either Zookeeper or the KRaft metadata log). In this post, we will discuss how to configure Kafka authorization with Java and Python client examples while SASL is kept for client authentication.
+
 [**UPDATE 2025-10-01**]
 
 Bitnami's public Docker images have been moved to the [**Bitnami Legacy**](https://hub.docker.com/u/bitnamilegacy) repository. To ensure continued access and compatibility, please update your Docker image references accordingly.
@@ -28,8 +30,6 @@ For example:
 * `bitnami/python:3.9.0` → `bitnamilegacy/python:3.9.0`
 
 ---
-
-In the previous posts, we discussed how to implement client authentication by TLS (SSL or TLS/SSL) and SASL authentication. One of the key benefits of client authentication is achieving user access control. Kafka ships with a pluggable, out-of-the box authorization framework, which is configured with the *authorizer.class.name* property in the server configuration and stores Access Control Lists (ACLs) in the cluster metadata (either Zookeeper or the KRaft metadata log). In this post, we will discuss how to configure Kafka authorization with Java and Python client examples while SASL is kept for client authentication.
 
 * [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
 * [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)

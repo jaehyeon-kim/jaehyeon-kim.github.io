@@ -2,7 +2,7 @@
 title: Flink Table API - Declarative Analytics for Supplier Stats in Real Time
 date: 2025-06-17
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:
@@ -12,10 +12,12 @@ categories:
 tags: 
   - Apache Kafka
   - Kafka Streams
+  - Apache Flink
   - Kotlin
   - Docker
   - Kafka UI
   - odctl
+  - Benchtop
 description: Flink Table API in Kotlin states the supplier statistics as a declarative windowed aggregation over a DataStream, with late rows routed by hand.
 ---
 
@@ -39,7 +41,7 @@ We develop a Flink application that uses Flink's Table API and SQL-like expressi
 *   Splits the stream to route late-arriving records to a separate "skipped" topic for analysis.
 *   Sinks the aggregated results to a Kafka topic using the built-in `avro-confluent` format connector.
 
-The source code for the application discussed in this post can be found in the _orders-stats-flink_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams).
+The source code for the application discussed in this post can be found in the _orders-stats-flink_ folder of this [**GitHub repository**](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams). It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.
 
 ### Build Configuration
 
@@ -856,6 +858,12 @@ Next, open the `orders-avro-ktl-skipped` topic's **Messages** tab in Kafka UI:
 These records were intercepted and rerouted by our custom `LateDataRouter` `ProcessFunction`. This manual step was necessary to separate late data before converting the stream to a `Table`, demonstrating a powerful pattern of blending Flink's APIs to solve complex requirements.
 
 ![Kafka UI messages tab of the orders-avro-ktl-skipped topic, the newest record expanded to show the order fields and late set to true](skipped.png#center "Late order records on the orders-avro-ktl-skipped topic")
+
+## Related posts
+
+* [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql) - Flink SQL jobs that rank game scores from Kafka, the same declarative approach written as SQL
+* [Run Flink SQL Cookbook in Docker](/blog/2025-04-15-sql-cookbook) - recipes for Flink SQL, the SQL counterpart of the Table API, on a local cluster
+* [Stream Processing with Flink in Kotlin](/blog/2025-12-10-streaming-processing-with-flink-in-kotlin) - more Flink examples in Kotlin, ported from the book Stream Processing with Apache Flink
 
 ## Conclusion
 

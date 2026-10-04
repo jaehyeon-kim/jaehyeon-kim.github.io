@@ -17,6 +17,7 @@ tags:
   - Recommender System
   - MABWiser
   - Mab2Rec
+  - Benchtop
 description: A Python prototype of a contextual multi-armed bandit recommender that simulates user behaviour and validates the algorithm against cold-start users.
 ---
 
@@ -87,7 +88,7 @@ $ source venv/bin/activate
 
 > **📂 Source Code for the Post**
 > 
-> The source code for this post is available in the **product-recommender** folder of the [benchtop](https://github.com/jaehyeon-kim/benchtop) GitHub repository.  
+> The source code for this post is available in the **product-recommender** folder of the [benchtop](https://github.com/jaehyeon-kim/benchtop) GitHub repository. It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.  
 
 ## Data Generation
 
@@ -412,6 +413,10 @@ Across 30 simulated visits, CTR reached **53%**.
 This elevated CTR indicates that the model has internalized dominant temporal and demographic patterns encoded in the simulation. It aggressively exploits strong signals such as weekend pizza and morning coffee while still exploring less-certain regions.
 
 Importantly, the simulation includes realistic noise. Even strong recommendations do not always convert, reflecting probabilistic user behavior.
+
+## Related posts
+
+* [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning) - another online learning system, where a model learns on Flink as machinery wears and detects concept drift
 
 ## What's Next?
 

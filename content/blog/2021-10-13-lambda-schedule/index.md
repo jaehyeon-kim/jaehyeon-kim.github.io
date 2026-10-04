@@ -20,9 +20,9 @@ cevo: 3
 description: Schedule an AWS Lambda function more often than once a minute, using Amazon SQS to get past the one invocation per minute limit of EventBridge rules.
 ---
 
-> **Status, September 2026.** The `nodejs12.x` runtime in the serverless.yml below reached end of support in AWS Lambda on 31 March 2023, and Lambda now blocks function creation and updates on it. Deploy the same code on a supported Node.js runtime such as `nodejs24.x`.
-
 [Triggering a Lambda function by an EventBridge Events rule](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-run-lambda-schedule.html) can be used as a _serverless _replacement of [cron job](https://en.wikipedia.org/wiki/Cron). The highest frequency of it is one invocation per minute so that it cannot be used directly if you need to schedule a Lambda function more frequently. For example, it may be refreshing an application with real time metrics from an Amazon Connect instance where [some metrics are updated every 15 seconds](https://docs.aws.amazon.com/connect/latest/adminguide/real-time-metrics-reports.html). There is a [post in the AWS Architecture Blog](https://aws.amazon.com/blogs/architecture/a-serverless-solution-for-invoking-aws-lambda-at-a-sub-minute-frequency/), and it suggests using [AWS Step Functions](https://aws.amazon.com/step-functions/). Or a usual recommendation is using [Amazon EC2](https://stackoverflow.com/questions/35878619/scheduled-aws-lambda-task-at-less-than-1-minute-frequency). Albeit being _serverless_, the former gets a bit complicated especially in order to [handle the hard quota of 25,000 entries in the execution history](https://docs.aws.amazon.com/step-functions/latest/dg/tutorial-continue-new.html). And the latter is not an option if you look for a _serverless_ solution. In this post, I’ll demonstrate another _serverless_ solution of scheduling a Lambda function at a sub-minute frequency using [Amazon SQS](https://aws.amazon.com/sqs/).
+
+> **Status, September 2026.** The `nodejs12.x` runtime in the serverless.yml below reached end of support in AWS Lambda on 31 March 2023, and Lambda now blocks function creation and updates on it. Deploy the same code on a supported Node.js runtime such as `nodejs24.x`.
 
 
 ## Architecture

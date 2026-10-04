@@ -2,7 +2,7 @@
 title: Guide to Running DBT in Production
 date: 2024-09-13
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 series:

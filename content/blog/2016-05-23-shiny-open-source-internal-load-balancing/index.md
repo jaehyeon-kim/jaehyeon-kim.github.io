@@ -12,10 +12,8 @@ categories:
 tags: 
   - R Shiny
   - R
-description: In this post, a simple way of internal load balancing is demonstrated by redirecting multiple same applications, depending on the number of processes binded to them
+description: "Spread users of an open source Shiny Server app across copies of the same app, by sending each new session to the copy with the fewest users."
 ---
-
-> **Status, September 2026.** This post works around the 2016 open source Shiny Server by redirecting sessions between copies of the same application, and the `top`, `netstat` and `lsof` monitoring it relies on is tied to that server layout. Read it as background on the load balancing problem rather than as a deployment recipe.
 
 Shiny is an interesting web framework that helps create a web application quickly. If it targets a large number of users, however, there are several limitations and it is so true when the open source version of Shiny is in use. It would be possible to tackle down some of the limitations with the enterprise version but it is not easy to see enough examples of Shiny applications in production environment. While whether Shiny can be used in production environment is a controversial issue, this series of posts illustrate some ways to use **open source Shiny** a bit more wisely. Specifically the following topics are going to be covered.
 
@@ -25,6 +23,8 @@ Shiny is an interesting web framework that helps create a web application quickl
     - An application is served as a single-page web application and thus it is not built to render multiple pages. Application code could be easier to manage if code is split by different pages. Moreover it is highly desirable to implement authentication.
 + Running with a Proxy and SSL configuration for HTTPS
     - By default, an application is served by HTTP with port 3838. A useful use case to serve a Shiny application via HTTPS is it can be integrated with a Tableau dashboard.
+
+> **Status, September 2026.** This post works around the 2016 open source Shiny Server by redirecting sessions between copies of the same application, and the `top`, `netstat` and `lsof` monitoring it relies on is tied to that server layout. Read it as background on the load balancing problem rather than as a deployment recipe.
 
 In this post, a simple way of **internal load balancing** is demonstrated by *redirecting multiple same applications, depending on the number of processes binded to them* - this is originally from [Huidong Tian's blog](http://withr.me/a-shiny-app-serves-as-shiny-server-load-balancer/).
 

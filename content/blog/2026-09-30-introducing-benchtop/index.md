@@ -1,8 +1,8 @@
 ---
-title: "Introducing Benchtop: Data Streaming and Machine Learning Projects You Can Run Locally"
+title: "Data Streaming and Machine Learning Projects That Run on Your Laptop"
 date: 2026-09-30
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 categories:
@@ -15,11 +15,12 @@ tags:
   - MLOps
   - odctl
   - dynamic-des
+  - Benchtop
 description: |
-  Introducing Benchtop, a collection of small, hands-on demos for data engineering, stream processing, machine learning, AI engineering and MLOps. Each one runs locally on the odctl stack from a fresh clone, and explains the ideas behind the system it builds.
+  Small data engineering, stream processing, machine learning and MLOps projects that run on a laptop from a fresh clone, each explaining the system it builds.
 ---
 
-[Benchtop](https://github.com/jaehyeon-kim/benchtop) is a collection of small, hands-on demos for data engineering, stream processing, machine learning, AI engineering and MLOps. Each demo runs locally on the odctl stack, and works from a fresh clone of the repository, with nothing to install beforehand but Docker and uv. Each one builds a working system from open-source tools and explains the ideas behind it, so you learn a tool by running it rather than only reading about it.
+Reading about a data tool only goes so far. The hard part is getting several tools to run together and seeing how data moves between them. [Benchtop](https://github.com/jaehyeon-kim/benchtop) is a collection of small, hands-on demos for data engineering, stream processing, machine learning, AI engineering and MLOps. Each demo runs locally on the odctl stack, and works from a fresh clone of the repository, with nothing to install beforehand but Docker and uv. Each one builds a working system from open-source tools and explains the ideas behind it, so you learn a tool by running it rather than only reading about it.
 
 <!--more-->
 
@@ -38,7 +39,7 @@ Two tools of mine sit underneath every project.
 
 [odctl](https://github.com/jaehyeon-kim/odctl) starts an open data stack with Docker Compose, as introduced in an [earlier post](/blog/2026-07-16-odctl-open-data-stack/). Each project starts only the services it needs, such as PostgreSQL, Kafka, Flink or Valkey, with one command like `odctl up kafka-lite flink-lite postgres`. The same addresses and credentials work in every project, so there is nothing to configure.
 
-[dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) is a Python library for discrete-event simulations that stream their output to Kafka, PostgreSQL and Iceberg. Most projects use it to produce their data: a shop where visitors arrive, browse and buy, or a game where players join teams and score. Its parameters can change while it runs, so you can double the visitors or send the warehouse pickers home, and watch the rest of the system respond.
+[dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/)) is a Python library for discrete-event simulations that stream their output to Kafka, PostgreSQL and Iceberg. Most projects use it to produce their data: a shop where visitors arrive, browse and buy, or a game where players join teams and score. Its parameters can change while it runs, so you can double the visitors or send the warehouse pickers home, and watch the rest of the system respond.
 
 ## Projects
 

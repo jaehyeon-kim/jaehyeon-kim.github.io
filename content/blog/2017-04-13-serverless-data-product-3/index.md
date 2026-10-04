@@ -18,9 +18,9 @@ tags:
 description: Expose an R machine learning model packaged in AWS Lambda through Amazon API Gateway, giving the model a callable HTTP endpoint on AWS.
 ---
 
-> **Status, September 2026.** The Amazon API Gateway console has been redesigned since these screenshots were taken, so the Actions menu and the method configuration pages below no longer match it. Resources, methods and deployments are now created from buttons on the API pages themselves.
-
 In [Part I](/blog/2017-04-08-serverless-data-product-1) of this series, R and necessary libraries/packages together with a Lambda function handler are packaged and saved to [Amazon S3](https://aws.amazon.com/s3/). Then, in [Part II](/blog/2017-04-11-serverless-data-product-2), the package is deployed at [AWS Lambda](https://aws.amazon.com/lambda/) after creating and assigning a role to the Lambda function. Although the Lambda function can be called via the Invoke API, it'll be much more useful if the function can be called as a web service (or API). In this post, it is discussed how to expose the Lambda function via [Amazon API Gateway](https://aws.amazon.com/api-gateway/). After creating an API by integrating the Lambda function, it is protected with an API key. Finally a custom domain name is used as an alternative URL of the API.
+
+> **Status, September 2026.** The Amazon API Gateway console has been redesigned since these screenshots were taken, so the Actions menu and the method configuration pages below no longer match it. Resources, methods and deployments are now created from buttons on the API pages themselves.
 
 * Backend
     * [Part I - Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1)

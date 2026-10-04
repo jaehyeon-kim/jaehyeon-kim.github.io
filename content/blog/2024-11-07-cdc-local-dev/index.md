@@ -2,7 +2,7 @@
 title: Change Data Capture (CDC) Local Development with PostgreSQL, Debezium Server and Pub/Sub Emulator
 date: 2024-11-07
 draft: false
-featured: true
+featured: false
 comment: true
 toc: true
 # series:
@@ -481,3 +481,4 @@ python ps_sub.py -t demo.ecommerce.orders
 * [Data Lake Demo with CDC - Part 1 Local Development](/blog/2021-12-05-datalake-demo-part1) - the Kafka Connect version of this local setup, with Debezium and an S3 sink connector
 * [Data Lake Demo with CDC - Part 2 Implement CDC](/blog/2021-12-12-datalake-demo-part2) - the same change data capture running on Amazon MSK and MSK Connect
 * [Data Lake Demo with CDC - Part 3 Implement Data Lake](/blog/2021-12-19-datalake-demo-part3) - what to do with the captured changes, using Hudi on EMR and Athena
+* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect) - the Kafka Connect version on a simulated online shop, with Debezium streaming changes to Kafka and an S3 sink saving them
