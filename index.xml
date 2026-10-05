@@ -46,7 +46,11 @@
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">4&lt;/span>&lt;span class="cl">
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">5&lt;/span>&lt;span class="cl">&lt;span class="c1"># Override run.until, in seconds or as a duration such as &amp;#34;2 min&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">6&lt;/span>&lt;span class="cl">ddes run local.yaml --until &lt;span class="m">30&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The &lt;a href="https://jaehyeon.me/dynamic-des/">documentation&lt;/a> has the full reference. The &lt;code>ddes&lt;/code> command comes with the core package. Typer and PyYAML are now core dependencies, so no extra is needed to run a blueprint. From Python, &lt;code>SimulationContext.from_yaml(&amp;quot;local.yaml&amp;quot;)&lt;/code> returns the same simulation as a builder you can extend.&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;picture>&lt;img class="img-fluid " alt="Downloading local.yaml, printing it and running it with ddes, with events and telemetry streaming until the run is stopped" src="https://jaehyeon.me/blog/2026-10-06-simulations-in-yaml-dynamic-des/local-yaml-run.gif" loading="lazy" width="1100" height="680" />
+&lt;/picture>
+
+&lt;/p>
+&lt;p>The &lt;a href="https://jaehyeon.me/dynamic-des/">documentation&lt;/a> has the full reference. The &lt;code>ddes&lt;/code> command comes with the core package. Typer and PyYAML are now core dependencies, so no extra is needed to run a blueprint. From Python, &lt;code>SimulationContext.from_yaml(&amp;quot;local.yaml&amp;quot;)&lt;/code> returns the same simulation as a builder you can extend.&lt;/p>
 &lt;p>The file is checked before the run starts. An unknown key, a task that names a missing service, or a scenario path that does not exist is reported with the file name and the line number.&lt;/p>
 
 &lt;h2 id="what-a-blueprint-can-express" data-numberify>What a Blueprint Can Express&lt;a class="anchor ms-1" href="#what-a-blueprint-can-express" aria-label="Link to this section: What a Blueprint Can Express">&lt;/a>&lt;/h2>
