@@ -168,7 +168,10 @@ The [documentation](https://jaehyeon.me/dynamic-des/) was reorganised around tho
 
 ## Related Posts
 
-The simulations in two recent posts feed real pipelines: [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/) and [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql/). [Why Digital Twins Are Rewiring Industry 4.0](/blog/2026-04-23-digital-twin-industry-4-0/) explains where a simulation like this fits in a digital twin. [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system/) uses dynamic-des to fill an Iceberg lakehouse with the data an agent queries.
+* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/) - a simulated shop feeding a change data capture pipeline
+* [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql/) - a simulated mobile game feeding Flink SQL leaderboards
+* [Why Digital Twins Are Rewiring Industry 4.0](/blog/2026-04-23-digital-twin-industry-4-0/) - where a simulation like this fits in a digital twin
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system/) - dynamic-des filling an Iceberg lakehouse with the data an agent queries
 
 ## Try It Out
 
