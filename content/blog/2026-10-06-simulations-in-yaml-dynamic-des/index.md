@@ -83,6 +83,8 @@ ddes run local.yaml
 ddes run local.yaml --until 30
 ```
 
+![Downloading local.yaml, printing it and running it with ddes, with events and telemetry streaming until the run is stopped](local-yaml-run.gif)
+
 The [documentation](https://jaehyeon.me/dynamic-des/) has the full reference. The `ddes` command comes with the core package. Typer and PyYAML are now core dependencies, so no extra is needed to run a blueprint. From Python, `SimulationContext.from_yaml("local.yaml")` returns the same simulation as a builder you can extend.
 
 The file is checked before the run starts. An unknown key, a task that names a missing service, or a scenario path that does not exist is reported with the file name and the line number.
