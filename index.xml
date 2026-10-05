@@ -122,7 +122,12 @@
 &lt;/ul>
 
 &lt;h2 id="related-posts" data-numberify>Related Posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related Posts">&lt;/a>&lt;/h2>
-&lt;p>The simulations in two recent posts feed real pipelines: &lt;a href="https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/">Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect&lt;/a> and &lt;a href="https://jaehyeon.me/blog/2026-10-02-game-leaderboard-flink-sql/">Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL&lt;/a>. &lt;a href="https://jaehyeon.me/blog/2026-04-23-digital-twin-industry-4-0/">Why Digital Twins Are Rewiring Industry 4.0&lt;/a> explains where a simulation like this fits in a digital twin. &lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> uses dynamic-des to fill an Iceberg lakehouse with the data an agent queries.&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/">Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect&lt;/a> - a simulated shop feeding a change data capture pipeline&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-02-game-leaderboard-flink-sql/">Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL&lt;/a> - a simulated mobile game feeding Flink SQL leaderboards&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-23-digital-twin-industry-4-0/">Why Digital Twins Are Rewiring Industry 4.0&lt;/a> - where a simulation like this fits in a digital twin&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - dynamic-des filling an Iceberg lakehouse with the data an agent queries&lt;/li>
+&lt;/ul>
 
 &lt;h2 id="try-it-out" data-numberify>Try It Out&lt;a class="anchor ms-1" href="#try-it-out" aria-label="Link to this section: Try It Out">&lt;/a>&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">&lt;span class="c1"># Core library and the ddes command&lt;/span>
