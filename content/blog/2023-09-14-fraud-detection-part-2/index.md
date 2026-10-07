@@ -22,7 +22,7 @@ description: Deploy the Kafka, Flink and DynamoDB fraud detection app to Amazon 
 ---
 This series aims to help those who are new to [Apache Flink](https://flink.apache.org/) and [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/) by re-implementing a simple fraud detection application that is discussed in an AWS workshop titled [AWS Kafka and DynamoDB for real time fraud detection](https://catalog.us-east-1.prod.workshops.aws/workshops/ad026e95-37fd-4605-a327-b585a53b1300/en-US). In part 1, I demonstrated how to develop the application locally, and the app will be deployed via *Amazon Managed Service for Apache Flink* in this post.
 
-* [Part 1 Local Development](/blog/2023-08-10-fraud-detection-part-1)
+* [Part 1 Local Development](/blog/2023-08-10-fraud-detection-part-1/)
 * [Part 2 Deployment via AWS Managed Flink](#) (this post)
 
 [**Update 2023-08-30**] Amazon Kinesis Data Analytics is renamed into [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/). In this post, Kinesis Data Analytics (KDA) and Amazon Managed Service for Apache Flink will be used interchangeably.
@@ -40,7 +40,7 @@ The infrastructure resources are created using Terraform. The source can be foun
 
 #### Flink Application and Kafka Connector Packages
 
-The Flink application has multiple jar dependencies as the Kafka cluster is authenticated via IAM. Therefore, the jar files have to be combined into a single Uber jar file because KDA does not allow you to specify multiple pipeline jar files. The details about how to create the custom jar file can be found in [this post](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2). Also, the Camel DynamoDB sink connector needs to be packaged into a zip file, and it can be performed after downloading the binaries from the Maven repository.
+The Flink application has multiple jar dependencies as the Kafka cluster is authenticated via IAM. Therefore, the jar files have to be combined into a single Uber jar file because KDA does not allow you to specify multiple pipeline jar files. The details about how to create the custom jar file can be found in [this post](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2/). Also, the Camel DynamoDB sink connector needs to be packaged into a zip file, and it can be performed after downloading the binaries from the Maven repository.
 
 The following script (*build.sh*) creates the Flink app and Kafka connector packages. For the former, it builds the Uber Jar file, followed by downloading the *kafka-python* package, creating a zip file that can be used to deploy the Flink app via KDA. Note that, although the Flink app does not need the *kafka-python* package, it is added in order to check if `--pyFiles` option works.
 
@@ -135,7 +135,7 @@ networks:
 
 ### VPC and VPN
 
-A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*infra/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*infra/vpn.tf*). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in [this post](/blog/2022-02-06-dev-infra-terraform).
+A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*infra/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*infra/vpn.tf*). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in [this post](/blog/2022-02-06-dev-infra-terraform/).
 
 ### MSK Cluster
 
@@ -719,7 +719,7 @@ Once deployed, we can see the application on AWS console, and it stays in the re
 
 ### Camel DynamoDB Sink Connector
 
-The connector is configured to write messages from the *flagged-transactions* topic into the DynamoDB table created earlier. It requires to specify the table name, AWS region, operation, write capacity and whether to use the [default credential provider](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) - see the [documentation](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) for details. See [this post](/blog/2023-07-03-kafka-connect-for-aws-part-3) for details about how to set up the sink connector.
+The connector is configured to write messages from the *flagged-transactions* topic into the DynamoDB table created earlier. It requires to specify the table name, AWS region, operation, write capacity and whether to use the [default credential provider](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) - see the [documentation](https://camel.apache.org/camel-kafka-connector/latest/reference/connectors/camel-aws-ddb-sink-kafka-sink-connector.html) for details. See [this post](/blog/2023-07-03-kafka-connect-for-aws-part-3/) for details about how to set up the sink connector.
 
 ```terraform
 # infra/msk-connect.tf
@@ -831,7 +831,7 @@ The sink connector can be checked on AWS Console as shown below.
 
 ## Run Application
 
-We first need to create records in the source Kafka topics. It is performed by executing the data generator app (*producer.py*). See [part 1](/blog/2023-08-10-fraud-detection-part-1) for details about the generator app and how to execute it. Note that we should connect to the VPN server in order to create records from the developer machine.
+We first need to create records in the source Kafka topics. It is performed by executing the data generator app (*producer.py*). See [part 1](/blog/2023-08-10-fraud-detection-part-1/) for details about the generator app and how to execute it. Note that we should connect to the VPN server in order to create records from the developer machine.
 
 Once executed, we can check the source topics are created and messages are ingested.
 

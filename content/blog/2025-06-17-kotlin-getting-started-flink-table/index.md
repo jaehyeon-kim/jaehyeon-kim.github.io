@@ -25,10 +25,10 @@ In the last post, we explored the fine-grained control of Flink's DataStream API
 
 <!--more-->
 
-* [Kafka Clients with JSON - Producing and Consuming Order Events](/blog/2025-05-20-kotlin-getting-started-kafka-json-clients)
-* [Kafka Clients with Avro - Schema Registry and Order Events](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients)
-* [Kafka Streams - Lightweight Real-Time Processing for Supplier Stats](/blog/2025-06-03-kotlin-getting-started-kafka-streams)
-* [Flink DataStream API - Scalable Event Processing for Supplier Stats](/blog/2025-06-10-kotlin-getting-started-flink-datastream)
+* [Kafka Clients with JSON - Producing and Consuming Order Events](/blog/2025-05-20-kotlin-getting-started-kafka-json-clients/)
+* [Kafka Clients with Avro - Schema Registry and Order Events](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients/)
+* [Kafka Streams - Lightweight Real-Time Processing for Supplier Stats](/blog/2025-06-03-kotlin-getting-started-kafka-streams/)
+* [Flink DataStream API - Scalable Event Processing for Supplier Stats](/blog/2025-06-10-kotlin-getting-started-flink-datastream/)
 * [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](#) (this post)
 
 ## Flink Table Application
@@ -45,7 +45,7 @@ The source code for the application discussed in this post can be found in the _
 
 ### Build Configuration
 
-The `build.gradle.kts` file sets up the project, its dependencies, and packaging. It's shared between the DataStream and Table API applications - see [the previous post](/blog/2025-06-10-kotlin-getting-started-flink-datastream) for the Flink application that uses the DataStream API.
+The `build.gradle.kts` file sets up the project, its dependencies, and packaging. It's shared between the DataStream and Table API applications - see [the previous post](/blog/2025-06-10-kotlin-getting-started-flink-datastream/) for the Flink application that uses the DataStream API.
 
 *   **Plugins:**
     *   `kotlin("jvm")`: Enables Kotlin language support.
@@ -781,7 +781,7 @@ fun main(args: Array<String>) {
 
 ## Run Flink Application
 
-As with the DataStream job in the [previous post](/blog/2025-06-10-kotlin-getting-started-flink-datastream), running the Table API application involves setting up a local Kafka environment with [odctl](https://github.com/jaehyeon-kim/odctl), starting the data producer, and then launching the Flink job with the correct argument.
+As with the DataStream job in the [previous post](/blog/2025-06-10-kotlin-getting-started-flink-datastream/), running the Table API application involves setting up a local Kafka environment with [odctl](https://github.com/jaehyeon-kim/odctl), starting the data producer, and then launching the Flink job with the correct argument.
 
 ### odctl
 
@@ -861,9 +861,9 @@ These records were intercepted and rerouted by our custom `LateDataRouter` `Proc
 
 ## Related posts
 
-* [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql) - Flink SQL jobs that rank game scores from Kafka, the same declarative approach written as SQL
-* [Run Flink SQL Cookbook in Docker](/blog/2025-04-15-sql-cookbook) - recipes for Flink SQL, the SQL counterpart of the Table API, on a local cluster
-* [Stream Processing with Flink in Kotlin](/blog/2025-12-10-streaming-processing-with-flink-in-kotlin) - more Flink examples in Kotlin, ported from the book Stream Processing with Apache Flink
+* [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql/) - Flink SQL jobs that rank game scores from Kafka, the same declarative approach written as SQL
+* [Run Flink SQL Cookbook in Docker](/blog/2025-04-15-sql-cookbook/) - recipes for Flink SQL, the SQL counterpart of the Table API, on a local cluster
+* [Stream Processing with Flink in Kotlin](/blog/2025-12-10-streaming-processing-with-flink-in-kotlin/) - more Flink examples in Kotlin, ported from the book Stream Processing with Apache Flink
 
 ## Conclusion
 

@@ -15,7 +15,7 @@ tags:
 description: Wrap Python boto calls for Amazon S3 in an R package, rs3helper, where the Python scripts return JSON so R parses it as vectors and data frames.
 ---
 
-In relation to s3, although there are a number of existing packages, many of them seem to be deprecated, premature or platform-dependent. As mentioned in an [earlier post](/blog/2015-08-09-some-thoughts-on-python-for-r-users), things that are not easy in R can be relatively simple in other languages, and connecting to Amazon Web Services is another example. (I consider the [cloudyr](https://cloudyr.github.io/) project looks promising though.)
+In relation to s3, although there are a number of existing packages, many of them seem to be deprecated, premature or platform-dependent. As mentioned in an [earlier post](/blog/2015-08-09-some-thoughts-on-python-for-r-users/), things that are not easy in R can be relatively simple in other languages, and connecting to Amazon Web Services is another example. (I consider the [cloudyr](https://cloudyr.github.io/) project looks promising though.)
 
 If there isn't a comprehensive *R-way* of doing something yet, it may be necessary to create it from scratch. Actually there are some options to do so by using [AWS Command Line Interface](https://aws.amazon.com/cli/), [AWS REST API](https://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html) or wrapping functionality of another language.
 

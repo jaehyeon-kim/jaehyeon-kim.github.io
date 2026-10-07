@@ -20,11 +20,11 @@ description: "Transform IMDb data with dbt on Amazon EMR on EC2, running layered
 ---
 Data models on Amazon EMR on EC2 can be built with the [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) through a Spark Thrift server started on the cluster. In the previous posts, we discussed benefits of a common data transformation tool and the potential of dbt to cover a wide range of data projects from data warehousing to data lake to data lakehouse. Demo data projects that target Redshift Serverless and Glue are illustrated as well. In part 3 of the dbt on AWS series, we discuss data transformation pipelines using dbt on [Amazon EMR](https://aws.amazon.com/emr/). [Subsets of IMDb data](https://data.imdb.com/non-commercial-datasets/) are used as source and data models are developed in multiple layers according to the [dbt best practices](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview). A list of posts of this series can be found below.
 
-* [Part 1 Redshift](/blog/2022-09-28-dbt-on-aws-part-1-redshift)
-* [Part 2 Glue](/blog/2022-10-09-dbt-on-aws-part-2-glue)
+* [Part 1 Redshift](/blog/2022-09-28-dbt-on-aws-part-1-redshift/)
+* [Part 2 Glue](/blog/2022-10-09-dbt-on-aws-part-2-glue/)
 * [Part 3 EMR on EC2](#) (this post)
-* [Part 4 EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks)
-* [Part 5 Athena](/blog/2022-12-06-dbt-on-aws-part-5-athena)
+* [Part 4 EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks/)
+* [Part 5 Athena](/blog/2022-12-06-dbt-on-aws-part-5-athena/)
 
 Below shows an overview diagram of the scope of this dbt on AWS series. EMR is highlighted as it is discussed in this post.
 
@@ -32,7 +32,7 @@ Below shows an overview diagram of the scope of this dbt on AWS series. EMR is h
 
 ## Infrastructure
 
-The infrastructure hosting this solution leverages an Amazon EMR cluster and a S3 bucket. We also need a VPN server so that a developer can connect to the EMR cluster in a private subnet. It is extended from a [previous post](/blog/2022-02-06-dev-infra-terraform) and the resources covered there (VPC, subnets, auto scaling group for VPN etc) are not repeated. All resources are deployed using Terraform and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/dbt-on-aws) of this post.
+The infrastructure hosting this solution leverages an Amazon EMR cluster and a S3 bucket. We also need a VPN server so that a developer can connect to the EMR cluster in a private subnet. It is extended from a [previous post](/blog/2022-02-06-dev-infra-terraform/) and the resources covered there (VPC, subnets, auto scaling group for VPN etc) are not repeated. All resources are deployed using Terraform and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/dbt-on-aws) of this post.
 
 
 ### EMR Cluster
@@ -137,7 +137,7 @@ resource "aws_security_group_rule" "emr_vpn_inbound" {
 ```
 
 
-As in the [previous post](/blog/2022-02-06-dev-infra-terraform), we connect to the EMR cluster via [SoftEther VPN](https://www.softether.org/). Instead of providing VPN related secrets as Terraform variables, they are created internally and stored to AWS Secrets Manager. The details can be found in [dbt-on-aws/emr-ec2/infra/secrets.tf](https://github.com/jaehyeon-kim/dbt-on-aws/blob/main/emr-ec2/infra/secrets.tf) and the secret string can be retrieved as shown below. 
+As in the [previous post](/blog/2022-02-06-dev-infra-terraform/), we connect to the EMR cluster via [SoftEther VPN](https://www.softether.org/). Instead of providing VPN related secrets as Terraform variables, they are created internally and stored to AWS Secrets Manager. The details can be found in [dbt-on-aws/emr-ec2/infra/secrets.tf](https://github.com/jaehyeon-kim/dbt-on-aws/blob/main/emr-ec2/infra/secrets.tf) and the secret string can be retrieved as shown below. 
 
 
 ```bash
@@ -148,7 +148,7 @@ $ aws secretsmanager get-secret-value --secret-id emr-ec2-all-secrets --query "S
   }
 ```
 
-The [previous post](/blog/2022-02-06-dev-infra-terraform) demonstrates how to create a VPN user and to establish connection in detail. An example of a successful connection is shown below.
+The [previous post](/blog/2022-02-06-dev-infra-terraform/) demonstrates how to create a VPN user and to establish connection in detail. An example of a successful connection is shown below.
 
 ![SoftEther VPN Client Manager listing the CEVO connection as Connected to 3.24.195.81 on hub DEFAULT](emr-ec2-vpn.png#center "VPN connection to the development environment")
 
@@ -412,7 +412,7 @@ models:
 ```
 
 
-While we created source tables using Glue crawlers in [part 2](/blog/2021-12-12-datalake-demo-part2), they are created directly from S3 by the [dbt_external_tables](https://hub.getdbt.com/dbt-labs/dbt_external_tables/latest/) package in this post. Also, the [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) package is installed for adding tests to the final marts models. They can be installed by the [dbt deps command](https://docs.getdbt.com/reference/commands/deps).
+While we created source tables using Glue crawlers in [part 2](/blog/2021-12-12-datalake-demo-part2/), they are created directly from S3 by the [dbt_external_tables](https://hub.getdbt.com/dbt-labs/dbt_external_tables/latest/) package in this post. Also, the [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) package is installed for adding tests to the final marts models. They can be installed by the [dbt deps command](https://docs.getdbt.com/reference/commands/deps).
 
 
 ```yaml

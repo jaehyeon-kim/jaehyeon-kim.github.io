@@ -24,13 +24,13 @@ description: Read records from S3 and send them into a Kafka topic with PyFlink,
 
 In this lab, we will create a Pyflink application that reads records from S3 and sends them into a Kafka topic. A custom pipeline Jar file will be created as the Kafka cluster is authenticated by IAM, and it will be demonstrated how to execute the app in a Flink cluster deployed on Docker as well as locally as a typical Python app. We can assume the S3 data is static metadata that needs to be joined into another stream, and this exercise can be useful for data enrichment.
 
-* [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
-* [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2)
+* [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1/)
+* [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/)
 * [Lab 2 Write data to Kafka from S3 using Flink](#) (this post)
-* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4)
-* [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5)
-* [Lab 5 Write data to DynamoDB using Kafka Connect](/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6)
-* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7)
+* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4/)
+* [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5/)
+* [Lab 5 Write data to DynamoDB using Kafka Connect](/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6/)
+* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7/)
 
 [**Update 2023-11-06**] Initially I planned to deploy Pyflink applications on [Amazon Managed Service for Apache Flink](https://aws.amazon.com/managed-service-apache-flink/), but I changed the plan to use a local Flink cluster deployed on Docker. The main reasons are
 
@@ -47,7 +47,7 @@ Sample taxi ride data is stored in a S3 bucket, and a Pyflink application reads 
 
 ### AWS Infrastructure
 
-The AWS infrastructure is created using [Terraform](https://developer.hashicorp.com/terraform) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post - see the [previous post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details. The infrastructure can be deployed (as well as destroyed) using Terraform CLI as shown below. 
+The AWS infrastructure is created using [Terraform](https://developer.hashicorp.com/terraform) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post - see the [previous post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/) for details. The infrastructure can be deployed (as well as destroyed) using Terraform CLI as shown below. 
 
 ```bash
 # initialize
@@ -110,7 +110,7 @@ The docker compose file includes services for a Flink cluster and [Kpow Communit
 
 Kafka bootstrap server addresses and AWS credentials are required for the Flink cluster and kpow app, which are specified as environment variables. The bootstrap server addresses can be obtained via terraform (`terraform output -json | jq -r '.msk_bootstrap_brokers_sasl_iam.value'`) or from AWS Console.
 
-Finally, see the [previous post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details about how to configure the *kpow* app.
+Finally, see the [previous post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/) for details about how to configure the *kpow* app.
 
 ```yaml
 # compose-msk.yml

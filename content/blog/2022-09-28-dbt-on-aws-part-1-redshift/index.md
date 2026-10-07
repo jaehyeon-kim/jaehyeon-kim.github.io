@@ -21,10 +21,10 @@ description: "Transform IMDb data in Amazon Redshift Serverless with dbt, buildi
 Data models in Amazon Redshift Serverless can be built with the [data build tool (dbt)](https://docs.getdbt.com/docs/introduction), which also supports Glue, EMR and Athena. In part 1 of the dbt on AWS series, we discuss data transformation pipelines using dbt on [Redshift Serverless](https://aws.amazon.com/redshift/redshift-serverless/). [Subsets of IMDb data](https://data.imdb.com/non-commercial-datasets/) are used as source and data models are developed in multiple layers according to the [dbt best practices](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview).
 
 * [Part 1 Redshift](#) (this post)
-* [Part 2 Glue](/blog/2022-10-09-dbt-on-aws-part-2-glue)
-* [Part 3 EMR on EC2](/blog/2022-10-19-dbt-on-aws-part-3-emr-ec2)
-* [Part 4 EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks)
-* [Part 5 Athena](/blog/2022-12-06-dbt-on-aws-part-5-athena)
+* [Part 2 Glue](/blog/2022-10-09-dbt-on-aws-part-2-glue/)
+* [Part 3 EMR on EC2](/blog/2022-10-19-dbt-on-aws-part-3-emr-ec2/)
+* [Part 4 EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks/)
+* [Part 5 Athena](/blog/2022-12-06-dbt-on-aws-part-5-athena/)
 
 
 ## Motivation
@@ -93,7 +93,7 @@ resource "aws_redshiftserverless_endpoint_access" "endpoint_access" {
 ```
 
 
-As in the [previous post](/blog/2022-02-06-dev-infra-terraform), we connect to Redshift via [SoftEther VPN](https://www.softether.org/) to improve developer experience significantly by accessing the database directly from the developer machine. Instead of providing VPN related secrets as Terraform variables in the earlier post, they are created internally and stored to AWS Secrets Manager. Also, the Redshift admin username and password are included so that the secrets can be accessed securely. The details can be found in [redshift-sls/infra/secrets.tf](https://github.com/jaehyeon-kim/dbt-on-aws/blob/main/redshift-sls/infra/secrets.tf) and the secret string can be retrieved as shown below. 
+As in the [previous post](/blog/2022-02-06-dev-infra-terraform/), we connect to Redshift via [SoftEther VPN](https://www.softether.org/) to improve developer experience significantly by accessing the database directly from the developer machine. Instead of providing VPN related secrets as Terraform variables in the earlier post, they are created internally and stored to AWS Secrets Manager. Also, the Redshift admin username and password are included so that the secrets can be accessed securely. The details can be found in [redshift-sls/infra/secrets.tf](https://github.com/jaehyeon-kim/dbt-on-aws/blob/main/redshift-sls/infra/secrets.tf) and the secret string can be retrieved as shown below. 
 
 
 ```bash
@@ -107,7 +107,7 @@ $ aws secretsmanager get-secret-value --secret-id redshift-sls-all-secrets --que
 ```
 
 
-The [previous post](/blog/2022-02-06-dev-infra-terraform) demonstrates how to create a VPN user and to establish connection in detail. An example of a successful connection is shown below.
+The [previous post](/blog/2022-02-06-dev-infra-terraform/) demonstrates how to create a VPN user and to establish connection in detail. An example of a successful connection is shown below.
 
 ![VPN client showing a successful connection to the server](vpn-connection.png#center "VPN client showing a successful connection to the server")
 

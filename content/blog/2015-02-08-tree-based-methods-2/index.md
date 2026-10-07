@@ -14,14 +14,14 @@ tags:
 description: Cost-sensitive classification with rpart and caret in R, treating a missed High class as twice as expensive by altering the priors and the loss matrix.
 ---
 
-* [Part I](/blog/2015-02-01-tree-based-methods-1)
+* [Part I](/blog/2015-02-01-tree-based-methods-1/)
 * [Part II](#) (this post)
-* [Part III](/blog/2015-02-14-tree-based-methods-3)
-* [Part IV](/blog/2015-02-15-tree-based-methods-4)
-* [Part V](/blog/2015-03-05-tree-based-methods-5)
-* [Part VI](/blog/2015-03-07-tree-based-methods-6)
+* [Part III](/blog/2015-02-14-tree-based-methods-3/)
+* [Part IV](/blog/2015-02-15-tree-based-methods-4/)
+* [Part V](/blog/2015-03-05-tree-based-methods-5/)
+* [Part VI](/blog/2015-03-07-tree-based-methods-6/)
 
-In the previous article ([Tree Based Methods in R - Part I](/blog/2015-02-01-tree-based-methods-1)), a decision tree is created on the *Carseats* data which is in the chapter 8 lab of [ISLR](https://www.statlearning.com/). In that article, potentially asymetric costs due to misclassification are not taken into account. When unbalance between false positive and false negative can have a significant impact, it can be explicitly adjusted either by altering prior (or empirical) probabilities or by adding a loss matrix. 
+In the previous article ([Tree Based Methods in R - Part I](/blog/2015-02-01-tree-based-methods-1/)), a decision tree is created on the *Carseats* data which is in the chapter 8 lab of [ISLR](https://www.statlearning.com/). In that article, potentially asymetric costs due to misclassification are not taken into account. When unbalance between false positive and false negative can have a significant impact, it can be explicitly adjusted either by altering prior (or empirical) probabilities or by adding a loss matrix. 
 
 A comprehensive summary of this topic, as illustrated in [Berk (2008)](https://www.springer.com/mathematics/probability/book/978-0-387-77500-5), is shown below.
 

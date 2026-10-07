@@ -22,10 +22,10 @@ description: Run a basic Apache Beam pipeline in Python, then develop interactiv
 In this series of posts, we discuss local development of Apache Beam pipelines using Python. In *Part 1*, a basic Beam pipeline is introduced, followed by demonstrating how to utilise Jupyter notebooks for interactive development. Several notebook examples are covered including [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) and [Beam DataFrames](https://beam.apache.org/documentation/dsls/dataframes/overview/). Batch pipelines will be developed in *Part 2*, and we use pipelines from [GCP Python DataFlow Quest](https://github.com/GoogleCloudPlatform/training-data-analyst/tree/master/quests/dataflow_python) while modifying them to access local resources only. Each batch pipeline has two versions with/without SQL. Beam doesn't have its own processing engine and Beam pipelines are executed on a runner such as Apache Flink, Apache Spark, or Google Cloud Dataflow instead. We will use the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) for deploying streaming pipelines as it supports [a wide range of features](https://beam.apache.org/documentation/runners/capability-matrix/) especially in streaming context. In *Part 3*, we will discuss how to set up a local Flink cluster as well as a local Kafka cluster for data source and sink. A streaming pipeline with/without Beam SQL will be built in *Part 4*, and this series concludes with illustrating unit testing of existing pipelines in *Part 5*.
 
 * [Part 1 Pipeline, Notebook, SQL and DataFrame](#) (this post)
-* [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2)
-* [Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3)
-* [Part 4 Streaming Pipelines](/blog/2024-05-02-beam-local-dev-4)
-* [Part 5 Testing Pipelines](/blog/2024-05-09-beam-local-dev-5)
+* [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2/)
+* [Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3/)
+* [Part 4 Streaming Pipelines](/blog/2024-05-02-beam-local-dev-4/)
+* [Part 5 Testing Pipelines](/blog/2024-05-09-beam-local-dev-5/)
 
 ## Prerequisites
 
@@ -485,7 +485,7 @@ Subsequently we convert the source PCollection into a pandas DataFrame using the
 
 ## Related posts
 
-* [Cache Data on Apache Beam Pipelines Using a Shared Object](/blog/2024-08-22-cache-using-shared-object) - caches lookup data in memory with the Shared class, refreshed periodically on streaming pipelines
+* [Cache Data on Apache Beam Pipelines Using a Shared Object](/blog/2024-08-22-cache-using-shared-object/) - caches lookup data in memory with the Shared class, refreshed periodically on streaming pipelines
 
 ## Summary
 

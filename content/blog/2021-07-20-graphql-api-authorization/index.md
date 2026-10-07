@@ -289,9 +289,9 @@ The contributor user can query all permitted projects without an error as shown 
 
 ## Related posts
 
-* [Invoking AWS Lambda at a sub-minute frequency](/blog/2021-10-13-lambda-schedule) - uses Amazon SQS to schedule a Lambda more often than once a minute
-* [Some Thoughts on Python](/blog/2015-08-08-some-thoughts-on-python) - writing Python in an object-oriented style, shown with SOAP API client classes
-* [Some Thoughts on Python for R Users](/blog/2015-08-09-some-thoughts-on-python-for-r-users) - calls a SOAP web service from Python with the suds library
+* [Invoking AWS Lambda at a sub-minute frequency](/blog/2021-10-13-lambda-schedule/) - uses Amazon SQS to schedule a Lambda more often than once a minute
+* [Some Thoughts on Python](/blog/2015-08-08-some-thoughts-on-python/) - writing Python in an object-oriented style, shown with SOAP API client classes
+* [Some Thoughts on Python for R Users](/blog/2015-08-09-some-thoughts-on-python-for-r-users/) - calls a SOAP web service from Python with the suds library
 
 ## Conclusion
 

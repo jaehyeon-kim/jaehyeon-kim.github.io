@@ -443,6 +443,6 @@ rm -rf .venv
 
 ## Related posts
 
-* [Run Flink SQL Cookbook in Docker](/blog/2025-04-15-sql-cookbook) - more Flink SQL queries, from simple selects to windows and joins, run on a local cluster
-* [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](/blog/2025-06-17-kotlin-getting-started-flink-table) - a windowed aggregation over Kafka records with the Flink Table API, the code form of these SQL queries
-* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect) - another Benchtop project on the same simulation library, streaming database changes from PostgreSQL to Kafka
+* [Run Flink SQL Cookbook in Docker](/blog/2025-04-15-sql-cookbook/) - more Flink SQL queries, from simple selects to windows and joins, run on a local cluster
+* [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](/blog/2025-06-17-kotlin-getting-started-flink-table/) - a windowed aggregation over Kafka records with the Flink Table API, the code form of these SQL queries
+* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/) - another Benchtop project on the same simulation library, streaming database changes from PostgreSQL to Kafka

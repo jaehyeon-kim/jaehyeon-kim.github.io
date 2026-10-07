@@ -125,8 +125,8 @@ The v0.11.1 patch closed out threading race conditions in the egress providers d
 
 ## Related posts
 
-* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect) - the Postgres connector in use: a simulated shop writes its tables, and Debezium streams every change to Kafka
-* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system) - the library generating a lakehouse dataset that an agent queries through a semantic layer
+* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/) - the Postgres connector in use: a simulated shop writes its tables, and Debezium streams every change to Kafka
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system/) - the library generating a lakehouse dataset that an agent queries through a semantic layer
 
 ## Try It Out
 

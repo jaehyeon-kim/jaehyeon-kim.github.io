@@ -32,17 +32,17 @@ For example:
 
 ---
 
-* [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
-* [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
-* [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3)
-* [Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4)
-* [Part 5 Glue Schema Registry](/blog/2023-06-08-kafka-development-with-docker-part-5)
-* [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6)
-* [Part 7 Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7)
-* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8)
+* [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1/)
+* [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2/)
+* [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3/)
+* [Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4/)
+* [Part 5 Glue Schema Registry](/blog/2023-06-08-kafka-development-with-docker-part-5/)
+* [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6/)
+* [Part 7 Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7/)
+* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8/)
 * [Part 9 SSL Authentication](#) (this post)
-* [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10)
-* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11)
+* [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10/)
+* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11/)
 
 ## Certificate Setup
 
@@ -366,7 +366,7 @@ networks:
 
 #### Producer
 
-The same producer app discussed in [Part 4](/blog/2023-06-01-kafka-development-with-docker-part-4) is used here. The following arguments are added to access the SSL listener.
+The same producer app discussed in [Part 4](/blog/2023-06-01-kafka-development-with-docker-part-4/) is used here. The following arguments are added to access the SSL listener.
 
 - *security_protocol* - Protocol used to communicate with brokers.
 - *ssl_check_hostname* - Flag to configure whether SSL handshake should verify that the certificate matches the broker's hostname.
@@ -444,7 +444,7 @@ INFO:root:current run - 2
 
 #### Consumer
 
-The same consumer app in [Part 4](/blog/2023-06-01-kafka-development-with-docker-part-4) is used here as well. As the producer app, the following arguments are added - *security_protocol*, *ssl_check_hostname*, *ssl_cafile*, *ssl_certfile* and *ssl_keyfile*.
+The same consumer app in [Part 4](/blog/2023-06-01-kafka-development-with-docker-part-4/) is used here as well. As the producer app, the following arguments are added - *security_protocol*, *ssl_check_hostname*, *ssl_cafile*, *ssl_certfile* and *ssl_keyfile*.
 
 ```python
 # kafka-dev-with-docker/part-09/consumer.py

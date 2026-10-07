@@ -17,19 +17,19 @@ tags:
 description: A streaming file reader built with Splittable DoFn scans an input folder for new files repeatedly, a pattern for unbounded sources in the Python SDK.
 ---
 
-We can extend a batch file reader so that, instead of listing files once at the beginning, it scans an input folder periodically for new files and processes whenever new files are created in the folder. In [Part 9](/blog/2024-12-05-beam-examples-9), we developed two Apache Beam pipelines using [*Splittable DoFn (SDF)*](https://beam.apache.org/documentation/programming-guide/#splittable-dofns), and one of them is that batch file reader, which reads a list of files in an input folder followed by processing them in parallel. The techniques used here can be quite useful as they can be applied to developing I/O connectors that target other unbounded (or streaming) data sources (eg Kafka) using the Python SDK.
+We can extend a batch file reader so that, instead of listing files once at the beginning, it scans an input folder periodically for new files and processes whenever new files are created in the folder. In [Part 9](/blog/2024-12-05-beam-examples-9/), we developed two Apache Beam pipelines using [*Splittable DoFn (SDF)*](https://beam.apache.org/documentation/programming-guide/#splittable-dofns), and one of them is that batch file reader, which reads a list of files in an input folder followed by processing them in parallel. The techniques used here can be quite useful as they can be applied to developing I/O connectors that target other unbounded (or streaming) data sources (eg Kafka) using the Python SDK.
 
 <!--more-->
 
-* [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1)
-* [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
-* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
-* [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4)
-* [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5)
-* [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6)
-* [Part 7 Separate Droppable Data into Side Output](/blog/2024-10-24-beam-examples-7)
-* [Part 8 Enhance Sport Activity Tracker with Runner Motivation](/blog/2024-11-21-beam-examples-8)
-* [Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn](/blog/2024-12-05-beam-examples-9)
+* [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1/)
+* [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2/)
+* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3/)
+* [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4/)
+* [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5/)
+* [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6/)
+* [Part 7 Separate Droppable Data into Side Output](/blog/2024-10-24-beam-examples-7/)
+* [Part 8 Enhance Sport Activity Tracker with Runner Motivation](/blog/2024-11-21-beam-examples-8/)
+* [Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn](/blog/2024-12-05-beam-examples-9/)
 * [Part 10 Develop Streaming File Reader using Splittable DoFn](#) (this post)
 
 ## Splittable DoFn

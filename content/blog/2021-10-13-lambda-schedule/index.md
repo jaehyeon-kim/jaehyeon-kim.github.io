@@ -205,10 +205,10 @@ An [EventBridge Events rule can be triggered more than once](https://docs.aws.am
 
 ## Related posts
 
-* [Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) - another Lambda function invoked repeatedly by an EventBridge schedule rule, here producing into a Kafka topic
-* [Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1) - how to package a function and its dependencies for Lambda
-* [Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2) - deploying that package and giving the function the role it needs
-* [Adding Authorization to a Graphql API](/blog/2021-07-20-graphql-api-authorization) - another serverless application, covering authorization on an API
+* [Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/) - another Lambda function invoked repeatedly by an EventBridge schedule rule, here producing into a Kafka topic
+* [Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1/) - how to package a function and its dependencies for Lambda
+* [Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2/) - deploying that package and giving the function the role it needs
+* [Adding Authorization to a Graphql API](/blog/2021-07-20-graphql-api-authorization/) - another serverless application, covering authorization on an API
 
 ## Conclusion
 

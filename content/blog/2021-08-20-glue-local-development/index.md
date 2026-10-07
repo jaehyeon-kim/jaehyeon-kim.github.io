@@ -350,9 +350,9 @@ def test_filter_dynamic_frame_by_value(glueContext):
 
 ## Related posts
 
-* [Local Development of AWS Glue 3.0 and Later](/blog/2021-11-14-glue-3-local-development) - the current version of this setup, for Glue 3.0 and later, where the Docker image has to be built yourself.
-* [Develop and Test Apache Spark Apps for EMR Locally Using Docker](/blog/2022-05-08-emr-local-dev) - the equivalent local environment for Amazon EMR, with Glue Data Catalog integration.
-* [Data Warehousing ETL Demo with Apache Iceberg on EMR Local Environment](/blog/2022-06-26-iceberg-etl-demo) - an ETL job built in that local environment with Iceberg storage and PySpark processing.
+* [Local Development of AWS Glue 3.0 and Later](/blog/2021-11-14-glue-3-local-development/) - the current version of this setup, for Glue 3.0 and later, where the Docker image has to be built yourself.
+* [Develop and Test Apache Spark Apps for EMR Locally Using Docker](/blog/2022-05-08-emr-local-dev/) - the equivalent local environment for Amazon EMR, with Glue Data Catalog integration.
+* [Data Warehousing ETL Demo with Apache Iceberg on EMR Local Environment](/blog/2022-06-26-iceberg-etl-demo/) - an ETL job built in that local environment with Iceberg storage and PySpark processing.
 
 ## Conclusion
 

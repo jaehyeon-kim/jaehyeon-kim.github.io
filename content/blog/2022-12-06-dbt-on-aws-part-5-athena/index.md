@@ -20,10 +20,10 @@ description: "Transform IMDb data with dbt on Amazon Athena using the dbt-athena
 ---
 Data models on Amazon Athena can be built with the [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) and the dbt-athena adapter. In the previous posts, we discussed benefits of a common data transformation tool and the potential of dbt to cover a wide range of data projects from data warehousing to data lake to data lakehouse. Demo data projects that target Redshift Serverless, Glue, EMR on EC2 and EMR on EKS are illustrated as well. In the last part of the dbt on AWS series, we discuss data transformation pipelines using dbt on [Amazon Athena](https://aws.amazon.com/athena). [Subsets of IMDb data](https://data.imdb.com/non-commercial-datasets/) are used as source and data models are developed in multiple layers according to the [dbt best practices](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview). A list of posts of this series can be found below.
 
-* [Part 1 Redshift](/blog/2022-09-28-dbt-on-aws-part-1-redshift)
-* [Part 2 Glue](/blog/2022-10-09-dbt-on-aws-part-2-glue)
-* [Part 3 EMR on EC2](/blog/2022-10-19-dbt-on-aws-part-3-emr-ec2)
-* [Part 4 EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks)
+* [Part 1 Redshift](/blog/2022-09-28-dbt-on-aws-part-1-redshift/)
+* [Part 2 Glue](/blog/2022-10-09-dbt-on-aws-part-2-glue/)
+* [Part 3 EMR on EC2](/blog/2022-10-19-dbt-on-aws-part-3-emr-ec2/)
+* [Part 4 EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks/)
 * [Part 5 Athena](#) (this post)
 
 Below shows an overview diagram of the scope of this dbt on AWS series. Athena is highlighted as it is discussed in this post.

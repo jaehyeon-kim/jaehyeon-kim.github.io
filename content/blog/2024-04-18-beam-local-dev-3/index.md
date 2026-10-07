@@ -31,11 +31,11 @@ For example:
 
 ---
 
-* [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1)
-* [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2)
+* [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1/)
+* [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2/)
 * [Part 3 Flink Runner](#) (this post)
-* [Part 4 Streaming Pipelines](/blog/2024-05-02-beam-local-dev-4)
-* [Part 5 Testing Pipelines](/blog/2024-05-09-beam-local-dev-5)
+* [Part 4 Streaming Pipelines](/blog/2024-05-02-beam-local-dev-4/)
+* [Part 5 Testing Pipelines](/blog/2024-05-09-beam-local-dev-5/)
 
 ## Portability Layer
 
@@ -110,8 +110,8 @@ Next, Flink configuration is updated so that the Flink UI is accessible and the 
 
 A Kafka cluster with 1 broker and 1 Zookeeper node is used for this post together with a Kafka management app (*kafka-ui*). The details of setting up the resources can be found in my *Kafka Development with Docker* series.
 
-- [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
-- [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
+- [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1/)
+- [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2/)
 
 Those resources are deployed using Docker Compose with the following configuration file.
 
@@ -422,7 +422,7 @@ And the Flink web UI is accessible on *localhost:8081*.
 
 ### Generate Data
 
-For streaming data generation, we can use the website visit log generator that was introduced in [Part 1](/blog/2024-03-28-beam-local-dev-1). We can execute the script while specifying the *source* argument to *streaming*. Below shows an example of generating Kafka messages for the streaming pipeline.
+For streaming data generation, we can use the website visit log generator that was introduced in [Part 1](/blog/2024-03-28-beam-local-dev-1/). We can execute the script while specifying the *source* argument to *streaming*. Below shows an example of generating Kafka messages for the streaming pipeline.
 
 ```bash
 $ python datagen/generate_data.py --source streaming --num_users 5 --delay_seconds 0.5

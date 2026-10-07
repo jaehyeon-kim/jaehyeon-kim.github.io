@@ -126,10 +126,10 @@ I hope this article is useful and I'm going to write an article to show the seco
 
 ## Related posts
 
-* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2) - the same download done in memory, without saving each file to a local drive
-* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files) - turns merged price files into gross returns, standard deviation and correlation
-* [Short R Examples](/blog/2014-12-03-short-r-examples) - short examples of summarising a data frame by group and running a quick simulation
-* [Looping without for](/blog/2014-12-17-looping-without-for) - replaces for-loops with the apply family and plyr, the style the download script here uses
-* [Quick Trial of Adding Column](/blog/2015-01-14-quick-trial-of-adding-column) - adds average columns with base R, plyr, dplyr and data.table, and times each one
-* [Packaging Analysis](/blog/2015-03-24-packaging-analysis) - turns an analysis into an R package with roxygen2 documents, testthat tests and vignettes
-* [Setup Random Seeds on Caret Package](/blog/2015-05-30-setup-random-seeds-on-caret-package) - sets random seeds with caret so an analysis can be reproduced
+* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2/) - the same download done in memory, without saving each file to a local drive
+* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files/) - turns merged price files into gross returns, standard deviation and correlation
+* [Short R Examples](/blog/2014-12-03-short-r-examples/) - short examples of summarising a data frame by group and running a quick simulation
+* [Looping without for](/blog/2014-12-17-looping-without-for/) - replaces for-loops with the apply family and plyr, the style the download script here uses
+* [Quick Trial of Adding Column](/blog/2015-01-14-quick-trial-of-adding-column/) - adds average columns with base R, plyr, dplyr and data.table, and times each one
+* [Packaging Analysis](/blog/2015-03-24-packaging-analysis/) - turns an analysis into an R package with roxygen2 documents, testthat tests and vignettes
+* [Setup Random Seeds on Caret Package](/blog/2015-05-30-setup-random-seeds-on-caret-package/) - sets random seeds with caret so an analysis can be reproduced

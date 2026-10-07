@@ -14,14 +14,14 @@ tags:
 description: Fit a regression tree on the Carseats data in R, comparing the pruning parameter caret selects against the 1-SE rule that the rpart package recommends.
 ---
 
-* [Part I](/blog/2015-02-01-tree-based-methods-1)
-* [Part II](/blog/2015-02-08-tree-based-methods-2)
+* [Part I](/blog/2015-02-01-tree-based-methods-1/)
+* [Part II](/blog/2015-02-08-tree-based-methods-2/)
 * [Part III](#) (this post)
-* [Part IV](/blog/2015-02-15-tree-based-methods-4)
-* [Part V](/blog/2015-03-05-tree-based-methods-5)
-* [Part VI](/blog/2015-03-07-tree-based-methods-6)
+* [Part IV](/blog/2015-02-15-tree-based-methods-4/)
+* [Part V](/blog/2015-03-05-tree-based-methods-5/)
+* [Part VI](/blog/2015-03-07-tree-based-methods-6/)
 
-While classification tasks are implemented in the last two articles ([Part I](/blog/2015-02-01-tree-based-methods-1) and [Part II](/blog/2015-02-08-tree-based-methods-2)), a regression task is the topic of this article. While the **caret** package selects the tuning parameter (*cp*) that minimizes the error (*RMSE*), the **rpart** packages recommends the *1-SE rule*, which selects the smallest tree within 1 standard error of the minimum cross validation error (*xerror*). The models with 2 complexity parameters that are suggested by the packages are compared.
+While classification tasks are implemented in the last two articles ([Part I](/blog/2015-02-01-tree-based-methods-1/) and [Part II](/blog/2015-02-08-tree-based-methods-2/)), a regression task is the topic of this article. While the **caret** package selects the tuning parameter (*cp*) that minimizes the error (*RMSE*), the **rpart** packages recommends the *1-SE rule*, which selects the smallest tree within 1 standard error of the minimum cross validation error (*xerror*). The models with 2 complexity parameters that are suggested by the packages are compared.
 
 The bold-cased sections of the [tutorial](https://topepo.github.io/caret/index.html) of the caret package are covered in this article.
 

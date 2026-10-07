@@ -33,23 +33,23 @@ For example:
 
 ---
 
-* [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
-* [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2)
-* [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3)
-* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4)
-* [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5)
+* [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1/)
+* [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/)
+* [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3/)
+* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4/)
+* [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5/)
 * [Lab 5 Write data to DynamoDB using Kafka Connect](#) (this post)
-* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7)
+* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7/)
 
 ## Architecture
 
-Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The messages of the topic are written into a DynamoDB table by a Kafka sink connector, which is deployed on [Amazon MSK Connect](https://aws.amazon.com/msk/features/msk-connect/).
+Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/). The messages of the topic are written into a DynamoDB table by a Kafka sink connector, which is deployed on [Amazon MSK Connect](https://aws.amazon.com/msk/features/msk-connect/).
 
 ![Six labs drawn around Amazon MSK, with Lab 5 sending taxi rides to DynamoDB through MSK Connect](featured.png#center "Lab 5 within the series architecture, a Camel sink connector writing to DynamoDB")
 
 ## Infrastructure
 
-The AWS infrastructure is created using [Terraform](https://developer.hashicorp.com/terraform) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post. See this [earlier post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details about how to create the resources. The key resources cover a VPC, VPN server, MSK cluster and Python Lambda producer app.
+The AWS infrastructure is created using [Terraform](https://developer.hashicorp.com/terraform) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post. See this [earlier post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/) for details about how to create the resources. The key resources cover a VPC, VPN server, MSK cluster and Python Lambda producer app.
 
 ### MSK Connect
 
@@ -344,7 +344,7 @@ Once the resources are deployed, we can check the sink connector on AWS Console.
 
 #### Create Kafka Connect on Docker
 
-As discussed further later, we can use a local Kafka cluster deployed on Docker instead of one on Amazon MSK. For this option, we need to deploy a local Kafka Connect server on Docker as well, and it can be created by the following Docker Compose file. See [this post](/blog/2023-05-25-kafka-development-with-docker-part-3) for details about how to set up a Kafka Connect server on Docker.
+As discussed further later, we can use a local Kafka cluster deployed on Docker instead of one on Amazon MSK. For this option, we need to deploy a local Kafka Connect server on Docker as well, and it can be created by the following Docker Compose file. See [this post](/blog/2023-05-25-kafka-development-with-docker-part-3/) for details about how to set up a Kafka Connect server on Docker.
 
 ```yaml
 # compose-extra.yml
@@ -458,7 +458,7 @@ $ curl http://localhost:8083/connectors/real-time-streaming-taxi-rides-sink/stat
 
 ### Kafka Topic
 
-We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using [*compose-ui.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-ui.yml) - see [this post](/blog/2023-10-23-kafka-connect-for-aws-part-4) for details about *kpow* configuration.
+We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using [*compose-ui.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-ui.yml) - see [this post](/blog/2023-10-23-kafka-connect-for-aws-part-4/) for details about *kpow* configuration.
 
 ![kpow details for the taxi-rides topic, five partitions holding 151,250 messages in total](kafka-topic.png#center "taxi-rides topic and its partitions on kpow")
 

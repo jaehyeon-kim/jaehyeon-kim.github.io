@@ -335,6 +335,6 @@ Roughly there would be two ways of performing a task. One is easy to start but h
 
 ## Related posts
 
-* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1) - downloading stock price files in R and merging them into a single data frame.
-* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2) - the same download kept in memory, avoiding the slower route of saving each file to disk.
-* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files) - returns, standard deviation and correlation from those files, the kind of analysis worth packaging.
+* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1/) - downloading stock price files in R and merging them into a single data frame.
+* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2/) - the same download kept in memory, avoiding the slower route of saving each file to disk.
+* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files/) - returns, standard deviation and correlation from those files, the kind of analysis worth packaging.

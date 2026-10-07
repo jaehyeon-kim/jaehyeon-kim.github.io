@@ -429,6 +429,6 @@ $ git commit -m 'update them to v1.0.2'
 
 ## Related posts
 
-* [Slides as Code: Integrating Reveal.js into my Hugo Blog](/blog/2026-03-09-integrate-revealjs) - adds Markdown Reveal.js slides to the Hugo site set up here
-* [DBT CI/CD Demo with BigQuery and GitHub Actions](/blog/2024-09-05-dbt-cicd-demo) - the same GitHub Actions deployment approach applied to a dbt project
-* [Guide to Running DBT in Production](/blog/2024-09-13-dbt-guide) - deploys a dbt project to dev and prod with slim CI, unit tests and a write audit publish step
+* [Slides as Code: Integrating Reveal.js into my Hugo Blog](/blog/2026-03-09-integrate-revealjs/) - adds Markdown Reveal.js slides to the Hugo site set up here
+* [DBT CI/CD Demo with BigQuery and GitHub Actions](/blog/2024-09-05-dbt-cicd-demo/) - the same GitHub Actions deployment approach applied to a dbt project
+* [Guide to Running DBT in Production](/blog/2024-09-13-dbt-guide/) - deploys a dbt project to dev and prod with slim CI, unit tests and a write audit publish step

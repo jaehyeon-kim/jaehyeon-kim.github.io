@@ -18,20 +18,20 @@ tags:
 description: "Deploy an R machine learning model to AWS Lambda and call it without managing a server."
 ---
 
-No need of provisioning/managing servers is one of the key benefits of **serverless** **event-driven** application development. It is also a cost-effective way of delivering a data product as functions are executed *on-demand* rather than in servers that run 24/7. In the [previous post](/blog/2017-04-08-serverless-data-product-1), that kind of application development is introduced, and how to package R, necessary libraries/packages and a Lambda function handler is discussed. Furthermore [AWS Lambda free tier](https://aws.amazon.com/lambda/pricing/) includes 1M free requests per month and 400,000 GB-seconds of compute time per month, which is available to both existing and new AWS customers indefinitely. (GB-seconds is applicable when execution is made with 1 GB of memory.) Lowering the size of memory increases the execution time and thus 3.2M seconds or about 37 days are free with 128 MB of memory (1 GB divided by 8) - note that CPU power is proportional to allocated memory.
+No need of provisioning/managing servers is one of the key benefits of **serverless** **event-driven** application development. It is also a cost-effective way of delivering a data product as functions are executed *on-demand* rather than in servers that run 24/7. In the [previous post](/blog/2017-04-08-serverless-data-product-1/), that kind of application development is introduced, and how to package R, necessary libraries/packages and a Lambda function handler is discussed. Furthermore [AWS Lambda free tier](https://aws.amazon.com/lambda/pricing/) includes 1M free requests per month and 400,000 GB-seconds of compute time per month, which is available to both existing and new AWS customers indefinitely. (GB-seconds is applicable when execution is made with 1 GB of memory.) Lowering the size of memory increases the execution time and thus 3.2M seconds or about 37 days are free with 128 MB of memory (1 GB divided by 8) - note that CPU power is proportional to allocated memory.
 
 > **Status, September 2026.** The Lambda console has been redesigned since these screenshots were taken, so the blueprint selection and function configuration pages below no longer match it. Choose Author from scratch on the Create function page, then upload the same zip package.
 
 Initially I was planning to discuss how to deploy a package at AWS Lambda and to expose it via Amazon API Gateway in this post. However it'd be too long with so many screenshots and I split them in Part II and III. Here is an updated series plan.
 
 * Backend
-    * [Part I - Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1)
+    * [Part I - Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1/)
     * [Part II - Deploying R ML Model via Lambda](#) - this post
-    * [Part III - Exposing R ML Model via APIG](/blog/2017-04-13-serverless-data-product-3)
+    * [Part III - Exposing R ML Model via APIG](/blog/2017-04-13-serverless-data-product-3/)
 * Frontend
-    * [Part IV - Serving R ML Model via S3](/blog/2017-04-17-serverless-data-product-4)
+    * [Part IV - Serving R ML Model via S3](/blog/2017-04-17-serverless-data-product-4/)
 
-[**EDIT 2017-04-17**] The Lambda function handler (*handler.py*) has been modified to resolve an issue of *Cross-Origin Resource Sharing (CORS)*. See [Part IV](/blog/2017-04-17-serverless-data-product-4) for further details.
+[**EDIT 2017-04-17**] The Lambda function handler (*handler.py*) has been modified to resolve an issue of *Cross-Origin Resource Sharing (CORS)*. See [Part IV](/blog/2017-04-17-serverless-data-product-4/) for further details.
 
 ## Managing security
 

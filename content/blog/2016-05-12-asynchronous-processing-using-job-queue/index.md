@@ -42,7 +42,7 @@ library(jobqueue)
 
 ## Running a Blocking Function Asynchronously
 
-As can be seen in the description, it is highly related to the **parallel** package and thus it wouldn't be hard to understand how it works if you know how to do parallel processing using that package - if not, have a look at [this post](/blog/2015-03-14-parallel-processing-on-single-machine-1). 
+As can be seen in the description, it is highly related to the **parallel** package and thus it wouldn't be hard to understand how it works if you know how to do parallel processing using that package - if not, have a look at [this post](/blog/2015-03-14-parallel-processing-on-single-machine-1/). 
 
 Here is a quick example of job queue. In the following function, execution is suspended for 1 second at each iteration and the processed is blocking until it is executed in base R.
 

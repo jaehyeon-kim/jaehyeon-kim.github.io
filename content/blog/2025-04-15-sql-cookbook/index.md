@@ -228,8 +228,8 @@ CREATE TABLE server_logs (
 
 ## Related posts
 
-* [Local Development - Kafka, Flink and DynamoDB for Real Time Fraud Detection Part 1](/blog/2023-08-10-fraud-detection-part-1) - a local Flink app that puts this kind of SQL into a full pipeline
-* [Getting Started with PyFlink on AWS - Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1) - runs a PyFlink app against Kafka on Docker, in a virtual environment and in a local cluster
-* [Building Apache Flink Applications in Python](/blog/2023-10-19-build-pyflink-apps) - three DataStream applications in PyFlink, for the cases SQL does not cover
-* [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql) - four Flink SQL jobs that read Kafka and keep top 10 leaderboards up to date in PostgreSQL, a complete pipeline built from queries like these
-* [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](/blog/2025-06-17-kotlin-getting-started-flink-table) - the Flink Table API in Kotlin, which expresses the same kind of query in code
+* [Local Development - Kafka, Flink and DynamoDB for Real Time Fraud Detection Part 1](/blog/2023-08-10-fraud-detection-part-1/) - a local Flink app that puts this kind of SQL into a full pipeline
+* [Getting Started with PyFlink on AWS - Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1/) - runs a PyFlink app against Kafka on Docker, in a virtual environment and in a local cluster
+* [Building Apache Flink Applications in Python](/blog/2023-10-19-build-pyflink-apps/) - three DataStream applications in PyFlink, for the cases SQL does not cover
+* [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql/) - four Flink SQL jobs that read Kafka and keep top 10 leaderboards up to date in PostgreSQL, a complete pipeline built from queries like these
+* [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](/blog/2025-06-17-kotlin-getting-started-flink-table/) - the Flink Table API in Kotlin, which expresses the same kind of query in code

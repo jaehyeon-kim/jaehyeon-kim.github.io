@@ -16,17 +16,17 @@ tags:
 description: Batch Apache Beam pipelines in Python that aggregate website visit logs by user and time, written with and without Beam SQL and run in notebooks.
 ---
 
-We discuss Batch pipelines that aggregate website visit log by user and time in this post. The pipelines are developed with and without *Beam SQL*. Additionally, each pipeline is implemented on a Jupyter notebook for demonstration. In this series, we discuss local development of [Apache Beam](https://beam.apache.org/) pipelines using Python. A basic Beam pipeline was introduced in [Part 1](/blog/2024-03-28-beam-local-dev-1), followed by demonstrating how to utilise Jupyter notebooks, [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) and [Beam DataFrames](https://beam.apache.org/documentation/dsls/dataframes/overview/).
+We discuss Batch pipelines that aggregate website visit log by user and time in this post. The pipelines are developed with and without *Beam SQL*. Additionally, each pipeline is implemented on a Jupyter notebook for demonstration. In this series, we discuss local development of [Apache Beam](https://beam.apache.org/) pipelines using Python. A basic Beam pipeline was introduced in [Part 1](/blog/2024-03-28-beam-local-dev-1/), followed by demonstrating how to utilise Jupyter notebooks, [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/) and [Beam DataFrames](https://beam.apache.org/documentation/dsls/dataframes/overview/).
 
-* [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1)
+* [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1/)
 * [Part 2 Batch Pipelines](#) (this post)
-* [Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3)
-* [Part 4 Streaming Pipelines](/blog/2024-05-02-beam-local-dev-4)
-* [Part 5 Testing Pipelines](/blog/2024-05-09-beam-local-dev-5)
+* [Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3/)
+* [Part 4 Streaming Pipelines](/blog/2024-05-02-beam-local-dev-4/)
+* [Part 5 Testing Pipelines](/blog/2024-05-09-beam-local-dev-5/)
 
 ## Data Generation
 
-We first need to generate website visit log data. As the second pipeline aggregates data by time, the max lag seconds (`--max_lag_seconds`) is set to 300 so that records are spread over 5 minutes period. See [Part 1](/blog/2024-03-28-beam-local-dev-1) for details about the data generation script and the source of this post can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-dev-env).
+We first need to generate website visit log data. As the second pipeline aggregates data by time, the max lag seconds (`--max_lag_seconds`) is set to 300 so that records are spread over 5 minutes period. See [Part 1](/blog/2024-03-28-beam-local-dev-1/) for details about the data generation script and the source of this post can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-dev-env).
 
 ```bash
 $ python datagen/generate_data.py --source batch --num_users 20 --num_events 10000 --max_lag_seconds 300

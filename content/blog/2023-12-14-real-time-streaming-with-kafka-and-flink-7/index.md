@@ -20,22 +20,22 @@ description: Consume Kafka messages with an AWS Lambda function, using Amazon MS
 ---
 Amazon MSK can be configured as an [event source](https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html) of a Lambda function. Lambda internally polls for new messages from the event source and then synchronously invokes the target Lambda function. With this feature, we can develop a Kafka consumer application in serverless environment where developers can focus on application logic. In this lab, we will discuss how to create a Kafka consumer using a Lambda function.
 
-* [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
-* [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2)
-* [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3)
-* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4)
-* [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5)
-* [Lab 5 Write data to DynamoDB using Kafka Connect](/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6)
+* [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1/)
+* [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/)
+* [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3/)
+* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4/)
+* [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5/)
+* [Lab 5 Write data to DynamoDB using Kafka Connect](/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6/)
 * [Lab 6 Consume data from Kafka using Lambda](#) (this post)
 
 ## Architecture
 
-Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The messages of the *taxi-rides* topic are consumed by a Lambda function where the MSK cluster is configured as an event source of the function.
+Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/). The messages of the *taxi-rides* topic are consumed by a Lambda function where the MSK cluster is configured as an event source of the function.
 
 
 ## Infrastructure
 
-The AWS infrastructure is created using [Terraform](https://developer.hashicorp.com/terraform) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post. See this [earlier post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details about how to create the resources. The key resources cover a VPC, VPN server, MSK cluster and Python Lambda producer app.
+The AWS infrastructure is created using [Terraform](https://developer.hashicorp.com/terraform) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post. See this [earlier post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/) for details about how to create the resources. The key resources cover a VPC, VPN server, MSK cluster and Python Lambda producer app.
 
 ### Lambda Kafka Consumer
 
@@ -256,7 +256,7 @@ Once the resources are deployed, we can check the Lambda function on AWS Console
 
 ### Kafka Topic
 
-We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using [*compose-ui.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-ui.yml) - see [this post](/blog/2023-10-23-kafka-connect-for-aws-part-4) for details about *kpow* configuration.
+We can see the topic (*taxi-rides*) is created, and the details of the topic can be found on the *Topics* menu on *localhost:3000*. Note that, if the Kafka monitoring app (*kpow*) is not started, we can run it using [*compose-ui.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-ui.yml) - see [this post](/blog/2023-10-23-kafka-connect-for-aws-part-4/) for details about *kpow* configuration.
 
 ![Kpow topic details for taxi-rides, 5 partitions holding about 35000 messages each and 177000 in total](kafka-topic.png#center "The taxi-rides topic in Kpow")
 

@@ -18,16 +18,16 @@ description: Set up a Kafka cluster with Docker Compose, the base for a series o
 I'm teaching myself [modern data streaming architectures](https://docs.aws.amazon.com/whitepapers/latest/build-modern-data-streaming-analytics-architectures/build-modern-data-streaming-analytics-architectures.html) on AWS, and [Apache Kafka](https://kafka.apache.org/) is one of the key technologies, which can be used for messaging, activity tracking, stream processing and so on. While applications tend to be deployed to cloud, it can be much easier if we develop and test those with [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) locally. As the series title indicates, I plan to publish articles that demonstrate Kafka and related tools in *Dockerized* environments. Although I covered some of them in previous posts, they are implemented differently in terms of the Kafka Docker image, the number of brokers, Docker volume mapping etc. It can be confusing, and one of the purposes of this series is to illustrate reference implementations that can be applied to future development projects. Also, I can extend my knowledge while preparing for this series. In fact Kafka security is one of the areas that I expect to learn further. Below shows a list of posts that I plan for now.
 
 * [Part 1 Cluster Setup](#) (this post)
-* [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
-* [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3)
-* [Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4)
-* [Part 5 Glue Schema Registry](/blog/2023-06-08-kafka-development-with-docker-part-5)
-* [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6)
-* [Part 7 Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7)
-* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8)
-* [Part 9 SSL Authentication](/blog/2023-07-06-kafka-development-with-docker-part-9)
-* [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10)
-* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11)
+* [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2/)
+* [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3/)
+* [Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4/)
+* [Part 5 Glue Schema Registry](/blog/2023-06-08-kafka-development-with-docker-part-5/)
+* [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6/)
+* [Part 7 Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7/)
+* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8/)
+* [Part 9 SSL Authentication](/blog/2023-07-06-kafka-development-with-docker-part-9/)
+* [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10/)
+* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11/)
 
 [**UPDATE 2025-10-01**]
 

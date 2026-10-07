@@ -408,6 +408,6 @@ Lambda logs (and traceback) are found for both succeeded and failed tasks.
 
 ## Related posts
 
-* [Revisit AWS Lambda Invoke Function Operator of Apache Airflow](/blog/2022-08-06-revisit-lambda-operator) - the same operator extended with a correlation ID so it reports the exact error message.
-* [dbt Pizza Shop Demo - Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6) - Airflow orchestrating a dbt project on Amazon Athena, a fuller example of task design.
-* [AWS Local Development with LocalStack](/blog/2019-07-20-aws-localstack) - running AWS services on a local machine so Lambda code can be tested without an account.
+* [Revisit AWS Lambda Invoke Function Operator of Apache Airflow](/blog/2022-08-06-revisit-lambda-operator/) - the same operator extended with a correlation ID so it reports the exact error message.
+* [dbt Pizza Shop Demo - Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6/) - Airflow orchestrating a dbt project on Amazon Athena, a fuller example of task design.
+* [AWS Local Development with LocalStack](/blog/2019-07-20-aws-localstack/) - running AWS services on a local machine so Lambda code can be tested without an account.

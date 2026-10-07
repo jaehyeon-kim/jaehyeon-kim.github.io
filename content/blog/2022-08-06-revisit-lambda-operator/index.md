@@ -663,9 +663,9 @@ Still the failure by synchronous invocation doesn’t show the exact error messa
 
 ## Related posts
 
-* [Thoughts on Apache Airflow AWS Lambda Operator](/blog/2020-04-13-airflow-lambda-operator) - the earlier custom Lambda operator that this post revisits
-* [ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6) - another Airflow orchestration example, running a dbt project on Amazon Athena
-* [AWS Local Development with LocalStack](/blog/2019-07-20-aws-localstack) - running AWS services on a local machine so functions can be exercised without an AWS account
+* [Thoughts on Apache Airflow AWS Lambda Operator](/blog/2020-04-13-airflow-lambda-operator/) - the earlier custom Lambda operator that this post revisits
+* [ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6/) - another Airflow orchestration example, running a dbt project on Amazon Athena
+* [AWS Local Development with LocalStack](/blog/2019-07-20-aws-localstack/) - running AWS services on a local machine so functions can be exercised without an AWS account
 
 ## Summary
 

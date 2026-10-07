@@ -37,6 +37,6 @@ I hope you find this post useful and good luck with your exam!
 
 ## Related posts
 
-* [Data Lake Demo with CDC - Part 1 Local Development](/blog/2021-12-05-datalake-demo-part1) - the local Debezium and Kafka Connect setup behind the CDC project mentioned here
-* [Data Lake Demo with CDC - Part 2 Implement CDC](/blog/2021-12-12-datalake-demo-part2) - the same pipeline built on Amazon MSK and MSK Connect
-* [Data Lake Demo with CDC - Part 3 Implement Data Lake](/blog/2021-12-19-datalake-demo-part3) - querying the captured changes with Hudi, Athena and QuickSight
+* [Data Lake Demo with CDC - Part 1 Local Development](/blog/2021-12-05-datalake-demo-part1/) - the local Debezium and Kafka Connect setup behind the CDC project mentioned here
+* [Data Lake Demo with CDC - Part 2 Implement CDC](/blog/2021-12-12-datalake-demo-part2/) - the same pipeline built on Amazon MSK and MSK Connect
+* [Data Lake Demo with CDC - Part 3 Implement Data Lake](/blog/2021-12-19-datalake-demo-part3/) - querying the captured changes with Hudi, Athena and QuickSight

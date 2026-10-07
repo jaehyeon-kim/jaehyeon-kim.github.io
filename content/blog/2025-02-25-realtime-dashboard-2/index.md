@@ -18,13 +18,13 @@ tags:
 description: Streamlit and Apache ECharts draw a live sales dashboard that reads order counts and revenue by country from a FastAPI WebSocket server.
 ---
 
-A real-time monitoring dashboard is developed using [Streamlit](https://streamlit.io/), an open-source Python framework that allows data scientists and AI/ML engineers to create interactive data apps. The app connects to the WebSocket server we developed in [Part 1](/blog/2025-02-18-realtime-dashboard-1) and continuously fetches data to visualize key metrics such as **order counts**, **sales data**, and **revenue by traffic source and country**. With interactive bar charts and dynamic metrics, users can monitor sales trends and other important business KPIs in real-time.
+A real-time monitoring dashboard is developed using [Streamlit](https://streamlit.io/), an open-source Python framework that allows data scientists and AI/ML engineers to create interactive data apps. The app connects to the WebSocket server we developed in [Part 1](/blog/2025-02-18-realtime-dashboard-1/) and continuously fetches data to visualize key metrics such as **order counts**, **sales data**, and **revenue by traffic source and country**. With interactive bar charts and dynamic metrics, users can monitor sales trends and other important business KPIs in real-time.
 
 <!--more-->
 
-* [Part 1 Data Producer](/blog/2025-02-18-realtime-dashboard-1)
+* [Part 1 Data Producer](/blog/2025-02-18-realtime-dashboard-1/)
 * [Part 2 Streamlit Dashboard](#) (this post)
-* [Part 3 Next.js Dashboard](/blog/2025-03-04-realtime-dashboard-3)
+* [Part 3 Next.js Dashboard](/blog/2025-03-04-realtime-dashboard-3/)
 
 ## Streamlit Frontend
 
@@ -236,7 +236,7 @@ else:
 
 ### Data Producer and WebSocket Server
 
-As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1), PostgreSQL is started with `odctl up postgres`, and the data generator and WebSocket server are started with `python -m sales.simulation.run` and `uvicorn sales.api.server:app --host 127.0.0.1 --port 8000`, each in its own terminal. Once started, the server can be checked with the WebSocket client of the [websockets](https://websockets.readthedocs.io/) package by executing `python -m websockets ws://127.0.0.1:8000/ws`, and its logs are printed in its terminal.
+As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1/), PostgreSQL is started with `odctl up postgres`, and the data generator and WebSocket server are started with `python -m sales.simulation.run` and `uvicorn sales.api.server:app --host 127.0.0.1 --port 8000`, each in its own terminal. Once started, the server can be checked with the WebSocket client of the [websockets](https://websockets.readthedocs.io/) package by executing `python -m websockets ws://127.0.0.1:8000/ws`, and its logs are printed in its terminal.
 
 The client prints each message the server sends: a list of the order items of the last five minutes, here 39 records in the first message.
 

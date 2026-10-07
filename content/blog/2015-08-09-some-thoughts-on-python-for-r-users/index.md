@@ -188,5 +188,5 @@ DEBUG:suds.client:headers = {'SOAPAction': '"http://api.eyeblaster.com/IAdvertis
 
 ## When to Reach for Python as an R User
 
-I guess most R users are not programmers but many of them are quite good at understanding how a program works. Therefore, if there is an area that R is not strong, it'd be alright to consider another language to make life easier. Among those, I consider Python is easy to learn and it can provide a range of good tools. If you're interested, please see my next article about [some thoughts on Python](/blog/2015-08-08-some-thoughts-on-python).
+I guess most R users are not programmers but many of them are quite good at understanding how a program works. Therefore, if there is an area that R is not strong, it'd be alright to consider another language to make life easier. Among those, I consider Python is easy to learn and it can provide a range of good tools. If you're interested, please see my next article about [some thoughts on Python](/blog/2015-08-08-some-thoughts-on-python/).
 

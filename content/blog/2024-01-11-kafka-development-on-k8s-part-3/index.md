@@ -23,8 +23,8 @@ description: Ingest fake customer and order data into Kafka with the MSK Data Ge
 
 [Kafka Connect](https://kafka.apache.org/documentation/#connect) is a tool for scalably and reliably streaming data between Apache Kafka and other systems. It makes it simple to quickly define connectors that move large collections of data into and out of Kafka. In this post, we discuss how to set up a data ingestion pipeline using Kafka connectors. Fake customer and order data is ingested into Kafka topics using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator). Also, we use the [Confluent S3](https://www.confluent.io/hub/confluentinc/kafka-connect-s3) sink connector to save the messages of the topics into a S3 bucket. The Kafka Connect servers and individual connectors are deployed using the custom resources of [Strimzi](https://strimzi.io/) on Kubernetes.
 
-* [Part 1 Cluster Setup](/blog/2023-12-21-kafka-development-on-k8s-part-1)
-* [Part 2 Producer and Consumer](/blog/2024-01-04-kafka-development-on-k8s-part-2)
+* [Part 1 Cluster Setup](/blog/2023-12-21-kafka-development-on-k8s-part-1/)
+* [Part 2 Producer and Consumer](/blog/2024-01-04-kafka-development-on-k8s-part-2/)
 * [Part 3 Kafka Connect](#) (this post)
 
 ## Kafka Connect
@@ -114,7 +114,7 @@ spec:
             url: https://github.com/awslabs/amazon-msk-data-generator/releases/download/v0.4.0/msk-data-generator-0.4-jar-with-dependencies.jar
 ```
 
-We assume that a Kafka cluster and management app are deployed on Minikube as discussed in [Part 1](/blog/2023-12-21-kafka-development-on-k8s-part-1). The Kafka Connect server can be created using the *kubernetes create* command as shown below.
+We assume that a Kafka cluster and management app are deployed on Minikube as discussed in [Part 1](/blog/2023-12-21-kafka-development-on-k8s-part-1/). The Kafka Connect server can be created using the *kubernetes create* command as shown below.
 
 ```bash
 kubectl create -f manifests/kafka-connect.yaml

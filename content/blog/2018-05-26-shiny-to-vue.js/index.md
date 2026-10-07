@@ -17,7 +17,7 @@ tags:
 description: Render htmlwidgets inside a Vue.js application, then replace those widgets with native JavaScript libraries for performance async Shiny cannot reach.
 ---
 
-In the [last post](/blog/2018-05-19-asyn-shiny-and-its-limitation), the async feature of Shiny was discussed. Although it is a remarkable step forward to web development in R, it is not to the full extent that a Javascript application can bring. In fact, (long running) requests of a user (or session) are not impacted by those of other users (or sessions) but, for a given user, all requests are handled sequentially. On the other hand, it is not the case for a Javascript-backed app where all requests are processed asynchronously.
+In the [last post](/blog/2018-05-19-asyn-shiny-and-its-limitation/), the async feature of Shiny was discussed. Although it is a remarkable step forward to web development in R, it is not to the full extent that a Javascript application can bring. In fact, (long running) requests of a user (or session) are not impacted by those of other users (or sessions) but, for a given user, all requests are handled sequentially. On the other hand, it is not the case for a Javascript-backed app where all requests are processed asynchronously.
 
 > **Status, September 2026.** This post works around open source Shiny handling one user session's requests one after another. Shiny now provides `ExtendedTask`, which unblocks the session that started a long running operation, so rewriting an app in a JavaScript framework is no longer needed for that reason alone.
 

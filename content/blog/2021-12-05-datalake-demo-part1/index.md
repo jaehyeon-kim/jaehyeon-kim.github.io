@@ -28,8 +28,8 @@ math: true # This post renders maths, so it needs the KaTeX bundle.
 [Change data capture (CDC)](https://www.redhat.com/en/topics/integration/what-is-change-data-capture#what-is-cdc) is a proven data integration pattern that has a wide range of applications. Among those, data replication to data lakes is a good use case in data engineering. Coupled with [best-in-breed data lake formats](https://lakefs.io/hudi-iceberg-and-delta-lake-data-lake-table-formats-compared/) such as [Apache Hudi](https://hudi.apache.org/), we can build an efficient data replication solution. This is the first post of the data lake demo series. Over time, we'll build a data lake that uses CDC. As a starting point, we'll discuss the source database and CDC streaming infrastructure in the local environment.
 
 * [Part 1 Local Development](#) (this post)
-* [Part 2 Implement CDC](/blog/2021-12-12-datalake-demo-part2)
-* [Part 3 Implement Data Lake](/blog/2021-12-19-datalake-demo-part3)
+* [Part 2 Implement CDC](/blog/2021-12-12-datalake-demo-part2/)
+* [Part 3 Implement Data Lake](/blog/2021-12-19-datalake-demo-part3/)
 
 ## Architecture
 
@@ -557,8 +557,8 @@ We can see the output file includes 4 JSON objects where the first object has NU
 
 ## Related posts
 
-* [Change Data Capture (CDC) Local Development with PostgreSQL, Debezium Server and Pub/Sub Emulator](/blog/2024-11-07-cdc-local-dev) - a later take on local CDC that uses Debezium Server instead of Kafka Connect.
-* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect) - a recent version of this setup, with Debezium and an S3 sink connector capturing changes from a simulated online shop.
+* [Change Data Capture (CDC) Local Development with PostgreSQL, Debezium Server and Pub/Sub Emulator](/blog/2024-11-07-cdc-local-dev/) - a later take on local CDC that uses Debezium Server instead of Kafka Connect.
+* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/) - a recent version of this setup, with Debezium and an S3 sink connector capturing changes from a simulated online shop.
 
 ## Conclusion
 

@@ -17,24 +17,24 @@ tags:
 description: Pacing messages are added to the Beam sport activity tracker by comparing short term speed metrics against their long term counterparts.
 ---
 
-We develop a new pipeline that tracks user activities and reports pacing details by comparing short term metrics to their long term counterparts. In [Part 3](/blog/2024-08-01-beam-examples-3), we developed a Beam pipeline that tracks sport activities of users and outputs their speeds periodically. While reporting such values is useful for users on its own, we can provide more engaging information to users if we have a pipeline that reports pacing of their activities over periods. For example, we can send a message to encourage a user to work harder if he/she has a performance goal and is underperforming for some periods.
+We develop a new pipeline that tracks user activities and reports pacing details by comparing short term metrics to their long term counterparts. In [Part 3](/blog/2024-08-01-beam-examples-3/), we developed a Beam pipeline that tracks sport activities of users and outputs their speeds periodically. While reporting such values is useful for users on its own, we can provide more engaging information to users if we have a pipeline that reports pacing of their activities over periods. For example, we can send a message to encourage a user to work harder if he/she has a performance goal and is underperforming for some periods.
 
 <!--more-->
 
-* [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1)
-* [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
-* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
-* [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4)
-* [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5)
-* [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6)
-* [Part 7 Separate Droppable Data into Side Output](/blog/2024-10-24-beam-examples-7)
+* [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1/)
+* [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2/)
+* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3/)
+* [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4/)
+* [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5/)
+* [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6/)
+* [Part 7 Separate Droppable Data into Side Output](/blog/2024-10-24-beam-examples-7/)
 * [Part 8 Enhance Sport Activity Tracker with Runner Motivation](#) (this post)
-* [Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn](/blog/2024-12-05-beam-examples-9)
-* [Part 10 Develop Streaming File Reader using Splittable DoFn](/blog/2024-12-19-beam-examples-10)
+* [Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn](/blog/2024-12-05-beam-examples-9/)
+* [Part 10 Develop Streaming File Reader using Splittable DoFn](/blog/2024-12-19-beam-examples-10/)
 
 ## Development Environment
 
-The development environment has an Apache Flink cluster, Apache Kafka cluster and [gRPC](https://grpc.io/) server. The gRPC server was used in Part 4 to 6. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
+The development environment has an Apache Flink cluster, Apache Kafka cluster and [gRPC](https://grpc.io/) server. The gRPC server was used in Part 4 to 6. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1/) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
 
 ### Manage Environment
 

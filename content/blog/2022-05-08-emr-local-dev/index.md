@@ -22,7 +22,7 @@ description: Create a Spark local development environment for Amazon EMR with Do
 [Amazon EMR](https://aws.amazon.com/emr/) is a managed service that simplifies running Apache Spark on AWS. It has multiple deployment options that cover EC2, [EKS](https://aws.amazon.com/emr/features/eks/), [Outposts](https://aws.amazon.com/emr/features/outposts/) and [Serverless](https://aws.amazon.com/emr/serverless/). For development and testing, [EMR Notebooks](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html) or [EMR Studio](https://aws.amazon.com/emr/features/studio/) can be an option. Both provide a Jupyter Notebook environment and the former is only available for EMR on EC2. There are cases, however, that development (and learning) is performed in a local environment more efficiently. The AWS Glue team understands this demand, and they illustrate how to make use of a custom Docker image for Glue in a [recent blog post](https://aws.amazon.com/blogs/big-data/develop-and-test-aws-glue-version-3-0-jobs-locally-using-a-docker-container/). However, we don’t hear similar news from the EMR team. In order to fill the gap, we’ll discuss how to create a Spark local development environment for EMR using Docker and/or VSCode. Typical Spark development examples will be demonstrated, which covers Spark Submit, Pytest, PySpark shell, Jupyter Notebook and Spark Structured Streaming. For the Spark Submit and Jupyter Notebook examples, [Glue Catalog integration](https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-spark-glue.html) will be illustrated as well. And both the cases of utilising [Visual Studio Code Remote - Containers](https://code.visualstudio.com/docs/remote/containers) extension and running as an isolated container will be covered in some key examples.
 
 [**UPDATE 2023-12-07**]
-- I wrote a [new post](/blog/2023-12-07-flink-spark-local-dev) that simplifies the Spark configuration dramatically. Besides, the log configuration is based on Log4J2, which applies to newer Spark versions. Moreover, the container is configured to run the Spark History Server, and it allows us to debug and diagnose completed and running Spark applications. I recommend referring to the new post.
+- I wrote a [new post](/blog/2023-12-07-flink-spark-local-dev/) that simplifies the Spark configuration dramatically. Besides, the log configuration is based on Log4J2, which applies to newer Spark versions. Moreover, the container is configured to run the Spark History Server, and it allows us to debug and diagnose completed and running Spark applications. I recommend referring to the new post.
 
 [**UPDATE 2025-10-01**]
 
@@ -135,7 +135,7 @@ We are able to run Spark Submit, pytest, PySpark shell examples as an isolated c
 
 ### Docker Compose
 
-The main service (container) is named _spark_ and its command prevents it from being terminated. The current working directory is mapped to _/home/hadoop/repo_ and it’ll be the container folder that we’ll open for development. The aws configuration folder is volume-mapped to the container user’s home directory. It is an optional configuration to access AWS services without relying on AWS credentials via environment variables. The remaining services are related to Kafka. The _kafka_ and _zookeeper_ services are to run a Kafka cluster and the _kafka-ui_ allows us to access the cluster on a browser. The services share the same Docker network named _spark_. Note that the compose file includes other Kafka related services and their details can be found in [one of my earlier posts](/blog/2021-12-05-datalake-demo-part1).
+The main service (container) is named _spark_ and its command prevents it from being terminated. The current working directory is mapped to _/home/hadoop/repo_ and it’ll be the container folder that we’ll open for development. The aws configuration folder is volume-mapped to the container user’s home directory. It is an optional configuration to access AWS services without relying on AWS credentials via environment variables. The remaining services are related to Kafka. The _kafka_ and _zookeeper_ services are to run a Kafka cluster and the _kafka-ui_ allows us to access the cluster on a browser. The services share the same Docker network named _spark_. Note that the compose file includes other Kafka related services and their details can be found in [one of my earlier posts](/blog/2021-12-05-datalake-demo-part1/).
 
 
 ```yaml
@@ -638,7 +638,7 @@ We can check the individual messages via the UI as well.
 
 ## Related posts
 
-* [Develop and Test Apache Spark Apps for EMR Remotely Using Visual Studio Code](/blog/2022-09-07-emr-remote-dev) - the follow-up, developing against an EMR cluster in a private subnet over VPN and remote SSH
+* [Develop and Test Apache Spark Apps for EMR Remotely Using Visual Studio Code](/blog/2022-09-07-emr-remote-dev/) - the follow-up, developing against an EMR cluster in a private subnet over VPN and remote SSH
 
 ## Summary
 

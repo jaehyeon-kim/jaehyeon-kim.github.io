@@ -52,9 +52,9 @@ Visualizing this multi-path journey, including column-level details, was achieve
 
 ## Related posts
 
-* [Setup Local Development Environment for Apache Flink and Spark Using EMR Container Images](/blog/2023-12-07-flink-spark-local-dev) - a local Flink and Spark environment of the kind this lineage work instruments.
-* [Self-service Data Platform via a Multi-tenant SQL Gateway](/blog/2025-07-17-self-service-data-platform-via-sql-gateway) - Apache Kyuubi giving on-demand Spark, Flink and Trino engines with central governance.
-* [Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI](/blog/2026-07-16-odctl-open-data-stack) - a CLI that starts Kafka, Flink, Spark, Trino, Iceberg and observability tooling as one local stack.
+* [Setup Local Development Environment for Apache Flink and Spark Using EMR Container Images](/blog/2023-12-07-flink-spark-local-dev/) - a local Flink and Spark environment of the kind this lineage work instruments.
+* [Self-service Data Platform via a Multi-tenant SQL Gateway](/blog/2025-07-17-self-service-data-platform-via-sql-gateway/) - Apache Kyuubi giving on-demand Spark, Flink and Trino engines with central governance.
+* [Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI](/blog/2026-07-16-odctl-open-data-stack/) - a CLI that starts Kafka, Flink, Spark, Trino, Iceberg and observability tooling as one local stack.
 
 ## Moving Forward
 

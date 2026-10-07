@@ -181,8 +181,8 @@ shinyApp(ui = ui, server = server)
 
 ## Related posts
 
-* [Render Multiple Pages](/blog/2016-06-27-shiny-open-source-render-multiple-pages) - the next topic in this series, rendering several pages with htmlOutput and renderUI, including login and registration.
-* [Async Shiny and Its Limitation](/blog/2018-05-19-asyn-shiny-and-its-limitation) - what the async feature of Shiny fixes and where it still falls short.
-* [Shiny to Vue.js](/blog/2018-05-26-shiny-to-vue.js) - moving the front end to Vue.js for performance async Shiny cannot reach.
+* [Render Multiple Pages](/blog/2016-06-27-shiny-open-source-render-multiple-pages/) - the next topic in this series, rendering several pages with htmlOutput and renderUI, including login and registration.
+* [Async Shiny and Its Limitation](/blog/2018-05-19-asyn-shiny-and-its-limitation/) - what the async feature of Shiny fixes and where it still falls short.
+* [Shiny to Vue.js](/blog/2018-05-26-shiny-to-vue.js/) - moving the front end to Vue.js for performance async Shiny cannot reach.
 
 

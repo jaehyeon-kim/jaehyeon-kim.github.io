@@ -19,14 +19,14 @@ tags:
 description: Orchestrate the BigQuery pizza shop dbt project with Apache Airflow, running the SCD type 2 dimension tables and the denormalised fact table.
 ---
 
-An ETL process is set up with Apache Airflow on a [dbt](https://docs.getdbt.com/docs/introduction) project that targets Google BigQuery with fictional pizza shop data. We developed that project in [Part 3](/blog/2024-02-08-dbt-pizza-shop-3). Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. The fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested) for improving query performance.
+An ETL process is set up with Apache Airflow on a [dbt](https://docs.getdbt.com/docs/introduction) project that targets Google BigQuery with fictional pizza shop data. We developed that project in [Part 3](/blog/2024-02-08-dbt-pizza-shop-3/). Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. The fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested) for improving query performance.
 
-* [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1)
-* [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2)
-* [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3)
+* [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1/)
+* [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2/)
+* [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3/)
 * [Part 4 ETL on BigQuery via Airflow](#) (this post)
-* [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5)
-* [Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6)
+* [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5/)
+* [Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6/)
 
 ## Infrastructure
 
@@ -34,7 +34,7 @@ Apache Airflow and Google BigQuery are used in this post, and the former is depl
 
 ### Airflow
 
-Airflow is simplified by using the [Local Executor](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/local.html) where both scheduling and task execution are handled by the airflow scheduler service - i.e. *AIRFLOW__CORE__EXECUTOR: LocalExecutor*. Also, it is configured to be able to run the *dbt* project (see [Part 3](/blog/2024-02-08-dbt-pizza-shop-3) for details) within the scheduler service by 
+Airflow is simplified by using the [Local Executor](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/local.html) where both scheduling and task execution are handled by the airflow scheduler service - i.e. *AIRFLOW__CORE__EXECUTOR: LocalExecutor*. Also, it is configured to be able to run the *dbt* project (see [Part 3](/blog/2024-02-08-dbt-pizza-shop-3/) for details) within the scheduler service by 
 
 - installing the *dbt-bigquery* package as an additional pip package,
 - volume-mapping folders that keep the *dbt* project and *dbt* project profile, and
@@ -148,7 +148,7 @@ networks:
     name: app-network
 ```
 
-Before we deploy the Airflow services, we need to create the BigQuery dataset and staging tables, followed by inserting initial records - see [Part 3](/blog/2024-02-08-dbt-pizza-shop-3) for details about the prerequisite steps. Then the services can be started using the *docker-compose up* command. Note that it is recommended to specify the host user's ID as the *AIRFLOW_UID* value. Otherwise, Airflow can fail to launch due to insufficient permission to write logs. Note also that the relevant GCP project ID should be included as it is read in the compose file.
+Before we deploy the Airflow services, we need to create the BigQuery dataset and staging tables, followed by inserting initial records - see [Part 3](/blog/2024-02-08-dbt-pizza-shop-3/) for details about the prerequisite steps. Then the services can be started using the *docker-compose up* command. Note that it is recommended to specify the host user's ID as the *AIRFLOW_UID* value. Otherwise, Airflow can fail to launch due to insufficient permission to write logs. Note also that the relevant GCP project ID should be included as it is read in the compose file.
 
 ```bash
 ## prerequisite

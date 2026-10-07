@@ -225,6 +225,6 @@ To explore the source code, view the full API documentation, or test out the zer
 
 ## Related posts
 
-* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect) - the library running an online shop on PostgreSQL, with Debezium streaming every change
-* [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql) - the library playing a mobile game, with Flink SQL keeping leaderboards up to date
-* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system) - the library generating Parquet data for an Iceberg lakehouse that an agent queries
+* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/) - the library running an online shop on PostgreSQL, with Debezium streaming every change
+* [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql/) - the library playing a mobile game, with Flink SQL keeping leaderboards up to date
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system/) - the library generating Parquet data for an Iceberg lakehouse that an agent queries

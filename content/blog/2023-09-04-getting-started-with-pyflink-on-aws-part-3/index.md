@@ -21,8 +21,8 @@ description: Deploy a PyFlink app that reads and writes Kafka topics on Amazon M
 ---
 [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/) is the easiest option to run Flink applications on AWS, and the Pyflink app is deployed via it in this post. In this series of posts, we discuss a Flink (Pyflink) application that reads/writes from/to Kafka topics. In the previous posts, I demonstrated a Pyflink app that targets a local Kafka cluster as well as a Kafka cluster on Amazon MSK. The app was executed in a virtual environment as well as in a local Flink cluster for improved monitoring.
 
-* [Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1)
-* [Part 2 Local Flink and MSK](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2)
+* [Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1/)
+* [Part 2 Local Flink and MSK](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2/)
 * [Part 3 AWS Managed Flink and MSK](#) (this post)
 
 [**Update 2023-08-30**] Amazon Kinesis Data Analytics is renamed into [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/). In this post, Kinesis Data Analytics (KDA) and Amazon Managed Service for Apache Flink will be used interchangeably.
@@ -40,7 +40,7 @@ A Kafka cluster is created on Amazon MSK using Terraform, and the cluster is sec
 
 #### Application Package
 
-As discussed in [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2), the app has multiple jar dependencies, and they have to be combined into a single Uber jar file. This is because KDA does not allow you to specify multiple pipeline jar files. The details about how to create the custom jar file can be found in [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2).
+As discussed in [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2/), the app has multiple jar dependencies, and they have to be combined into a single Uber jar file. This is because KDA does not allow you to specify multiple pipeline jar files. The details about how to create the custom jar file can be found in [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2/).
 
 The following script (*build.sh*) builds to create the Uber Jar file for this post, followed by downloading the *kafka-python* package and creating a zip file that can be used to deploy the Flink app via KDA. Although the Flink app does not need the *kafka-python* package, it is added in order to check if `--pyFiles` option works when deploying the app via KDA. The zip package file will be used for KDA deployment in this post.
 
@@ -111,7 +111,7 @@ networks:
 
 ### VPC and VPN
 
-A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*infra/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*infra/vpn.tf*). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in an [earlier post](/blog/2022-02-06-dev-infra-terraform).
+A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*infra/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*infra/vpn.tf*). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in an [earlier post](/blog/2022-02-06-dev-infra-terraform/).
 
 ### MSK Cluster
 
@@ -618,7 +618,7 @@ Once deployed, we can see the application on AWS console, and it stays in the re
 
 ## Run Application
 
-We first need to create records in the source Kafka topic. It is done by executing the data generator app (*producer.py*). See [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2) for details about the generator app and how to execute it. Note that we should connect to the VPN server in order to create records from the developer machine.
+We first need to create records in the source Kafka topic. It is done by executing the data generator app (*producer.py*). See [part 2](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2/) for details about the generator app and how to execute it. Note that we should connect to the VPN server in order to create records from the developer machine.
 
 Once executed, we can check the source topic is created and messages are ingested.
 

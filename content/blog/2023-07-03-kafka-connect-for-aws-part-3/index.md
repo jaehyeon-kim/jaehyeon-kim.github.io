@@ -22,17 +22,17 @@ cevo: 30
 description: Deploy the Camel DynamoDB sink connector and its data generator source on Amazon MSK and MSK Connect, moving the local pipeline onto AWS.
 ---
 
-As part of investigating how to utilize Kafka Connect effectively for AWS services integration, I demonstrated how to develop the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/latest/index.html) using Docker in [Part 2](/blog/2023-06-04-kafka-connect-for-aws-part-2). Fake order data was generated using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) source connector, and the sink connector was configured to consume the topic messages to ingest them into a DynamoDB table. In this post, I will illustrate how to deploy the data ingestion applications using [Amazon MSK](https://aws.amazon.com/msk/) and [MSK Connect](https://aws.amazon.com/msk/features/msk-connect/).
+As part of investigating how to utilize Kafka Connect effectively for AWS services integration, I demonstrated how to develop the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/latest/index.html) using Docker in [Part 2](/blog/2023-06-04-kafka-connect-for-aws-part-2/). Fake order data was generated using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) source connector, and the sink connector was configured to consume the topic messages to ingest them into a DynamoDB table. In this post, I will illustrate how to deploy the data ingestion applications using [Amazon MSK](https://aws.amazon.com/msk/) and [MSK Connect](https://aws.amazon.com/msk/features/msk-connect/).
 
-* [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1)
-* [Part 2 Develop Camel DynamoDB Sink Connector](/blog/2023-06-04-kafka-connect-for-aws-part-2)
+* [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1/)
+* [Part 2 Develop Camel DynamoDB Sink Connector](/blog/2023-06-04-kafka-connect-for-aws-part-2/)
 * [Part 3 Deploy Camel DynamoDB Sink Connector](#) (this post)
-* [Part 4 Develop Aiven OpenSearch Sink Connector](/blog/2023-10-23-kafka-connect-for-aws-part-4)
-* [Part 5 Deploy Aiven OpenSearch Sink Connector](/blog/2023-10-30-kafka-connect-for-aws-part-5)
+* [Part 4 Develop Aiven OpenSearch Sink Connector](/blog/2023-10-23-kafka-connect-for-aws-part-4/)
+* [Part 5 Deploy Aiven OpenSearch Sink Connector](/blog/2023-10-30-kafka-connect-for-aws-part-5/)
 
 ## Infrastructure
 
-A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (`vpc.tf`). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (`vpn.tf`). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in an [earlier post](/blog/2022-02-06-dev-infra-terraform). The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-connect-for-aws/part-03) of this post.
+A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (`vpc.tf`). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (`vpn.tf`). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in an [earlier post](/blog/2022-02-06-dev-infra-terraform/). The source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/kafka-pocs/tree/main/kafka-connect-for-aws/part-03) of this post.
 
 ### MSK
 
@@ -647,4 +647,4 @@ We can also obtain an individual Json record by clicking an *order_id* value as 
 
 ## Summary
 
-As part of investigating how to utilize Kafka Connect effectively for AWS services integration, I demonstrated how to develop the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/latest/index.html) using Docker in [Part 2](/blog/2023-06-04-kafka-connect-for-aws-part-2). Fake order data was generated using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) source connector, and the sink connector was configured to consume the topic messages to ingest them into a DynamoDB table. In this post, I illustrated how to deploy the data ingestion applications using [Amazon MSK](https://aws.amazon.com/msk/) and [MSK Connect](https://aws.amazon.com/msk/features/msk-connect/).
+As part of investigating how to utilize Kafka Connect effectively for AWS services integration, I demonstrated how to develop the [Camel DynamoDB sink connector](https://camel.apache.org/camel-kafka-connector/latest/index.html) using Docker in [Part 2](/blog/2023-06-04-kafka-connect-for-aws-part-2/). Fake order data was generated using the [MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator) source connector, and the sink connector was configured to consume the topic messages to ingest them into a DynamoDB table. In this post, I illustrated how to deploy the data ingestion applications using [Amazon MSK](https://aws.amazon.com/msk/) and [MSK Connect](https://aws.amazon.com/msk/features/msk-connect/).

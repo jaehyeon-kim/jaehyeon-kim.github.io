@@ -24,7 +24,7 @@ description: Deploy a PyFlink application to minikube with the Flink Kubernetes 
 <!--more-->
 
 * [Part 1 PyFlink Application](#) (this post)
-* [Part 2 Beam Pipeline on Flink Runner](/blog/2024-06-06-beam-deploy-2)
+* [Part 2 Beam Pipeline on Flink Runner](/blog/2024-06-06-beam-deploy-2/)
 
 ## Setup Kafka Cluster
 

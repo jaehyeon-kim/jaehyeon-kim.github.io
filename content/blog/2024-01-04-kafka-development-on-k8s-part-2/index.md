@@ -35,9 +35,9 @@ For example:
 ---
 
 
-* [Part 1 Cluster Setup](/blog/2023-12-21-kafka-development-on-k8s-part-1)
+* [Part 1 Cluster Setup](/blog/2023-12-21-kafka-development-on-k8s-part-1/)
 * [Part 2 Producer and Consumer](#) (this post)
-* [Part 3 Kafka Connect](/blog/2024-01-11-kafka-development-on-k8s-part-3)
+* [Part 3 Kafka Connect](/blog/2024-01-11-kafka-development-on-k8s-part-3/)
 
 ## Kafka Client Apps
 
@@ -228,7 +228,7 @@ if __name__ == "__main__":
 
 ## Test Client Apps on Host
 
-We assume that a Kafka cluster and management app are deployed on Minikube as discussed in [Part 1](/blog/2023-12-21-kafka-development-on-k8s-part-1). As mentioned in Part 1, the external listener of the Kafka bootstrap server is exposed by a service named *demo-cluster-kafka-external-bootstrap*. We can use the [*minikube service*](https://minikube.sigs.k8s.io/docs/handbook/accessing/) command to obtain the Kubernetes URL for the service.
+We assume that a Kafka cluster and management app are deployed on Minikube as discussed in [Part 1](/blog/2023-12-21-kafka-development-on-k8s-part-1/). As mentioned in Part 1, the external listener of the Kafka bootstrap server is exposed by a service named *demo-cluster-kafka-external-bootstrap*. We can use the [*minikube service*](https://minikube.sigs.k8s.io/docs/handbook/accessing/) command to obtain the Kubernetes URL for the service.
 
 ```bash
 minikube service demo-cluster-kafka-external-bootstrap --url

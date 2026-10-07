@@ -23,14 +23,14 @@ While the API returns a predicted admission status value given *GRE*, *GPA* and 
 > **Status, September 2026.** The AWS console screens shown here have been redesigned, so the API Gateway *Enable CORS* flow under *Actions*, and the S3 and CloudFront setup pages, no longer match what the console presents. The Lambda handler change and the overall approach still apply, and an infrastructure as code tool is a better fit than clicking through the console.
 
 * Backend
-    * [Part I - Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1)
-    * [Part II - Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2)
-    * [Part III - Exposing R ML Model via APIG](/blog/2017-04-13-serverless-data-product-3)
+    * [Part I - Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1/)
+    * [Part II - Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2/)
+    * [Part III - Exposing R ML Model via APIG](/blog/2017-04-13-serverless-data-product-3/)
 * Frontend
     * [Part IV - Serving R ML Model via S3](#) - this post
 ## Frontend
 
-A simple *single page application* is created using [React](https://facebook.github.io/react/). By clicking the *Check!* button after entering the *GRE*, *GPA* and *Rank* values, information of the expected admimission status pops up in a modal. The status value is `fetch`ed from the API of the POC application that is discussed in [Part III](/blog/2017-04-13-serverless-data-product-3). The code of this application can be found [here](https://github.com/jaehyeon-kim/serverless-poc/tree/master/poc-web).
+A simple *single page application* is created using [React](https://facebook.github.io/react/). By clicking the *Check!* button after entering the *GRE*, *GPA* and *Rank* values, information of the expected admimission status pops up in a modal. The status value is `fetch`ed from the API of the POC application that is discussed in [Part III](/blog/2017-04-13-serverless-data-product-3/). The code of this application can be found [here](https://github.com/jaehyeon-kim/serverless-poc/tree/master/poc-web).
 
 ![Single page app with GRE, GPA and Rank inputs and a Check button](00-app-01.png#center "Single page app with GRE, GPA and Rank inputs and a Check button")
 
@@ -199,7 +199,7 @@ index.html
 
 ### Static website hosting
 
-First *read-access* is given to all objects in the bucket (*poc.jaehyeon.me*). It is set in *Bucket Policy* of the permissions tab - *Policy* is discussed in [Part II](/blog/2017-04-11-serverless-data-product-2).
+First *read-access* is given to all objects in the bucket (*poc.jaehyeon.me*). It is set in *Bucket Policy* of the permissions tab - *Policy* is discussed in [Part II](/blog/2017-04-11-serverless-data-product-2/).
 
 ![S3 bucket policy in the permissions tab granting read access to all objects](03-s3-setup-02.png#center "S3 bucket policy in the permissions tab granting read access to all objects")
 
@@ -246,7 +246,7 @@ In default cache behavior settings, *Redirect HTTP to HTTPS* is selected for the
 
 ![CloudFront default cache behaviour with Redirect HTTP to HTTPS selected](05-cloudfront-03.png#center "CloudFront default cache behaviour with Redirect HTTP to HTTPS selected")
 
-In distribution settings, a CNAME record (*web.jaehyeon.me*) is created to be the same to the bucket name. The custom SSL certificate that is obtained from [AWS Certificate Manager](https://aws.amazon.com/certificate-manager/) is chosen rather than the default CloudFront certificate - see [Part III](/blog/2017-04-13-serverless-data-product-3). Finally it is selected to support only clients that support server name indication (SNI). Note all the other options are left untouched - they are not shown.
+In distribution settings, a CNAME record (*web.jaehyeon.me*) is created to be the same to the bucket name. The custom SSL certificate that is obtained from [AWS Certificate Manager](https://aws.amazon.com/certificate-manager/) is chosen rather than the default CloudFront certificate - see [Part III](/blog/2017-04-13-serverless-data-product-3/). Finally it is selected to support only clients that support server name indication (SNI). Note all the other options are left untouched - they are not shown.
 
 ![CloudFront distribution settings with the CNAME web.jaehyeon.me and a custom SSL certificate](05-cloudfront-04.png#center "CloudFront distribution settings with the CNAME web.jaehyeon.me and a custom SSL certificate")
 

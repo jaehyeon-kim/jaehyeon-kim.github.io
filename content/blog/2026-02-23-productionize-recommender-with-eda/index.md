@@ -235,7 +235,7 @@ Add `--volumes` to also remove `odctl-shared-deps`, the named volume holding the
 
 ## Related posts
 
-* [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning) - online machine learning on Flink and Kafka for an industrial digital twin, with drift detection and a shadow mode router
+* [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning/) - online machine learning on Flink and Kafka for an industrial digital twin, with drift detection and a shadow mode router
 
 ## Conclusion
 

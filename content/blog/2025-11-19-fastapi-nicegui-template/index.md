@@ -150,9 +150,9 @@ These auto-generated documents are invaluable for development, testing, and coll
 
 ## Related posts
 
-* [Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1 Data Producer](/blog/2025-02-18-realtime-dashboard-1) - a FastAPI WebSocket server that queries PostgreSQL on a timer to serve live dashboards
-* [Dynamic Routing and Centralized Auth with Traefik](/blog/2019-11-29-traefik-example) - puts Traefik in front of Python and R services for path-based routing and shared authentication
-* [dbt Pizza Shop Demo - Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1) - models data on PostgreSQL with dbt, a source such an application can read from
+* [Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1 Data Producer](/blog/2025-02-18-realtime-dashboard-1/) - a FastAPI WebSocket server that queries PostgreSQL on a timer to serve live dashboards
+* [Dynamic Routing and Centralized Auth with Traefik](/blog/2019-11-29-traefik-example/) - puts Traefik in front of Python and R services for path-based routing and shared authentication
+* [dbt Pizza Shop Demo - Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1/) - models data on PostgreSQL with dbt, a source such an application can read from
 
 ## Summary and Use Cases
 

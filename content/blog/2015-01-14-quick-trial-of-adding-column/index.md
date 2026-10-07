@@ -187,6 +187,6 @@ system.time(postDf3 <- preDt %>%
 
 ## Related posts
 
-* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1) - building a data frame in R by reading and merging many stock price files
-* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2) - the in-memory version of that merge, which avoids writing each file to disk
-* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files) - grouping and summarising a combined data frame to get returns and correlations
+* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1/) - building a data frame in R by reading and merging many stock price files
+* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2/) - the in-memory version of that merge, which avoids writing each file to disk
+* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files/) - grouping and summarising a combined data frame to get returns and correlations

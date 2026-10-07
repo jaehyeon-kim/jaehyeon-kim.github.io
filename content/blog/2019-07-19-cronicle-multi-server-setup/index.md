@@ -234,6 +234,6 @@ In `Schedule`, the test event can be found.
 
 ## Related posts
 
-* [API Development with R Part 1](/blog/2017-11-18-api-development-with-r-1) - serves an R function as an API three ways, with plumber, RServe and rApache
-* [API Development with R Part 2](/blog/2017-11-19-api-development-with-r-2) - runs those three R API options in Docker containers and compares them on example requests
-* [AWS Local Development with LocalStack](/blog/2019-07-20-aws-localstack) - runs AWS services on a local machine so an application can be developed and tested against them
+* [API Development with R Part 1](/blog/2017-11-18-api-development-with-r-1/) - serves an R function as an API three ways, with plumber, RServe and rApache
+* [API Development with R Part 2](/blog/2017-11-19-api-development-with-r-2/) - runs those three R API options in Docker containers and compares them on example requests
+* [AWS Local Development with LocalStack](/blog/2019-07-20-aws-localstack/) - runs AWS services on a local machine so an application can be developed and tested against them

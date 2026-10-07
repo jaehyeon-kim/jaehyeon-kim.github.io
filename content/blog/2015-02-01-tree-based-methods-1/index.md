@@ -16,11 +16,11 @@ math: true # This post renders maths, so it needs the KaTeX bundle.
 ---
 
 * [Part I](#) (this post)
-* [Part II](/blog/2015-02-08-tree-based-methods-2)
-* [Part III](/blog/2015-02-14-tree-based-methods-3)
-* [Part IV](/blog/2015-02-15-tree-based-methods-4)
-* [Part V](/blog/2015-03-05-tree-based-methods-5)
-* [Part VI](/blog/2015-03-07-tree-based-methods-6)
+* [Part II](/blog/2015-02-08-tree-based-methods-2/)
+* [Part III](/blog/2015-02-14-tree-based-methods-3/)
+* [Part IV](/blog/2015-02-15-tree-based-methods-4/)
+* [Part V](/blog/2015-03-05-tree-based-methods-5/)
+* [Part VI](/blog/2015-03-07-tree-based-methods-6/)
 
 This is the first article about tree based methods using R. *Carseats* data in the chapter 8 lab of [ISLR](https://www.statlearning.com/) is used to perform classification analysis. Unlike the lab example, the **rpart** package is used to fit the CART model on the data and the **caret** package is used for tuning the pruning parameter (`cp`).
 

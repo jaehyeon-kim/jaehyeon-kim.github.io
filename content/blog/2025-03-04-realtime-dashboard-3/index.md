@@ -18,12 +18,12 @@ tags:
 description: Next.js and React with Apache ECharts show the same live order and revenue metrics, reading from the FastAPI WebSocket server in the browser.
 ---
 
-A real-time monitoring dashboard connects to the WebSocket server from [Part 1](/blog/2025-02-18-realtime-dashboard-1) to continuously fetch and visualize key metrics such as **order counts**, **sales data**, and **revenue by traffic source and country**. With interactive bar charts and dynamic metrics, users can monitor sales trends and other critical business KPIs in real-time. In this post, we build it using [Next.js](https://nextjs.org/), a React framework that supports server-side rendering, static site generation, and full-stack capabilities with built-in performance optimizations. It is similar to the *Streamlit* app we developed in [Part 2](/blog/2025-02-25-realtime-dashboard-2).  
+A real-time monitoring dashboard connects to the WebSocket server from [Part 1](/blog/2025-02-18-realtime-dashboard-1/) to continuously fetch and visualize key metrics such as **order counts**, **sales data**, and **revenue by traffic source and country**. With interactive bar charts and dynamic metrics, users can monitor sales trends and other critical business KPIs in real-time. In this post, we build it using [Next.js](https://nextjs.org/), a React framework that supports server-side rendering, static site generation, and full-stack capabilities with built-in performance optimizations. It is similar to the *Streamlit* app we developed in [Part 2](/blog/2025-02-25-realtime-dashboard-2/).  
 
 <!--more-->
 
-* [Part 1 Data Producer](/blog/2025-02-18-realtime-dashboard-1)
-* [Part 2 Streamlit Dashboard](/blog/2025-02-25-realtime-dashboard-2)
+* [Part 1 Data Producer](/blog/2025-02-18-realtime-dashboard-1/)
+* [Part 2 Streamlit Dashboard](/blog/2025-02-25-realtime-dashboard-2/)
 * [Part 3 Next.js Dashboard](#) (this post)
 
 ## Next.js Frontend
@@ -255,7 +255,7 @@ export default function Home() {
 
 ### Data Producer and WebSocket Server
 
-As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1), PostgreSQL is started with `odctl up postgres`, and the data generator and WebSocket server are started with `python -m sales.simulation.run` and `uvicorn sales.api.server:app --host 127.0.0.1 --port 8000`, each in its own terminal. Once started, the server can be checked with the WebSocket client of the [websockets](https://websockets.readthedocs.io/) package by executing `python -m websockets ws://127.0.0.1:8000/ws`, and its logs are printed in its terminal.
+As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1/), PostgreSQL is started with `odctl up postgres`, and the data generator and WebSocket server are started with `python -m sales.simulation.run` and `uvicorn sales.api.server:app --host 127.0.0.1 --port 8000`, each in its own terminal. Once started, the server can be checked with the WebSocket client of the [websockets](https://websockets.readthedocs.io/) package by executing `python -m websockets ws://127.0.0.1:8000/ws`, and its logs are printed in its terminal.
 
 The client prints each message the server sends: a list of the order items of the last five minutes, here 39 records in the first message.
 

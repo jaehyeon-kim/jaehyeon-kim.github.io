@@ -34,19 +34,19 @@ For example:
 
 ---
 
-* [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
-* [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2)
-* [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3)
+* [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1/)
+* [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/)
+* [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3/)
 * [Lab 3 Transform and write data to S3 from Kafka using Flink](#) (this post)
-* [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5)
-* [Lab 5 Write data to DynamoDB using Kafka Connect](/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6)
-* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7)
+* [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5/)
+* [Lab 5 Write data to DynamoDB using Kafka Connect](/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6/)
+* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7/)
 
 [**Update 2023-11-22**] Amazon MSK now supports fully managed data delivery to Amazon S3 using Kinesis Data Firehose, and you may consider this feature rather than relying on a Flink application. See [this page](https://aws.amazon.com/about-aws/whats-new/2023/09/amazon-msk-data-s3-kinesis-data-firehose/) for details.
 
 ## Architecture
 
-Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The records are read by a Pyflink application, and it writes them into a S3 bucket. The app enriches the records by adding a new column named *source* using a user defined function. The records in the S3 bucket can be queried on Amazon Athena after creating an external table that sources the bucket.
+Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/). The records are read by a Pyflink application, and it writes them into a S3 bucket. The app enriches the records by adding a new column named *source* using a user defined function. The records in the S3 bucket can be queried on Amazon Athena after creating an external table that sources the bucket.
 
 ![Six labs drawn around Amazon MSK; Lab 3 sends Flink output to S3, then AWS Glue and Amazon Athena](featured.png#center "Lab architecture, with Lab 3 writing to S3 and reading it on Athena")
 
@@ -54,7 +54,7 @@ Fake taxi ride data is sent to a Kafka topic by the Kafka producer application t
 
 ### AWS Infrastructure
 
-The AWS infrastructure is created using [Terraform](https://developer.hashicorp.com/terraform) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post - see this [earlier post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details about how to create the resources. The infrastructure can be deployed (as well as destroyed) using Terraform CLI as shown below.
+The AWS infrastructure is created using [Terraform](https://developer.hashicorp.com/terraform) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post - see this [earlier post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/) for details about how to create the resources. The infrastructure can be deployed (as well as destroyed) using Terraform CLI as shown below.
 
 ```bash
 # initialize
@@ -72,7 +72,7 @@ Note that deploying the AWS infrastructure is optional because we can create a l
 
 ### Kafka and Flink Cluster on Docker Compose
 
-In the [previous post](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3), we discussed how to create a local Flink cluster on Docker. We can add additional Docker Compose services (*zookeeper* and *kafka-0*) for a Kafka cluster and the updated compose file can be found below. See [this post](/blog/2023-05-04-kafka-development-with-docker-part-1) for details how to set up a Kafka cluster on Docker.
+In the [previous post](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3/), we discussed how to create a local Flink cluster on Docker. We can add additional Docker Compose services (*zookeeper* and *kafka-0*) for a Kafka cluster and the updated compose file can be found below. See [this post](/blog/2023-05-04-kafka-development-with-docker-part-1/) for details how to set up a Kafka cluster on Docker.
 
 ```yaml
 # compose-local-kafka.yml

@@ -142,6 +142,6 @@ I hope this post is useful.
 
 ## Related posts
 
-* [Quick Start SparkR in Local and Cluster Mode](/blog/2016-03-02-quick-start-sparkr-in-local-and-cluster-mode) - runs SparkR against this cluster and in local mode, with the environment variables and library path to set
-* [Boost SparkR with Hive](/blog/2016-04-30-boost-sparkr-with-hive) - uses the Hive Context from SparkR to reach the UDFs and window functions the SQL Context lacks
-* [AWS Glue Local Development with Docker and Visual Studio Code](/blog/2021-08-20-glue-local-development) - a later way to get a Spark environment without building virtual machines
+* [Quick Start SparkR in Local and Cluster Mode](/blog/2016-03-02-quick-start-sparkr-in-local-and-cluster-mode/) - runs SparkR against this cluster and in local mode, with the environment variables and library path to set
+* [Boost SparkR with Hive](/blog/2016-04-30-boost-sparkr-with-hive/) - uses the Hive Context from SparkR to reach the UDFs and window functions the SQL Context lacks
+* [AWS Glue Local Development with Docker and Visual Studio Code](/blog/2021-08-20-glue-local-development/) - a later way to get a Spark environment without building virtual machines

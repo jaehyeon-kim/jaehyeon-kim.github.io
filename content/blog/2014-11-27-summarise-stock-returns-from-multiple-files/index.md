@@ -14,7 +14,7 @@ tags:
 description: Produce gross returns, standard deviation and correlation for several shares in R by reading and combining multiple downloaded stock price files.
 ---
 
-Gross returns, standard deviation and correlation of multiple shares are produced here. This post is a slight extension of the previous two articles ([Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1), [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2)).
+Gross returns, standard deviation and correlation of multiple shares are produced here. This post is a slight extension of the previous two articles ([Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1/), [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2/)).
 
 > **Status, September 2026.** Google retired the `finance/historical` CSV endpoint that the download step uses, so the price files this post summarises can no longer be fetched. The return, standard deviation and correlation steps still hold for any price files that carry Date, Close and Code columns.
 

@@ -290,9 +290,9 @@ $ aws s3 ls s3://sam-for-data-professionals-cevo/output/
 
 ## Related posts
 
-* [Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1) - packaging a function and its dependencies by hand, before a framework does it for you
-* [Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2) - deploying that package and setting up the function role
-* [Exposing R ML Model via APIG](/blog/2017-04-13-serverless-data-product-3) - putting an Amazon API Gateway endpoint in front of the function
+* [Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1/) - packaging a function and its dependencies by hand, before a framework does it for you
+* [Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2/) - deploying that package and setting up the function role
+* [Exposing R ML Model via APIG](/blog/2017-04-13-serverless-data-product-3/) - putting an Amazon API Gateway endpoint in front of the function
 
 ## Summary
 

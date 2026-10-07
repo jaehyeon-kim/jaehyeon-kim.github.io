@@ -18,16 +18,16 @@ tags:
 description: Model pizza shop data as Apache Iceberg tables transformed on Amazon Athena with dbt, using array and struct types to denormalise the fact table.
 ---
 
-The data is modelled by [SCD type 2](https://en.wikipedia.org/wiki/Slowly_changing_dimension) dimension tables and one transactional fact table. In [Part 1](/blog/2024-01-18-dbt-pizza-shop-1) and [Part 3](/blog/2024-02-08-dbt-pizza-shop-3), we developed [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) projects that target *PostgreSQL* and *BigQuery* using fictional pizza shop data. While the order records should be joined with dimension tables to get complete details for *PostgreSQL*, the fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested) to improve query performance for *BigQuery*. 
+The data is modelled by [SCD type 2](https://en.wikipedia.org/wiki/Slowly_changing_dimension) dimension tables and one transactional fact table. In [Part 1](/blog/2024-01-18-dbt-pizza-shop-1/) and [Part 3](/blog/2024-02-08-dbt-pizza-shop-3/), we developed [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) projects that target *PostgreSQL* and *BigQuery* using fictional pizza shop data. While the order records should be joined with dimension tables to get complete details for *PostgreSQL*, the fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested) to improve query performance for *BigQuery*. 
 
 Open Table Formats such as [Apache Iceberg](https://iceberg.apache.org/) bring a new opportunity that implements data warehousing features in a data lake (i.e. data lakehouse) and [Amazon Athena](https://aws.amazon.com/athena/) is probably the easiest way to perform such tasks on AWS. In this post, we create a new *dbt* project that targets *Apache Iceberg* where transformations are performed on *Amazon Athena*. Data modelling is similar to the *BigQuery* project where the dimension tables are modelled by the *SCD type 2* approach and the fact table is denormalized using the *array* and *struct* data types. 
 
-* [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1)
-* [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2)
-* [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3)
-* [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4)
+* [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1/)
+* [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2/)
+* [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3/)
+* [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4/)
 * [Part 5 Modelling on Amazon Athena](#) (this post)
-* [Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6)
+* [Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6/)
 
 ## Setup Amazon Athena
 

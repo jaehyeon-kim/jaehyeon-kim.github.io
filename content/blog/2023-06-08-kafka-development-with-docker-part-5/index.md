@@ -22,17 +22,17 @@ As described in the [Confluent document](https://docs.confluent.io/platform/curr
 
 In order to integrate the *Glue Schema Registry* with an application, we need to use the [AWS Glue Schema Registry Client library](https://github.com/awslabs/aws-glue-schema-registry), which primarily provides serializers and deserializers for Avro, Json and Portobuf formats. It also supports other necessary features such as registering schemas and performing compatibility check. As the project doesn't provide pre-built binaries, we have to build them on our own. In this post, I'll illustrate how to build the client library after introducing how it works to integrate the Glue Schema Registry with Kafka producer and consumer apps. Once built successfully, we can obtain multiple binaries not only for Kafka Connect but also other applications such as Flink for Kinesis Data Analytics. Therefore, this post can be considered as a stepping stone for later posts.
 
-* [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
-* [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
-* [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3)
-* [Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4)
+* [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1/)
+* [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2/)
+* [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3/)
+* [Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4/)
 * [Part 5 Glue Schema Registry](#) (this post)
-* [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6)
-* [Part 7 Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7)
-* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8)
-* [Part 9 SSL Authentication](/blog/2023-07-06-kafka-development-with-docker-part-9)
-* [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10)
-* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11)
+* [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6/)
+* [Part 7 Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7/)
+* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8/)
+* [Part 9 SSL Authentication](/blog/2023-07-06-kafka-development-with-docker-part-9/)
+* [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10/)
+* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11/)
 
 ## How It Works with Apache Kafka
 

@@ -22,20 +22,20 @@ Each input element performs a **Remote Procedure Call (RPC)** and the output is 
 
 <!--more-->
 
-* [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1)
-* [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
-* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
+* [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1/)
+* [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2/)
+* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3/)
 * [Part 4 Call RPC Service for Data Augmentation](#) (this post)
-* [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5)
-* [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6)
-* [Part 7 Separate Droppable Data into Side Output](/blog/2024-10-24-beam-examples-7)
-* [Part 8 Enhance Sport Activity Tracker with Runner Motivation](/blog/2024-11-21-beam-examples-8)
-* [Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn](/blog/2024-12-05-beam-examples-9)
-* [Part 10 Develop Streaming File Reader using Splittable DoFn](/blog/2024-12-19-beam-examples-10)
+* [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5/)
+* [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6/)
+* [Part 7 Separate Droppable Data into Side Output](/blog/2024-10-24-beam-examples-7/)
+* [Part 8 Enhance Sport Activity Tracker with Runner Motivation](/blog/2024-11-21-beam-examples-8/)
+* [Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn](/blog/2024-12-05-beam-examples-9/)
+* [Part 10 Develop Streaming File Reader using Splittable DoFn](/blog/2024-12-19-beam-examples-10/)
 
 ## Development Environment
 
-The development environment has an Apache Flink cluster, Apache Kafka cluster and [gRPC](https://grpc.io/) server. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
+The development environment has an Apache Flink cluster, Apache Kafka cluster and [gRPC](https://grpc.io/) server. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1/) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
 
 ### Manage Environment
 
@@ -574,7 +574,7 @@ cat /etc/hosts | grep host.docker.internal
 # 127.0.0.1       host.docker.internal
 ```
 
-We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - `python utils/faker_gen.py`. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about the Kafka producer.
+We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - `python utils/faker_gen.py`. See [Part 1](/blog/2024-07-04-beam-examples-1/) for details about the Kafka producer.
 
 ![Kafka UI input-topic messages tab, 22 messages consumed with the first text value expanded](input-messages.png#center "Input text messages produced into the Kafka topic")
 

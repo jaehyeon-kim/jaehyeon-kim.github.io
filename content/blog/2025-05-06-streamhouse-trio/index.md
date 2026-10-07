@@ -128,10 +128,10 @@ Imagine an e-commerce website that wants to track user actions (like clicks, pag
 
 ## Related posts
 
-* [Self-service Data Platform via a Multi-tenant SQL Gateway](/blog/2025-07-17-self-service-data-platform-via-sql-gateway) - Apache Kyuubi provisioning Spark, Flink and Trino engines on demand over table layers like these.
-* [Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI](/blog/2026-07-16-odctl-open-data-stack) - a CLI that launches Kafka, Flink, Spark, Trino and Iceberg locally, for trying this architecture out.
-* [Benefits and Opportunities of Stateful Stream Processing](/blog/2023-11-02-stateful-stream-processing) - why streaming-first architectures pay off, the reasoning the Streamhouse rests on.
-* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system) - a language model querying an Iceberg lakehouse through a semantic layer and Trino.
+* [Self-service Data Platform via a Multi-tenant SQL Gateway](/blog/2025-07-17-self-service-data-platform-via-sql-gateway/) - Apache Kyuubi provisioning Spark, Flink and Trino engines on demand over table layers like these.
+* [Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI](/blog/2026-07-16-odctl-open-data-stack/) - a CLI that launches Kafka, Flink, Spark, Trino and Iceberg locally, for trying this architecture out.
+* [Benefits and Opportunities of Stateful Stream Processing](/blog/2023-11-02-stateful-stream-processing/) - why streaming-first architectures pay off, the reasoning the Streamhouse rests on.
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system/) - a language model querying an Iceberg lakehouse through a semantic layer and Trino.
 
 ## Conclusion
 

@@ -45,7 +45,7 @@ Where you're familiar with *kubectl* or not, you will be able to learn how to ma
 
 ### A Cloud Guru
 
-A friend of mine recommended the *A Cloud Guru* course and I took it as I had a good memory while I was preparing for my [Kafka certification](/blog/2023-05-11-how-i-prepared-for-ccdak). The lectures are well-organised and matches the exam curriculum suitably. It also provides good study notes that keep key points and relevant document links. Although I enjoyed the lectures, I find quite a significant drawback of this course. The lectures and answers to hands-on labs/practice exams rely on YAML manifests, and I don't think it is a good approach for exam preparation. Nonetheless, this concise and focused course can be beneficial if you're familiar with the Kubernetes command line tool already.
+A friend of mine recommended the *A Cloud Guru* course and I took it as I had a good memory while I was preparing for my [Kafka certification](/blog/2023-05-11-how-i-prepared-for-ccdak/). The lectures are well-organised and matches the exam curriculum suitably. It also provides good study notes that keep key points and relevant document links. Although I enjoyed the lectures, I find quite a significant drawback of this course. The lectures and answers to hands-on labs/practice exams rely on YAML manifests, and I don't think it is a good approach for exam preparation. Nonetheless, this concise and focused course can be beneficial if you're familiar with the Kubernetes command line tool already.
 
 ## Practice Exams
 

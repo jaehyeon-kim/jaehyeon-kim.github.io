@@ -22,9 +22,9 @@ tags:
 cevo: 11
 description: Deploy a Change Data Capture pipeline to AWS with the Apicurio registry on ECS, private subnets over VPN and the Avro converter packaged with the connectors.
 ---
-We build the Change Data Capture (CDC) solution with a schema registry on AWS using [MSK](https://aws.amazon.com/msk/), [MSK Connect](https://aws.amazon.com/msk/features/msk-connect/), [Aurora PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraPostgreSQL.html) and [ECS](https://aws.amazon.com/ecs/). In the [previous post](/blog/2022-03-07-schema-registry-part1), we discussed that solution in a local development environment set up using Docker Compose. The Debezium and Confluent S3 connectors are deployed with the Confluent Avro converter and the Apicurio registry is used as the schema registry service. A quick example is shown to illustrate how schema evolution can be managed by the schema registry.
+We build the Change Data Capture (CDC) solution with a schema registry on AWS using [MSK](https://aws.amazon.com/msk/), [MSK Connect](https://aws.amazon.com/msk/features/msk-connect/), [Aurora PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraPostgreSQL.html) and [ECS](https://aws.amazon.com/ecs/). In the [previous post](/blog/2022-03-07-schema-registry-part1/), we discussed that solution in a local development environment set up using Docker Compose. The Debezium and Confluent S3 connectors are deployed with the Confluent Avro converter and the Apicurio registry is used as the schema registry service. A quick example is shown to illustrate how schema evolution can be managed by the schema registry.
 
-* [Part 1 Local Development](/blog/2022-03-07-schema-registry-part1)
+* [Part 1 Local Development](/blog/2022-03-07-schema-registry-part1/)
 * [Part 2 MSK Deployment](#) (this post)
 
 ## Architecture
@@ -34,12 +34,12 @@ Below shows an updated CDC architecture with a schema registry. The Debezium con
 
 ## Infrastructure
 
-The main AWS resources will be deployed to private subnets of a VPC and connection between those will be managed by updating security group inbound rules. For example, the MSK connectors should have access to the registry service and the connectors' security group ID should be added to the inbound rule of the registry service. As multiple resources are deployed to private subnets, it'll be convenient to set up VPN so that access to them can be made from the developer machine. It can improve developer experience significantly. We'll use [Terraform](https://developer.hashicorp.com/terraform) for managing the resources on AWS and _how to set up VPC, VPN and Aurora PostgreSQL is discussed in detail in [one of my earlier posts](/blog/2022-02-06-dev-infra-terraform)_. In this post, I'll illustrate those that are not covered in the article. The Terraform source can be found in the [**GitHub repository** for this post](https://github.com/jaehyeon-kim/msk-connect-schema-registry/tree/main/infra).
+The main AWS resources will be deployed to private subnets of a VPC and connection between those will be managed by updating security group inbound rules. For example, the MSK connectors should have access to the registry service and the connectors' security group ID should be added to the inbound rule of the registry service. As multiple resources are deployed to private subnets, it'll be convenient to set up VPN so that access to them can be made from the developer machine. It can improve developer experience significantly. We'll use [Terraform](https://developer.hashicorp.com/terraform) for managing the resources on AWS and _how to set up VPC, VPN and Aurora PostgreSQL is discussed in detail in [one of my earlier posts](/blog/2022-02-06-dev-infra-terraform/)_. In this post, I'll illustrate those that are not covered in the article. The Terraform source can be found in the [**GitHub repository** for this post](https://github.com/jaehyeon-kim/msk-connect-schema-registry/tree/main/infra).
 
 
 ### MSK Cluster
 
-As discussed in [one of the earlier posts](/blog/2021-12-12-datalake-demo-part2), we'll create an MSK cluster with 2 brokers of the `kafka.m5.large` instance type in order to prevent the [failed authentication error](https://github.com/aws/aws-msk-iam-auth/issues/28). 2 inbound rules are configured for the MSK's security group. The first one is allowing all access from its own security group, and it is required for MSK connectors to have access to the MKS cluster. Note, when we create a connector from the AWS console, the cluster's subnets and security group are selected for the connector by default. The second inbound rule is allowing the VPN's security group at port 9098, which is the port of bootstrap servers for IAM authentication. Also, an IAM role is created, which can be assumed by MSK connectors in order to have permission on the cluster, topic and group. The Terraform file for the MSK cluster and related resources can be found in [infra/msk.tf](https://github.com/jaehyeon-kim/msk-connect-schema-registry/blob/main/infra/msk.tf).
+As discussed in [one of the earlier posts](/blog/2021-12-12-datalake-demo-part2/), we'll create an MSK cluster with 2 brokers of the `kafka.m5.large` instance type in order to prevent the [failed authentication error](https://github.com/aws/aws-msk-iam-auth/issues/28). 2 inbound rules are configured for the MSK's security group. The first one is allowing all access from its own security group, and it is required for MSK connectors to have access to the MKS cluster. Note, when we create a connector from the AWS console, the cluster's subnets and security group are selected for the connector by default. The second inbound rule is allowing the VPN's security group at port 9098, which is the port of bootstrap servers for IAM authentication. Also, an IAM role is created, which can be assumed by MSK connectors in order to have permission on the cluster, topic and group. The Terraform file for the MSK cluster and related resources can be found in [infra/msk.tf](https://github.com/jaehyeon-kim/msk-connect-schema-registry/blob/main/infra/msk.tf).
 
 
 ### Schema Registry
@@ -61,7 +61,7 @@ variable "registry_create" {
 ```
 
 
-A simple python application is created to set up the database, and it can be run as shown below. Note [do not forget to connect the VPN](/blog/2022-02-06-dev-infra-terraform) before executing the command.
+A simple python application is created to set up the database, and it can be run as shown below. Note [do not forget to connect the VPN](/blog/2022-02-06-dev-infra-terraform/) before executing the command.
 
 
 ```bash
@@ -126,7 +126,7 @@ The UI can be checked on a browser as shown below.
 
 ## Create Connectors
 
-Creating custom plugins and connectors is illustrated in detail in [one of my earlier posts](/blog/2021-12-12-datalake-demo-part2). Here I'll sketch key points only. The custom plugins for the source and sink connectors should include the [Kafka Connect Avro Converter](https://www.confluent.io/hub/confluentinc/kafka-connect-avro-converter) as well. The version 6.0.3 is used, and plugin packaging can be checked in [connect/local/download-connectors.sh](https://github.com/jaehyeon-kim/msk-connect-schema-registry/blob/main/connect/local/download-connectors.sh).
+Creating custom plugins and connectors is illustrated in detail in [one of my earlier posts](/blog/2021-12-12-datalake-demo-part2/). Here I'll sketch key points only. The custom plugins for the source and sink connectors should include the [Kafka Connect Avro Converter](https://www.confluent.io/hub/confluentinc/kafka-connect-avro-converter) as well. The version 6.0.3 is used, and plugin packaging can be checked in [connect/local/download-connectors.sh](https://github.com/jaehyeon-kim/msk-connect-schema-registry/blob/main/connect/local/download-connectors.sh).
 
 The [Debezium Postgres Connector](https://debezium.io/documentation/reference/stable/connectors/postgresql.html) is used as the source connector. Here the main difference from the earlier post is using the Confluent Avro Converter class for key and value converter properties and adding the schema registry URL.
 

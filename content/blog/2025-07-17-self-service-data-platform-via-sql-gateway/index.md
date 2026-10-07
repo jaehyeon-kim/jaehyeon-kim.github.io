@@ -214,11 +214,11 @@ GROUP BY
 
 ## Related posts
 
-* [Building End-to-End Data Lineage](/blog/2026-05-22-end-to-end-data-lineage) - captures and visualises lineage across a production-style data stack, the governance piece this design depends on
-* [Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI](/blog/2026-07-16-odctl-open-data-stack) - a CLI that brings up Kafka, Flink, Spark, Iceberg and Trino locally so you can try an architecture like this
-* [Setup Local Development Environment for Apache Flink and Spark Using EMR Container Images](/blog/2023-12-07-flink-spark-local-dev) - a local Flink and Spark environment where Flink ingests data and Spark queries it through the Glue Data Catalog
-* [Meet the Streamhouse Trio](/blog/2025-05-06-streamhouse-trio) - compares Paimon, Fluss and Iceberg as the table layer that sits under a gateway like this
-* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system) - a language model querying Iceberg tables through Trino, with a semantic layer in between
+* [Building End-to-End Data Lineage](/blog/2026-05-22-end-to-end-data-lineage/) - captures and visualises lineage across a production-style data stack, the governance piece this design depends on
+* [Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI](/blog/2026-07-16-odctl-open-data-stack/) - a CLI that brings up Kafka, Flink, Spark, Iceberg and Trino locally so you can try an architecture like this
+* [Setup Local Development Environment for Apache Flink and Spark Using EMR Container Images](/blog/2023-12-07-flink-spark-local-dev/) - a local Flink and Spark environment where Flink ingests data and Spark queries it through the Glue Data Catalog
+* [Meet the Streamhouse Trio](/blog/2025-05-06-streamhouse-trio/) - compares Paimon, Fluss and Iceberg as the table layer that sits under a gateway like this
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system/) - a language model querying Iceberg tables through Trino, with a semantic layer in between
 
 ## Conclusion: The Power of a Gateway-Centric Design
 

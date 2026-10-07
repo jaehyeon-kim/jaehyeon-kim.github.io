@@ -106,6 +106,6 @@ kable(head(df))
 
 ## Related posts
 
-* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1) - a longer R example that downloads stock price files and merges them into one data frame
-* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2) - the same job done in memory, avoiding the slower route through local files
-* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files) - returns, standard deviation and correlation worked out across several files
+* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1/) - a longer R example that downloads stock price files and merges them into one data frame
+* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2/) - the same job done in memory, avoiding the slower route through local files
+* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files/) - returns, standard deviation and correlation worked out across several files

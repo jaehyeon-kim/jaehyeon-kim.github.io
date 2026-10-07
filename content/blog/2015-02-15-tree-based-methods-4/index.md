@@ -14,12 +14,12 @@ tags:
 description: "Compare three R packages for classification trees, rpart, caret and mlr, on the Carseats data used in the earlier parts."
 ---
 
-* [Part I](/blog/2015-02-01-tree-based-methods-1)
-* [Part II](/blog/2015-02-08-tree-based-methods-2)
-* [Part III](/blog/2015-02-14-tree-based-methods-3)
+* [Part I](/blog/2015-02-01-tree-based-methods-1/)
+* [Part II](/blog/2015-02-08-tree-based-methods-2/)
+* [Part III](/blog/2015-02-14-tree-based-methods-3/)
 * [Part IV](#) (this post)
-* [Part V](/blog/2015-03-05-tree-based-methods-5)
-* [Part VI](/blog/2015-03-07-tree-based-methods-6)
+* [Part V](/blog/2015-03-05-tree-based-methods-5/)
+* [Part VI](/blog/2015-03-07-tree-based-methods-6/)
 
 While the last three articles illustrated the CART model for both classification (with equal/unequal costs) and regression tasks, this article is rather technical as it compares three packages: **rpart**, **caret** and **mlr**. For those who are not familiar with the last two packages, they are wrappers (or frameworks) that implement a range of models (or algorithms) in a unified way. They are useful because inconsistent API could be a drawback of R (like other open source tools) and it would be quite beneficial if there is a way to implement different models in a standardized way. In line with the earlier articles, the *Carseats* data is used for a classification task.
 

@@ -102,9 +102,9 @@ Moving forward, the goal is to ensure that even the most complex architectural d
 
 ## Related posts
 
-* [Self-managed Blog with Hugo and GitHub Pages](/blog/2023-04-24-self-hosted-blog) - sets up the Hugo site that this Reveal.js layout plugs into
-* [Async Shiny and Its Limitation](/blog/2018-05-19-asyn-shiny-and-its-limitation) - an earlier comparison of a JavaScript frontend against a framework that renders the page for you
-* [Shiny to Vue.js](/blog/2018-05-26-shiny-to-vue.js) - replaces R widgets with native JavaScript libraries, the same shift from generated output to hand-written frontend
+* [Self-managed Blog with Hugo and GitHub Pages](/blog/2023-04-24-self-hosted-blog/) - sets up the Hugo site that this Reveal.js layout plugs into
+* [Async Shiny and Its Limitation](/blog/2018-05-19-asyn-shiny-and-its-limitation/) - an earlier comparison of a JavaScript frontend against a framework that renders the page for you
+* [Shiny to Vue.js](/blog/2018-05-26-shiny-to-vue.js/) - replaces R widgets with native JavaScript libraries, the same shift from generated output to hand-written frontend
 
 ## Why this works for me
 

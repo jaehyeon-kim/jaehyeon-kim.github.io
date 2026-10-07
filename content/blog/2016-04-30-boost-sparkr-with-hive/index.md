@@ -18,7 +18,7 @@ tags:
 description: Run SparkR in Hive Context to reach the Hive UDFs and window functions the SQL Context lacks, compared against dplyr, plus building Spark with Hive.
 ---
 
-While SparkR is in active development, it is yet to fully support Spark's key libraries such as MLlib and Spark Streaming. Even, as a data processing engine, this R API is still limited as it is not possible to manipulate RDDs directly but only via Spark SQL/DataFrame API. In the [previous post](/blog/2016-03-02-quick-start-sparkr-in-local-and-cluster-mode), it is demonstrated how to start SparkR in local and cluster mode. As can be checked in the [API doc](https://spark.apache.org/docs/latest/api/R/index.html), SparkR rebuilds many existing R functions to work with Spark DataFrame and notably it borrows some functions from the dplyr package. Also there are some alien functions (eg `from_utc_timestamp()`) and many of them are from [Hive Query Language (HiveQL)](https://cwiki.apache.org/confluence/display/Hive/LanguageManual). In relation to those functions from HiveQL, although some Hive user defined functions (UDFs) are ported, still many useful [UDFs](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF) and [Window functions](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics) don't exist. 
+While SparkR is in active development, it is yet to fully support Spark's key libraries such as MLlib and Spark Streaming. Even, as a data processing engine, this R API is still limited as it is not possible to manipulate RDDs directly but only via Spark SQL/DataFrame API. In the [previous post](/blog/2016-03-02-quick-start-sparkr-in-local-and-cluster-mode/), it is demonstrated how to start SparkR in local and cluster mode. As can be checked in the [API doc](https://spark.apache.org/docs/latest/api/R/index.html), SparkR rebuilds many existing R functions to work with Spark DataFrame and notably it borrows some functions from the dplyr package. Also there are some alien functions (eg `from_utc_timestamp()`) and many of them are from [Hive Query Language (HiveQL)](https://cwiki.apache.org/confluence/display/Hive/LanguageManual). In relation to those functions from HiveQL, although some Hive user defined functions (UDFs) are ported, still many useful [UDFs](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF) and [Window functions](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics) don't exist. 
 
 > **Status, September 2026.** This post uses Spark 1.6 and the SparkR API of that release, so the pre-built binary, the build with Hive steps and the function set described here no longer match current Spark. Read it for the Hive Context approach rather than as working instructions.
 
@@ -26,7 +26,7 @@ In this circumstances, I consider one option to boost SparkR's performance as a 
 
 ## SparkR in Hive Context
 
-I tried in local mode on my Windows machine and here is how SparkR context (*sc*) is created - for details, see [this post](/blog/2016-03-02-quick-start-sparkr-in-local-and-cluster-mode). Here the key difference is *spark_home* - this is where my pre-built Spark with Hive locates.
+I tried in local mode on my Windows machine and here is how SparkR context (*sc*) is created - for details, see [this post](/blog/2016-03-02-quick-start-sparkr-in-local-and-cluster-mode/). Here the key difference is *spark_home* - this is where my pre-built Spark with Hive locates.
 
 
 ```r

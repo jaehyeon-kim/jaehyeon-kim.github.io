@@ -85,6 +85,6 @@ One purpose-built approach to solving this specific pattern is the [**`dynamic-d
 
 ## Related posts
 
-* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect) - a dynamic-des simulation of an online shop feeding a change data capture pipeline
-* [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql) - a dynamic-des simulation of a mobile game feeding Flink SQL leaderboards
-* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system) - dynamic-des generating the lakehouse data that an agent queries
+* [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/) - a dynamic-des simulation of an online shop feeding a change data capture pipeline
+* [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql/) - a dynamic-des simulation of a mobile game feeding Flink SQL leaderboards
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system/) - dynamic-des generating the lakehouse data that an agent queries

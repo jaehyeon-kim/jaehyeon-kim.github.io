@@ -21,9 +21,9 @@ description: Connect a PyFlink app to an IAM authenticated MSK cluster, building
 ---
 A Kafka cluster on Amazon MSK is authenticated by IAM, and the app needs an additional jar dependency for it. As [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/) does not allow you to specify multiple pipeline jar files, we have to build a custom Uber Jar that combines multiple jar files. In this series of posts, we discuss a Flink (Pyflink) application that reads/writes from/to Kafka topics. In part 1, an app that targets a local Kafka cluster was created. In this post, we will update the app by connecting a Kafka cluster on Amazon MSK. Same as part 1, the app will be executed in a virtual environment as well as in a local Flink cluster for improved monitoring with the updated pipeline jar file.
 
-* [Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1)
+* [Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1/)
 * [Part 2 Local Flink and MSK](#) (this post)
-* [Part 3 AWS Managed Flink and MSK](/blog/2023-09-04-getting-started-with-pyflink-on-aws-part-3)
+* [Part 3 AWS Managed Flink and MSK](/blog/2023-09-04-getting-started-with-pyflink-on-aws-part-3/)
 
 [**Update 2023-08-30**] Amazon Kinesis Data Analytics is renamed into [Amazon Managed Service for Apache Flink](https://aws.amazon.com/about-aws/whats-new/2023/08/amazon-managed-service-apache-flink/). In this post, Kinesis Data Analytics (KDA) and Amazon Managed Service for Apache Flink will be used interchangeably.
 
@@ -276,7 +276,7 @@ Once completed, the Uber Jar file and python package can be found in the *lib* a
 
 ### VPC and VPN
 
-A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*infra/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*infra/vpn.tf*). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in an [earlier post](/blog/2022-02-06-dev-infra-terraform).
+A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*infra/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*infra/vpn.tf*). It is particularly useful to monitor and manage the MSK cluster and Kafka topic locally. The details about how to configure the VPN server can be found in an [earlier post](/blog/2022-02-06-dev-infra-terraform/).
 
 ### MSK Cluster
 
@@ -391,7 +391,7 @@ networks:
 
 ### Flink Cluster
 
-We can create a Flink cluster using the custom Docker image that we used in [part 1](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1). The cluster is made up of a single Job Manger and Task Manager, and the cluster runs in the [Session Mode](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/deployment/overview/) where one or more Flink applications can be submitted/executed simultaneously. See [this page](https://nightlies.apache.org/flink/flink-docs-master/docs/deployment/resource-providers/standalone/docker/#flink-with-docker-compose) for details about how to create a Flink cluster using *docker-compose*.
+We can create a Flink cluster using the custom Docker image that we used in [part 1](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1/). The cluster is made up of a single Job Manger and Task Manager, and the cluster runs in the [Session Mode](https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/deployment/overview/) where one or more Flink applications can be submitted/executed simultaneously. See [this page](https://nightlies.apache.org/flink/flink-docs-master/docs/deployment/resource-providers/standalone/docker/#flink-with-docker-compose) for details about how to create a Flink cluster using *docker-compose*.
 
 A set of environment variables are configured to adjust the application behaviour and to give permission to read/write messages from the Kafka cluster with IAM authentication. The *RUNTIME_ENV* is set to *DOCKER*, and it determines which pipeline jar and application property file to choose. Also, the *BOOTSTRAP_SERVERS* overrides the Kafka bootstrap server address value from the application property file. The bootstrap server address of the MSK cluster are referred from the host environment variable that has the same name. Finally, the current directory is volume-mapped into */etc/flink* so that the application and related resources can be available in the Flink cluster.
 

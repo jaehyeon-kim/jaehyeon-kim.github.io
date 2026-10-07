@@ -20,12 +20,12 @@ description: Orchestrate the PostgreSQL pizza shop dbt project with Apache Airfl
 
 We set up an ETL process on a *dbt* project using Apache Airflow in this post. In this series of posts, we discuss data warehouse/lakehouse examples using [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) including ETL orchestration with Apache Airflow. In Part 1, we developed a *dbt* project on PostgreSQL with fictional pizza shop data. Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders.
 
-* [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1)
+* [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1/)
 * [Part 2 ETL on PostgreSQL via Airflow](#) (this post)
-* [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3)
-* [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4)
-* [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5)
-* [Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6)
+* [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3/)
+* [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4/)
+* [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5/)
+* [Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6/)
 
 ## Infrastructure
 
@@ -33,7 +33,7 @@ Apache Airflow and PostgreSQL are used in this post, and they are deployed local
 
 ### Database
 
-As [Part 1](/blog/2024-01-18-dbt-pizza-shop-1), a PostgreSQL server is deployed using Docker Compose. See the previous post for details about (1) how fictional pizza shop data sets are made available, and (2) how the database is bootstrapped using a script (*bootstrap.sql*), which creates necessary schemas/tables as well as loads initial records to the tables. Note that the database cluster is shared with Airflow and thus a database and role named *airflow* are created for it - see below for details.
+As [Part 1](/blog/2024-01-18-dbt-pizza-shop-1/), a PostgreSQL server is deployed using Docker Compose. See the previous post for details about (1) how fictional pizza shop data sets are made available, and (2) how the database is bootstrapped using a script (*bootstrap.sql*), which creates necessary schemas/tables as well as loads initial records to the tables. Note that the database cluster is shared with Airflow and thus a database and role named *airflow* are created for it - see below for details.
 
 ```yaml
 # compose-orchestration.yml
@@ -72,7 +72,7 @@ GRANT ALL ON DATABASE airflow TO airflow;
 
 ### Airflow
 
-Airflow is simplified by using the [Local Executor](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/local.html) where both scheduling and task execution are handled by the airflow scheduler service - i.e. *AIRFLOW__CORE__EXECUTOR: LocalExecutor*. Also, it is configured to be able to run the *dbt* project (see [Part 1](/blog/2024-01-18-dbt-pizza-shop-1) for details) within the scheduler service by 
+Airflow is simplified by using the [Local Executor](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/local.html) where both scheduling and task execution are handled by the airflow scheduler service - i.e. *AIRFLOW__CORE__EXECUTOR: LocalExecutor*. Also, it is configured to be able to run the *dbt* project (see [Part 1](/blog/2024-01-18-dbt-pizza-shop-1/) for details) within the scheduler service by 
 
 - installing the *dbt-postgre* package as an additional pip package, and
 - volume-mapping folders that keep the *dbt* project and *dbt* project profile

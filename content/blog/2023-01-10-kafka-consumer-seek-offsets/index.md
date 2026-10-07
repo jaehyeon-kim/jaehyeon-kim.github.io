@@ -419,9 +419,9 @@ We can also check that the correct offset is obtained as the message timestamp o
 
 ## Related posts
 
-* [Kafka Development with Docker - Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4) - the kafka-python producer and consumer applications that this offset seeking builds on.
-* [Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7) - the same applications serialising and deserialising through AWS Glue Schema Registry.
-* [Kafka Development with Docker - Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8) - TLS encryption between brokers and clients, with Java and Python examples.
+* [Kafka Development with Docker - Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4/) - the kafka-python producer and consumer applications that this offset seeking builds on.
+* [Producer and Consumer with Glue Schema Registry](/blog/2023-06-22-kafka-development-with-docker-part-7/) - the same applications serialising and deserialising through AWS Glue Schema Registry.
+* [Kafka Development with Docker - Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8/) - TLS encryption between brokers and clients, with Java and Python examples.
 
 ## Summary
 

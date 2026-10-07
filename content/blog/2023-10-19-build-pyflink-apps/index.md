@@ -156,6 +156,6 @@ Four lessons have unit testing cases, and they are expected to run separately by
 
 ## Related posts
 
-* [Getting Started with PyFlink on AWS - Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1) - the PyFlink and Kafka on Docker setup that these applications build on
-* [Local Development - Kafka, Flink and DynamoDB for Real Time Fraud Detection Part 1](/blog/2023-08-10-fraud-detection-part-1) - another local Flink project, this one writing detection results to DynamoDB
-* [Getting Started with PyFlink on AWS - Part 2 Local Flink and MSK](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2) - connects a PyFlink app to an IAM authenticated MSK cluster with a custom uber jar
+* [Getting Started with PyFlink on AWS - Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1/) - the PyFlink and Kafka on Docker setup that these applications build on
+* [Local Development - Kafka, Flink and DynamoDB for Real Time Fraud Detection Part 1](/blog/2023-08-10-fraud-detection-part-1/) - another local Flink project, this one writing detection results to DynamoDB
+* [Getting Started with PyFlink on AWS - Part 2 Local Flink and MSK](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2/) - connects a PyFlink app to an IAM authenticated MSK cluster with a custom uber jar

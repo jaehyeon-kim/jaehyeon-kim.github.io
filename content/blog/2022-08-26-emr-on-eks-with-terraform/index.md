@@ -501,9 +501,9 @@ As expected, the executors are added dynamically and removed subsequently as the
 
 ## Related posts
 
-* [EMR on EKS by Example](/blog/2022-01-17-emr-on-eks-by-example) - the same platform set up by hand, which shows what the Terraform modules provision
-* [EMR on EKS - Data Build Tool (dbt) for Effective Data Transformation on AWS Part 4](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks) - runs dbt transformation pipelines on an EMR on EKS virtual cluster
-* [Develop and Test Apache Spark Apps for EMR Locally Using Docker](/blog/2022-05-08-emr-local-dev) - develops the Spark jobs on a laptop before they are submitted to a cluster
+* [EMR on EKS by Example](/blog/2022-01-17-emr-on-eks-by-example/) - the same platform set up by hand, which shows what the Terraform modules provision
+* [EMR on EKS - Data Build Tool (dbt) for Effective Data Transformation on AWS Part 4](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks/) - runs dbt transformation pipelines on an EMR on EKS virtual cluster
+* [Develop and Test Apache Spark Apps for EMR Locally Using Docker](/blog/2022-05-08-emr-local-dev/) - develops the Spark jobs on a laptop before they are submitted to a cluster
 
 ## Summary
 

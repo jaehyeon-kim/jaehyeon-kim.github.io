@@ -443,6 +443,6 @@ rm -rf .venv
 
 ## Related posts
 
-* [Change Data Capture (CDC) Local Development with PostgreSQL, Debezium Server and Pub/Sub Emulator](/blog/2024-11-07-cdc-local-dev) - change data capture from PostgreSQL with Debezium Server and a Pub/Sub emulator instead of Kafka Connect
-* [Data Lake Demo using Change Data Capture (CDC) on AWS - Part 1 Local Development](/blog/2021-12-05-datalake-demo-part1) - an earlier local setup with Debezium and an S3 sink connector on Kafka Connect, the start of a data lake series
-* [Defining Data-Streaming Simulations in YAML, Without Writing Python](/blog/2026-10-06-simulations-in-yaml-dynamic-des) - the simulation library that runs the shop, now configurable in plain YAML
+* [Change Data Capture (CDC) Local Development with PostgreSQL, Debezium Server and Pub/Sub Emulator](/blog/2024-11-07-cdc-local-dev/) - change data capture from PostgreSQL with Debezium Server and a Pub/Sub emulator instead of Kafka Connect
+* [Data Lake Demo using Change Data Capture (CDC) on AWS - Part 1 Local Development](/blog/2021-12-05-datalake-demo-part1/) - an earlier local setup with Debezium and an S3 sink connector on Kafka Connect, the start of a data lake series
+* [Defining Data-Streaming Simulations in YAML, Without Writing Python](/blog/2026-10-06-simulations-in-yaml-dynamic-des/) - the simulation library that runs the shop, now configurable in plain YAML

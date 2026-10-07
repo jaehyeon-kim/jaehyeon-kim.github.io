@@ -140,11 +140,11 @@ Simulates a pristine factory state, such as immediately after a maintenance shif
 
 ## Related posts
 
-* [Building an Event-Driven Hybrid Digital Twin with dynamic-des](/blog/2026-04-28-digital-twin-dynamic-des) - the simulation package behind the twin, built on the Switchboard pattern and dynamic topic routing.
-* [Dynamic DES: A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors) - the later release that adds a declarative API and native Postgres and Redis connectors.
-* [Why Digital Twins Are Rewiring Industry 4.0](/blog/2026-04-23-digital-twin-industry-4-0) - the architectural layers that separate a traditional simulation from an event-driven hybrid pipeline.
-* [Stream Processing with Flink in Kotlin](/blog/2025-12-10-streaming-processing-with-flink-in-kotlin) - more Flink examples in Kotlin, the language this pipeline is written in.
-* [Productionizing an Online Product Recommender using Event Driven Architecture](/blog/2026-02-23-productionize-recommender-with-eda) - a contextual bandit recommender trained and served online with Flink, Kafka and Valkey.
+* [Building an Event-Driven Hybrid Digital Twin with dynamic-des](/blog/2026-04-28-digital-twin-dynamic-des/) - the simulation package behind the twin, built on the Switchboard pattern and dynamic topic routing.
+* [Dynamic DES: A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors/) - the later release that adds a declarative API and native Postgres and Redis connectors.
+* [Why Digital Twins Are Rewiring Industry 4.0](/blog/2026-04-23-digital-twin-industry-4-0/) - the architectural layers that separate a traditional simulation from an event-driven hybrid pipeline.
+* [Stream Processing with Flink in Kotlin](/blog/2025-12-10-streaming-processing-with-flink-in-kotlin/) - more Flink examples in Kotlin, the language this pipeline is written in.
+* [Productionizing an Online Product Recommender using Event Driven Architecture](/blog/2026-02-23-productionize-recommender-with-eda/) - a contextual bandit recommender trained and served online with Flink, Kafka and Valkey.
 
 ## Conclusion
 

@@ -415,7 +415,7 @@ Importantly, the simulation includes realistic noise. Even strong recommendation
 
 ## Related posts
 
-* [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning) - another online learning system, where a model learns on Flink as machinery wears and detects concept drift
+* [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning/) - another online learning system, where a model learns on Flink as machinery wears and detects concept drift
 
 ## What's Next?
 

@@ -19,13 +19,13 @@ tags:
 description: Orchestrate the Amazon Athena and Iceberg pizza shop dbt project with Apache Airflow, running the dimension and denormalised fact table builds.
 ---
 
-An ETL process is set up on the pizza shop dbt project using Apache Airflow. In [Part 5](/blog/2024-03-07-dbt-pizza-shop-5), we developed a [dbt](https://docs.getdbt.com/docs/introduction) project that that targets [Apache Iceberg](https://iceberg.apache.org/) where transformations are performed on [Amazon Athena](https://aws.amazon.com/athena/). Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. To improve query performance, the fact table is denormalized to pre-join records from the dimension tables using the array and struct data types.
+An ETL process is set up on the pizza shop dbt project using Apache Airflow. In [Part 5](/blog/2024-03-07-dbt-pizza-shop-5/), we developed a [dbt](https://docs.getdbt.com/docs/introduction) project that that targets [Apache Iceberg](https://iceberg.apache.org/) where transformations are performed on [Amazon Athena](https://aws.amazon.com/athena/). Two dimension tables that keep product and user records are created as [Type 2 slowly changing dimension (SCD Type 2)](https://en.wikipedia.org/wiki/Slowly_changing_dimension) tables, and one transactional fact table is built to keep pizza orders. To improve query performance, the fact table is denormalized to pre-join records from the dimension tables using the array and struct data types.
 
-* [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1)
-* [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2)
-* [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3)
-* [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4)
-* [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5)
+* [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1/)
+* [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2/)
+* [Part 3 Modelling on BigQuery](/blog/2024-02-08-dbt-pizza-shop-3/)
+* [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4/)
+* [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5/)
 * [Part 6 ETL on Amazon Athena via Airflow](#) (this post)
 
 ## Infrastructure
@@ -34,7 +34,7 @@ Apache Airflow and Amazon Athena are used in this post, and the former is deploy
 
 ### Airflow
 
-Airflow is simplified by using the [Local Executor](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/local.html) where both scheduling and task execution are handled by the airflow scheduler service - i.e. *AIRFLOW__CORE__EXECUTOR: LocalExecutor*. Also, it is configured to be able to run the *dbt* project (see [Part 5](/blog/2024-03-07-dbt-pizza-shop-5) for details) within the scheduler service by 
+Airflow is simplified by using the [Local Executor](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/executor/local.html) where both scheduling and task execution are handled by the airflow scheduler service - i.e. *AIRFLOW__CORE__EXECUTOR: LocalExecutor*. Also, it is configured to be able to run the *dbt* project (see [Part 5](/blog/2024-03-07-dbt-pizza-shop-5/) for details) within the scheduler service by 
 
 - installing the *dbt-athena-community* and *awswrangler* packages as additional pip packages,
 - volume-mapping folders that keep the *dbt* project and *dbt* project profile, and
@@ -147,7 +147,7 @@ networks:
     name: app-network
 ```
 
-Before we deploy the Airflow services, we need to create staging tables and insert initial records. It can be achieved by executing a Python script ([insert_records.py](https://github.com/jaehyeon-kim/general-demos/blob/master/dbt-athena-demo/setup/insert_records.py)) - see [Part 5](/blog/2024-03-07-dbt-pizza-shop-5) for details about the prerequisite step. Then the services can be started using the *docker-compose up* command. Note that it is recommended to specify the host user's ID as the *AIRFLOW_UID* value. Otherwise, Airflow can fail to launch due to insufficient permission to write logs.
+Before we deploy the Airflow services, we need to create staging tables and insert initial records. It can be achieved by executing a Python script ([insert_records.py](https://github.com/jaehyeon-kim/general-demos/blob/master/dbt-athena-demo/setup/insert_records.py)) - see [Part 5](/blog/2024-03-07-dbt-pizza-shop-5/) for details about the prerequisite step. Then the services can be started using the *docker-compose up* command. Note that it is recommended to specify the host user's ID as the *AIRFLOW_UID* value. Otherwise, Airflow can fail to launch due to insufficient permission to write logs.
 
 ```bash
 ## prerequisite

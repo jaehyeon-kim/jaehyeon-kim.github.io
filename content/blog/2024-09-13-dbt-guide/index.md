@@ -18,18 +18,18 @@ tags:
 description: Deploying a dbt project to dev and prod on BigQuery, covering slim CI, unit tests and a write audit publish step that builds on a cloned dataset.
 ---
 
-Deploying a *dbt* project in multiple environments is the focus here, and we walk through the entire CI/CD process step-by-step. In the [previous post](/blog/2024-09-05-dbt-cicd-demo), we started discussing a *continuous integration/continuous delivery (CI/CD)* process of a *dbt* project by introducing two GitHub Actions workflows - `slim-ci` and `deploy`. The former is triggered when a pull request is created to the main branch, and it builds only modified models and its first-order children in a *ci* dataset, followed by performing tests on them. The second workflow gets triggered once a pull request is merged. Beginning with running unit tests, it packages the *dbt* project as a Docker container and publishes to *Artifact Registry*.
+Deploying a *dbt* project in multiple environments is the focus here, and we walk through the entire CI/CD process step-by-step. In the [previous post](/blog/2024-09-05-dbt-cicd-demo/), we started discussing a *continuous integration/continuous delivery (CI/CD)* process of a *dbt* project by introducing two GitHub Actions workflows - `slim-ci` and `deploy`. The former is triggered when a pull request is created to the main branch, and it builds only modified models and its first-order children in a *ci* dataset, followed by performing tests on them. The second workflow gets triggered once a pull request is merged. Beginning with running unit tests, it packages the *dbt* project as a Docker container and publishes to *Artifact Registry*.
 
 <!--more-->
 
 As the CI process executes tests in multiple phases, it is advised to deploy a new release automatically in lower environments, which supports fast iteration. In higher environments, however, the testing scope is normally beyond what a development team can control. We involve business teams to perform extensive testing using BI tools and a new release can be deployed only if it is signed-off by them. Often it requires a copy of main datasets including changes in a new release. Also, those changes must not be executed in main datasets until it is approved. To meet those requirements, either [blue/green deployment](https://discourse.getdbt.com/t/performing-a-blue-green-deploy-of-your-dbt-project-on-snowflake/1349) or the [Write-Audit-Publish (WAP)](https://lakefs.io/blog/data-engineering-patterns-write-audit-publish/) pattern can be considered. In this post, we employ the WAP pattern because, while blue/green deployment requires changing dataset (or schema) names at the end, BigQuery does not support renaming datasets by default.
 
-* [DBT CI/CD Demo with BigQuery and GitHub Actions](/blog/2024-09-05-dbt-cicd-demo)
+* [DBT CI/CD Demo with BigQuery and GitHub Actions](/blog/2024-09-05-dbt-cicd-demo/)
 * [Guide to Running DBT in Production](#) (this post)
 
 ## DBT Project
 
-We continue using the *dbt* project for a fictional pizza shop. There are three staging data sets (*staging_orders*, *staging_products*, and *staging_users*), and they are loaded as *dbt* seeds. Initially the project ends up building two *SCD Type 2* dimension tables (*dim_products* and *dim_users*) and one fact table (*fct_orders*) - see [this post](/blog/2024-02-08-dbt-pizza-shop-3) for more details about data modelling of those tables. The structure of the project is listed below, and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/dbt-cicd-demo/tree/release-lifecycle) (*release-lifecycle* branch) of this post.
+We continue using the *dbt* project for a fictional pizza shop. There are three staging data sets (*staging_orders*, *staging_products*, and *staging_users*), and they are loaded as *dbt* seeds. Initially the project ends up building two *SCD Type 2* dimension tables (*dim_products* and *dim_users*) and one fact table (*fct_orders*) - see [this post](/blog/2024-02-08-dbt-pizza-shop-3/) for more details about data modelling of those tables. The structure of the project is listed below, and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/dbt-cicd-demo/tree/release-lifecycle) (*release-lifecycle* branch) of this post.
 
 ```text
 pizza_shop
@@ -131,7 +131,7 @@ sources:
         identifier: staging_orders
 ```
 
-Initial deployment is identical in each environment. After specifying the desired *dbt* profile target, we can execute the *dbt* `seed`, `run` and `test` commands successively. After that, the *dbt* artifact (*manifest.json*) is uploaded to the corresponding location in a GCS bucket. Below shows commands that are related to deploying to the dev environment. Note that the artifact is used to perform *dbt slim ci* as discussed in the [previous post](/blog/2024-09-05-dbt-cicd-demo).
+Initial deployment is identical in each environment. After specifying the desired *dbt* profile target, we can execute the *dbt* `seed`, `run` and `test` commands successively. After that, the *dbt* artifact (*manifest.json*) is uploaded to the corresponding location in a GCS bucket. Below shows commands that are related to deploying to the dev environment. Note that the artifact is used to perform *dbt slim ci* as discussed in the [previous post](/blog/2024-09-05-dbt-cicd-demo/).
 
 ```bash
 ## deploy and test in dev

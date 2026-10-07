@@ -168,6 +168,6 @@ kable(subset(exDf, subset = Date %in% dateFilter & BPM %in% numFilter, select = 
 
 ## Related posts
 
-* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1) - downloads price files with `Map` and merges them with `llply`, the looping functions described here
-* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2) - the same job done in memory, reading and combining files from URLs with `llply`
-* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files) - uses `llply` and `apply` to turn several price files into returns and correlation
+* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1/) - downloads price files with `Map` and merges them with `llply`, the looping functions described here
+* [Download Stock Data - Part II](/blog/2014-11-21-download-stock-data-2/) - the same job done in memory, reading and combining files from URLs with `llply`
+* [Summarise Stock Returns from Multiple Files](/blog/2014-11-27-summarise-stock-returns-from-multiple-files/) - uses `llply` and `apply` to turn several price files into returns and correlation

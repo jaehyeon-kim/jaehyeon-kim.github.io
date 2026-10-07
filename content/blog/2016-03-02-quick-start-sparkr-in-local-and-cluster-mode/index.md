@@ -16,7 +16,7 @@ tags:
 description: Run SparkR in local and cluster mode from an R project, setting environment variables and the library path, then reading JSON and CSV files.
 ---
 
-A [**BitBucket repository**](https://bitbucket.org/jaehyeon/sparkr-test) is introduced, which is a R project that includes *Spark 1.6.0 Pre-built for Hadoop 2.0 and later* and *hadoop-common 2.2.0* - the latter is necessary if it is tested on Windows. In the [previous post](/blog/2016-02-22-spark-cluster-setup-on-virtualbox), a Spark cluster is set up using 2 VirtualBox Ubuntu guests. While this is a viable option for many, it is not always for others. For those who find setting-up such a cluster is not convenient, there's still another option, which is relying on the local mode of Spark. Several initialization steps are then discussed such as setting-up environment variables and library path as well as including the [spark-csv package](https://github.com/databricks/spark-csv) and a JDBC driver. Finally it shows some examples of reading JSON and CSV files in the cluster mode.
+A [**BitBucket repository**](https://bitbucket.org/jaehyeon/sparkr-test) is introduced, which is a R project that includes *Spark 1.6.0 Pre-built for Hadoop 2.0 and later* and *hadoop-common 2.2.0* - the latter is necessary if it is tested on Windows. In the [previous post](/blog/2016-02-22-spark-cluster-setup-on-virtualbox/), a Spark cluster is set up using 2 VirtualBox Ubuntu guests. While this is a viable option for many, it is not always for others. For those who find setting-up such a cluster is not convenient, there's still another option, which is relying on the local mode of Spark. Several initialization steps are then discussed such as setting-up environment variables and library path as well as including the [spark-csv package](https://github.com/databricks/spark-csv) and a JDBC driver. Finally it shows some examples of reading JSON and CSV files in the cluster mode.
 
 > **Status, September 2026.** This post targets Spark 1.6.0 and the SparkR build shipped with it, and the download and setup steps no longer match a supported Spark release. Install a current Spark release and follow its own SparkR documentation instead.
 
@@ -94,7 +94,7 @@ sparkR.stop()
 
 ### standalone cluster
 
-In order to run the script in the cluster mode, the two data files (*iris.json* and *iris_up.csv*) are copied to `~/data` in both the master and slave machines. (Files should exist in the same location if you're not using HDFS, S3 ...) Note that I started a cluster by `~/spark/sbin/start-all.sh` - see [this post](/blog/2016-02-22-spark-cluster-setup-on-virtualbox) for further details.
+In order to run the script in the cluster mode, the two data files (*iris.json* and *iris_up.csv*) are copied to `~/data` in both the master and slave machines. (Files should exist in the same location if you're not using HDFS, S3 ...) Note that I started a cluster by `~/spark/sbin/start-all.sh` - see [this post](/blog/2016-02-22-spark-cluster-setup-on-virtualbox/) for further details.
 
 The main difference is the Spark master, which is set to be *spark://192.168.1.10:7077*.
 

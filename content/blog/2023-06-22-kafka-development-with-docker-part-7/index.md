@@ -19,7 +19,7 @@ tags:
 description: Schema registry support added to kafka-python producer and consumer apps, which serialise and deserialise through AWS Glue Schema Registry.
 ---
 
-In [Part 4](/blog/2023-06-01-kafka-development-with-docker-part-4), we developed Kafka producer and consumer applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package. The Kafka messages are serialized as Json, but are not associated with a schema as there was not an integrated schema registry. Later we discussed how producers and consumers to Kafka topics can use schemas to ensure data consistency and compatibility as schemas evolve in [Part 5](/blog/2023-06-08-kafka-development-with-docker-part-5). In this post, I'll demonstrate how to enhance the existing applications by integrating [*AWS Glue Schema Registry*](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html).
+In [Part 4](/blog/2023-06-01-kafka-development-with-docker-part-4/), we developed Kafka producer and consumer applications using the [kafka-python](https://kafka-python.readthedocs.io/en/master/index.html) package. The Kafka messages are serialized as Json, but are not associated with a schema as there was not an integrated schema registry. Later we discussed how producers and consumers to Kafka topics can use schemas to ensure data consistency and compatibility as schemas evolve in [Part 5](/blog/2023-06-08-kafka-development-with-docker-part-5/). In this post, I'll demonstrate how to enhance the existing applications by integrating [*AWS Glue Schema Registry*](https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html).
 
 [**UPDATE 2025-10-01**]
 
@@ -33,17 +33,17 @@ For example:
 
 ---
 
-* [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1)
-* [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2)
-* [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3)
-* [Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4)
-* [Part 5 Glue Schema Registry](/blog/2023-06-08-kafka-development-with-docker-part-5)
-* [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6)
+* [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1/)
+* [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2/)
+* [Part 3 Kafka Connect](/blog/2023-05-25-kafka-development-with-docker-part-3/)
+* [Part 4 Producer and Consumer](/blog/2023-06-01-kafka-development-with-docker-part-4/)
+* [Part 5 Glue Schema Registry](/blog/2023-06-08-kafka-development-with-docker-part-5/)
+* [Part 6 Kafka Connect with Glue Schema Registry](/blog/2023-06-15-kafka-development-with-docker-part-6/)
 * [Part 7 Producer and Consumer with Glue Schema Registry](#) (this post)
-* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8)
-* [Part 9 SSL Authentication](/blog/2023-07-06-kafka-development-with-docker-part-9)
-* [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10)
-* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11)
+* [Part 8 SSL Encryption](/blog/2023-06-29-kafka-development-with-docker-part-8/)
+* [Part 9 SSL Authentication](/blog/2023-07-06-kafka-development-with-docker-part-9/)
+* [Part 10 SASL Authentication](/blog/2023-07-13-kafka-development-with-docker-part-10/)
+* [Part 11 Kafka Authorization](/blog/2023-07-20-kafka-development-with-docker-part-11/)
 
 ## Producer
 

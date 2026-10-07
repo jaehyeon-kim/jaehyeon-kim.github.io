@@ -20,10 +20,10 @@ description: Deploy a Kafka to OpenSearch pipeline on AWS with Terraform, coveri
 ---
 A data pipeline from Apache Kafka into OpenSearch is deployed on AWS using [Amazon MSK](https://aws.amazon.com/msk/), [Amazon MSK Connect](https://aws.amazon.com/msk/features/msk-connect/) and [Amazon OpenSearch Service](https://aws.amazon.com/opensearch-service/) with [Terraform](https://developer.hashicorp.com/terraform) in this post. First the infrastructure will be deployed that covers a Virtual Private Cloud (VPC), Virtual Private Network (VPN) server, MSK Cluster and OpenSearch domain. Then Kafka source and sink connectors will be deployed on MSK Connect, followed by performing quick data analysis. In the previous post, we discussed how to develop that pipeline locally using Docker.
 
-* [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1)
-* [Part 2 Develop Camel DynamoDB Sink Connector](/blog/2023-06-04-kafka-connect-for-aws-part-2)
-* [Part 3 Deploy Camel DynamoDB Sink Connector](/blog/2023-07-03-kafka-connect-for-aws-part-3)
-* [Part 4 Develop Aiven OpenSearch Sink Connector](/blog/2023-10-23-kafka-connect-for-aws-part-4)
+* [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1/)
+* [Part 2 Develop Camel DynamoDB Sink Connector](/blog/2023-06-04-kafka-connect-for-aws-part-2/)
+* [Part 3 Deploy Camel DynamoDB Sink Connector](/blog/2023-07-03-kafka-connect-for-aws-part-3/)
+* [Part 4 Develop Aiven OpenSearch Sink Connector](/blog/2023-10-23-kafka-connect-for-aws-part-4/)
 * [Part 5 Deploy Aiven OpenSearch Sink Connector](#) (this post)
 
 ## Architecture
@@ -37,7 +37,7 @@ The infrastructure is created using [Terraform](https://developer.hashicorp.com/
 
 ### VPC and VPN
 
-A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*vpn.tf*). The details about how to configure the VPN server can be found in [this post](/blog/2022-02-06-dev-infra-terraform).
+A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*vpn.tf*). The details about how to configure the VPN server can be found in [this post](/blog/2022-02-06-dev-infra-terraform/).
 
 ### OpenSearch Cluster
 

@@ -52,10 +52,10 @@ This provides an end-to-end data engineering toolkit for simulation-based Machin
 
 ## Related posts
 
-* [Building an Event-Driven Hybrid Digital Twin with dynamic-des](/blog/2026-04-28-digital-twin-dynamic-des) - the earlier release that turns a static SimPy model into a synchronized forecasting engine
-* [Dynamic DES: A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors) - the later release, which adds a declarative API and native Postgres and Redis connectors
-* [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning) - the Flink pipeline that learns online from the kind of stream this simulation feeds
-* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system) - the fast-forward clock used to fill an Iceberg lakehouse with Parquet data that an agent queries
+* [Building an Event-Driven Hybrid Digital Twin with dynamic-des](/blog/2026-04-28-digital-twin-dynamic-des/) - the earlier release that turns a static SimPy model into a synchronized forecasting engine
+* [Dynamic DES: A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors/) - the later release, which adds a declarative API and native Postgres and Redis connectors
+* [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning/) - the Flink pipeline that learns online from the kind of stream this simulation feeds
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system/) - the fast-forward clock used to fill an Iceberg lakehouse with Parquet data that an agent queries
 
 ## Try it out
 

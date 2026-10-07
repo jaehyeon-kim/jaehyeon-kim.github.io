@@ -18,14 +18,14 @@ tags:
 description: Model pizza shop data on Google BigQuery with dbt, keeping SCD type 2 dimensions and denormalising the fact table with nested and repeated fields.
 ---
 
-We create a new *dbt* project that targets [Google BigQuery](https://cloud.google.com/bigquery) in this post. While the dimension tables are kept by the same SCD type 2 approach, the fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested), which potentially can improve query performance by pre-joining corresponding dimension records. In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) and ETL is managed by [Apache Airflow](https://airflow.apache.org/). In [Part 1](/blog/2024-01-18-dbt-pizza-shop-1), we developed a *dbt* project on PostgreSQL using fictional pizza shop data. At the end, the data sets are modelled by two [SCD type 2](https://en.wikipedia.org/wiki/Slowly_changing_dimension) dimension tables and one transactional fact table.
+We create a new *dbt* project that targets [Google BigQuery](https://cloud.google.com/bigquery) in this post. While the dimension tables are kept by the same SCD type 2 approach, the fact table is denormalized using [nested and repeated fields](https://cloud.google.com/bigquery/docs/best-practices-performance-nested), which potentially can improve query performance by pre-joining corresponding dimension records. In this series, we discuss practical examples of data warehouse and lakehouse development where data transformation is performed by the [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) and ETL is managed by [Apache Airflow](https://airflow.apache.org/). In [Part 1](/blog/2024-01-18-dbt-pizza-shop-1/), we developed a *dbt* project on PostgreSQL using fictional pizza shop data. At the end, the data sets are modelled by two [SCD type 2](https://en.wikipedia.org/wiki/Slowly_changing_dimension) dimension tables and one transactional fact table.
 
-* [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1)
-* [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2)
+* [Part 1 Modelling on PostgreSQL](/blog/2024-01-18-dbt-pizza-shop-1/)
+* [Part 2 ETL on PostgreSQL via Airflow](/blog/2024-01-25-dbt-pizza-shop-2/)
 * [Part 3 Modelling on BigQuery](#) (this post)
-* [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4)
-* [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5)
-* [Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6)
+* [Part 4 ETL on BigQuery via Airflow](/blog/2024-02-22-dbt-pizza-shop-4/)
+* [Part 5 Modelling on Amazon Athena](/blog/2024-03-07-dbt-pizza-shop-5/)
+* [Part 6 ETL on Amazon Athena via Airflow](/blog/2024-03-14-dbt-pizza-shop-6/)
 
 ## Setup BigQuery
 

@@ -198,6 +198,6 @@ I hope this post is useful.
 
 ## Related posts
 
-* [Internal Load Balancing](/blog/2016-05-23-shiny-open-source-internal-load-balancing) - spreads users over copies of the same app, the other workaround for the single process limit
-* [Async Shiny and Its Limitation](/blog/2018-05-19-asyn-shiny-and-its-limitation) - measures how far the promises package gets past that limit, and where it stops
-* [Shiny to Vue.js](/blog/2018-05-26-shiny-to-vue.js) - moves the frontend to Vue.js and native JavaScript libraries instead of working around Shiny
+* [Internal Load Balancing](/blog/2016-05-23-shiny-open-source-internal-load-balancing/) - spreads users over copies of the same app, the other workaround for the single process limit
+* [Async Shiny and Its Limitation](/blog/2018-05-19-asyn-shiny-and-its-limitation/) - measures how far the promises package gets past that limit, and where it stops
+* [Shiny to Vue.js](/blog/2018-05-26-shiny-to-vue.js/) - moves the frontend to Vue.js and native JavaScript libraries instead of working around Shiny

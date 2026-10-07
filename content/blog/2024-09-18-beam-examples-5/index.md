@@ -18,24 +18,24 @@ tags:
 description: Batching gRPC calls in a stateless DoFn so one request covers a whole bundle, cutting the time a Beam Python pipeline spends on enrichment.
 ---
 
-We enhance the pipeline so that a single RPC call is made for a bundle of elements, which can save a significant amount time compared to making a call for each element. In the [previous post](/blog/2024-08-15-beam-examples-4), we developed an Apache Beam pipeline where the input data is augmented by a **Remote Procedure Call (RPC)** service. Each input element performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element.
+We enhance the pipeline so that a single RPC call is made for a bundle of elements, which can save a significant amount time compared to making a call for each element. In the [previous post](/blog/2024-08-15-beam-examples-4/), we developed an Apache Beam pipeline where the input data is augmented by a **Remote Procedure Call (RPC)** service. Each input element performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element.
 
 <!--more-->
 
-* [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1)
-* [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
-* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
-* [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4)
+* [Part 1 Calculate K Most Frequent Words and Max Word Length](/blog/2024-07-04-beam-examples-1/)
+* [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2/)
+* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3/)
+* [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4/)
 * [Part 5 Call RPC Service in Batch using Stateless DoFn](#) (this post)
-* [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6)
-* [Part 7 Separate Droppable Data into Side Output](/blog/2024-10-24-beam-examples-7)
-* [Part 8 Enhance Sport Activity Tracker with Runner Motivation](/blog/2024-11-21-beam-examples-8)
-* [Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn](/blog/2024-12-05-beam-examples-9)
-* [Part 10 Develop Streaming File Reader using Splittable DoFn](/blog/2024-12-19-beam-examples-10)
+* [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6/)
+* [Part 7 Separate Droppable Data into Side Output](/blog/2024-10-24-beam-examples-7/)
+* [Part 8 Enhance Sport Activity Tracker with Runner Motivation](/blog/2024-11-21-beam-examples-8/)
+* [Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn](/blog/2024-12-05-beam-examples-9/)
+* [Part 10 Develop Streaming File Reader using Splittable DoFn](/blog/2024-12-19-beam-examples-10/)
 
 ## Development Environment
 
-The development environment has an Apache Flink cluster, Apache Kafka cluster and [gRPC](https://grpc.io/) server. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
+The development environment has an Apache Flink cluster, Apache Kafka cluster and [gRPC](https://grpc.io/) server. For Flink, we can use either an embedded cluster or a local cluster while [Docker Compose](https://docs.docker.com/compose/) is used for the rest. See [Part 1](/blog/2024-07-04-beam-examples-1/) for details about how to set up the development environment. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/beam-demos/tree/master/beam-pipelines).
 
 ### Manage Environment
 
@@ -82,7 +82,7 @@ Below shows how to start resources using the start-up script. We need to launch 
 
 ## Remote Procedure Call (RPC) Service
 
-The RPC service have two methods - `resolve` and `resolveBatch`. The former accepts a request with a string and returns an integer while the latter accepts a list of string requests and returns a list of integer responses. See [Part 4](/blog/2024-08-15-beam-examples-4) for details about how the RPC service is developed.
+The RPC service have two methods - `resolve` and `resolveBatch`. The former accepts a request with a string and returns an integer while the latter accepts a list of string requests and returns a list of integer responses. See [Part 4](/blog/2024-08-15-beam-examples-4/) for details about how the RPC service is developed.
 
 Overall, we have the following files for the gRPC server and client applications, and the `server.py` gets started when we execute the start-up script with the `-g` flag.
 
@@ -450,7 +450,7 @@ cat /etc/hosts | grep host.docker.internal
 # 127.0.0.1       host.docker.internal
 ```
 
-We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - `python utils/faker_gen.py`. See [Part 1](/blog/2024-07-04-beam-examples-1) for details about the Kafka producer.
+We need to send messages into the input Kafka topic before executing the pipeline. Input messages can be sent by executing the Kafka text producer - `python utils/faker_gen.py`. See [Part 1](/blog/2024-07-04-beam-examples-1/) for details about the Kafka producer.
 
 ![Input text messages of the Kafka topic listed in Kafka UI](input-messages.png#center "Input text messages of the Kafka topic listed in Kafka UI")
 

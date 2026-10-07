@@ -17,13 +17,13 @@ tags:
 description: A streaming Apache Beam pipeline in Python that aggregates page visits by user in fixed 20 second windows, written with and without Beam SQL.
 ---
 
-We build a streaming pipeline that aggregates page visits by user in a [fixed time window](https://beam.apache.org/documentation/programming-guide/#fixed-time-windows) of 20 seconds. Two versions of the pipeline are created with/without relying on [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/). In [Part 3](/blog/2024-04-18-beam-local-dev-3), we discussed the portability layer of [Apache Beam](https://beam.apache.org/) as it helps understand (1) how Python pipelines run on the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) and (2) how multiple SDKs can be used in a single pipeline, followed by demonstrating local Flink and Kafka cluster creation for developing streaming pipelines.
+We build a streaming pipeline that aggregates page visits by user in a [fixed time window](https://beam.apache.org/documentation/programming-guide/#fixed-time-windows) of 20 seconds. Two versions of the pipeline are created with/without relying on [Beam SQL](https://beam.apache.org/documentation/dsls/sql/overview/). In [Part 3](/blog/2024-04-18-beam-local-dev-3/), we discussed the portability layer of [Apache Beam](https://beam.apache.org/) as it helps understand (1) how Python pipelines run on the [Flink Runner](https://beam.apache.org/documentation/runners/flink/) and (2) how multiple SDKs can be used in a single pipeline, followed by demonstrating local Flink and Kafka cluster creation for developing streaming pipelines.
 
-* [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1)
-* [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2)
-* [Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3)
+* [Part 1 Pipeline, Notebook, SQL and DataFrame](/blog/2024-03-28-beam-local-dev-1/)
+* [Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2/)
+* [Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3/)
 * [Part 4 Streaming Pipelines](#) (this post)
-* [Part 5 Testing Pipelines](/blog/2024-05-09-beam-local-dev-5)
+* [Part 5 Testing Pipelines](/blog/2024-05-09-beam-local-dev-5/)
 
 ## Streaming Pipeline
 
@@ -345,7 +345,7 @@ if __name__ == "__main__":
 
 ## Run Pipeline
 
-We can use local Flink and Kafka clusters as discussed in [Part 3](/blog/2024-04-18-beam-local-dev-3). The Flink cluster is optional as Beam runs a pipeline on an embedded Flink cluster if we do not specify a cluster URL.
+We can use local Flink and Kafka clusters as discussed in [Part 3](/blog/2024-04-18-beam-local-dev-3/). The Flink cluster is optional as Beam runs a pipeline on an embedded Flink cluster if we do not specify a cluster URL.
 
 ### Start Flink/Kafka Clusters
 
@@ -361,7 +361,7 @@ $ ./setup/start-flink-env.sh -k
 
 ### Data Generation
 
-For streaming data generation, we can use the website visit log generator that was introduced in [Part 1](/blog/2024-03-28-beam-local-dev-1). We can execute the script while specifying the *source* argument to *streaming*. Below shows an example of generating Kafka messages for the streaming pipeline.
+For streaming data generation, we can use the website visit log generator that was introduced in [Part 1](/blog/2024-03-28-beam-local-dev-1/). We can execute the script while specifying the *source* argument to *streaming*. Below shows an example of generating Kafka messages for the streaming pipeline.
 
 ```bash
 $ python datagen/generate_data.py --source streaming --num_users 5 --delay_seconds 0.5
@@ -394,7 +394,7 @@ We can use the Flink web UI to monitor the pipeline as a Flink job. When we clic
 
 #### SQL Traffic Aggregation
 
-I see the following error when I execute the SQL version of the pipeline with the *use_own* option. It seems that the Java SDK container for SQL transformation fails to download its expansion service and does not complete initialisation steps - see [Part 3](/blog/2024-04-18-beam-local-dev-3) for details about how multiple SDKs can be used in a single pipeline. Therefore, the Flink job fails to access the SDK container, and it keeps recreate a new container.
+I see the following error when I execute the SQL version of the pipeline with the *use_own* option. It seems that the Java SDK container for SQL transformation fails to download its expansion service and does not complete initialisation steps - see [Part 3](/blog/2024-04-18-beam-local-dev-3/) for details about how multiple SDKs can be used in a single pipeline. Therefore, the Flink job fails to access the SDK container, and it keeps recreate a new container.
 
 ![Error raised when the SQL pipeline runs on the local Flink cluster](flink-job-sql.png#center "Error raised when the SQL pipeline runs on the local Flink cluster")
 

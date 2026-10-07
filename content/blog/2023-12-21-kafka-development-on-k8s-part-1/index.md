@@ -23,8 +23,8 @@ description: Create a Kafka cluster on Kubernetes with Strimzi, the first step i
 [Apache Kafka](https://kafka.apache.org/) is one of the key technologies for implementing data streaming architectures. [Strimzi](https://strimzi.io/) provides a way to run an Apache Kafka cluster and related resources on Kubernetes in various deployment configurations. In this series of posts, we will discuss how to create a Kafka cluster, to develop Kafka client applications in Python and to build a data pipeline using Kafka connectors on Kubernetes.
 
 * [Part 1 Cluster Setup](#) (this post)
-* [Part 2 Producer and Consumer](/blog/2024-01-04-kafka-development-on-k8s-part-2)
-* [Part 3 Kafka Connect](/blog/2024-01-11-kafka-development-on-k8s-part-3)
+* [Part 2 Producer and Consumer](/blog/2024-01-04-kafka-development-on-k8s-part-2/)
+* [Part 3 Kafka Connect](/blog/2024-01-11-kafka-development-on-k8s-part-3/)
 
 ## Setup Kafka Cluster
 
@@ -150,7 +150,7 @@ kubectl get all -l app.kubernetes.io/instance=demo-cluster
 
 **Update 2024-07-11**
 
-In later versions of the Strimzi operator manage the Kafka and Zookeeper nodes using the [*StrimziPodSet*](https://strimzi.io/docs/operators/latest/configuring.html#type-StrimziPodSet-reference) custom resource. Check [this post](/blog/2024-05-30-beam-deploy-1) for details about how to deploy a Kafka cluster using Strimzi 0.39.0.
+In later versions of the Strimzi operator manage the Kafka and Zookeeper nodes using the [*StrimziPodSet*](https://strimzi.io/docs/operators/latest/configuring.html#type-StrimziPodSet-reference) custom resource. Check [this post](/blog/2024-05-30-beam-deploy-1/) for details about how to deploy a Kafka cluster using Strimzi 0.39.0.
 
 ### Deploy Kafka UI
 
@@ -272,7 +272,7 @@ minikube delete
 
 ## Related posts
 
-* [How I Prepared for Certified Kubernetes Application Developer (CKAD)](/blog/2023-10-12-how-i-prepared-for-ckad) - courses and practice tests for the Kubernetes background this series assumes
+* [How I Prepared for Certified Kubernetes Application Developer (CKAD)](/blog/2023-10-12-how-i-prepared-for-ckad/) - courses and practice tests for the Kubernetes background this series assumes
 
 ## Summary
 

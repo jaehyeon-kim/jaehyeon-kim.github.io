@@ -83,11 +83,11 @@ Measuring an agent means judging both its decision-making and its safety. The re
 
 ## Related posts
 
-* [Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI](/blog/2026-07-16-odctl-open-data-stack) - the CLI that starts the local open source stack this system runs on
-* [One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES](/blog/2026-05-25-dynamic-des-parquet-support) - generating the batch Parquet and live streaming data such a stack reads
-* [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning) - the real-time side that this batch-only phase leaves for later
-* [Meet the Streamhouse Trio - Paimon, Fluss, and Iceberg for Unified Data Architectures](/blog/2025-05-06-streamhouse-trio) - compares Paimon, Fluss and Iceberg as table layers for streaming and batch
-* [Self-service Data Platform via a Multi-tenant SQL Gateway](/blog/2025-07-17-self-service-data-platform-via-sql-gateway) - a multi-tenant SQL gateway that starts Spark, Flink and Trino engines on demand over tables like these
+* [Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI](/blog/2026-07-16-odctl-open-data-stack/) - the CLI that starts the local open source stack this system runs on
+* [One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES](/blog/2026-05-25-dynamic-des-parquet-support/) - generating the batch Parquet and live streaming data such a stack reads
+* [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning/) - the real-time side that this batch-only phase leaves for later
+* [Meet the Streamhouse Trio - Paimon, Fluss, and Iceberg for Unified Data Architectures](/blog/2025-05-06-streamhouse-trio/) - compares Paimon, Fluss and Iceberg as table layers for streaming and batch
+* [Self-service Data Platform via a Multi-tenant SQL Gateway](/blog/2025-07-17-self-service-data-platform-via-sql-gateway/) - a multi-tenant SQL gateway that starts Spark, Flink and Trino engines on demand over tables like these
 
 ## Where This Is Going
 

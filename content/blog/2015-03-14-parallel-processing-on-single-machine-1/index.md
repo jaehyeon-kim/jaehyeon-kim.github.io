@@ -318,6 +318,6 @@ A quick introduction to the **snow** and **parallel** packages is made in this a
 
 ## Related posts
 
-* [Parallel Processing on Single Machine - Part 2](/blog/2015-03-17-parallel-processing-on-single-machine-2) - the foreach and doParallel packages, the next step promised at the end of this article
-* [Parallel Processing on Single Machine - Part 3](/blog/2015-03-19-parallel-processing-on-single-machine-3) - compares the snow and foreach approaches on three practical examples
-* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1) - downloads and merges stock price files, the kind of repeated task worth running in parallel
+* [Parallel Processing on Single Machine - Part 2](/blog/2015-03-17-parallel-processing-on-single-machine-2/) - the foreach and doParallel packages, the next step promised at the end of this article
+* [Parallel Processing on Single Machine - Part 3](/blog/2015-03-19-parallel-processing-on-single-machine-3/) - compares the snow and foreach approaches on three practical examples
+* [Download Stock Data - Part I](/blog/2014-11-20-download-stock-data-1/) - downloads and merges stock price files, the kind of repeated task worth running in parallel

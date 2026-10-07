@@ -58,10 +58,10 @@ I find this book is well organized and covers enough topics related to Python it
 
 ## Related posts
 
-* [Some Thoughts on Python for R Users](/blog/2015-08-09-some-thoughts-on-python-for-r-users) - calls a SOAP web service from Python with the suds library, a job R has no comprehensive client for
-* [Quick Test to Wrap Python in R](/blog/2015-11-21-quick-test-to-wrap-python-in-r) - wraps Python boto calls for Amazon S3 in an R package that parses the returned JSON
-* [Asynchronous Processing Using Job Queue](/blog/2016-05-12-asynchronous-processing-using-job-queue) - gets around R's lack of multi-threading with the jobqueue package
-* [Serverless Data Product POC Backend Part 1](/blog/2017-04-08-serverless-data-product-1) - packages an R logistic regression model for AWS Lambda
+* [Some Thoughts on Python for R Users](/blog/2015-08-09-some-thoughts-on-python-for-r-users/) - calls a SOAP web service from Python with the suds library, a job R has no comprehensive client for
+* [Quick Test to Wrap Python in R](/blog/2015-11-21-quick-test-to-wrap-python-in-r/) - wraps Python boto calls for Amazon S3 in an R package that parses the returned JSON
+* [Asynchronous Processing Using Job Queue](/blog/2016-05-12-asynchronous-processing-using-job-queue/) - gets around R's lack of multi-threading with the jobqueue package
+* [Serverless Data Product POC Backend Part 1](/blog/2017-04-08-serverless-data-product-1/) - packages an R logistic regression model for AWS Lambda
 
 ## What Matters for Python Development
 

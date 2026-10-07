@@ -14,7 +14,7 @@ tags:
 description: Compare the snow and foreach approaches to parallel processing in R on three practical examples, starting with k-means clustering on the Boston data.
 ---
 
-Three practical examples are discussed for comparison in this article, concluding this series. In the [previous posts](/blog/2015-03-17-parallel-processing-on-single-machine-2), two groups of ways to implement parallel processing on a single machine are introduced. The first group is provided by the **snow** or **parallel** package and the functions are an extension of `lapply()` ([LINK](/blog/2015-03-14-parallel-processing-on-single-machine-1)). The second group is based on an extension of the *for* construct (*foreach*, *%dopar%* and *%:%*). The *foreach* construct is provided by the *foreach* package while clusters are made and registered by the **parallel** and **doParallel** packages respectively ([LINK](/blog/2015-03-17-parallel-processing-on-single-machine-2)).
+Three practical examples are discussed for comparison in this article, concluding this series. In the [previous posts](/blog/2015-03-17-parallel-processing-on-single-machine-2/), two groups of ways to implement parallel processing on a single machine are introduced. The first group is provided by the **snow** or **parallel** package and the functions are an extension of `lapply()` ([LINK](/blog/2015-03-14-parallel-processing-on-single-machine-1/)). The second group is based on an extension of the *for* construct (*foreach*, *%dopar%* and *%:%*). The *foreach* construct is provided by the *foreach* package while clusters are made and registered by the **parallel** and **doParallel** packages respectively ([LINK](/blog/2015-03-17-parallel-processing-on-single-machine-2/)).
 
 Let's get started.
 
@@ -106,7 +106,7 @@ According to the package document,
 
 ### parallel package
 
-*x* and *y* keep the predictors and response. A function (`rf()`) is created to implement the algorithm. If data has to be sent to each worker, it can be sent either by `clusterCall()` or by a function. If `clusterApply()` or `clusterApplyLB()` are used, the former should be used to reduce I/O operations time and it'd be alright to send by a function if `parLapply()` or `parLapplyLB()` are used - single I/O for each task split. (for details, see the [first article](/blog/2015-03-14-parallel-processing-on-single-machine-1)) As the **randomForest** package provides a function to combine the objects (`combine()`), it is used in `do.call()`. Finally a confusion table is created.
+*x* and *y* keep the predictors and response. A function (`rf()`) is created to implement the algorithm. If data has to be sent to each worker, it can be sent either by `clusterCall()` or by a function. If `clusterApply()` or `clusterApplyLB()` are used, the former should be used to reduce I/O operations time and it'd be alright to send by a function if `parLapply()` or `parLapplyLB()` are used - single I/O for each task split. (for details, see the [first article](/blog/2015-03-14-parallel-processing-on-single-machine-1/)) As the **randomForest** package provides a function to combine the objects (`combine()`), it is used in `do.call()`. Finally a confusion table is created.
 
 
 ```r

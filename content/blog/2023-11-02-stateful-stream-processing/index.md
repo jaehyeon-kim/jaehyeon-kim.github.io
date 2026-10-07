@@ -98,6 +98,6 @@ Each of the application areas of the stateful stream processing pattern mentione
 
 ## Related posts
 
-* [Kafka, Flink and DynamoDB for Real Time Fraud Detection - Part 1](/blog/2023-08-10-fraud-detection-part-1) - an event-driven application of this pattern, developed locally on Docker.
-* [Getting Started with PyFlink on AWS - Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1) - a first PyFlink application against a Kafka cluster on Docker.
-* [Getting Started with PyFlink on AWS - Part 2 Local Flink and MSK](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2) - the same application connected to an IAM authenticated MSK cluster.
+* [Kafka, Flink and DynamoDB for Real Time Fraud Detection - Part 1](/blog/2023-08-10-fraud-detection-part-1/) - an event-driven application of this pattern, developed locally on Docker.
+* [Getting Started with PyFlink on AWS - Part 1 Local Flink and Local Kafka](/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1/) - a first PyFlink application against a Kafka cluster on Docker.
+* [Getting Started with PyFlink on AWS - Part 2 Local Flink and MSK](/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2/) - the same application connected to an IAM authenticated MSK cluster.

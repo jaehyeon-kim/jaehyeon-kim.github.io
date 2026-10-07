@@ -14,12 +14,12 @@ tags:
 description: Evaluate a single regression tree in R against 2000 bagged trees, comparing out-of-bag and test errors, cumulative errors and variable importance.
 ---
 
-* [Part I](/blog/2015-02-01-tree-based-methods-1)
-* [Part II](/blog/2015-02-08-tree-based-methods-2)
-* [Part III](/blog/2015-02-14-tree-based-methods-3)
-* [Part IV](/blog/2015-02-15-tree-based-methods-4)
+* [Part I](/blog/2015-02-01-tree-based-methods-1/)
+* [Part II](/blog/2015-02-08-tree-based-methods-2/)
+* [Part III](/blog/2015-02-14-tree-based-methods-3/)
+* [Part IV](/blog/2015-02-15-tree-based-methods-4/)
 * [Part V](#) (this post)
-* [Part VI](/blog/2015-03-07-tree-based-methods-6)
+* [Part VI](/blog/2015-03-07-tree-based-methods-6/)
 
 This article evaluates a single regression tree's performance by comparing to bagged trees' individual oob/test errors, cumulative oob/test errors and variable importance measures.
 

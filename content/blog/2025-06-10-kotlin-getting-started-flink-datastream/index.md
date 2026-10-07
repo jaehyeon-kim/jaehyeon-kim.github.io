@@ -25,11 +25,11 @@ Building on our exploration of stream processing, we now transition from Kafka's
 
 <!--more-->
 
-* [Kafka Clients with JSON - Producing and Consuming Order Events](/blog/2025-05-20-kotlin-getting-started-kafka-json-clients)
-* [Kafka Clients with Avro - Schema Registry and Order Events](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients)
-* [Kafka Streams - Lightweight Real-Time Processing for Supplier Stats](/blog/2025-06-03-kotlin-getting-started-kafka-streams)
+* [Kafka Clients with JSON - Producing and Consuming Order Events](/blog/2025-05-20-kotlin-getting-started-kafka-json-clients/)
+* [Kafka Clients with Avro - Schema Registry and Order Events](/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients/)
+* [Kafka Streams - Lightweight Real-Time Processing for Supplier Stats](/blog/2025-06-03-kotlin-getting-started-kafka-streams/)
 * [Flink DataStream API - Scalable Event Processing for Supplier Stats](#) (this post)
-* [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](/blog/2025-06-17-kotlin-getting-started-flink-table)
+* [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](/blog/2025-06-17-kotlin-getting-started-flink-table/)
 
 ## Flink DataStream Application
 
@@ -795,7 +795,7 @@ These records are the ones that arrived too late to be included in their windows
 
 ## Related posts
 
-* [Stream Processing with Flink in Kotlin](/blog/2025-12-10-streaming-processing-with-flink-in-kotlin) - the examples from the book Stream Processing with Apache Flink, ported to Kotlin with the same DataStream API
+* [Stream Processing with Flink in Kotlin](/blog/2025-12-10-streaming-processing-with-flink-in-kotlin/) - the examples from the book Stream Processing with Apache Flink, ported to Kotlin with the same DataStream API
 
 ## Conclusion
 

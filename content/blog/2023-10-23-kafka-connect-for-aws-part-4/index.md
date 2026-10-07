@@ -38,11 +38,11 @@ When it comes to ingesting data from Apache Kafka into OpenSearch, OpenSearch ha
 
 In this post, we will discuss how to develop a data pipeline from Apache Kafka into OpenSearch locally using Docker while the pipeline will be deployed on AWS in the next post. Fake impressions and clicks data will be pushed into Kafka topics using a Kafka source connector and those records will be ingested into OpenSearch indexes using a sink connector for near-real time analytics.
 
-* [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1)
-* [Part 2 Develop Camel DynamoDB Sink Connector](/blog/2023-06-04-kafka-connect-for-aws-part-2)
-* [Part 3 Deploy Camel DynamoDB Sink Connector](/blog/2023-07-03-kafka-connect-for-aws-part-3)
+* [Part 1 Introduction](/blog/2023-05-03-kafka-connect-for-aws-part-1/)
+* [Part 2 Develop Camel DynamoDB Sink Connector](/blog/2023-06-04-kafka-connect-for-aws-part-2/)
+* [Part 3 Deploy Camel DynamoDB Sink Connector](/blog/2023-07-03-kafka-connect-for-aws-part-3/)
 * [Part 4 Develop Aiven OpenSearch Sink Connector](#) (this post)
-* [Part 5 Deploy Aiven OpenSearch Sink Connector](/blog/2023-10-30-kafka-connect-for-aws-part-5)
+* [Part 5 Deploy Aiven OpenSearch Sink Connector](/blog/2023-10-30-kafka-connect-for-aws-part-5/)
 
 ## Architecture
 

@@ -21,7 +21,7 @@ API is an effective way of distributing analysis outputs to external clients. Wh
 
 > **Status, September 2026.** The Rserve and rApache sections here describe options that few R projects use now, and the plumber link points at its old `trestletech` repository, which has moved to [rstudio/plumber](https://github.com/rstudio/plumber). Start with plumber if you want to serve an R function as an API today.
 
-This is 2 part series in relation to _API development with R_. In this post, serving an R function with _plumber_, _Rserve_ and _rApache_ is discussed. _OpenCPU_ is not discussed partly because it could be overkill for API. Also its performance may be similar to _rApache_ with [Prefork Multi-Processing Module](https://httpd.apache.org/docs/2.2/mod/prefork.html) enabled. Then deploying the APIs in a Docker container, making example HTTP requests and their performance will be discussed in [Part II](/blog/2015-02-08-tree-based-methods-2).
+This is 2 part series in relation to _API development with R_. In this post, serving an R function with _plumber_, _Rserve_ and _rApache_ is discussed. _OpenCPU_ is not discussed partly because it could be overkill for API. Also its performance may be similar to _rApache_ with [Prefork Multi-Processing Module](https://httpd.apache.org/docs/2.2/mod/prefork.html) enabled. Then deploying the APIs in a Docker container, making example HTTP requests and their performance will be discussed in [Part II](/blog/2015-02-08-tree-based-methods-2/).
 
 ## Plumber
 
@@ -238,8 +238,8 @@ test <- function(env) {
 }
 ```
 
-This is all for Part I. In [Part II](/blog/2017-11-19-api-development-with-r-2), it'll be discussed how to deploy the APIs via a Docker container, how to make example requests and their performance. I hope this article is interesting.
+This is all for Part I. In [Part II](/blog/2017-11-19-api-development-with-r-2/), it'll be discussed how to deploy the APIs via a Docker container, how to make example requests and their performance. I hope this article is interesting.
 
 ## Related posts
 
-* [Cronicle Multi Server Setup](/blog/2019-07-19-cronicle-multi-server-setup) - schedules and runs jobs across several servers with Docker and Nginx as load balancer, once the R code is behind an endpoint
+* [Cronicle Multi Server Setup](/blog/2019-07-19-cronicle-multi-server-setup/) - schedules and runs jobs across several servers with Docker and Nginx as load balancer, once the R code is behind an endpoint

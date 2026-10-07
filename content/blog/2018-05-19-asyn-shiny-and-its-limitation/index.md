@@ -19,7 +19,7 @@ description: Implement the async feature of R Shiny and find its limits, measure
 
 A Shiny app is served by one (*single-threaded blocking*) process by [Open Source Shiny Server](https://docs.posit.co/shiny-server/). This causes a scalability issue because all requests are handled one by one in a queue. Recently the creator of *Shiny* introduced the [promises](https://rstudio.github.io/promises/) package, which brings *asynchronous programming capabilities to R*. This is a remarkable step forward to web development in R.
 
-> **Status, September 2026.** The async setup here works around the single process limit of Shiny Open Source, and it installs packages from 2018 development branches such as `rstudio/DT@async`, so the versions and install steps are historical. [Shiny to Vue.js](/blog/2018-05-26-shiny-to-vue.js) covers the JavaScript frontend alternative this post argues for.
+> **Status, September 2026.** The async setup here works around the single process limit of Shiny Open Source, and it installs packages from 2018 development branches such as `rstudio/DT@async`, so the versions and install steps are historical. [Shiny to Vue.js](/blog/2018-05-26-shiny-to-vue.js/) covers the JavaScript frontend alternative this post argues for.
 
 In this post, it'll be demonstrated how to implement the async feature of Shiny. Then its limitation will be discussed with an alternative app, which is built by *JavaScript* for the frontend and *RServe* for the backend.
 
@@ -142,7 +142,7 @@ This limitation can have a significant impact on developing a web application. I
 In order to compare the async Shiny app to a typical web app, an app is created with JavaScript for the frontend and RServe for the backend. In the UI, JQuery will be used for AJAX requests by clicking buttons. Then the same htmlwidget elements will be rendered to the app. With this setup, it's possible to make multiple requests concurrently in a session and they are all handled asynchronously by a JavaScript-backed app.
 
 ### RServe Backend
-So as to render *htmlwidgets* to UI, it is necessary to have a backend API. As discussed in *API Development with R* series ([Part I](/blog/2017-11-18-api-development-with-r-1), [Part II](/blog/2017-11-19-api-development-with-r-2)), RServe can be a performant option for building an API. 
+So as to render *htmlwidgets* to UI, it is necessary to have a backend API. As discussed in *API Development with R* series ([Part I](/blog/2017-11-18-api-development-with-r-1/), [Part II](/blog/2017-11-19-api-development-with-r-2/)), RServe can be a performant option for building an API. 
 
 I don't plan to use native JavaScript libraries for creating individual widgets. Rather I'm going to render widgets that are created by R. Therefore it is necessary to understand the structure of a widget. `saveWidget()` of the *htmlwidgets* package helps save a widget into a HTML file and it executes `save_html()` of the *htmltools* package. 
 
@@ -320,7 +320,7 @@ get_iris <- function(get_all = FALSE) {
 * Response content type
   + depending on _type_, response content type will be either _application/json_ or _text/html_
 
-See *API Development with R* series ([Part I](/blog/2017-11-18-api-development-with-r-1), [Part II](/blog/2017-11-19-api-development-with-r-2)) for further details of `process_request()` and how RServe's built-in HTTP server works.
+See *API Development with R* series ([Part I](/blog/2017-11-18-api-development-with-r-1/), [Part II](/blog/2017-11-19-api-development-with-r-2/)) for further details of `process_request()` and how RServe's built-in HTTP server works.
 
 ```r
 process_request <- function(url, query, body, headers) {

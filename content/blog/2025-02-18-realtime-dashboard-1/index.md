@@ -24,8 +24,8 @@ A data generating app is created with Python, and it ingests the [theLook eComme
 <!--more-->
 
 * [Part 1 Data Producer](#) (this post)
-* [Part 2 Streamlit Dashboard](/blog/2025-02-25-realtime-dashboard-2)
-* [Part 3 Next.js Dashboard](/blog/2025-03-04-realtime-dashboard-3)
+* [Part 2 Streamlit Dashboard](/blog/2025-02-25-realtime-dashboard-2/)
+* [Part 3 Next.js Dashboard](/blog/2025-03-04-realtime-dashboard-3/)
 
 <!--more-->
 
@@ -392,4 +392,4 @@ INFO:     Sending 67 records
 
 ## Related posts
 
-* [Guide to Building Integrated Web Applications with FastAPI and NiceGUI](/blog/2025-11-19-fastapi-nicegui-template) - serves a FastAPI backend and the web UI from one Python process, compared with React and with Streamlit
+* [Guide to Building Integrated Web Applications with FastAPI and NiceGUI](/blog/2025-11-19-fastapi-nicegui-template/) - serves a FastAPI backend and the web UI from one Python process, compared with React and with Streamlit

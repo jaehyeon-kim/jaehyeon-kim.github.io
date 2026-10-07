@@ -28,14 +28,14 @@ This is the first post of *Serverless Data Product POC* series and I'm planning 
 
 * Backend
     * [Part I - Packaging R ML Model for Lambda](#) - this post
-    * [Part II - Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2)
-    * [Part III - Exposing R ML Model via APIG](/blog/2017-04-13-serverless-data-product-3)
+    * [Part II - Deploying R ML Model via Lambda](/blog/2017-04-11-serverless-data-product-2/)
+    * [Part III - Exposing R ML Model via APIG](/blog/2017-04-13-serverless-data-product-3/)
 * Frontend
-    * [Part IV - Serving R ML Model via S3](/blog/2017-04-17-serverless-data-product-4)
+    * [Part IV - Serving R ML Model via S3](/blog/2017-04-17-serverless-data-product-4/)
 
 [**EDIT 2017-04-11**] Deploying at AWS Lambda and exposing via API Gateway are split into 2 posts (Part II and III).
 
-[**EDIT 2017-04-17**] The Lambda function hander (*handler.py*) has been modified to resolve an issue of *Cross-Origin Resource Sharing (CORS)*. See [Part IV](/blog/2017-04-17-serverless-data-product-4) for further details.
+[**EDIT 2017-04-17**] The Lambda function hander (*handler.py*) has been modified to resolve an issue of *Cross-Origin Resource Sharing (CORS)*. See [Part IV](/blog/2017-04-17-serverless-data-product-4/) for further details.
 
 ## Model
 
@@ -334,4 +334,4 @@ This is all that I've prepared for this post and I hope you don't feel bored. Th
 
 ## Related posts
 
-* [Serverless Application Model (SAM) for Data Professionals](/blog/2022-07-18-sam-for-data-professionals) - a current way to package and deploy a Lambda based data application, with third party packages in a layer.
+* [Serverless Application Model (SAM) for Data Professionals](/blog/2022-07-18-sam-for-data-professionals/) - a current way to package and deploy a Lambda based data application, with third party packages in a layer.

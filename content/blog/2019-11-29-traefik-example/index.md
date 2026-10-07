@@ -412,6 +412,6 @@ while true; do echo '{"gre": 600, "rank": "1"}' \
 
 ## Related posts
 
-* [Linux Dev Environment on Windows](/blog/2019-11-01-linux-on-windows) - builds the WSL and Minikube setup these Kubernetes examples run on
-* [Distributed Task Queue with Python and R Example](/blog/2019-11-15-task-queue) - puts similar Python and R services behind Celery and Redis instead of a router
-* [Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1](/blog/2025-02-18-realtime-dashboard-1) - a later Python service example, streaming database records over WebSocket
+* [Linux Dev Environment on Windows](/blog/2019-11-01-linux-on-windows/) - builds the WSL and Minikube setup these Kubernetes examples run on
+* [Distributed Task Queue with Python and R Example](/blog/2019-11-15-task-queue/) - puts similar Python and R services behind Celery and Redis instead of a router
+* [Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1](/blog/2025-02-18-realtime-dashboard-1/) - a later Python service example, streaming database records over WebSocket

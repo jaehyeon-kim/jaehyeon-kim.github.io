@@ -17,7 +17,7 @@ tags:
   - rApache
 description: Deploy plumber, RServe and rApache APIs in Docker containers, then compare the three R API options on example requests and response performance.
 ---
-In [Part I](/blog/2017-11-18-api-development-with-r-1), it is discussed how to serve an R function with _plumber_, _Rserve_ and _rApache_. In this post, the APIs are deployed in a Docker container and, after showing example requests, their performance is compared. The [rocker/r-ver:3.4](https://hub.docker.com/r/rocker/r-ver/) is used as the base image and each of the APIs is added to it. For simplicity, the APIs are served by [Supervisor](https://supervisord.org/). For performance testing, [Locust](https://locust.io/) is used. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/r-api-demo).
+In [Part I](/blog/2017-11-18-api-development-with-r-1/), it is discussed how to serve an R function with _plumber_, _Rserve_ and _rApache_. In this post, the APIs are deployed in a Docker container and, after showing example requests, their performance is compared. The [rocker/r-ver:3.4](https://hub.docker.com/r/rocker/r-ver/) is used as the base image and each of the APIs is added to it. For simplicity, the APIs are served by [Supervisor](https://supervisord.org/). For performance testing, [Locust](https://locust.io/) is used. The source of this post can be found in this [**GitHub repository**](https://github.com/jaehyeon-kim/r-api-demo).
 
 > **Status, September 2026.** This post deploys the APIs on R 3.4 through the `rocker/r-ver:3.4` image, and the rApache and Rserve builds it performs are pinned to versions that are no longer current. Use a current R image and serve the function with plumber instead.
 
@@ -81,7 +81,7 @@ CMD ["/usr/bin/supervisord", "-c", "/home/docker/api-supervisor.conf"]
 
 ### Plumber
 
-As can be seen in [api-supervisor.conf](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/api-supervisor.conf), the _plumber_ API can be started at _port 9000_ as following. ([plumber-src.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/plumber/plumber-src.R) and [plumber-serve.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/plumber/plumber-serve.R) are discussed in [Part I](/blog/2017-11-18-api-development-with-r-1))
+As can be seen in [api-supervisor.conf](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/api-supervisor.conf), the _plumber_ API can be started at _port 9000_ as following. ([plumber-src.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/plumber/plumber-src.R) and [plumber-serve.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/plumber/plumber-serve.R) are discussed in [Part I](/blog/2017-11-18-api-development-with-r-1/))
 
 ```bash
 /usr/local/bin/Rscript /home/docker/plumber/plumber-serve.R
@@ -99,7 +99,7 @@ daemon disable
 control disable
 ```
 
-Then it is possible to start the _Rserve_ API at _port 8000_ as shown below. ([rserve-src.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/rserve/rserve-src.R) is discussed in [Part I](/blog/2017-11-18-api-development-with-r-1).)
+Then it is possible to start the _Rserve_ API at _port 8000_ as shown below. ([rserve-src.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/rserve/rserve-src.R) is discussed in [Part I](/blog/2017-11-18-api-development-with-r-1/).)
 
 ```bash
 /usr/local/bin/R CMD Rserve --slave --RS-conf /home/docker/rserve/rserve.conf \
@@ -118,7 +118,7 @@ LoadModule R_module /usr/lib/apache2/modules/mod_R.so
 </Location>
 ```
 
-It is possible to start the _rApache_ API at _port 80_ as following. ([rapache-app.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/rapache/rapache-app.R) is discussed in [Part I](/blog/2017-11-18-api-development-with-r-1).)
+It is possible to start the _rApache_ API at _port 80_ as following. ([rapache-app.R](https://github.com/jaehyeon-kim/r-api-demo/blob/master/api/src/rapache/rapache-app.R) is discussed in [Part I](/blog/2017-11-18-api-development-with-r-1/).)
 
 ```bash
 apache2ctl -DFOREGROUND

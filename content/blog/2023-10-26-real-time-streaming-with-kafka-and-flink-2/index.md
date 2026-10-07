@@ -24,13 +24,13 @@ description: Produce fake taxi ride data into a Kafka topic on Amazon MSK from a
 
 In this lab, we will create a Kafka producer application using [AWS Lambda](https://aws.amazon.com/lambda/), which sends fake taxi ride data into a Kafka topic on [Amazon MSK](https://aws.amazon.com/msk/). A configurable number of the producer Lambda function will be invoked by an [Amazon EventBridge](https://aws.amazon.com/eventbridge/) schedule rule. In this way we are able to generate test data concurrently based on the desired volume of messages. 
 
-* [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
+* [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1/)
 * [Lab 1 Produce data to Kafka using Lambda](#) (this post)
-* [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3)
-* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4)
-* [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5)
-* [Lab 5 Write data to DynamoDB using Kafka Connect](/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6)
-* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7)
+* [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3/)
+* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4/)
+* [Lab 4 Clean, Aggregate, and Enrich Events with Flink](/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5/)
+* [Lab 5 Write data to DynamoDB using Kafka Connect](/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6/)
+* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7/)
 
 [**Update 2023-11-06**] Initially I planned to deploy Pyflink applications on [Amazon Managed Service for Apache Flink](https://aws.amazon.com/managed-service-apache-flink/), but I changed the plan to use a local Flink cluster deployed on Docker. The main reasons are
 
@@ -49,7 +49,7 @@ The infrastructure is created using [Terraform](https://developer.hashicorp.com/
 
 ### VPC and VPN
 
-A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*infra/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*infra/vpn.tf*). The details about how to configure the VPN server can be found in [this post](/blog/2022-02-06-dev-infra-terraform).
+A VPC with 3 public and private subnets is created using the [AWS VPC Terraform module](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) (*infra/vpc.tf*). Also, a [SoftEther VPN](https://www.softether.org/) server is deployed in order to access the resources in the private subnets from the developer machine (*infra/vpn.tf*). The details about how to configure the VPN server can be found in [this post](/blog/2022-02-06-dev-infra-terraform/).
 
 ### MSK Cluster
 

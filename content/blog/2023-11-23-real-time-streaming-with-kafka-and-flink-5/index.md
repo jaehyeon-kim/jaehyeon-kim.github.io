@@ -19,22 +19,22 @@ description: Aggregate taxi ride counts and trip durations by vendor over five s
 ---
 The value of data can be maximised when it is used without delay. With Apache Flink, we can build streaming analytics applications that incorporate the latest events with low latency. In this lab, we will create a Pyflink application that writes accumulated taxi rides data into an OpenSearch cluster. It aggregates the number of trips/passengers and trip durations by vendor ID for a window of 5 seconds. The data is then used to create a chart that monitors the status of taxi rides in the OpenSearch Dashboard.
 
-* [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1)
-* [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2)
-* [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3)
-* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4)
+* [Introduction](/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1/)
+* [Lab 1 Produce data to Kafka using Lambda](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/)
+* [Lab 2 Write data to Kafka from S3 using Flink](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3/)
+* [Lab 3 Transform and write data to S3 from Kafka using Flink](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4/)
 * [Lab 4 Clean, Aggregate, and Enrich Events with Flink](#) (this post)
-* [Lab 5 Write data to DynamoDB using Kafka Connect](/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6)
-* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7)
+* [Lab 5 Write data to DynamoDB using Kafka Connect](/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6/)
+* [Lab 6 Consume data from Kafka using Lambda](/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7/)
 
 ## Architecture
 
-Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2). The Pyflink app aggregates the number of trips/passengers and trip durations by vendor ID for a window of 5 seconds and sends the accumulated records into an OpenSearch cluster. The data is then used to create a chart that monitors the status of taxi rides in the OpenSearch Dashboard.
+Fake taxi ride data is sent to a Kafka topic by the Kafka producer application that is discussed in [Lab 1](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/). The Pyflink app aggregates the number of trips/passengers and trip durations by vendor ID for a window of 5 seconds and sends the accumulated records into an OpenSearch cluster. The data is then used to create a chart that monitors the status of taxi rides in the OpenSearch Dashboard.
 
 
 ## Infrastructure
 
-The AWS infrastructure is created using [Terraform](https://developer.hashicorp.com/terraform) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post. See this [earlier post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2) for details about how to create the resources. The key resources cover a VPC, VPN server, MSK cluster and Python Lambda producer app.
+The AWS infrastructure is created using [Terraform](https://developer.hashicorp.com/terraform) and the source can be found in the [**GitHub repository**](https://github.com/jaehyeon-kim/flink-demos/tree/master/real-time-streaming-aws) of this post. See this [earlier post](/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/) for details about how to create the resources. The key resources cover a VPC, VPN server, MSK cluster and Python Lambda producer app.
 
 ### OpenSearch Cluster
 
@@ -232,7 +232,7 @@ volumes:
 
 ### Flink Cluster on Docker Compose
 
-There are two Docker Compose files that deploy a Flink Cluster locally. The first one ([*compose-msk.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-msk.yml)) relies on the Kafka cluster on Amazon MSK while a local Kafka cluster is created together with a Flink cluster in the second file ([*compose-local-kafka.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-local-kafka.yml)) - see [Lab 2](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3) and [Lab 3](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4) respectively for details about them. Note that, if we use a local Kafka and Flink clusters, we don't have to deploy the AWS resources. Instead, we can use a local OpenSearch cluster, and it can be deployed by using [*compose-extra.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-extra.yml).
+There are two Docker Compose files that deploy a Flink Cluster locally. The first one ([*compose-msk.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-msk.yml)) relies on the Kafka cluster on Amazon MSK while a local Kafka cluster is created together with a Flink cluster in the second file ([*compose-local-kafka.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-local-kafka.yml)) - see [Lab 2](/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3/) and [Lab 3](/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4/) respectively for details about them. Note that, if we use a local Kafka and Flink clusters, we don't have to deploy the AWS resources. Instead, we can use a local OpenSearch cluster, and it can be deployed by using [*compose-extra.yml*](https://github.com/jaehyeon-kim/flink-demos/blob/master/real-time-streaming-aws/compose-extra.yml).
 
 The Docker Compose services can be deployed as shown below.
 

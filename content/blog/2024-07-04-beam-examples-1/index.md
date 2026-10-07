@@ -22,15 +22,15 @@ Beginning with setting up the development environment, we build two pipelines th
 <!--more-->
 
 * [Part 1 Calculate K Most Frequent Words and Max Word Length](#) (this post)
-* [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2)
-* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3)
-* [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4)
-* [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5)
-* [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6)
-* [Part 7 Separate Droppable Data into Side Output](/blog/2024-10-24-beam-examples-7)
-* [Part 8 Enhance Sport Activity Tracker with Runner Motivation](/blog/2024-11-21-beam-examples-8)
-* [Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn](/blog/2024-12-05-beam-examples-9)
-* [Part 10 Develop Streaming File Reader using Splittable DoFn](/blog/2024-12-19-beam-examples-10)
+* [Part 2 Calculate Average Word Length with/without Fixed Look back](/blog/2024-07-18-beam-examples-2/)
+* [Part 3 Build Sport Activity Tracker with/without SQL](/blog/2024-08-01-beam-examples-3/)
+* [Part 4 Call RPC Service for Data Augmentation](/blog/2024-08-15-beam-examples-4/)
+* [Part 5 Call RPC Service in Batch using Stateless DoFn](/blog/2024-09-18-beam-examples-5/)
+* [Part 6 Call RPC Service in Batch with Defined Batch Size using Stateful DoFn](/blog/2024-10-02-beam-examples-6/)
+* [Part 7 Separate Droppable Data into Side Output](/blog/2024-10-24-beam-examples-7/)
+* [Part 8 Enhance Sport Activity Tracker with Runner Motivation](/blog/2024-11-21-beam-examples-8/)
+* [Part 9 Develop Batch File Reader and PiSampler using Splittable DoFn](/blog/2024-12-05-beam-examples-9/)
+* [Part 10 Develop Streaming File Reader using Splittable DoFn](/blog/2024-12-19-beam-examples-10/)
 
 [**UPDATE 2025-10-01**]
 
@@ -69,7 +69,7 @@ chmod -R +x flink-${FLINK_VERSION}/bin
 
 ### Kafka Cluster
 
-A Kafka cluster with 1 broker and 1 Zookeeper node is used together with a Kafka management app (*kafka-ui*). The details of setting up the resources can be found in my *Kafka Development with Docker* series: [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1) and [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2).
+A Kafka cluster with 1 broker and 1 Zookeeper node is used together with a Kafka management app (*kafka-ui*). The details of setting up the resources can be found in my *Kafka Development with Docker* series: [Part 1 Cluster Setup](/blog/2023-05-04-kafka-development-with-docker-part-1/) and [Part 2 Management App](/blog/2023-05-18-kafka-development-with-docker-part-2/).
 
 Those resources are deployed using Docker Compose with the following configuration file.
 

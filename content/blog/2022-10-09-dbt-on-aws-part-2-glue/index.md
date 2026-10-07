@@ -18,13 +18,13 @@ tags:
 cevo: 19
 description: "Transform IMDb data in an S3 data lake with dbt on AWS Glue, running layered models through Glue interactive sessions with the dbt-glue adapter."
 ---
-Data models on AWS Glue can be built with the [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) through Glue interactive sessions and the dbt-glue adapter. In [part 1](/blog/2022-09-28-dbt-on-aws-part-1-redshift), we discussed benefits of a common data transformation tool and the potential of dbt to cover a wide range of data projects from data warehousing to data lake to data lakehouse. A demo data project that targets Redshift Serverless is illustrated as well. In part 2 of the dbt on AWS series, we discuss data transformation pipelines using dbt on [AWS Glue](https://aws.amazon.com/glue/). [Subsets of IMDb data](https://data.imdb.com/non-commercial-datasets/) are used as source and data models are developed in multiple layers according to the [dbt best practices](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview). A list of posts of this series can be found below.
+Data models on AWS Glue can be built with the [data build tool (dbt)](https://docs.getdbt.com/docs/introduction) through Glue interactive sessions and the dbt-glue adapter. In [part 1](/blog/2022-09-28-dbt-on-aws-part-1-redshift/), we discussed benefits of a common data transformation tool and the potential of dbt to cover a wide range of data projects from data warehousing to data lake to data lakehouse. A demo data project that targets Redshift Serverless is illustrated as well. In part 2 of the dbt on AWS series, we discuss data transformation pipelines using dbt on [AWS Glue](https://aws.amazon.com/glue/). [Subsets of IMDb data](https://data.imdb.com/non-commercial-datasets/) are used as source and data models are developed in multiple layers according to the [dbt best practices](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview). A list of posts of this series can be found below.
 
-* [Part 1 Redshift](/blog/2022-09-28-dbt-on-aws-part-1-redshift)
+* [Part 1 Redshift](/blog/2022-09-28-dbt-on-aws-part-1-redshift/)
 * [Part 2 Glue](#) (this post)
-* [Part 3 EMR on EC2](/blog/2022-10-19-dbt-on-aws-part-3-emr-ec2)
-* [Part 4 EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks)
-* [Part 5 Athena](/blog/2022-12-06-dbt-on-aws-part-5-athena)
+* [Part 3 EMR on EC2](/blog/2022-10-19-dbt-on-aws-part-3-emr-ec2/)
+* [Part 4 EMR on EKS](/blog/2022-11-01-dbt-on-aws-part-4-emr-eks/)
+* [Part 5 Athena](/blog/2022-12-06-dbt-on-aws-part-5-athena/)
 
 Below shows an overview diagram of the scope of this dbt on AWS series. Glue is highlighted as it is discussed in this post. 
 

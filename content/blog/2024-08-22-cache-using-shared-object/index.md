@@ -317,6 +317,6 @@ INFO:root:refresh customer cache, current tag 1724099780.0, existing tag 1724099
 
 ## Related posts
 
-* [Apache Beam Local Development with Python Part 1](/blog/2024-03-28-beam-local-dev-1) - sets up the local Beam environment, with notebooks, Beam SQL and Beam DataFrames
-* [Apache Beam Local Development with Python - Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2) - batch pipelines that aggregate website visit logs by user and time
-* [Apache Beam Local Development with Python - Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3) - the Beam portability layer and a streaming pipeline on the Flink Runner
+* [Apache Beam Local Development with Python Part 1](/blog/2024-03-28-beam-local-dev-1/) - sets up the local Beam environment, with notebooks, Beam SQL and Beam DataFrames
+* [Apache Beam Local Development with Python - Part 2 Batch Pipelines](/blog/2024-04-04-beam-local-dev-2/) - batch pipelines that aggregate website visit logs by user and time
+* [Apache Beam Local Development with Python - Part 3 Flink Runner](/blog/2024-04-18-beam-local-dev-3/) - the Beam portability layer and a streaming pipeline on the Flink Runner

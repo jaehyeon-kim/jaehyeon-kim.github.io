@@ -340,6 +340,6 @@ http http://172.28.175.23:30000/rserve/collect?task_id=$TASK_ID
 
 ## Related posts
 
-* [Dynamic Routing and Centralized Auth with Traefik, Python and R Example](/blog/2019-11-29-traefik-example) - putting Traefik in front of the same kind of Python and R services, with centralized authentication
-* [Some Thoughts on Python](/blog/2015-08-08-some-thoughts-on-python) - writing Python in an object-oriented style, shown with API client classes
-* [Some Thoughts on Python for R Users](/blog/2015-08-09-some-thoughts-on-python-for-r-users) - what Python offers an R user, demonstrated on a web service client
+* [Dynamic Routing and Centralized Auth with Traefik, Python and R Example](/blog/2019-11-29-traefik-example/) - putting Traefik in front of the same kind of Python and R services, with centralized authentication
+* [Some Thoughts on Python](/blog/2015-08-08-some-thoughts-on-python/) - writing Python in an object-oriented style, shown with API client classes
+* [Some Thoughts on Python for R Users](/blog/2015-08-09-some-thoughts-on-python-for-r-users/) - what Python offers an R user, demonstrated on a web service client
