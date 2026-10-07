@@ -4,13 +4,22 @@
   saying which URL is the original. Called from the theme's _default/baseof.html, so it
   reaches every page that uses it.
 
-  .Permalink rather than a computed value. Alias stubs inherit the target page's
-  context, so an alias correctly points at what it redirects to rather than at itself.
-  Paginated pages inherit the list page's permalink, so /blog/page/5/ points at /blog/;
-  those pages are absent from the sitemap, so they are not competing for a query.
+  .Permalink for every page except the second and later pages of a list. Alias stubs
+  inherit the target page's context, so an alias correctly points at what it redirects
+  to rather than at itself. A list's later pages inherit the list's permalink, so
+  /blog/page/5/ would point at /blog/; Google's pagination guidance says to give each
+  page its own canonical URL instead, so they use their own. The theme's head/title.html
+  calls .Paginate for every list page before this hook runs, so .Paginator here returns
+  that same paginator rather than starting a new one.
 
   layouts/slides/single.html has its own <head> and never calls baseof, so it carries
   its own copy of this line.
 */ -}}
-<link rel="canonical" href="{{ .Permalink }}">
+{{- $canonical := .Permalink -}}
+{{- if not .IsPage -}}
+  {{- with .Paginator -}}
+    {{- if gt .PageNumber 1 }}{{ $canonical = .URL | absURL }}{{ end -}}
+  {{- end -}}
+{{- end }}
+<link rel="canonical" href="{{ $canonical }}">
 {{ partial "head/json-ld" . }}
