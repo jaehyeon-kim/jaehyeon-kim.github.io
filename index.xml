@@ -553,9 +553,9 @@
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-04-15-sql-cookbook">Run Flink SQL Cookbook in Docker&lt;/a> - more Flink SQL queries, from simple selects to windows and joins, run on a local cluster&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-06-17-kotlin-getting-started-flink-table">Flink Table API - Declarative Analytics for Supplier Stats in Real Time&lt;/a> - a windowed aggregation over Kafka records with the Flink Table API, the code form of these SQL queries&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect">Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect&lt;/a> - another Benchtop project on the same simulation library, streaming database changes from PostgreSQL to Kafka&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-04-15-sql-cookbook/">Run Flink SQL Cookbook in Docker&lt;/a> - more Flink SQL queries, from simple selects to windows and joins, run on a local cluster&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-06-17-kotlin-getting-started-flink-table/">Flink Table API - Declarative Analytics for Supplier Stats in Real Time&lt;/a> - a windowed aggregation over Kafka records with the Flink Table API, the code form of these SQL queries&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/">Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect&lt;/a> - another Benchtop project on the same simulation library, streaming database changes from PostgreSQL to Kafka&lt;/li>
 &lt;/ul></content:encoded></item><item><title>Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect</title><link>https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/</link><guid>https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/</guid><pubDate>Thu, 01 Oct 2026 00:00:00 +0000</pubDate><category>Change Data Capture (CDC)</category><category>Debezium</category><category>Kafka Connect</category><category>Apache Kafka</category><category>PostgreSQL</category><category>SeaweedFS</category><category>odctl</category><category>dynamic-des</category><category>Benchtop</category><description>&lt;p>Most databases change all day: users sign up, orders are placed, and each order moves from one status to the next. Change data capture (CDC) turns those changes into a stream of events that other systems can read as they happen. In this post, a simulated online shop writes to PostgreSQL in real time, Debezium streams every change to Kafka, and a sink connector saves the changes as files in object storage. Everything runs on your own machine.&lt;/p></description><content:encoded>&lt;p>Most databases change all day: users sign up, orders are placed, and each order moves from one status to the next. Change data capture (CDC) turns those changes into a stream of events that other systems can read as they happen. In this post, a simulated online shop writes to PostgreSQL in real time, Debezium streams every change to Kafka, and a sink connector saves the changes as files in object storage. Everything runs on your own machine.&lt;/p>
 &lt;p>The shop&amp;rsquo;s data model follows the &lt;a href="https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce" target="_blank" rel="noopener noreferrer">theLook eCommerce&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a> dataset. The source code is in &lt;a href="https://github.com/jaehyeon-kim/benchtop/tree/main/ecommerce-cdc" target="_blank" rel="noopener noreferrer">benchtop/ecommerce-cdc&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>. It is one of the &lt;a href="https://jaehyeon.me/blog/2026-09-30-introducing-benchtop/">Benchtop&lt;/a> projects, which run locally from a fresh clone.&lt;/p>
 
@@ -1092,9 +1092,9 @@ ecommerce.cdc.users
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2024-11-07-cdc-local-dev">Change Data Capture (CDC) Local Development with PostgreSQL, Debezium Server and Pub/Sub Emulator&lt;/a> - change data capture from PostgreSQL with Debezium Server and a Pub/Sub emulator instead of Kafka Connect&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2021-12-05-datalake-demo-part1">Data Lake Demo using Change Data Capture (CDC) on AWS - Part 1 Local Development&lt;/a> - an earlier local setup with Debezium and an S3 sink connector on Kafka Connect, the start of a data lake series&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-06-simulations-in-yaml-dynamic-des">Defining Data-Streaming Simulations in YAML, Without Writing Python&lt;/a> - the simulation library that runs the shop, now configurable in plain YAML&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2024-11-07-cdc-local-dev/">Change Data Capture (CDC) Local Development with PostgreSQL, Debezium Server and Pub/Sub Emulator&lt;/a> - change data capture from PostgreSQL with Debezium Server and a Pub/Sub emulator instead of Kafka Connect&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2021-12-05-datalake-demo-part1/">Data Lake Demo using Change Data Capture (CDC) on AWS - Part 1 Local Development&lt;/a> - an earlier local setup with Debezium and an S3 sink connector on Kafka Connect, the start of a data lake series&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-06-simulations-in-yaml-dynamic-des/">Defining Data-Streaming Simulations in YAML, Without Writing Python&lt;/a> - the simulation library that runs the shop, now configurable in plain YAML&lt;/li>
 &lt;/ul></content:encoded></item><item><title>Data Streaming and Machine Learning Projects That Run on Your Laptop</title><link>https://jaehyeon.me/blog/2026-09-30-introducing-benchtop/</link><guid>https://jaehyeon.me/blog/2026-09-30-introducing-benchtop/</guid><pubDate>Wed, 30 Sep 2026 00:00:00 +0000</pubDate><category>Apache Kafka</category><category>Apache Flink</category><category>MLOps</category><category>odctl</category><category>dynamic-des</category><category>Benchtop</category><description>&lt;p>Reading about a data tool only goes so far. The hard part is getting several tools to run together and seeing how data moves between them. &lt;a href="https://github.com/jaehyeon-kim/benchtop" target="_blank" rel="noopener noreferrer">Benchtop&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a> is a collection of small, hands-on demos for data engineering, stream processing, machine learning, AI engineering and MLOps. Each demo runs locally on the odctl stack, and works from a fresh clone of the repository, with nothing to install beforehand but Docker and uv. Each one builds a working system from open-source tools and explains the ideas behind it, so you learn a tool by running it rather than only reading about it.&lt;/p></description><content:encoded>&lt;p>Reading about a data tool only goes so far. The hard part is getting several tools to run together and seeing how data moves between them. &lt;a href="https://github.com/jaehyeon-kim/benchtop" target="_blank" rel="noopener noreferrer">Benchtop&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a> is a collection of small, hands-on demos for data engineering, stream processing, machine learning, AI engineering and MLOps. Each demo runs locally on the odctl stack, and works from a fresh clone of the repository, with nothing to install beforehand but Docker and uv. Each one builds a working system from open-source tools and explains the ideas behind it, so you learn a tool by running it rather than only reading about it.&lt;/p>
 &lt;h2 id="why-one-repository" data-numberify>Why One Repository&lt;a class="anchor ms-1" href="#why-one-repository" aria-label="Link to this section: Why One Repository">&lt;/a>&lt;/h2>
 &lt;p>My earlier examples were spread across several repositories, each with its own setup. Some needed a cloud account, and some had drifted out of date with the tools they used. Benchtop brings them together under one set of rules:&lt;/p>
@@ -1273,11 +1273,11 @@ ecommerce.cdc.users
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-16-odctl-open-data-stack">Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI&lt;/a> - the CLI that starts the local open source stack this system runs on&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-05-25-dynamic-des-parquet-support">One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES&lt;/a> - generating the batch Parquet and live streaming data such a stack reads&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning">Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning&lt;/a> - the real-time side that this batch-only phase leaves for later&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-05-06-streamhouse-trio">Meet the Streamhouse Trio - Paimon, Fluss, and Iceberg for Unified Data Architectures&lt;/a> - compares Paimon, Fluss and Iceberg as table layers for streaming and batch&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-07-17-self-service-data-platform-via-sql-gateway">Self-service Data Platform via a Multi-tenant SQL Gateway&lt;/a> - a multi-tenant SQL gateway that starts Spark, Flink and Trino engines on demand over tables like these&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-16-odctl-open-data-stack/">Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI&lt;/a> - the CLI that starts the local open source stack this system runs on&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-05-25-dynamic-des-parquet-support/">One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES&lt;/a> - generating the batch Parquet and live streaming data such a stack reads&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/">Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning&lt;/a> - the real-time side that this batch-only phase leaves for later&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-05-06-streamhouse-trio/">Meet the Streamhouse Trio - Paimon, Fluss, and Iceberg for Unified Data Architectures&lt;/a> - compares Paimon, Fluss and Iceberg as table layers for streaming and batch&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-07-17-self-service-data-platform-via-sql-gateway/">Self-service Data Platform via a Multi-tenant SQL Gateway&lt;/a> - a multi-tenant SQL gateway that starts Spark, Flink and Trino engines on demand over tables like these&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="where-this-is-going" data-numberify>Where This Is Going&lt;a class="anchor ms-1" href="#where-this-is-going" aria-label="Link to this section: Where This Is Going">&lt;/a>&lt;/h2>
@@ -1361,8 +1361,8 @@ ecommerce.cdc.users
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect">Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect&lt;/a> - the Postgres connector in use: a simulated shop writes its tables, and Debezium streams every change to Kafka&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - the library generating a lakehouse dataset that an agent queries through a semantic layer&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/">Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect&lt;/a> - the Postgres connector in use: a simulated shop writes its tables, and Debezium streams every change to Kafka&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - the library generating a lakehouse dataset that an agent queries through a semantic layer&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="try-it-out" data-numberify>Try It Out&lt;a class="anchor ms-1" href="#try-it-out" aria-label="Link to this section: Try It Out">&lt;/a>&lt;/h2>
@@ -1444,9 +1444,9 @@ ecommerce.cdc.users
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda">Productionizing an Online Product Recommender using Event Driven Architecture&lt;/a> - Flink, Kafka and Valkey turn a contextual bandit recommender into an event driven service&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - a local proof of concept built on this stack, putting a semantic layer between a model and Iceberg&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2022-06-26-iceberg-etl-demo">Data Warehousing ETL Demo with Apache Iceberg&lt;/a> - an Iceberg and PySpark ETL job run in an EMR local environment, then verified in Athena&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/">Productionizing an Online Product Recommender using Event Driven Architecture&lt;/a> - Flink, Kafka and Valkey turn a contextual bandit recommender into an event driven service&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - a local proof of concept built on this stack, putting a semantic layer between a model and Iceberg&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2022-06-26-iceberg-etl-demo/">Data Warehousing ETL Demo with Apache Iceberg&lt;/a> - an Iceberg and PySpark ETL job run in an EMR local environment, then verified in Athena&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="try-it-out" data-numberify>Try It Out&lt;a class="anchor ms-1" href="#try-it-out" aria-label="Link to this section: Try It Out">&lt;/a>&lt;/h2>
@@ -1481,10 +1481,10 @@ Maintaining two separate simulation codebases, one for generating training data 
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des">Building an Event-Driven Hybrid Digital Twin with dynamic-des&lt;/a> - the earlier release that turns a static SimPy model into a synchronized forecasting engine&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-17-dynamic-des-declarative-connectors">Dynamic DES: A Declarative API with Postgres and Redis Connectors&lt;/a> - the later release, which adds a declarative API and native Postgres and Redis connectors&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning">Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning&lt;/a> - the Flink pipeline that learns online from the kind of stream this simulation feeds&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - the fast-forward clock used to fill an Iceberg lakehouse with Parquet data that an agent queries&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des/">Building an Event-Driven Hybrid Digital Twin with dynamic-des&lt;/a> - the earlier release that turns a static SimPy model into a synchronized forecasting engine&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-17-dynamic-des-declarative-connectors/">Dynamic DES: A Declarative API with Postgres and Redis Connectors&lt;/a> - the later release, which adds a declarative API and native Postgres and Redis connectors&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/">Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning&lt;/a> - the Flink pipeline that learns online from the kind of stream this simulation feeds&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - the fast-forward clock used to fill an Iceberg lakehouse with Parquet data that an agent queries&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="try-it-out" data-numberify>Try it out&lt;a class="anchor ms-1" href="#try-it-out" aria-label="Link to this section: Try it out">&lt;/a>&lt;/h2>
@@ -1535,9 +1535,9 @@ Maintaining two separate simulation codebases, one for generating training data 
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2023-12-07-flink-spark-local-dev">Setup Local Development Environment for Apache Flink and Spark Using EMR Container Images&lt;/a> - a local Flink and Spark environment of the kind this lineage work instruments.&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-07-17-self-service-data-platform-via-sql-gateway">Self-service Data Platform via a Multi-tenant SQL Gateway&lt;/a> - Apache Kyuubi giving on-demand Spark, Flink and Trino engines with central governance.&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-16-odctl-open-data-stack">Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI&lt;/a> - a CLI that starts Kafka, Flink, Spark, Trino, Iceberg and observability tooling as one local stack.&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2023-12-07-flink-spark-local-dev/">Setup Local Development Environment for Apache Flink and Spark Using EMR Container Images&lt;/a> - a local Flink and Spark environment of the kind this lineage work instruments.&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-07-17-self-service-data-platform-via-sql-gateway/">Self-service Data Platform via a Multi-tenant SQL Gateway&lt;/a> - Apache Kyuubi giving on-demand Spark, Flink and Trino engines with central governance.&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-16-odctl-open-data-stack/">Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI&lt;/a> - a CLI that starts Kafka, Flink, Spark, Trino, Iceberg and observability tooling as one local stack.&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="moving-forward" data-numberify>Moving Forward&lt;a class="anchor ms-1" href="#moving-forward" aria-label="Link to this section: Moving Forward">&lt;/a>&lt;/h2>
@@ -1710,9 +1710,9 @@ Standard simulation clocks (like those in traditional SimPy implementations) are
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect">Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect&lt;/a> - the library running an online shop on PostgreSQL, with Debezium streaming every change&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-02-game-leaderboard-flink-sql">Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL&lt;/a> - the library playing a mobile game, with Flink SQL keeping leaderboards up to date&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - the library generating Parquet data for an Iceberg lakehouse that an agent queries&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/">Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect&lt;/a> - the library running an online shop on PostgreSQL, with Debezium streaming every change&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-02-game-leaderboard-flink-sql/">Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL&lt;/a> - the library playing a mobile game, with Flink SQL keeping leaderboards up to date&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - the library generating Parquet data for an Iceberg lakehouse that an agent queries&lt;/li>
 &lt;/ul></content:encoded></item><item><title>Why Digital Twins Are Rewiring Industry 4.0</title><link>https://jaehyeon.me/blog/2026-04-23-digital-twin-industry-4-0/</link><guid>https://jaehyeon.me/blog/2026-04-23-digital-twin-industry-4-0/</guid><pubDate>Wed, 22 Apr 2026 00:00:00 +0000</pubDate><category>Digital Twin</category><category>Discrete Event Simulation</category><category>IoT</category><category>dynamic-des</category><category>SimPy</category><category>Python</category><description>A simulation and a digital twin are often treated as the same thing, but they are built differently. A traditional simulation runs offline on assumed inputs. An operational digital twin stays aligned with one real system as it changes. This post walks through the layers that separate the two, and an event-driven hybrid that combines them.
 Beyond CAD Models There is a project by Dassault Systèmes called the Living Heart that illustrates the trajectory of this technology.</description><content:encoded>&lt;p>A simulation and a digital twin are often treated as the same thing, but they are built differently. A traditional simulation runs offline on assumed inputs. An operational digital twin stays aligned with one real system as it changes. This post walks through the layers that separate the two, and an event-driven hybrid that combines them.&lt;/p>
 
@@ -1769,9 +1769,9 @@ Beyond CAD Models There is a project by Dassault Systèmes called the Living Hea
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect">Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect&lt;/a> - a dynamic-des simulation of an online shop feeding a change data capture pipeline&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-02-game-leaderboard-flink-sql">Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL&lt;/a> - a dynamic-des simulation of a mobile game feeding Flink SQL leaderboards&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - dynamic-des generating the lakehouse data that an agent queries&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/">Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect&lt;/a> - a dynamic-des simulation of an online shop feeding a change data capture pipeline&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-02-game-leaderboard-flink-sql/">Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL&lt;/a> - a dynamic-des simulation of a mobile game feeding Flink SQL leaderboards&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - dynamic-des generating the lakehouse data that an agent queries&lt;/li>
 &lt;/ul></content:encoded></item><item><title>Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning</title><link>https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/</link><guid>https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/</guid><pubDate>Tue, 21 Apr 2026 00:00:00 +0000</pubDate><category>Apache Flink</category><category>Apache Kafka</category><category>Kotlin</category><category>Python</category><category>Online Machine Learning</category><category>Digital Twin</category><category>Discrete Event Simulation</category><category>dynamic-des</category><description>Overview Imagine using a rolling pin to flatten out a thick piece of dough. A Hot Strip Mill does the exact same thing, but with glowing red-hot steel slabs (often heated over 1000°C) and massive mechanical rollers. The steel is passed through a series of these rollers, crushing it down from a thick block into a long, thin sheet.
 Calculating the exact Rolling Force required to crush the steel is critical.</description><content:encoded>
 &lt;h2 id="overview" data-numberify>Overview&lt;a class="anchor ms-1" href="#overview" aria-label="Link to this section: Overview">&lt;/a>&lt;/h2>
@@ -1886,11 +1886,11 @@ Calculating the exact Rolling Force required to crush the steel is critical.</de
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des">Building an Event-Driven Hybrid Digital Twin with dynamic-des&lt;/a> - the simulation package behind the twin, built on the Switchboard pattern and dynamic topic routing.&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-17-dynamic-des-declarative-connectors">Dynamic DES: A Declarative API with Postgres and Redis Connectors&lt;/a> - the later release that adds a declarative API and native Postgres and Redis connectors.&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-23-digital-twin-industry-4-0">Why Digital Twins Are Rewiring Industry 4.0&lt;/a> - the architectural layers that separate a traditional simulation from an event-driven hybrid pipeline.&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-12-10-streaming-processing-with-flink-in-kotlin">Stream Processing with Flink in Kotlin&lt;/a> - more Flink examples in Kotlin, the language this pipeline is written in.&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda">Productionizing an Online Product Recommender using Event Driven Architecture&lt;/a> - a contextual bandit recommender trained and served online with Flink, Kafka and Valkey.&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des/">Building an Event-Driven Hybrid Digital Twin with dynamic-des&lt;/a> - the simulation package behind the twin, built on the Switchboard pattern and dynamic topic routing.&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-17-dynamic-des-declarative-connectors/">Dynamic DES: A Declarative API with Postgres and Redis Connectors&lt;/a> - the later release that adds a declarative API and native Postgres and Redis connectors.&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-23-digital-twin-industry-4-0/">Why Digital Twins Are Rewiring Industry 4.0&lt;/a> - the architectural layers that separate a traditional simulation from an event-driven hybrid pipeline.&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-12-10-streaming-processing-with-flink-in-kotlin/">Stream Processing with Flink in Kotlin&lt;/a> - more Flink examples in Kotlin, the language this pipeline is written in.&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/">Productionizing an Online Product Recommender using Event Driven Architecture&lt;/a> - a contextual bandit recommender trained and served online with Flink, Kafka and Valkey.&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="conclusion" data-numberify>Conclusion&lt;a class="anchor ms-1" href="#conclusion" aria-label="Link to this section: Conclusion">&lt;/a>&lt;/h2>
@@ -1974,9 +1974,9 @@ Calculating the exact Rolling Force required to crush the steel is critical.</de
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2023-04-24-self-hosted-blog">Self-managed Blog with Hugo and GitHub Pages&lt;/a> - sets up the Hugo site that this Reveal.js layout plugs into&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2018-05-19-asyn-shiny-and-its-limitation">Async Shiny and Its Limitation&lt;/a> - an earlier comparison of a JavaScript frontend against a framework that renders the page for you&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2018-05-26-shiny-to-vue.js">Shiny to Vue.js&lt;/a> - replaces R widgets with native JavaScript libraries, the same shift from generated output to hand-written frontend&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2023-04-24-self-hosted-blog/">Self-managed Blog with Hugo and GitHub Pages&lt;/a> - sets up the Hugo site that this Reveal.js layout plugs into&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2018-05-19-asyn-shiny-and-its-limitation/">Async Shiny and Its Limitation&lt;/a> - an earlier comparison of a JavaScript frontend against a framework that renders the page for you&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2018-05-26-shiny-to-vue.js/">Shiny to Vue.js&lt;/a> - replaces R widgets with native JavaScript libraries, the same shift from generated output to hand-written frontend&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="why-this-works-for-me" data-numberify>Why this works for me&lt;a class="anchor ms-1" href="#why-this-works-for-me" aria-label="Link to this section: Why this works for me">&lt;/a>&lt;/h2>
@@ -2171,7 +2171,7 @@ This is the standard Linear Regression prediction. It asks: &lt;em>&amp;ldquo;Ba
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning">Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning&lt;/a> - online machine learning on Flink and Kafka for an industrial digital twin, with drift detection and a shadow mode router&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/">Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning&lt;/a> - online machine learning on Flink and Kafka for an industrial digital twin, with drift detection and a shadow mode router&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="conclusion" data-numberify>Conclusion&lt;a class="anchor ms-1" href="#conclusion" aria-label="Link to this section: Conclusion">&lt;/a>&lt;/h2>
@@ -2888,7 +2888,7 @@ This is the standard Linear Regression prediction. It asks: &lt;em>&amp;ldquo;Ba
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning">Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning&lt;/a> - another online learning system, where a model learns on Flink as machinery wears and detects concept drift&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/">Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning&lt;/a> - another online learning system, where a model learns on Flink as machinery wears and detects concept drift&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="whats-next" data-numberify>What&amp;rsquo;s Next?&lt;a class="anchor ms-1" href="#whats-next" aria-label="Link to this section: What&amp;amp;rsquo;s Next?">&lt;/a>&lt;/h2>
@@ -3000,10 +3000,10 @@ This is the standard Linear Regression prediction. It asks: &lt;em>&amp;ldquo;Ba
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning">Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning&lt;/a> - a larger Flink and Kotlin application, adding online machine learning&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2023-08-10-fraud-detection-part-1">Kafka, Flink and DynamoDB for Real Time Fraud Detection&lt;/a> - a Flink application built locally on Docker with Kafka and DynamoDB&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1">Getting Started with PyFlink on AWS&lt;/a> - the Python API whose limits led to this Kotlin rewrite, shown against a local Kafka cluster&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-06-10-kotlin-getting-started-flink-datastream">Flink DataStream API - Scalable Event Processing for Supplier Stats&lt;/a> - the DataStream API in Kotlin applied to Avro order events from Kafka, with watermarks and late records&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/">Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning&lt;/a> - a larger Flink and Kotlin application, adding online machine learning&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2023-08-10-fraud-detection-part-1/">Kafka, Flink and DynamoDB for Real Time Fraud Detection&lt;/a> - a Flink application built locally on Docker with Kafka and DynamoDB&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1/">Getting Started with PyFlink on AWS&lt;/a> - the Python API whose limits led to this Kotlin rewrite, shown against a local Kafka cluster&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-06-10-kotlin-getting-started-flink-datastream/">Flink DataStream API - Scalable Event Processing for Supplier Stats&lt;/a> - the DataStream API in Kotlin applied to Avro order events from Kafka, with watermarks and late records&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="conclusion" data-numberify>Conclusion&lt;a class="anchor ms-1" href="#conclusion" aria-label="Link to this section: Conclusion">&lt;/a>&lt;/h2>
@@ -3158,9 +3158,9 @@ This is the standard Linear Regression prediction. It asks: &lt;em>&amp;ldquo;Ba
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-02-18-realtime-dashboard-1">Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1 Data Producer&lt;/a> - a FastAPI WebSocket server that queries PostgreSQL on a timer to serve live dashboards&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2019-11-29-traefik-example">Dynamic Routing and Centralized Auth with Traefik&lt;/a> - puts Traefik in front of Python and R services for path-based routing and shared authentication&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2024-01-18-dbt-pizza-shop-1">dbt Pizza Shop Demo - Part 1 Modelling on PostgreSQL&lt;/a> - models data on PostgreSQL with dbt, a source such an application can read from&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-02-18-realtime-dashboard-1/">Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1 Data Producer&lt;/a> - a FastAPI WebSocket server that queries PostgreSQL on a timer to serve live dashboards&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2019-11-29-traefik-example/">Dynamic Routing and Centralized Auth with Traefik&lt;/a> - puts Traefik in front of Python and R services for path-based routing and shared authentication&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2024-01-18-dbt-pizza-shop-1/">dbt Pizza Shop Demo - Part 1 Modelling on PostgreSQL&lt;/a> - models data on PostgreSQL with dbt, a source such an application can read from&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="summary-and-use-cases" data-numberify>Summary and Use Cases&lt;a class="anchor ms-1" href="#summary-and-use-cases" aria-label="Link to this section: Summary and Use Cases">&lt;/a>&lt;/h2>
@@ -3367,20 +3367,20 @@ The agent sends this stream of standardized JSON-formatted lineage events to a c
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-05-22-end-to-end-data-lineage">Building End-to-End Data Lineage&lt;/a> - captures and visualises lineage across a production-style data stack, the governance piece this design depends on&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-16-odctl-open-data-stack">Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI&lt;/a> - a CLI that brings up Kafka, Flink, Spark, Iceberg and Trino locally so you can try an architecture like this&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2023-12-07-flink-spark-local-dev">Setup Local Development Environment for Apache Flink and Spark Using EMR Container Images&lt;/a> - a local Flink and Spark environment where Flink ingests data and Spark queries it through the Glue Data Catalog&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-05-06-streamhouse-trio">Meet the Streamhouse Trio&lt;/a> - compares Paimon, Fluss and Iceberg as the table layer that sits under a gateway like this&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - a language model querying Iceberg tables through Trino, with a semantic layer in between&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-05-22-end-to-end-data-lineage/">Building End-to-End Data Lineage&lt;/a> - captures and visualises lineage across a production-style data stack, the governance piece this design depends on&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-16-odctl-open-data-stack/">Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI&lt;/a> - a CLI that brings up Kafka, Flink, Spark, Iceberg and Trino locally so you can try an architecture like this&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2023-12-07-flink-spark-local-dev/">Setup Local Development Environment for Apache Flink and Spark Using EMR Container Images&lt;/a> - a local Flink and Spark environment where Flink ingests data and Spark queries it through the Glue Data Catalog&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-05-06-streamhouse-trio/">Meet the Streamhouse Trio&lt;/a> - compares Paimon, Fluss and Iceberg as the table layer that sits under a gateway like this&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/">Building an Agentic Analytics System over an Iceberg Lakehouse&lt;/a> - a language model querying Iceberg tables through Trino, with a semantic layer in between&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="conclusion-the-power-of-a-gateway-centric-design" data-numberify>Conclusion: The Power of a Gateway-Centric Design&lt;a class="anchor ms-1" href="#conclusion-the-power-of-a-gateway-centric-design" aria-label="Link to this section: Conclusion: The Power of a Gateway-Centric Design">&lt;/a>&lt;/h2>
 &lt;p>Building a successful self-service platform is not about exposing raw power, but about providing controlled, stable, and governed access. By embracing a gateway-centric architecture built around the principles embodied by Apache Kyuubi, you can finally resolve the conflict between user empowerment and platform stability. The gateway acts as the indispensable control plane, turning a potential &amp;ldquo;Wild West&amp;rdquo; of big data engines into a well-regulated, multi-tenant, and powerful SQL service for the entire organization—for both batch and real-time workloads.&lt;/p></content:encoded></item><item><title>Flink Table API - Declarative Analytics for Supplier Stats in Real Time</title><link>https://jaehyeon.me/blog/2025-06-17-kotlin-getting-started-flink-table/</link><guid>https://jaehyeon.me/blog/2025-06-17-kotlin-getting-started-flink-table/</guid><pubDate>Tue, 17 Jun 2025 00:00:00 +0000</pubDate><category>Apache Kafka</category><category>Kafka Streams</category><category>Apache Flink</category><category>Kotlin</category><category>Docker</category><category>Kafka UI</category><category>odctl</category><category>Benchtop</category><description>&lt;p>In the last post, we explored the fine-grained control of Flink&amp;rsquo;s DataStream API. Now, we&amp;rsquo;ll approach the same problem from a higher level of abstraction using the &lt;strong>Flink Table API&lt;/strong>. This post demonstrates how to build a declarative analytics pipeline that processes our continuous stream of Avro-formatted order events. We will define a &lt;code>Table&lt;/code> on top of a &lt;code>DataStream&lt;/code> and use SQL-like expressions to perform windowed aggregations. This example highlights the power and simplicity of the Table API for analytical tasks and showcases Flink&amp;rsquo;s seamless integration between its different API layers to handle complex requirements like late data.&lt;/p></description><content:encoded>&lt;p>In the last post, we explored the fine-grained control of Flink&amp;rsquo;s DataStream API. Now, we&amp;rsquo;ll approach the same problem from a higher level of abstraction using the &lt;strong>Flink Table API&lt;/strong>. This post demonstrates how to build a declarative analytics pipeline that processes our continuous stream of Avro-formatted order events. We will define a &lt;code>Table&lt;/code> on top of a &lt;code>DataStream&lt;/code> and use SQL-like expressions to perform windowed aggregations. This example highlights the power and simplicity of the Table API for analytical tasks and showcases Flink&amp;rsquo;s seamless integration between its different API layers to handle complex requirements like late data.&lt;/p>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-05-20-kotlin-getting-started-kafka-json-clients">Kafka Clients with JSON - Producing and Consuming Order Events&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients">Kafka Clients with Avro - Schema Registry and Order Events&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-06-03-kotlin-getting-started-kafka-streams">Kafka Streams - Lightweight Real-Time Processing for Supplier Stats&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-06-10-kotlin-getting-started-flink-datastream">Flink DataStream API - Scalable Event Processing for Supplier Stats&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-05-20-kotlin-getting-started-kafka-json-clients/">Kafka Clients with JSON - Producing and Consuming Order Events&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients/">Kafka Clients with Avro - Schema Registry and Order Events&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-06-03-kotlin-getting-started-kafka-streams/">Kafka Streams - Lightweight Real-Time Processing for Supplier Stats&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-06-10-kotlin-getting-started-flink-datastream/">Flink DataStream API - Scalable Event Processing for Supplier Stats&lt;/a>&lt;/li>
 &lt;li>&lt;a href="https://jaehyeon.me/blog/2025-06-17-kotlin-getting-started-flink-table/#">Flink Table API - Declarative Analytics for Supplier Stats in Real Time&lt;/a> (this post)&lt;/li>
 &lt;/ul>
 
@@ -3397,7 +3397,7 @@ The agent sends this stream of standardized JSON-formatted lineage events to a c
 &lt;p>The source code for the application discussed in this post can be found in the &lt;em>orders-stats-flink&lt;/em> folder of this &lt;a href="https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams" target="_blank" rel="noopener noreferrer">&lt;strong>GitHub repository&lt;/strong>&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>. It is one of the &lt;a href="https://jaehyeon.me/blog/2026-09-30-introducing-benchtop/">Benchtop&lt;/a> projects, which run locally from a fresh clone.&lt;/p>
 
 &lt;h3 id="build-configuration" data-numberify>Build Configuration&lt;a class="anchor ms-1" href="#build-configuration" aria-label="Link to this section: Build Configuration">&lt;/a>&lt;/h3>
-&lt;p>The &lt;code>build.gradle.kts&lt;/code> file sets up the project, its dependencies, and packaging. It&amp;rsquo;s shared between the DataStream and Table API applications - see &lt;a href="https://jaehyeon.me/blog/2025-06-10-kotlin-getting-started-flink-datastream">the previous post&lt;/a> for the Flink application that uses the DataStream API.&lt;/p>
+&lt;p>The &lt;code>build.gradle.kts&lt;/code> file sets up the project, its dependencies, and packaging. It&amp;rsquo;s shared between the DataStream and Table API applications - see &lt;a href="https://jaehyeon.me/blog/2025-06-10-kotlin-getting-started-flink-datastream/">the previous post&lt;/a> for the Flink application that uses the DataStream API.&lt;/p>
 &lt;ul>
 &lt;li>&lt;strong>Plugins:&lt;/strong>
 &lt;ul>
@@ -4127,7 +4127,7 @@ The agent sends this stream of standardized JSON-formatted lineage events to a c
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">19&lt;/span>&lt;span class="cl">&lt;span class="p">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
 &lt;h2 id="run-flink-application" data-numberify>Run Flink Application&lt;a class="anchor ms-1" href="#run-flink-application" aria-label="Link to this section: Run Flink Application">&lt;/a>&lt;/h2>
-&lt;p>As with the DataStream job in the &lt;a href="https://jaehyeon.me/blog/2025-06-10-kotlin-getting-started-flink-datastream">previous post&lt;/a>, running the Table API application involves setting up a local Kafka environment with &lt;a href="https://github.com/jaehyeon-kim/odctl" target="_blank" rel="noopener noreferrer">odctl&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>, starting the data producer, and then launching the Flink job with the correct argument.&lt;/p>
+&lt;p>As with the DataStream job in the &lt;a href="https://jaehyeon.me/blog/2025-06-10-kotlin-getting-started-flink-datastream/">previous post&lt;/a>, running the Table API application involves setting up a local Kafka environment with &lt;a href="https://github.com/jaehyeon-kim/odctl" target="_blank" rel="noopener noreferrer">odctl&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>, starting the data producer, and then launching the Flink job with the correct argument.&lt;/p>
 
 &lt;h3 id="odctl" data-numberify>odctl&lt;a class="anchor ms-1" href="#odctl" aria-label="Link to this section: odctl">&lt;/a>&lt;/h3>
 &lt;p>&lt;a href="https://github.com/jaehyeon-kim/odctl" target="_blank" rel="noopener noreferrer">odctl&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a> starts a local data stack with Docker Compose. Its &lt;code>kafka-lite&lt;/code> profile runs one Kafka broker, the Karapace schema registry and Kafka UI. Install odctl, clone the repository, and start the profile from its &lt;em>order-streams&lt;/em> folder, where the rest of the commands also run:&lt;/p>
@@ -4199,9 +4199,9 @@ The agent sends this stream of standardized JSON-formatted lineage events to a c
 
 &lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
 &lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-02-game-leaderboard-flink-sql">Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL&lt;/a> - Flink SQL jobs that rank game scores from Kafka, the same declarative approach written as SQL&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-04-15-sql-cookbook">Run Flink SQL Cookbook in Docker&lt;/a> - recipes for Flink SQL, the SQL counterpart of the Table API, on a local cluster&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-12-10-streaming-processing-with-flink-in-kotlin">Stream Processing with Flink in Kotlin&lt;/a> - more Flink examples in Kotlin, ported from the book Stream Processing with Apache Flink&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-02-game-leaderboard-flink-sql/">Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL&lt;/a> - Flink SQL jobs that rank game scores from Kafka, the same declarative approach written as SQL&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-04-15-sql-cookbook/">Run Flink SQL Cookbook in Docker&lt;/a> - recipes for Flink SQL, the SQL counterpart of the Table API, on a local cluster&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-12-10-streaming-processing-with-flink-in-kotlin/">Stream Processing with Flink in Kotlin&lt;/a> - more Flink examples in Kotlin, ported from the book Stream Processing with Apache Flink&lt;/li>
 &lt;/ul>
 
 &lt;h2 id="conclusion" data-numberify>Conclusion&lt;a class="anchor ms-1" href="#conclusion" aria-label="Link to this section: Conclusion">&lt;/a>&lt;/h2>
