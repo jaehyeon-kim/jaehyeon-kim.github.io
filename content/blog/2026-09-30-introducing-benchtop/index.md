@@ -33,9 +33,9 @@ My earlier examples were spread across several repositories, each with its own s
 - **Each project teaches.** Its README walks through the steps, and says what to run and what to look at. A `docs` folder explains the concepts behind it from the start, for readers who are new to the tools.
 - **Each project is tested.** Its unit tests need none of the services, and GitHub runs them for every project on every push.
 
-## What Every Project Shares
+## What the Projects Share
 
-Two tools of mine sit underneath every project.
+Two tools of mine sit underneath almost every project.
 
 [odctl](https://github.com/jaehyeon-kim/odctl) starts an open data stack with Docker Compose, as introduced in an [earlier post](/blog/2026-07-16-odctl-open-data-stack/). Each project starts only the services it needs, such as PostgreSQL, Kafka, Flink or Valkey, with one command like `odctl up kafka-lite flink-lite postgres`. The same addresses and credentials work in every project, so there is nothing to configure.
 
@@ -43,16 +43,14 @@ Two tools of mine sit underneath every project.
 
 ## Projects
 
-The projects are listed from the fewest services to the most, and each adds one new idea, so reading them in order is the gentlest path:
+These are the projects so far. More will be added over time, and the [repository](https://github.com/jaehyeon-kim/benchtop) and the [benchtop tag](/tags/benchtop/) always list the current set. The projects are independent of each other, so start with whichever matches what you want to learn:
 
-1. **[live-dashboard](https://github.com/jaehyeon-kim/benchtop/tree/main/live-dashboard):** two dashboards that update themselves as a simulated shop takes orders. You learn how a server pushes new data to a web page as it arrives, with WebSockets, and build the same dashboard in Streamlit and in Next.js. A series of three posts starts with the [data producer](/blog/2025-02-18-realtime-dashboard-1/).
-2. **[ecommerce-cdc](https://github.com/jaehyeon-kim/benchtop/tree/main/ecommerce-cdc):** every change to a shop's database, captured as it happens and saved as files. You learn change data capture: reading a database's own log of changes with Debezium, rather than querying its tables. The [post](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/) walks through it.
-3. **[order-streams](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams):** a stream of orders, first sent and read by small programs, then summarised every few seconds. You learn how Kafka moves messages, and two ways to process a stream as it flows, Kafka Streams and Flink, all in Kotlin. A series of five posts starts with [Kafka clients with JSON](/blog/2025-05-20-kotlin-getting-started-kafka-json-clients/).
-4. **[game-leaderboard](https://github.com/jaehyeon-kim/benchtop/tree/main/game-leaderboard):** live leaderboards for a simulated mobile game. You learn to write Flink SQL queries that never finish and keep their answer up to date as scores arrive, including late scores and top 10 rankings. The [post](/blog/2026-10-02-game-leaderboard-flink-sql/) walks through it.
-5. **[product-recommender](https://github.com/jaehyeon-kim/benchtop/tree/main/product-recommender):** a shop that learns which products to show each visitor from what they click. You learn contextual bandits, first in plain Python, then split into a live service and a Flink job that trains the models. The [prototype](/blog/2026-01-29-prototype-recommender-with-python/) and [production](/blog/2026-02-23-productionize-recommender-with-eda/) posts explain it.
-6. **[MLOps with a Feature Store](/blog/2026-09-28-mlops-with-a-feature-store/):** a series that rebuilds the three projects in Jim Dowling's book on feature stores with open-source tools. The first, [air-quality](https://github.com/jaehyeon-kim/benchtop/tree/main/air-quality), forecasts daily air pollution for the week ahead. Fraud detection and a video recommender will follow.
-
-Three of these, live-dashboard, order-streams and product-recommender, first appeared in an older repository. They now run on odctl, and their posts are updated to match.
+- **[live-dashboard](https://github.com/jaehyeon-kim/benchtop/tree/main/live-dashboard):** two dashboards that update themselves as a simulated shop takes orders. You learn how a server pushes new data to a web page as it arrives, with WebSockets, and build the same dashboard in Streamlit and in Next.js. A series of three posts starts with the [data producer](/blog/2025-02-18-realtime-dashboard-1/).
+- **[ecommerce-cdc](https://github.com/jaehyeon-kim/benchtop/tree/main/ecommerce-cdc):** every change to a shop's database, captured as it happens and saved as files. You learn change data capture: reading a database's own log of changes with Debezium, rather than querying its tables. The [post](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/) walks through it.
+- **[order-streams](https://github.com/jaehyeon-kim/benchtop/tree/main/order-streams):** a stream of orders, first sent and read by small programs, then summarised every few seconds. You learn how Kafka moves messages, and two ways to process a stream as it flows, Kafka Streams and Flink, all in Kotlin. A series of five posts starts with [Kafka clients with JSON](/blog/2025-05-20-kotlin-getting-started-kafka-json-clients/).
+- **[game-leaderboard](https://github.com/jaehyeon-kim/benchtop/tree/main/game-leaderboard):** live leaderboards for a simulated mobile game. You learn to write Flink SQL queries that never finish and keep their answer up to date as scores arrive, including late scores and top 10 rankings. The [post](/blog/2026-10-02-game-leaderboard-flink-sql/) walks through it.
+- **[product-recommender](https://github.com/jaehyeon-kim/benchtop/tree/main/product-recommender):** a shop that learns which products to show each visitor from what they click. You learn contextual bandits, first in plain Python, then split into a live service and a Flink job that trains the models. The [prototype](/blog/2026-01-29-prototype-recommender-with-python/) and [production](/blog/2026-02-23-productionize-recommender-with-eda/) posts explain it.
+- **[MLOps with a Feature Store](/blog/2026-09-28-mlops-with-a-feature-store/):** a series that rebuilds the three projects in Jim Dowling's book on feature stores with open-source tools. The first, [air-quality](https://github.com/jaehyeon-kim/benchtop/tree/main/air-quality), forecasts daily air pollution for the week ahead. Fraud detection and a video recommender will follow.
 
 ## Getting Started
 

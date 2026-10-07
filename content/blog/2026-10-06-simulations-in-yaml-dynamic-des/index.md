@@ -93,7 +93,7 @@ The file is checked before the run starts. An unknown key, a task that names a m
 
 Each section of a blueprint maps to one call of the declarative API. Beyond the sections above, a blueprint supports:
 
-* **Environment variables.** `${VAR}` and `${VAR:-default}` are replaced in string values, so one file serves a laptop and CI.
+* **Environment variables.** `${VAR}` and `${VAR:-default}` are replaced in string values, with a default when a variable is not set. The same file then runs on your machine and in a test pipeline, with no edits.
 * **Relative times.** `logical_start_time` and `go_live_at` take `now` or a signed duration such as `-10m`.
 * **Backfill then live in one run.** Each egress entry takes `when: history` or `when: live`. Records stamped before `go_live_at` go to one sink, and later records go to the other.
 * **Scenarios on simulation time.** A `scenario` list sets parameters at given simulation times, such as a capacity change at 30 seconds. The steps wait on the simulation clock, so they repeat exactly and also work at `factor: 0`.
