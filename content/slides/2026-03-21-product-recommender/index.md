@@ -110,6 +110,9 @@ Why LinUCB?
 - **Beats LinGreedy:** Explores effectively (CTR 0.20 vs 0.11).
 - **Beats LinTS:** Ranks accurately (AUC 0.86 vs 0.64).
 
+Each CTR counts only the test visits where the history happened to show one of the policy's five (rejection sampling): about 50 of 2,000.
+<!-- .element: style="font-size: 0.6em;" -->
+
 </div>
 
 --

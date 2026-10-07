@@ -263,7 +263,7 @@ We benchmarked several policies using `Mab2Rec` on the 10,000 historical events.
 ### Candidate Policies
 
 *   **Random:** The baseline. Recommends items blindly.
-*   **Popularity:** Recommends items with the highest *global* click rate.
+*   **Popularity:** Recommends items drawn at random, each weighted by its *global* click rate.
     *   *Result:* Mediocre (AUC ~0.59). While better than random, it still fails to capture specific rules, such as "Morning Coffee" vs. "Weekend Pizza."
 *   **LinGreedy:** Disjoint Linear Regression with $\epsilon$-greedy exploration.
 *   **LinUCB (The Winner):** Disjoint Linear Regression with **Upper Confidence Bound**.
@@ -297,25 +297,24 @@ ClustersTS      0.550505      0.153846     0.004651  0.023256
 --------------------------------------------------------------------------------
 ```
 
-### Why LinUCB Outperforms the Baseline in CTR
+### How the Click Rate Is Measured
 
-This is the core concept of **Offline Policy Evaluation**.
+The history records only the one product each visit was shown. If a policy would have shown a different product, what the user would have done is unknown. So the benchmark uses the **replay** method from [Li et al. (2011)](https://arxiv.org/abs/1003.5956). For each test visit it asks the policy for its five recommendations. If the logged product is among them, the visit is kept and its click counted. Otherwise the visit is skipped. Jurity calls this **matching**, and keeping the visits that pass a test while discarding the rest is a form of **rejection sampling**.
 
-The benchmark does **not** test on every single row of your history. It uses a technique called **Rejection Sampling** (or simply "Matching").
+The estimate is fair only because the history picked each product uniformly at random. Every product then had the same chance of being logged, so the kept visits are a fair sample of the visits on which the policy's choice was shown. The chance is 5 in 200, or 1 in 40, whatever the policy.
 
-Here is exactly how `mab2rec` calculates that **20.5%**:
+Four of LinUCB's test visits:
 
-1.  **Log (History):** Contains a mix of "Good Decisions" and "Bad Decisions" because it was generated randomly.
-    *   Row A: Morning User $\to$ Show **Pizza** $\to$ **No Click** (Bad Random Choice)
-    *   Row B: Morning User $\to$ Show **Coffee** $\to$ **Click** (Lucky Random Choice)
+| Visit | Time | Logged product | Clicked | Among LinUCB's five | Result |
+|---|---|---|---|---|---|
+| 8221 | weekend evening | Buffalo Chicken Pizza | yes | yes | kept, 1 click |
+| 8231 | weekday morning | Grilled Chicken Sandwich | no | yes | kept, 0 clicks |
+| 8003 | weekend evening | Dim Sims | yes | no | skipped |
+| 8024 | weekday morning | Strawberry Milkshake | yes | no | skipped |
 
-2.  **Test (LinUCB):** The model is smart. It knows Morning users want Coffee.
-    *   For Row A, LinUCB says: *"I would recommend **Coffee**."*
-        *   **Mismatch!** The history shows Pizza. We cannot know what would have happened if we showed Coffee. **This row is IGNORED.**
-    *   For Row B, LinUCB says: *"I would recommend **Coffee**."*
-        *   **Match!** The history shows Coffee. We know the result (Click). **This row is COUNTED.**
+On weekend evenings LinUCB's five are mostly pizzas, and on weekday mornings they include coffees, as the hidden click formula rewards. Visit 8003 was clicked, but it does not count, because LinUCB would not have shown Dim Sims. Across the 2,000 test visits, 44 are kept and 9 of those were clicked, so LinUCB's `CTR(score)@5` is 9 / 44 = 20.5%.
 
-The dataset average (**13.7%**) includes all the "Bad Random Choices" (Row A). The LinUCB score (**20.5%**) **filters out** the bad choices. It effectively says: *"On the rare occasions where the random history actually showed the right product (Row B), did the user click?"* Since LinUCB focuses only on the "Right Products," the click rate for those specific matches is much higher than the average of the random pile.
+So the 20.5% is the click rate of LinUCB's own choices, measured on the visits where the random history happened to show one of them. The other policies' click rates rest on 39 to 52 kept visits each. With so few, a difference of a few points can come from chance, and a longer history would make the comparison more certain.
 
 ## Simulation of the Selected Product Recommender Locally
 
