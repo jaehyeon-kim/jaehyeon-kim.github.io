@@ -2712,7 +2712,7 @@ This is the standard Linear Regression prediction. It asks: &lt;em>&amp;ldquo;Ba
 &lt;h3 id="candidate-policies" data-numberify>Candidate Policies&lt;a class="anchor ms-1" href="#candidate-policies" aria-label="Link to this section: Candidate Policies">&lt;/a>&lt;/h3>
 &lt;ul>
 &lt;li>&lt;strong>Random:&lt;/strong> The baseline. Recommends items blindly.&lt;/li>
-&lt;li>&lt;strong>Popularity:&lt;/strong> Recommends items with the highest &lt;em>global&lt;/em> click rate.
+&lt;li>&lt;strong>Popularity:&lt;/strong> Recommends items drawn at random, each weighted by its &lt;em>global&lt;/em> click rate.
 &lt;ul>
 &lt;li>&lt;em>Result:&lt;/em> Mediocre (AUC ~0.59). While better than random, it still fails to capture specific rules, such as &amp;ldquo;Morning Coffee&amp;rdquo; vs. &amp;ldquo;Weekend Pizza.&amp;rdquo;&lt;/li>
 &lt;/ul>
@@ -2744,35 +2744,58 @@ This is the standard Linear Regression prediction. It asks: &lt;em>&amp;ldquo;Ba
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">11&lt;/span>&lt;span class="cl">ClustersTS 0.550505 0.153846 0.004651 0.023256
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">12&lt;/span>&lt;span class="cl">--------------------------------------------------------------------------------
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
-&lt;h3 id="why-linucb-outperforms-the-baseline-in-ctr" data-numberify>Why LinUCB Outperforms the Baseline in CTR&lt;a class="anchor ms-1" href="#why-linucb-outperforms-the-baseline-in-ctr" aria-label="Link to this section: Why LinUCB Outperforms the Baseline in CTR">&lt;/a>&lt;/h3>
-&lt;p>This is the core concept of &lt;strong>Offline Policy Evaluation&lt;/strong>.&lt;/p>
-&lt;p>The benchmark does &lt;strong>not&lt;/strong> test on every single row of your history. It uses a technique called &lt;strong>Rejection Sampling&lt;/strong> (or simply &amp;ldquo;Matching&amp;rdquo;).&lt;/p>
-&lt;p>Here is exactly how &lt;code>mab2rec&lt;/code> calculates that &lt;strong>20.5%&lt;/strong>:&lt;/p>
-&lt;ol>
-&lt;li>
-&lt;p>&lt;strong>Log (History):&lt;/strong> Contains a mix of &amp;ldquo;Good Decisions&amp;rdquo; and &amp;ldquo;Bad Decisions&amp;rdquo; because it was generated randomly.&lt;/p>
-&lt;ul>
-&lt;li>Row A: Morning User $\to$ Show &lt;strong>Pizza&lt;/strong> $\to$ &lt;strong>No Click&lt;/strong> (Bad Random Choice)&lt;/li>
-&lt;li>Row B: Morning User $\to$ Show &lt;strong>Coffee&lt;/strong> $\to$ &lt;strong>Click&lt;/strong> (Lucky Random Choice)&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>Test (LinUCB):&lt;/strong> The model is smart. It knows Morning users want Coffee.&lt;/p>
-&lt;ul>
-&lt;li>For Row A, LinUCB says: &lt;em>&amp;ldquo;I would recommend &lt;strong>Coffee&lt;/strong>.&amp;rdquo;&lt;/em>
-&lt;ul>
-&lt;li>&lt;strong>Mismatch!&lt;/strong> The history shows Pizza. We cannot know what would have happened if we showed Coffee. &lt;strong>This row is IGNORED.&lt;/strong>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>For Row B, LinUCB says: &lt;em>&amp;ldquo;I would recommend &lt;strong>Coffee&lt;/strong>.&amp;rdquo;&lt;/em>
-&lt;ul>
-&lt;li>&lt;strong>Match!&lt;/strong> The history shows Coffee. We know the result (Click). &lt;strong>This row is COUNTED.&lt;/strong>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ol>
-&lt;p>The dataset average (&lt;strong>13.7%&lt;/strong>) includes all the &amp;ldquo;Bad Random Choices&amp;rdquo; (Row A). The LinUCB score (&lt;strong>20.5%&lt;/strong>) &lt;strong>filters out&lt;/strong> the bad choices. It effectively says: &lt;em>&amp;ldquo;On the rare occasions where the random history actually showed the right product (Row B), did the user click?&amp;rdquo;&lt;/em> Since LinUCB focuses only on the &amp;ldquo;Right Products,&amp;rdquo; the click rate for those specific matches is much higher than the average of the random pile.&lt;/p>
+&lt;h3 id="how-the-click-rate-is-measured" data-numberify>How the Click Rate Is Measured&lt;a class="anchor ms-1" href="#how-the-click-rate-is-measured" aria-label="Link to this section: How the Click Rate Is Measured">&lt;/a>&lt;/h3>
+&lt;p>The history records only the one product each visit was shown. If a policy would have shown a different product, what the user would have done is unknown. So the benchmark uses the &lt;strong>replay&lt;/strong> method from &lt;a href="https://arxiv.org/abs/1003.5956" target="_blank" rel="noopener noreferrer">Li et al. (2011)&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>. For each test visit it asks the policy for its five recommendations. If the logged product is among them, the visit is kept and its click counted. Otherwise the visit is skipped. Jurity calls this &lt;strong>matching&lt;/strong>, and keeping the visits that pass a test while discarding the rest is a form of &lt;strong>rejection sampling&lt;/strong>.&lt;/p>
+&lt;p>The estimate is fair only because the history picked each product uniformly at random. Every product then had the same chance of being logged, so the kept visits are a fair sample of the visits on which the policy&amp;rsquo;s choice was shown. The chance is 5 in 200, or 1 in 40, whatever the policy.&lt;/p>
+&lt;p>Four of LinUCB&amp;rsquo;s test visits:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Visit&lt;/th>
+&lt;th>Time&lt;/th>
+&lt;th>Logged product&lt;/th>
+&lt;th>Clicked&lt;/th>
+&lt;th>Among LinUCB&amp;rsquo;s five&lt;/th>
+&lt;th>Result&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>8221&lt;/td>
+&lt;td>weekend evening&lt;/td>
+&lt;td>Buffalo Chicken Pizza&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>kept, 1 click&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>8231&lt;/td>
+&lt;td>weekday morning&lt;/td>
+&lt;td>Grilled Chicken Sandwich&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>kept, 0 clicks&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>8003&lt;/td>
+&lt;td>weekend evening&lt;/td>
+&lt;td>Dim Sims&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>skipped&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>8024&lt;/td>
+&lt;td>weekday morning&lt;/td>
+&lt;td>Strawberry Milkshake&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>skipped&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>On weekend evenings LinUCB&amp;rsquo;s five are mostly pizzas, and on weekday mornings they include coffees, as the hidden click formula rewards. Visit 8003 was clicked, but it does not count, because LinUCB would not have shown Dim Sims. Across the 2,000 test visits, 44 are kept and 9 of those were clicked, so LinUCB&amp;rsquo;s &lt;code>CTR(score)@5&lt;/code> is 9 / 44 = 20.5%.&lt;/p>
+&lt;p>So the 20.5% is the click rate of LinUCB&amp;rsquo;s own choices, measured on the visits where the random history happened to show one of them. The other policies&amp;rsquo; click rates rest on 39 to 52 kept visits each. With so few, a difference of a few points can come from chance, and a longer history would make the comparison more certain.&lt;/p>
 
 &lt;h2 id="simulation-of-the-selected-product-recommender-locally" data-numberify>Simulation of the Selected Product Recommender Locally&lt;a class="anchor ms-1" href="#simulation-of-the-selected-product-recommender-locally" aria-label="Link to this section: Simulation of the Selected Product Recommender Locally">&lt;/a>&lt;/h2>
 &lt;p>With the model selected, we built a script to simulate the product recommender locally. This script acts as the Server, the User, and the Trainer simultaneously in a continuous loop.&lt;/p>
