@@ -76,7 +76,7 @@ To change a memory limit, a port or the Python packages a container installs, ru
 
 ## A Guide for Every Service
 
-The documentation at [jaehyeon.me/odctl](https://jaehyeon.me/odctl/) has a guide for each service, 21 in all, from producing to Kafka and running Flink SQL to serving a model from MLflow and cataloguing a database in OpenMetadata. Each guide uses the commands odctl's own tests run before every release, and shows what you should see.
+The documentation at [jaehyeon.me/odctl](https://jaehyeon.me/odctl/) has 18 guides, from producing to Kafka and running Flink SQL to serving a model from MLflow and cataloguing a database in OpenMetadata. Each guide uses the commands odctl's own tests run before every release, and shows what you should see.
 
 ![Kafka UI listing the topics of a running kafka-lite profile](kafka-ui.png#center "Kafka UI from the Kafka guide")
 
