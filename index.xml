@@ -84,7 +84,7 @@
 &lt;p>To change a memory limit, a port or the Python packages a container installs, run &lt;code>odctl init&lt;/code>. It copies the configuration into a &lt;code>.odctl&lt;/code> folder in your project, and odctl uses that copy from then on.&lt;/p>
 
 &lt;h2 id="a-guide-for-every-service" data-numberify>A Guide for Every Service&lt;a class="anchor ms-1" href="#a-guide-for-every-service" aria-label="Link to this section: A Guide for Every Service">&lt;/a>&lt;/h2>
-&lt;p>The documentation at &lt;a href="https://jaehyeon.me/odctl/">jaehyeon.me/odctl&lt;/a> has a guide for each service, 21 in all, from producing to Kafka and running Flink SQL to serving a model from MLflow and cataloguing a database in OpenMetadata. Each guide uses the commands odctl&amp;rsquo;s own tests run before every release, and shows what you should see.&lt;/p>
+&lt;p>The documentation at &lt;a href="https://jaehyeon.me/odctl/">jaehyeon.me/odctl&lt;/a> has 18 guides, from producing to Kafka and running Flink SQL to serving a model from MLflow and cataloguing a database in OpenMetadata. Each guide uses the commands odctl&amp;rsquo;s own tests run before every release, and shows what you should see.&lt;/p>
 &lt;p>&lt;figure class="figure mx-auto d-block">&lt;picture>&lt;img class="img-fluid figure-img" alt="Kafka UI listing the topics of a running kafka-lite profile" src="https://jaehyeon.me/blog/2026-10-12-odctl-1-0/kafka-ui.png" loading="lazy" title="Kafka UI from the Kafka guide" width="1440" height="545" />
 &lt;/picture>&lt;figcaption class="figure-caption">Kafka UI from the Kafka guide&lt;/figcaption>
 &lt;/figure>
