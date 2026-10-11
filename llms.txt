@@ -1,0 +1,249 @@
+# Jaehyeon Kim
+
+> Data Engineer | Data Streaming | Powering ML & AI in Real Time
+
+Articles on data engineering, data streaming and machine learning, most with their code in a public repository. Posts in a series are listed in reading order; the other posts follow, newest first.
+
+## Projects
+
+- [dynamic-des documentation](https://jaehyeon.me/dynamic-des/latest/): realistic event streams from a SimPy simulation you can steer while it runs, written to Kafka, Redis, PostgreSQL, Parquet, JSONL and Iceberg
+- [odctl documentation](https://jaehyeon.me/odctl/): a command-line tool that runs an open-source data platform on a laptop, with Kafka, Flink, Spark, Iceberg, Trino, Airflow and MLflow wired together
+- [Projects](https://jaehyeon.me/projects/): every project with its repository and posts
+
+## Kafka Development with Docker
+
+- [Kafka Development with Docker - Part 1 Cluster Setup](https://jaehyeon.me/blog/2023-05-04-kafka-development-with-docker-part-1/): Set up a Kafka cluster with Docker Compose, the base for a series on developing and testing Kafka applications for AWS in containers.
+- [Kafka Development with Docker - Part 2 Management App](https://jaehyeon.me/blog/2023-05-18-kafka-development-with-docker-part-2/): Kafka management apps compared for local development, covering IAM access control and integration with MSK Connect and Glue Schema Registry.
+- [Kafka Development with Docker - Part 3 Kafka Connect](https://jaehyeon.me/blog/2023-05-25-kafka-development-with-docker-part-3/): A Kafka Connect ingestion pipeline on Docker. The MSK Data Generator creates fake customer and order records, and the Confluent S3 sink saves them.
+- [Kafka Development with Docker - Part 4 Producer and Consumer](https://jaehyeon.me/blog/2023-06-01-kafka-development-with-docker-part-4/): Kafka producer and consumer applications written in Python with kafka-python, one of several open source alternatives to the Java clients.
+- [Kafka Development with Docker - Part 5 Glue Schema Registry](https://jaehyeon.me/blog/2023-06-08-kafka-development-with-docker-part-5/): Build the Glue Schema Registry client library and use it to manage and enforce schemas in Kafka producer and consumer applications.
+- [Kafka Development with Docker - Part 6 Kafka Connect with Glue Schema Registry](https://jaehyeon.me/blog/2023-06-15-kafka-development-with-docker-part-6/): Schema registry support added to a Kafka Connect ingestion pipeline, so the source and sink connectors serialise through AWS Glue Schema Registry.
+- [Producer and Consumer with Glue Schema Registry - Kafka Development with Docker Part 7](https://jaehyeon.me/blog/2023-06-22-kafka-development-with-docker-part-7/): Schema registry support added to kafka-python producer and consumer apps, which serialise and deserialise through AWS Glue Schema Registry.
+- [Kafka Development with Docker - Part 8 SSL Encryption](https://jaehyeon.me/blog/2023-06-29-kafka-development-with-docker-part-8/): Configure TLS encryption between Kafka brokers and clients, where the client verifies the server certificate, with Java and Python examples.
+- [Kafka Development with Docker - Part 9 SSL Authentication](https://jaehyeon.me/blog/2023-07-06-kafka-development-with-docker-part-9/): Enforce two-way TLS verification so Kafka brokers check the client certificate, with Java and Python client examples of SSL authentication.
+- [Kafka Development with Docker - Part 10 SASL Authentication](https://jaehyeon.me/blog/2023-07-13-kafka-development-with-docker-part-10/): Authenticate Kafka clients with SASL instead of client certificates, with Java and Python client examples of the SASL mechanisms.
+- [Kafka Development with Docker - Part 11 Kafka Authorization](https://jaehyeon.me/blog/2023-07-20-kafka-development-with-docker-part-11/): Control user access to Kafka resources with authorization rules, keeping SASL for client authentication, with Java and Python client examples.
+
+## Apache Beam Python Examples
+
+- [Calculate K Most Frequent Words and Max Word Length - Apache Beam Python Examples Part 1](https://jaehyeon.me/blog/2024-07-04-beam-examples-1/): Set up a local Apache Flink and Kafka environment, then build two Beam Python streaming pipelines for top K frequent words and longest word length.
+- [Calculate Average Word Length with/without Fixed Look back - Apache Beam Python Examples Part 2](https://jaehyeon.me/blog/2024-07-18-beam-examples-2/): Two Beam Python pipelines compute average word length from a Kafka topic, one emitting a global average and one using a sliding time window.
+- [Build Sport Activity Tracker with/without SQL - Apache Beam Python Examples Part 3](https://jaehyeon.me/blog/2024-08-01-beam-examples-3/): A sport activity tracker in Beam Python, built first with native transforms and then with Beam SQL, showing the limits of Beam SQL in the Python SDK.
+- [Apache Beam Python Examples - Part 4 Call RPC Service for Data Augmentation](https://jaehyeon.me/blog/2024-08-15-beam-examples-4/): Data augmentation in Beam Python by calling a gRPC service once per input element, running on a local Flink cluster with Kafka as the source.
+- [Call RPC Service in Batch using Stateless DoFn - Apache Beam Python Examples Part 5](https://jaehyeon.me/blog/2024-09-18-beam-examples-5/): Batching gRPC calls in a stateless DoFn so one request covers a whole bundle, cutting the time a Beam Python pipeline spends on enrichment.
+- [Call RPC Service in Batch with Defined Batch Size using Stateful DoFn - Apache Beam Python Examples Part 6](https://jaehyeon.me/blog/2024-10-02-beam-examples-6/): A stateful DoFn with Beam state and timers fixes the gRPC batch size and maximum wait time instead of leaving the bundle size to the runner.
+- [Apache Beam Python Examples - Part 7 Separate Droppable Data into Side Output](https://jaehyeon.me/blog/2024-10-24-beam-examples-7/): Late droppable elements are detected by a timer in a stateful DoFn and sent to a Beam side output instead of being discarded without notice.
+- [Enhance Sport Activity Tracker with Runner Motivation - Apache Beam Python Examples Part 8](https://jaehyeon.me/blog/2024-11-21-beam-examples-8/): Pacing messages are added to the Beam sport activity tracker by comparing short term speed metrics against their long term counterparts.
+- [Develop Batch File Reader and PiSampler using Splittable DoFn - Apache Beam Python Examples Part 9](https://jaehyeon.me/blog/2024-12-05-beam-examples-9/): Splittable DoFn in Beam Python builds a batch file reader that processes files in parallel, and a PiSampler that estimates pi by Monte Carlo runs.
+- [Develop Streaming File Reader using Splittable DoFn - Apache Beam Python Examples Part 10](https://jaehyeon.me/blog/2024-12-19-beam-examples-10/): A streaming file reader built with Splittable DoFn scans an input folder for new files repeatedly, a pattern for unbounded sources in the Python SDK.
+
+## Real Time Streaming with Kafka and Flink
+
+- [Real Time Streaming with Kafka and Flink - Introduction](https://jaehyeon.me/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1/): Kafka and PyFlink replace Amazon Kinesis in a real time analytics app from an AWS workshop. The original and the new architecture are compared.
+- [Produce data to Kafka using Lambda - Real Time Streaming with Kafka and Flink Lab 1](https://jaehyeon.me/blog/2023-10-26-real-time-streaming-with-kafka-and-flink-2/): Produce fake taxi ride data into a Kafka topic on Amazon MSK from an AWS Lambda function invoked repeatedly by an EventBridge schedule rule.
+- [Write data to Kafka from S3 using Flink - Real Time Streaming with Kafka and Flink Lab 2](https://jaehyeon.me/blog/2023-11-09-real-time-streaming-with-kafka-and-flink-3/): Read records from S3 and send them into a Kafka topic with PyFlink, using a custom pipeline jar for IAM authentication, which is useful for enrichment.
+- [Transform and write data to S3 from Kafka using Flink - Real Time Streaming with Kafka and Flink Lab 3](https://jaehyeon.me/blog/2023-11-16-real-time-streaming-with-kafka-and-flink-4/): Export Kafka topic messages to S3 with PyFlink, enriching records through a user defined function and querying them on Athena through a Glue table.
+- [Clean, Aggregate, and Enrich Events with Flink - Real Time Streaming with Kafka and Flink Lab 4](https://jaehyeon.me/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5/): Aggregate taxi ride counts and trip durations by vendor over five second windows with PyFlink, then chart them in an OpenSearch dashboard.
+- [Write data to DynamoDB using Kafka Connect - Real Time Streaming with Kafka and Flink Lab 5](https://jaehyeon.me/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6/): Ingest records from a Kafka topic into a DynamoDB table using the Camel DynamoDB sink connector, defined and run on Kafka Connect.
+- [Consume data from Kafka using Lambda - Real Time Streaming with Kafka and Flink Lab 6](https://jaehyeon.me/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7/): Consume Kafka messages with an AWS Lambda function, using Amazon MSK as an event source so that Lambda polls the topic and invokes the function.
+
+## Building Real-Time Digital Twins with dynamic-des
+
+- [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/): An Apache Flink and Kotlin streaming architecture where online machine learning detects concept drift from machinery wear, controlled by a shadow mode router.
+- [Why Digital Twins Are Rewiring Industry 4.0](https://jaehyeon.me/blog/2026-04-23-digital-twin-industry-4-0/): Why a simulation is not a digital twin: the layers that separate an offline model, an operational twin and an event-driven hybrid of the two.
+- [Building an Event-Driven Hybrid Digital Twin with dynamic-des](https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des/): Keeping a simulation in step with live data: change a running SimPy model's parameters from Kafka and stream its events out, so it acts as a digital twin.
+- [One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES](https://jaehyeon.me/blog/2026-05-25-dynamic-des-parquet-support/): One simulation that writes Parquet for model training and streams Kafka events for live inference, so training and serving use the same simulation code.
+- [Dynamic DES: A Declarative API with Postgres and Redis Connectors](https://jaehyeon.me/blog/2026-07-17-dynamic-des-declarative-connectors/): Generating test data that changes while it runs: SimPy simulations written with a declarative API that read settings from and write events to PostgreSQL and Redis.
+- [Defining Data-Streaming Simulations in YAML, Without Writing Python](https://jaehyeon.me/blog/2026-10-06-simulations-in-yaml-dynamic-des/): Test data for a streaming pipeline, from a settings file rather than a program: a plain YAML file describes a simulation, and one command runs it and sends its events to Kafka, PostgreSQL, Parquet or Iceberg.
+
+## dbt Pizza Shop Demo
+
+- [Data Build Tool (dbt) Pizza Shop Demo - Part 1 Modelling on PostgreSQL](https://jaehyeon.me/blog/2024-01-18-dbt-pizza-shop-1/): Model fictional pizza shop data on PostgreSQL with dbt, building two SCD type 2 dimension tables and one transactional fact table.
+- [Data Build Tool (dbt) Pizza Shop Demo - Part 2 ETL on PostgreSQL via Airflow](https://jaehyeon.me/blog/2024-01-25-dbt-pizza-shop-2/): Orchestrate the PostgreSQL pizza shop dbt project with Apache Airflow, scheduling the SCD type 2 dimension and fact table builds as an ETL process.
+- [Data Build Tool (dbt) Pizza Shop Demo - Part 3 Modelling on BigQuery](https://jaehyeon.me/blog/2024-02-08-dbt-pizza-shop-3/): Model pizza shop data on Google BigQuery with dbt, keeping SCD type 2 dimensions and denormalising the fact table with nested and repeated fields.
+- [Data Build Tool (dbt) Pizza Shop Demo - Part 4 ETL on BigQuery via Airflow](https://jaehyeon.me/blog/2024-02-22-dbt-pizza-shop-4/): Orchestrate the BigQuery pizza shop dbt project with Apache Airflow, running the SCD type 2 dimension tables and the denormalised fact table.
+- [Data Build Tool (dbt) Pizza Shop Demo - Part 5 Modelling on Amazon Athena](https://jaehyeon.me/blog/2024-03-07-dbt-pizza-shop-5/): Model pizza shop data as Apache Iceberg tables transformed on Amazon Athena with dbt, using array and struct types to denormalise the fact table.
+- [Data Build Tool (dbt) Pizza Shop Demo - Part 6 ETL on Amazon Athena via Airflow](https://jaehyeon.me/blog/2024-03-14-dbt-pizza-shop-6/): Orchestrate the Amazon Athena and Iceberg pizza shop dbt project with Apache Airflow, running the dimension and denormalised fact table builds.
+
+## Tree Based Methods in R
+
+- [Tree Based Methods in R - Part 1](https://jaehyeon.me/blog/2015-02-01-tree-based-methods-1/): Fit a CART classification model on the ISLR Carseats data with the rpart package in R, and tune the pruning parameter with the caret package.
+- [Tree Based Methods in R - Part 2](https://jaehyeon.me/blog/2015-02-08-tree-based-methods-2/): Cost-sensitive classification with rpart and caret in R, treating a missed High class as twice as expensive by altering the priors and the loss matrix.
+- [Tree Based Methods in R - Part 3](https://jaehyeon.me/blog/2015-02-14-tree-based-methods-3/): Fit a regression tree on the Carseats data in R, comparing the pruning parameter caret selects against the 1-SE rule that the rpart package recommends.
+- [Tree Based Methods in R - Part 4](https://jaehyeon.me/blog/2015-02-15-tree-based-methods-4/): Compare three R packages for classification trees, rpart, caret and mlr, on the Carseats data used in the earlier parts.
+- [Tree Based Methods in R - Part 5](https://jaehyeon.me/blog/2015-03-05-tree-based-methods-5/): Evaluate a single regression tree in R against 2000 bagged trees, comparing out-of-bag and test errors, cumulative errors and variable importance.
+- [Tree Based Methods in R - Part 6](https://jaehyeon.me/blog/2015-03-07-tree-based-methods-6/): Compare a single classification tree in R with 500 bagged trees on out-of-bag and test errors, cumulative errors and variable importance measures.
+
+## Apache Beam Local Development with Python
+
+- [Pipeline, Notebook, SQL and DataFrame - Apache Beam Local Development with Python Part 1](https://jaehyeon.me/blog/2024-03-28-beam-local-dev-1/): Run a basic Apache Beam pipeline in Python, then develop interactively in Jupyter notebooks with Beam SQL and Beam DataFrames examples.
+- [Apache Beam Local Development with Python - Part 2 Batch Pipelines](https://jaehyeon.me/blog/2024-04-04-beam-local-dev-2/): Batch Apache Beam pipelines in Python that aggregate website visit logs by user and time, written with and without Beam SQL and run in notebooks.
+- [Apache Beam Local Development with Python - Part 3 Flink Runner](https://jaehyeon.me/blog/2024-04-18-beam-local-dev-3/): The Apache Beam portability layer explained, with bash scripts that manage local Flink and Kafka clusters and a streaming pipeline on the Flink Runner.
+- [Apache Beam Local Development with Python - Part 4 Streaming Pipelines](https://jaehyeon.me/blog/2024-05-02-beam-local-dev-4/): A streaming Apache Beam pipeline in Python that aggregates page visits by user in fixed 20 second windows, written with and without Beam SQL.
+- [Apache Beam Local Development with Python - Part 5 Testing Pipelines](https://jaehyeon.me/blog/2024-05-09-beam-local-dev-5/): Unit test batch and streaming Apache Beam pipelines in Python, using TestStream to advance watermarks and processing time across scenarios.
+
+## dbt for Effective Data Transformation on AWS
+
+- [Data Build Tool (dbt) for Effective Data Transformation on AWS - Part 1 Redshift](https://jaehyeon.me/blog/2022-09-28-dbt-on-aws-part-1-redshift/): Transform IMDb data in Amazon Redshift Serverless with dbt, building layered models that follow dbt best practices.
+- [Data Build Tool (dbt) for Effective Data Transformation on AWS - Part 2 Glue](https://jaehyeon.me/blog/2022-10-09-dbt-on-aws-part-2-glue/): Transform IMDb data in an S3 data lake with dbt on AWS Glue, running layered models through Glue interactive sessions with the dbt-glue adapter.
+- [EMR on EC2 - Data Build Tool (dbt) for Effective Data Transformation on AWS Part 3](https://jaehyeon.me/blog/2022-10-19-dbt-on-aws-part-3-emr-ec2/): Transform IMDb data with dbt on Amazon EMR on EC2, running layered models through a Spark Thrift server.
+- [EMR on EKS - Data Build Tool (dbt) for Effective Data Transformation on AWS Part 4](https://jaehyeon.me/blog/2022-11-01-dbt-on-aws-part-4-emr-eks/): Transform IMDb data with dbt on Amazon EMR on EKS, through a Spark Thrift server kept running on Kubernetes by a small wrapper class.
+- [Data Build Tool (dbt) for Effective Data Transformation on AWS - Part 5 Athena](https://jaehyeon.me/blog/2022-12-06-dbt-on-aws-part-5-athena/): Transform IMDb data with dbt on Amazon Athena using the dbt-athena adapter, the last part of the dbt on AWS series.
+
+## Getting Started with Real-Time Streaming in Kotlin
+
+- [Kafka Clients with JSON - Producing and Consuming Order Events](https://jaehyeon.me/blog/2025-05-20-kotlin-getting-started-kafka-json-clients/): A Kotlin Kafka producer and consumer for order events, with custom JSON serialisers, admin helpers and a Gradle build, run on odctl.
+- [Kafka Clients with Avro - Schema Registry and Order Events](https://jaehyeon.me/blog/2025-05-27-kotlin-getting-started-kafka-avro-clients/): Avro and Schema Registry replace hand written JSON codecs in a Kotlin Kafka producer and consumer, with generated classes and graceful shutdown.
+- [Kafka Streams - Lightweight Real-Time Processing for Supplier Stats](https://jaehyeon.me/blog/2025-06-03-kotlin-getting-started-kafka-streams/): Kafka Streams in Kotlin aggregates Avro order events into tumbling window supplier statistics and handles late records with a custom extractor.
+- [Flink DataStream API - Scalable Event Processing for Supplier Stats](https://jaehyeon.me/blog/2025-06-10-kotlin-getting-started-flink-datastream/): Flink DataStream API in Kotlin computes the same supplier statistics, using watermarks for event time and side outputs to collect late order events.
+- [Flink Table API - Declarative Analytics for Supplier Stats in Real Time](https://jaehyeon.me/blog/2025-06-17-kotlin-getting-started-flink-table/): Flink Table API in Kotlin states the supplier statistics as a declarative windowed aggregation over a DataStream, with late rows routed by hand.
+
+## Kafka Connect for AWS Services Integration
+
+- [Kafka Connect for AWS Services Integration - Part 1 Introduction](https://jaehyeon.me/blog/2023-05-03-kafka-connect-for-aws-part-1/): A survey of the Kafka connectors available for AWS service integration, as the starting point for building real time data pipelines on AWS.
+- [Develop Camel DynamoDB Sink Connector - Kafka Connect for AWS Services Integration Part 2](https://jaehyeon.me/blog/2023-06-04-kafka-connect-for-aws-part-2/): Develop the Camel DynamoDB sink connector on Docker, consuming fake order records from a Kafka topic and writing them into a DynamoDB table.
+- [Deploy Camel DynamoDB Sink Connector - Kafka Connect for AWS Services Integration Part 3](https://jaehyeon.me/blog/2023-07-03-kafka-connect-for-aws-part-3/): Deploy the Camel DynamoDB sink connector and its data generator source on Amazon MSK and MSK Connect, moving the local pipeline onto AWS.
+- [Develop Aiven OpenSearch Sink Connector - Kafka Connect for AWS Services Integration Part 4](https://jaehyeon.me/blog/2023-10-23-kafka-connect-for-aws-part-4/): Build a local Kafka to OpenSearch pipeline on Docker with the Aiven sink connector, ingesting fake impressions and clicks for near real time analytics.
+- [Deploy Aiven OpenSearch Sink Connector - Kafka Connect for AWS Services Integration Part 5](https://jaehyeon.me/blog/2023-10-30-kafka-connect-for-aws-part-5/): Deploy a Kafka to OpenSearch pipeline on AWS with Terraform, covering a VPC, VPN server, MSK cluster, OpenSearch domain and the MSK Connect connectors.
+
+## Serverless Data Product
+
+- [Serverless Data Product POC Backend Part 1 - Packaging R ML Model for Lambda](https://jaehyeon.me/blog/2017-04-08-serverless-data-product-1/): Package a logistic regression model built in R so it can run on AWS Lambda, after testing it locally.
+- [Serverless Data Product POC Backend Part 2 - Deploying R ML Model via Lambda](https://jaehyeon.me/blog/2017-04-11-serverless-data-product-2/): Deploy an R machine learning model to AWS Lambda and call it without managing a server.
+- [Serverless Data Product POC Backend Part 3 - Exposing R ML Model via APIG](https://jaehyeon.me/blog/2017-04-13-serverless-data-product-3/): Expose an R machine learning model packaged in AWS Lambda through Amazon API Gateway, giving the model a callable HTTP endpoint on AWS.
+- [Serverless Data Product POC Backend Part 4 - Serving R ML Model via S3](https://jaehyeon.me/blog/2017-04-17-serverless-data-product-4/): Host the web application that calls an R machine learning model on Amazon S3, so both the front end and the Lambda backend run without a server.
+
+## Data Lake Demo Using Change Data Capture
+
+- [Data Lake Demo using Change Data Capture (CDC) on AWS - Part 1 Local Development](https://jaehyeon.me/blog/2021-12-05-datalake-demo-part1/): Set up the source PostgreSQL database with an outbox table, then run Debezium and an S3 sink connector locally with Docker Compose.
+- [Data Lake Demo using Change Data Capture (CDC) on AWS - Part 2 Implement CDC](https://jaehyeon.me/blog/2021-12-12-datalake-demo-part2/): Build change data capture on AWS with Amazon MSK and MSK Connect, streaming PostgreSQL row changes into the topics that feed the data lake.
+- [Implement Data Lake - Data Lake Demo using Change Data Capture (CDC) on AWS Part 3](https://jaehyeon.me/blog/2021-12-19-datalake-demo-part3/): Run a Hudi DeltaStreamer application on Amazon EMR, then query the resulting Hudi table with Athena and build a QuickSight dashboard on it.
+
+## Getting Started with PyFlink on AWS
+
+- [Getting Started with PyFlink on AWS - Part 1 Local Flink and Local Kafka](https://jaehyeon.me/blog/2023-08-17-getting-started-with-pyflink-on-aws-part-1/): Develop a PyFlink app against a Kafka cluster on Docker, running it both in a virtual environment and in a local Flink cluster for better monitoring.
+- [Getting Started with PyFlink on AWS - Part 2 Local Flink and MSK](https://jaehyeon.me/blog/2023-08-28-getting-started-with-pyflink-on-aws-part-2/): Connect a PyFlink app to an IAM authenticated MSK cluster, building a custom uber jar because Amazon Managed Service for Apache Flink takes only one jar.
+- [Getting Started with PyFlink on AWS - Part 3 AWS Managed Flink and MSK](https://jaehyeon.me/blog/2023-09-04-getting-started-with-pyflink-on-aws-part-3/): Deploy a PyFlink app that reads and writes Kafka topics on Amazon MSK to Amazon Managed Service for Apache Flink, the managed Flink runtime.
+
+## Kafka Development on Kubernetes
+
+- [Kafka Development on Kubernetes - Part 1 Cluster Setup](https://jaehyeon.me/blog/2023-12-21-kafka-development-on-k8s-part-1/): Create a Kafka cluster on Kubernetes with Strimzi, the first step in a series on Python clients and Kafka Connect pipelines on Kubernetes.
+- [Kafka Development on Kubernetes - Part 2 Producer and Consumer](https://jaehyeon.me/blog/2024-01-04-kafka-development-on-k8s-part-2/): Send and read Kafka topic records from Python client applications built with the kafka-python package and deployed on Kubernetes.
+- [Kafka Development on Kubernetes - Part 3 Kafka Connect](https://jaehyeon.me/blog/2024-01-11-kafka-development-on-k8s-part-3/): Ingest fake customer and order data into Kafka with the MSK Data Generator and save it to S3, with connectors deployed as Strimzi custom resources.
+
+## Parallel processing on single machine
+
+- [Parallel Processing on Single Machine - Part 1](https://jaehyeon.me/blog/2015-03-14-parallel-processing-on-single-machine-1/): Run parallel tasks on one machine in R with the snow and parallel packages, comparing clusterApply, clusterApplyLB, parLapply and parLapplyLB.
+- [Parallel Processing on Single Machine - Part 2](https://jaehyeon.me/blog/2015-03-17-parallel-processing-on-single-machine-2/): Loop in parallel on one machine in R with the foreach and doParallel packages, with the iterators package covered for writing the loop itself.
+- [Parallel Processing on Single Machine - Part 3](https://jaehyeon.me/blog/2015-03-19-parallel-processing-on-single-machine-3/): Compare the snow and foreach approaches to parallel processing in R on three practical examples, starting with k-means clustering on the Boston data.
+
+## Realtime Dashboard with FastAPI, Streamlit and Next.js
+
+- [Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1 Data Producer](https://jaehyeon.me/blog/2025-02-18-realtime-dashboard-1/): A Python generator loads theLook eCommerce data into PostgreSQL, and a FastAPI WebSocket server queries it on a timer to serve live dashboards.
+- [Streamlit Dashboard - Realtime Dashboard with FastAPI, Streamlit and Next.js Part 2](https://jaehyeon.me/blog/2025-02-25-realtime-dashboard-2/): Streamlit and Apache ECharts draw a live sales dashboard that reads order counts and revenue by country from a FastAPI WebSocket server.
+- [Next.js Dashboard - Realtime Dashboard with FastAPI, Streamlit and Next.js Part 3](https://jaehyeon.me/blog/2025-03-04-realtime-dashboard-3/): Next.js and React with Apache ECharts show the same live order and revenue metrics, reading from the FastAPI WebSocket server in the browser.
+
+## API development with R
+
+- [API Development with R Part 1](https://jaehyeon.me/blog/2017-11-18-api-development-with-r-1/): Serve an R function as an API three ways, with plumber, RServe and rApache, and see what each option asks of the developer to set up.
+- [API Development with R Part 2](https://jaehyeon.me/blog/2017-11-19-api-development-with-r-2/): Deploy plumber, RServe and rApache APIs in Docker containers, then compare the three R API options on example requests and response performance.
+
+## dbt Guide for Production
+
+- [DBT CI/CD Demo with BigQuery and GitHub Actions](https://jaehyeon.me/blog/2024-09-05-dbt-cicd-demo/): GitHub Actions gives a dbt project on BigQuery a slim CI run on pull requests and a deploy job that publishes the project as a container image.
+- [Guide to Running DBT in Production](https://jaehyeon.me/blog/2024-09-13-dbt-guide/): Deploying a dbt project to dev and prod on BigQuery, covering slim CI, unit tests and a write audit publish step that builds on a cloned dataset.
+
+## Deploy Python Stream Processing App on Kubernetes
+
+- [Deploy Python Stream Processing App on Kubernetes - Part 1 PyFlink Application](https://jaehyeon.me/blog/2024-05-30-beam-deploy-1/): Deploy a PyFlink application to minikube with the Flink Kubernetes Operator, alongside a Kafka cluster that provides its source and sink topics.
+- [Beam Pipeline on Flink Runner - Deploy Python Stream Processing App on Kubernetes Part 2](https://jaehyeon.me/blog/2024-06-06-beam-deploy-2/): Deploy an Apache Beam Python pipeline to a Flink session cluster on minikube, packaged as a Docker image and submitted as a Kubernetes job.
+
+## Download Stock Data
+
+- [Download Stock Data - Part I](https://jaehyeon.me/blog/2014-11-20-download-stock-data-1/): Download stock price files in R, save them to a local folder and merge them into one data frame. The Google endpoint the script used has since been retired.
+- [Download Stock Data - Part II](https://jaehyeon.me/blog/2014-11-21-download-stock-data-2/): Download stock price data from Google in R and merge it into one data frame in memory, avoiding the slower route of saving each file to a local drive.
+
+## From Prototype to Production: Real-Time Product Recommendation with Contextual Bandits
+
+- [Prototyping an Online Product Recommender in Python](https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/): A Python prototype of a contextual multi-armed bandit recommender that simulates user behaviour and validates the algorithm against cold-start users.
+- [Productionizing an Online Product Recommender using Event Driven Architecture](https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/): Apache Flink, Kafka and Valkey turn a contextual bandit recommender into an event driven service with stateful training and low latency inference.
+
+## Integrate Schema Registry with MSK Connect
+
+- [Use External Schema Registry with MSK Connect - Part 1 Local Development](https://jaehyeon.me/blog/2022-03-07-schema-registry-part1/): A local Change Data Capture setup on Docker Compose with Debezium, the Confluent S3 sink and the Apicurio registry, showing how schema evolution is managed.
+- [Use External Schema Registry with MSK Connect - Part 2 MSK Deployment](https://jaehyeon.me/blog/2022-04-03-schema-registry-part2/): Deploy a Change Data Capture pipeline to AWS with the Apicurio registry on ECS, private subnets over VPN and the Avro converter packaged with the connectors.
+
+## Kafka, Flink and DynamoDB for Real Time Fraud Detection
+
+- [Local Development - Kafka, Flink and DynamoDB for Real Time Fraud Detection Part 1](https://jaehyeon.me/blog/2023-08-10-fraud-detection-part-1/): Develop a fraud detection app locally on Docker with Kafka, Flink and DynamoDB, re-implementing a solution taken from an AWS workshop.
+- [Deployment via AWS Managed Flink - Kafka, Flink and DynamoDB for Real Time Fraud Detection Part 2](https://jaehyeon.me/blog/2023-09-14-fraud-detection-part-2/): Deploy the Kafka, Flink and DynamoDB fraud detection app to Amazon Managed Service for Apache Flink, after developing it locally on Docker.
+
+## Simplify Streaming Ingestion on AWS
+
+- [Simplify Streaming Ingestion on AWS - Part 1 MSK and Redshift](https://jaehyeon.me/blog/2023-02-08-simplify-streaming-ingestion-redshift/): Stream Kafka records from Amazon MSK into Redshift through its direct integration, with a producer Lambda built locally using AWS SAM and Terraform.
+- [Simplify Streaming Ingestion on AWS - Part 2 MSK and Athena](https://jaehyeon.me/blog/2023-03-14-simplify-streaming-ingestion-athena/): Stream Kafka records from Amazon MSK into Athena through its direct integration, with a producer Lambda built locally using AWS SAM and Terraform.
+
+## MLOps with a Feature Store
+
+- [Learning MLOps with a Feature Store: A New Series](https://jaehyeon.me/blog/2026-09-28-mlops-with-a-feature-store/): Learning MLOps hands-on: the three projects from Jim Dowling's feature store book, rebuilt with open source tools that run locally.
+
+## Other posts
+
+- [odctl 1.0: Kafka, Flink, Spark, Iceberg, Trino and MLflow on Your Laptop with One Command](https://jaehyeon.me/blog/2026-10-12-odctl-1-0/): odctl is a command-line tool that runs an open-source data platform on your laptop: Kafka, Flink, Spark, Iceberg, ClickHouse, Trino, Airflow, MLflow, Feast and more, started with one command and wired together. Version 1.0 adds a documentation site with a guide for every service.
+- [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](https://jaehyeon.me/blog/2026-10-02-game-leaderboard-flink-sql/): Keeping top 10 leaderboards up to date as game scores arrive: four Flink SQL jobs read the scores from Kafka and keep the rankings in PostgreSQL, and a web dashboard shows them as they change.
+- [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](https://jaehyeon.me/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/): Capturing every insert and update in PostgreSQL without changing the application: Debezium streams the changes to Kafka, and an S3 sink connector saves them as files.
+- [Data Streaming and Machine Learning Projects That Run on Your Laptop](https://jaehyeon.me/blog/2026-09-30-introducing-benchtop/): Small data engineering, stream processing, machine learning and MLOps projects that run on a laptop from a fresh clone, each explaining the system it builds.
+- [Building an Agentic Analytics System over an Iceberg Lakehouse](https://jaehyeon.me/blog/2026-07-18-agentic-analytics-system/): Stopping a language model from inventing SQL over a lakehouse: a semantic layer between the model and Iceberg tables, built with Strands, WrenAI and Trino.
+- [Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI](https://jaehyeon.me/blog/2026-07-16-odctl-open-data-stack/): Running Kafka, Flink, Spark, Trino, Iceberg and Airflow together on a laptop: one CLI starts them as a single local stack, with MLOps and observability tools.
+- [Current London 2026: Building End-to-End Data Lineage](https://jaehyeon.me/blog/2026-05-22-end-to-end-data-lineage/): Tracking data across Kafka, Flink and Spark pipelines with OpenLineage, to show where each dataset came from and what reads it. Slides from my Current London 2026 session.
+- [Slides as Code: Integrating Reveal.js into my Hugo Blog](https://jaehyeon.me/blog/2026-03-09-integrate-revealjs/): Reveal.js slides written in Markdown and built by Hugo alongside blog posts, with code walkthroughs, fragments, MathJax and Mermaid diagrams.
+- [Stream Processing with Flink in Kotlin](https://jaehyeon.me/blog/2025-12-10-streaming-processing-with-flink-in-kotlin/): Examples from the book Stream Processing with Apache Flink ported to Kotlin, updated to current Flink APIs and built with Gradle after PyFlink lacked features.
+- [Guide to Building Integrated Web Applications with FastAPI and NiceGUI](https://jaehyeon.me/blog/2025-11-19-fastapi-nicegui-template/): FastAPI and NiceGUI served from one Python process give a backend API and a web UI in a single codebase, compared here with React and with Streamlit.
+- [Self-service Data Platform via a Multi-tenant SQL Gateway](https://jaehyeon.me/blog/2025-07-17-self-service-data-platform-via-sql-gateway/): Apache Kyuubi as a multi-tenant SQL gateway that provisions on-demand Spark, Flink and Trino engines, giving self-service analytics with central governance.
+- [Meet the Streamhouse Trio - Paimon, Fluss, and Iceberg for Unified Data Architectures](https://jaehyeon.me/blog/2025-05-06-streamhouse-trio/): Apache Paimon, Fluss and Apache Iceberg compared as table layers for streaming and batch, then combined into one architecture with Flink and Spark.
+- [Run Flink SQL Cookbook in Docker](https://jaehyeon.me/blog/2025-04-15-sql-cookbook/): Docker Compose runs a local Apache Flink cluster and SQL Client so the Ververica Flink SQL Cookbook recipes work without the Ververica Platform.
+- [Change Data Capture (CDC) Local Development with PostgreSQL, Debezium Server and Pub/Sub Emulator](https://jaehyeon.me/blog/2024-11-07-cdc-local-dev/): Debezium Server streams PostgreSQL row changes into the Google Pub/Sub emulator, with Docker Compose, a theLook data generator and a Python reader.
+- [Cache Data on Apache Beam Pipelines Using a Shared Object](https://jaehyeon.me/blog/2024-08-22-cache-using-shared-object/): The Shared class in the Beam Python SDK caches lookup data in memory for batch and streaming pipelines, with a periodic refresh for the latter.
+- [Setup Local Development Environment for Apache Flink and Spark Using EMR Container Images](https://jaehyeon.me/blog/2023-12-07-flink-spark-local-dev/): A local Flink and Spark environment built from EMR container images, where Flink ingests data in real time and Spark queries it via the Glue Data Catalog.
+- [Benefits and Opportunities of Stateful Stream Processing](https://jaehyeon.me/blog/2023-11-02-stateful-stream-processing/): Stateful stream processing set against traditional data infrastructure, showing which application patterns it improves and what opportunities it opens.
+- [Building Apache Flink Applications in Python](https://jaehyeon.me/blog/2023-10-19-build-pyflink-apps/): Three Flink DataStream applications from a Confluent Java course converted to PyFlink, from ingesting source data to calculating usage statistics.
+- [How I Prepared for Certified Kubernetes Application Developer (CKAD)](https://jaehyeon.me/blog/2023-10-12-how-i-prepared-for-ckad/): Three online courses and two practice tests reviewed after passing the Certified Kubernetes Application Developer exam, with notes on each.
+- [How I Prepared for Confluent Certified Developer for Apache Kafka as a Non-Java Developer](https://jaehyeon.me/blog/2023-05-11-how-i-prepared-for-ccdak/): How a non-Java developer prepared for and passed the Confluent Certified Developer for Apache Kafka exam, which assumes the Java APIs throughout.
+- [Self-managed Blog with Hugo and GitHub Pages](https://jaehyeon.me/blog/2023-04-24-self-hosted-blog/): Set up a self-managed blog with Hugo and GitHub Pages, including why Hugo was chosen over Jekyll and Pelican for its themes and features.
+- [Integrate Glue Schema Registry with Your Python Kafka App](https://jaehyeon.me/blog/2023-04-12-integrate-glue-schema-registry/): Integrate Python Kafka producer and consumer apps running on AWS Lambda with the Glue Schema Registry, which manages and validates message schemas.
+- [How to configure Kafka consumers to seek offsets by timestamp](https://jaehyeon.me/blog/2023-01-10-kafka-consumer-seek-offsets/): Configure a Kafka consumer to seek offsets by timestamp while partitions are assigned by subscription, on a single node cluster in Docker Compose.
+- [Develop and Test Apache Spark Apps for EMR Remotely Using Visual Studio Code](https://jaehyeon.me/blog/2022-09-07-emr-remote-dev/): Develop Spark apps on an EMR cluster in a private subnet over VPN and the VS Code remote SSH extension, with the cluster shared by several users.
+- [Manage EMR on EKS with Terraform](https://jaehyeon.me/blog/2022-08-26-emr-on-eks-with-terraform/): Provision EMR on EKS with Terraform and EKS Blueprints, then compare two Spark jobs with and without Dynamic Resource Allocation under Karpenter.
+- [Revisit AWS Lambda Invoke Function Operator of Apache Airflow](https://jaehyeon.me/blog/2022-08-06-revisit-lambda-operator/): Extend the Apache Airflow Lambda invoke function operator with a correlation ID, so it reports the invocation result and the exact error message.
+- [Serverless Application Model (SAM) for Data Professionals](https://jaehyeon.me/blog/2022-07-18-sam-for-data-professionals/): Build a serverless data processing app with AWS SAM. A Lambda function runs when an S3 object is created and gets its third party packages from a layer.
+- [Data Warehousing ETL Demo with Apache Iceberg on EMR Local Environment](https://jaehyeon.me/blog/2022-06-26-iceberg-etl-demo/): Run a data warehousing ETL job with Apache Iceberg for storage and PySpark for processing in an EMR local environment, then verify results in Athena.
+- [Develop and Test Apache Spark Apps for EMR Locally Using Docker](https://jaehyeon.me/blog/2022-05-08-emr-local-dev/): Create a Spark local development environment for Amazon EMR with Docker and Visual Studio Code, with Spark examples and Glue Catalog integration.
+- [Simplify Your Development on AWS with Terraform](https://jaehyeon.me/blog/2022-02-06-dev-infra-terraform/): Manage AWS development infrastructure with Terraform, creating an Aurora PostgreSQL cluster in a private subnet reached over SoftEther VPN.
+- [EMR on EKS by Example](https://jaehyeon.me/blog/2022-01-17-emr-on-eks-by-example/): Run Spark jobs on EMR on EKS, the EMR deployment option that provisions and manages open source big data frameworks, with simple and extended examples.
+- [Local Development of AWS Glue 3.0 and Later](https://jaehyeon.me/blog/2021-11-14-glue-3-local-development/): Create a development environment for AWS Glue 3.0 and later by building a custom Docker image, because AWS publishes no image for those versions.
+- [Yet another serverless solution for invoking AWS Lambda at a sub-minute frequency](https://jaehyeon.me/blog/2021-10-13-lambda-schedule/): Schedule an AWS Lambda function more often than once a minute, using Amazon SQS to get past the one invocation per minute limit of EventBridge rules.
+- [AWS Glue Local Development with Docker and Visual Studio Code](https://jaehyeon.me/blog/2021-08-20-glue-local-development/): Build development environments for AWS Glue 1.0 and 2.0 with the published Docker image and the Visual Studio Code Remote Containers extension.
+- [Adding Authorization to a Graphql API](https://jaehyeon.me/blog/2021-07-20-graphql-api-authorization/): Add authorization to a GraphQL API with a custom directive and Oso, an open source authorization library, to control who can act on which resource.
+- [Thoughts on Apache Airflow AWS Lambda Operator](https://jaehyeon.me/blog/2020-04-13-airflow-lambda-operator/): Run frequent Apache Airflow tasks on AWS Lambda instead of Celery workers or ECS, with a custom operator modelled on the ECS operator.
+- [Dynamic Routing and Centralized Auth with Traefik, Python and R Example](https://jaehyeon.me/blog/2019-11-29-traefik-example/): Set up path-based routing with Traefik and Docker for Python and R services, then add centralized authentication with Forward Authentication.
+- [Distributed Task Queue with Python and R Example](https://jaehyeon.me/blog/2019-11-15-task-queue/): A FastAPI web service dispatches tasks to Celery and RServe workers, with Redis as broker and store, running on Docker Compose and Kubernetes.
+- [Linux Dev Environment on Windows](https://jaehyeon.me/blog/2019-11-01-linux-on-windows/): Build a Linux development environment on Windows with WSL, then run an RServe web service with a sidecar container on Minikube as the example app.
+- [AWS Local Development with LocalStack](https://jaehyeon.me/blog/2019-07-20-aws-localstack/): Develop and test AWS applications against LocalStack, a mocking framework that runs AWS services on a local machine, demonstrated with a web service.
+- [Cronicle Multi Server Setup](https://jaehyeon.me/blog/2019-07-19-cronicle-multi-server-setup/): Keep the Cronicle job scheduler running when its master server fails: a master and a backup server on Docker, behind Nginx as the load balancer.
+- [Shiny to Vue.js](https://jaehyeon.me/blog/2018-05-26-shiny-to-vue.js/): Render htmlwidgets inside a Vue.js application, then replace those widgets with native JavaScript libraries for performance async Shiny cannot reach.
+- [Async Shiny and Its Limitation](https://jaehyeon.me/blog/2018-05-19-asyn-shiny-and-its-limitation/): Implement the async feature of R Shiny and find its limits, measured against an alternative app with a JavaScript frontend and an RServe backend.
+- [Some Thoughts on Shiny Open Source - Render Multiple Pages](https://jaehyeon.me/blog/2016-06-27-shiny-open-source-render-multiple-pages/): Render multiple pages in an open source R Shiny application with htmlOutput and renderUI, including login and registration backed by a SQLite database.
+- [Some Thoughts on Shiny Open Source - Internal Load Balancing](https://jaehyeon.me/blog/2016-05-23-shiny-open-source-internal-load-balancing/): Spread users of an open source Shiny Server app across copies of the same app, by sending each new session to the copy with the fewest users.
+- [Asynchronous Processing Using Job Queue](https://jaehyeon.me/blog/2016-05-12-asynchronous-processing-using-job-queue/): Keep an R session responsive while long computations run in the background, by queuing them with the jobqueue package.
+- [Boost SparkR with Hive](https://jaehyeon.me/blog/2016-04-30-boost-sparkr-with-hive/): Run SparkR in Hive Context to reach the Hive UDFs and window functions the SQL Context lacks, compared against dplyr, plus building Spark with Hive.
+- [Quick Start SparkR in Local and Cluster Mode](https://jaehyeon.me/blog/2016-03-02-quick-start-sparkr-in-local-and-cluster-mode/): Run SparkR in local and cluster mode from an R project, setting environment variables and the library path, then reading JSON and CSV files.
+- [Spark Cluster Setup on VirtualBox](https://jaehyeon.me/blog/2016-02-22-spark-cluster-setup-on-virtualbox/): Set up a two node Spark standalone cluster on VirtualBox Ubuntu guests, covering machine preparation, copying the VDI image and password-less SSH.
+- [Quick Test to Wrap Python in R](https://jaehyeon.me/blog/2015-11-21-quick-test-to-wrap-python-in-r/): Wrap Python boto calls for Amazon S3 in an R package, rs3helper, where the Python scripts return JSON so R parses it as vectors and data frames.
+- [Some Thoughts on Python for R Users](https://jaehyeon.me/blog/2015-08-09-some-thoughts-on-python-for-r-users/): Call a SOAP web service from Python with the suds library, a job R has no comprehensive client package for, demonstrated on the Sizmek MDX API.
+- [Some Thoughts on Python](https://jaehyeon.me/blog/2015-08-08-some-thoughts-on-python/): Write Python in an object-oriented style, shown with SOAP API client classes, and a reading order for the Introducing Python book by chapter group.
+- [Setup Random Seeds on Caret Package](https://jaehyeon.me/blog/2015-05-30-setup-random-seeds-on-caret-package/): Make caret results reproducible when a model trains in parallel on Windows or Linux, by setting the random seeds caret uses.
+- [Packaging Analysis](https://jaehyeon.me/blog/2015-03-24-packaging-analysis/): Turn an analysis into an R package, with the treebgg bagging package as the worked example, covering roxygen2 documents, testthat tests and vignettes.
+- [Quick Trial of Adding Column](https://jaehyeon.me/blog/2015-01-14-quick-trial-of-adding-column/): Add overall and per-user average columns to an R data frame with base, plyr, dplyr and data.table, and time how long each of the five approaches takes.
+- [Looping without for](https://jaehyeon.me/blog/2014-12-17-looping-without-for/): Replace for-loops in R with the apply family of functions and the plyr package, using two worked examples that make the code shorter and easier to debug.
+- [Short R Examples](https://jaehyeon.me/blog/2014-12-03-short-r-examples/): Two short R examples: summarise a data frame by group, and a quick way to run a simulation.
+- [Summarise Stock Returns from Multiple Files](https://jaehyeon.me/blog/2014-11-27-summarise-stock-returns-from-multiple-files/): Produce gross returns, standard deviation and correlation for several shares in R by reading and combining multiple downloaded stock price files.
