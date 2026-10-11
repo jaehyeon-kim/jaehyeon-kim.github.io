@@ -1,0 +1,35 @@
+{{- /* llms.txt (llmstxt.org): the site, the project docs, then every post, grouped by series. */ -}}
+{{- $posts := where (where .Site.RegularPages "Type" "in" .Site.Params.mainSections) "Draft" false -}}
+# {{ .Site.Title }}
+
+> {{ .Site.Params.description }}
+
+Articles on data engineering, data streaming and machine learning, most with their code in a public repository. Posts in a series are listed in reading order; the other posts follow, newest first.
+
+## Projects
+{{ range .Site.Params.llmsProjects }}
+- [{{ .name }} documentation]({{ .url }}): {{ .description }}
+{{- end }}
+- [Projects]({{ "projects/" | absURL }}): every project with its repository and posts
+{{- range .Site.Taxonomies.series.ByCount }}
+{{- $series := where .Pages "Draft" false }}
+{{- if $series }}
+
+## {{ .Page.Title }}
+{{ range $series.ByDate }}
+- [{{ .Title }}]({{ .Permalink }}): {{ template "llms-line" . }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+## Other posts
+{{ range $posts.ByDate.Reverse }}
+{{- if not .Params.series }}
+- [{{ .Title }}]({{ .Permalink }}): {{ template "llms-line" . }}
+{{- end }}
+{{- end }}
+{{- /* One line per post: its description, or the start of its summary. Kept in this
+file, because a partial is rendered as HTML and would escape the apostrophes. */ -}}
+{{- define "llms-line" -}}
+{{- .Params.description | default .Summary | plainify | htmlUnescape | replaceRE `\s+` " " | replaceRE `^ | $` "" | truncate 300 | htmlUnescape -}}
+{{- end -}}

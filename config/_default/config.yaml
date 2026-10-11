@@ -49,6 +49,9 @@ outputs:
   home:
     - HTML
     - RSS
+    # llms.txt at the site root, an index of the posts for AI assistants
+    # (llmstxt.org). Built by layouts/index.llms.txt.
+    - llms
   section:
     - HTML
     - RSS
@@ -65,6 +68,11 @@ outputs:
 #       - RSS
 
 outputFormats:
+  llms:
+    mediaType: "text/plain"
+    baseName: "llms"
+    isPlainText: true
+    notAlternative: true
   RSS:
     mediaType: "application/rss+xml"
     baseName: "index"

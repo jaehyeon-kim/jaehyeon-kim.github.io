@@ -7,6 +7,14 @@ mainSections:
 # titleSeparator: '|' # Title separator. Default to -.
 
 description: Data Engineer | Data Streaming | Powering ML & AI in Real Time
+# Project documentation sites, listed first in llms.txt (layouts/index.llms.txt).
+llmsProjects:
+  - name: dynamic-des
+    url: https://jaehyeon.me/dynamic-des/latest/
+    description: realistic event streams from a SimPy simulation you can steer while it runs, written to Kafka, Redis, PostgreSQL, Parquet, JSONL and Iceberg
+  - name: odctl
+    url: https://jaehyeon.me/odctl/
+    description: a command-line tool that runs an open-source data platform on a laptop, with Kafka, Flink, Spark, Iceberg, Trino, Airflow and MLflow wired together
 keywords: Real-time Analytics, Data Engineering, Data Streaming, Machine Learning, Artificial Intelligence, Data Architecture, Apache Kafka, Apache Flink, Apache Spark
 images:
   - site-feature-image.png

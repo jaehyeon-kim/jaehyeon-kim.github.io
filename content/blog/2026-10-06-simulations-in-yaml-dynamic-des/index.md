@@ -29,6 +29,14 @@ A pipeline is easier to test when its input behaves like production: orders arri
 
 <!--more-->
 
+[**Update 2026-10-11**] dynamic-des 0.17.0 changes some of what this post describes:
+
+* **Examples download with `ddes`.** `ddes examples get local --api yaml` downloads an example at the release you have installed, in place of the `curl` line below. Every example now exists as YAML, declarative and low-level code.
+* **Reorganised documentation.** [First Simulation](https://jaehyeon.me/dynamic-des/latest/tutorials/first-simulation/) replaces the three tutorials, with the YAML, declarative and low-level code in tabs at each step, and a new section, [How Simulation Works](https://jaehyeon.me/dynamic-des/latest/des/how-it-works/), explains discrete-event simulation, the building blocks of a model, and queues and capacity. The links to the old tutorials below lead to First Simulation.
+* **Parameters are checked.** A distribution parameter out of range is refused when the blueprint loads, with its line, and when it changes during a run. An unknown `dist` name is refused instead of running with a default. Two distributions are new: `truncated_normal` and `constant`.
+* **Capacity drops are exact.** Lowering a resource's capacity while it is busy no longer lets one more task start.
+* **Two smaller fixes.** A NaN or infinity inside a Pydantic model is now written as `null`, as it already was in a plain payload. The Kafka connectors no longer leave a client open each time they fail to reach the broker.
+
 The project started as a way to change a running SimPy model from Kafka ([Building an Event-Driven Hybrid Digital Twin with dynamic-des](/blog/2026-04-28-digital-twin-dynamic-des/)). It then learned to write Parquet for model training ([One Simulation, Two Pipelines](/blog/2026-05-25-dynamic-des-parquet-support/)) and gained a declarative Python API with PostgreSQL and Redis connectors ([A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors/)). This release removes the need for Python in most simulations.
 
 ## A Complete Blueprint
