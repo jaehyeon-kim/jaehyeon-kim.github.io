@@ -1,0 +1,4 @@
+User-agent: *
+Sitemap: {{ "sitemap.xml" | absURL }}
+Sitemap: {{ "dynamic-des/latest/sitemap.xml" | absURL }}
+Sitemap: {{ "odctl/latest/sitemap.xml" | absURL }}
