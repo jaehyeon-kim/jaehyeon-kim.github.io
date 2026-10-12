@@ -1,2 +1,4 @@
 User-agent: *
 Sitemap: https://jaehyeon.me/sitemap.xml
+Sitemap: https://jaehyeon.me/dynamic-des/latest/sitemap.xml
+Sitemap: https://jaehyeon.me/odctl/latest/sitemap.xml
