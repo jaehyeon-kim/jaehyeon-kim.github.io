@@ -2157,7 +2157,7 @@ Calculating the exact Rolling Force required to crush the steel is critical.</de
 &lt;h3 id="scalable-inference-logic" data-numberify>Scalable Inference Logic&lt;a class="anchor ms-1" href="#scalable-inference-logic" aria-label="Link to this section: Scalable Inference Logic">&lt;/a>&lt;/h3>
 &lt;p>The Python client (&lt;a href="https://github.com/jaehyeon-kim/benchtop/blob/main/product-recommender/recommender/run/live.py" target="_blank" rel="noopener noreferrer">&lt;code>recommender/run/live.py&lt;/code>&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>) is responsible for ranking items. It uses the &lt;strong>Upper Confidence Bound (UCB)&lt;/strong> formula to balance exploiting known good items and exploring uncertain ones.&lt;/p>
 &lt;p>For a given user context vector $x$ and product $a$, the score is calculated as:&lt;/p>
-&lt;p>$$ \text{Score}_a = x^T \theta_a + \alpha \sqrt{x^T A_a^{-1} x}, \quad \text{where } \theta_a = A_a^{-1} b_a $$&lt;/p>
+&lt;p>$$ \text{Score}&lt;em>a = \underbrace{x^T \theta_a}&lt;/em>{\text{exploitation}} + \underbrace{\alpha \sqrt{x^T A_a^{-1} x}}_{\text{exploration}}, \quad \text{where } \theta_a = A_a^{-1} b_a $$&lt;/p>
 &lt;p>&lt;strong>Prediction ($x^T \theta_a$)&lt;/strong>&lt;br>
 This is the standard Linear Regression prediction. It asks: &lt;em>&amp;ldquo;Based on historical data, what reward should we expect from this user?&amp;rdquo;&lt;/em> It is a linear estimate, not a probability. If the user matches features stored in vector $b$ (features that previously led to clicks), this term is high.&lt;/p>
 &lt;p>&lt;strong>Exploration ($\alpha \sqrt{x^T A_a^{-1} x}$)&lt;/strong>&lt;/p>
