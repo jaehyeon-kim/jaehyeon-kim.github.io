@@ -2124,7 +2124,7 @@ Calculating the exact Rolling Force required to crush the steel is critical.</de
 &lt;p>&lt;strong>📂 Source Code for the Post&lt;/strong>&lt;/p>
 &lt;p>The source code for this post is available in the &lt;strong>product-recommender&lt;/strong> folder of the &lt;a href="https://github.com/jaehyeon-kim/benchtop" target="_blank" rel="noopener noreferrer">benchtop&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a> GitHub repository. It is one of the &lt;a href="https://jaehyeon.me/blog/2026-09-30-introducing-benchtop/">Benchtop&lt;/a> projects, which run locally from a fresh clone.&lt;/p>
 &lt;/blockquote>
-&lt;p>&lt;figure class="figure mx-auto d-block">&lt;picture>&lt;img class="img-fluid figure-img" alt="The live client sends feedback to Kafka, the Flink job trains the models from it and from the history in SeaweedFS, and writes them to Valkey for the client to read" src="https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/part-2.png" loading="lazy" title="Architecture" width="1565" height="948" />
+&lt;p>&lt;figure class="figure mx-auto d-block">&lt;picture>&lt;img class="img-fluid figure-img" alt="The Flink job trains the models on the history in SeaweedFS first, then on the feedback the live client sends to Kafka, and writes them to Valkey for the client to read" src="https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/part-2.png" loading="lazy" title="Architecture" width="1595" height="948" />
 &lt;/picture>&lt;figcaption class="figure-caption">Architecture&lt;/figcaption>
 &lt;/figure>
 
@@ -2317,7 +2317,7 @@ This is the standard Linear Regression prediction. It asks: &lt;em>&amp;ldquo;Ba
 &lt;h3 id="data-streaming-opportunity" data-numberify>Data Streaming Opportunity&lt;a class="anchor ms-1" href="#data-streaming-opportunity" aria-label="Link to this section: Data Streaming Opportunity">&lt;/a>&lt;/h3>
 &lt;p>CMAB performs well in &lt;strong>data streaming environments&lt;/strong>. Integrated with platforms like &lt;strong>Kafka&lt;/strong> and &lt;strong>Flink&lt;/strong>, it learns directly from event streams, creating a feedback loop that responds to trends and shifts in user intent in sub-seconds.&lt;/p>
 &lt;p>In this series, &lt;strong>Part 1&lt;/strong> (&lt;em>this post&lt;/em>) builds a complete &lt;strong>Python prototype&lt;/strong> to validate the algorithm and simulate user behavior. &lt;a href="https://jaehyeon.me/blog/2026-02-23-productionize-recommender-with-eda/">&lt;strong>Part 2&lt;/strong>&lt;/a> will scale this to a distributed, event-driven architecture.&lt;/p>
-&lt;p>&lt;figure class="figure mx-auto d-block">&lt;picture>&lt;img class="img-fluid figure-img" alt="Data preparation writes the data folder, which the offline policy evaluation and the local simulation read" src="https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/part-1.png" loading="lazy" title="Architecture" width="1563" height="528" />
+&lt;p>&lt;figure class="figure mx-auto d-block">&lt;picture>&lt;img class="img-fluid figure-img" alt="Data generation, feature engineering and history simulation build the history; the offline policy evaluation selects LinUCB, which the local simulation trains on the history and then runs" src="https://jaehyeon.me/blog/2026-01-29-prototype-recommender-with-python/part-1.png" loading="lazy" title="Architecture" width="1685" height="614" />
 &lt;/picture>&lt;figcaption class="figure-caption">Architecture&lt;/figcaption>
 &lt;/figure>
 
