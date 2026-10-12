@@ -29,13 +29,14 @@ A pipeline is easier to test when its input behaves like production: orders arri
 
 <!--more-->
 
-[**Update 2026-10-11**] dynamic-des 0.17.0 changes some of what this post describes:
+[**Update 2026-10-13**] dynamic-des 0.17.0 and 0.18.0 change some of what this post describes:
 
-* **Examples download with `ddes`.** `ddes examples get local --api yaml` downloads an example at the release you have installed, in place of the `curl` line below. Every example now exists as YAML, declarative and low-level code.
-* **Reorganised documentation.** [First Simulation](https://jaehyeon.me/dynamic-des/latest/tutorials/first-simulation/) replaces the three tutorials, with the YAML, declarative and low-level code in tabs at each step, and a new section, [How Simulation Works](https://jaehyeon.me/dynamic-des/latest/des/how-it-works/), explains discrete-event simulation, the building blocks of a model, and queues and capacity. The links to the old tutorials below lead to First Simulation.
+* **Examples download with `ddes`.** `ddes examples get local --api yaml` downloads an example at the release you have installed, in place of the `curl` line below. Every example now exists as YAML, builder and low-level code.
+* **Reorganised documentation.** [First Simulation](https://jaehyeon.me/dynamic-des/latest/tutorials/first-simulation/) replaces the three tutorials, with the YAML, builder and low-level code in tabs at each step, and a new section, [How Simulation Works](https://jaehyeon.me/dynamic-des/latest/des/how-it-works/), explains discrete-event simulation, the building blocks of a model, and queues and capacity. The links to the old tutorials below lead to First Simulation.
 * **Parameters are checked.** A distribution parameter out of range is refused when the blueprint loads, with its line, and when it changes during a run. An unknown `dist` name is refused instead of running with a default. Two distributions are new: `truncated_normal` and `constant`.
 * **Capacity drops are exact.** Lowering a resource's capacity while it is busy no longer lets one more task start.
 * **Two smaller fixes.** A NaN or infinity inside a Pydantic model is now written as `null`, as it already was in a plain payload. The Kafka connectors no longer leave a client open each time they fail to reach the broker.
+* **API names (0.18.0).** The declarative API is now called the Builder API, and the example folders were renamed to match: `examples/declarative/` is now `examples/builder/`, `examples/imperative/` is now `examples/low-level/`, and `ddes examples get` takes `--api yaml`, `--api builder` or `--api low-level`. Nothing changes in the Python API itself.
 
 The project started as a way to change a running SimPy model from Kafka ([Building an Event-Driven Hybrid Digital Twin with dynamic-des](/blog/2026-04-28-digital-twin-dynamic-des/)). It then learned to write Parquet for model training ([One Simulation, Two Pipelines](/blog/2026-05-25-dynamic-des-parquet-support/)) and gained a declarative Python API with PostgreSQL and Redis connectors ([A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors/)). This release removes the need for Python in most simulations.
 
@@ -99,7 +100,7 @@ The file is checked before the run starts. An unknown key, a task that names a m
 
 ## What a Blueprint Can Express
 
-Each section of a blueprint maps to one call of the declarative API. Beyond the sections above, a blueprint supports:
+Each section of a blueprint maps to one call of the builder API. Beyond the sections above, a blueprint supports:
 
 * **Environment variables.** `${VAR}` and `${VAR:-default}` are replaced in string values, with a default when a variable is not set. The same file then runs on your machine and in a test pipeline, with no edits.
 * **Relative times.** `logical_start_time` and `go_live_at` take `now` or a signed duration such as `-10m`.
@@ -149,7 +150,7 @@ processes:
 A simulation can now be written in three ways, and all three build the same parameters and run on the same environment:
 
 * **Low-level API:** `DynamicRealtimeEnvironment` used directly, with SimPy processes you write yourself.
-* **Declarative API:** the `SimulationContext` builder and its decorators.
+* **Builder API:** the `SimulationContext` builder and its decorators.
 * **YAML blueprint:** the file above, run with `ddes`.
 
 The registry paths, the records and the connectors are the same whichever you choose, so a team can start in YAML and move one part to Python when it needs to.
@@ -158,9 +159,9 @@ The registry paths, the records and the connectors are the same whichever you ch
 
 The [documentation](https://jaehyeon.me/dynamic-des/) was reorganised around those three ways:
 
-* **Tutorials in three parts.** One small factory is built three times: [with the low-level API](https://jaehyeon.me/dynamic-des/latest/tutorials/low-level/), [with the declarative API](https://jaehyeon.me/dynamic-des/latest/tutorials/declarative/) and [as a YAML blueprint](https://jaehyeon.me/dynamic-des/latest/tutorials/yaml/).
+* **Tutorials in three parts.** One small factory is built three times: [with the low-level API](https://jaehyeon.me/dynamic-des/latest/tutorials/low-level/), [with the builder API](https://jaehyeon.me/dynamic-des/latest/tutorials/declarative/) and [as a YAML blueprint](https://jaehyeon.me/dynamic-des/latest/tutorials/yaml/).
 * **Core Architecture in two groups.** Writing a simulation has a page per way, starting from the [overview](https://jaehyeon.me/dynamic-des/latest/architecture/overview/). The runtime pages cover the environment, the [registry and live parameters](https://jaehyeon.me/dynamic-des/latest/architecture/registry/), time, resources, connectors, records and batching.
-* **Examples with a tab per way.** Each example page shows its versions side by side in tabs, low-level, declarative and YAML where all three exist, starting with the [local example](https://jaehyeon.me/dynamic-des/latest/examples/local/).
+* **Examples with a tab per way.** Each example page shows its versions side by side in tabs, low-level, builder and YAML where all three exist, starting with the [local example](https://jaehyeon.me/dynamic-des/latest/examples/local/).
 * **Guides grouped by topic.** Connectors, features such as [backfill then live](https://jaehyeon.me/dynamic-des/latest/guides/backfill-then-live/), and YAML, from [a first blueprint to connectors](https://jaehyeon.me/dynamic-des/latest/guides/yaml-blueprints/) to [custom logic with `!python`](https://jaehyeon.me/dynamic-des/latest/guides/yaml-advanced/). Modelling patterns such as preemptive breakdowns moved into an Advanced section.
 
 ## Other Changes in This Release
