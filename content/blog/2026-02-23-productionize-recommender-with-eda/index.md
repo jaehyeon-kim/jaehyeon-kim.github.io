@@ -86,7 +86,7 @@ The Python client ([`recommender/run/live.py`](https://github.com/jaehyeon-kim/b
 
 For a given user context vector $x$ and product $a$, the score is calculated as:
 
-$$ \text{Score}_a = x^T \theta_a + \alpha \sqrt{x^T A_a^{-1} x}, \quad \text{where } \theta_a = A_a^{-1} b_a $$
+$$ \text{Score}_a = \underbrace{x^T \theta_a}_{\text{exploitation}} + \underbrace{\alpha \sqrt{x^T A_a^{-1} x}}_{\text{exploration}}, \quad \text{where } \theta_a = A_a^{-1} b_a $$
 
 **Prediction ($x^T \theta_a$)**  
 This is the standard Linear Regression prediction. It asks: *"Based on historical data, what reward should we expect from this user?"* It is a linear estimate, not a probability. If the user matches features stored in vector $b$ (features that previously led to clicks), this term is high.
