@@ -44,7 +44,7 @@ To move from prototype to production, we split the application into two distinct
 > 
 > The source code for this post is available in the **product-recommender** folder of the [benchtop](https://github.com/jaehyeon-kim/benchtop) GitHub repository. It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.  
 
-![The live client sends feedback to Kafka, the Flink job trains the models from it and from the history in SeaweedFS, and writes them to Valkey for the client to read](part-2.png#center "Architecture")
+![The Flink job trains the models on the history in SeaweedFS first, then on the feedback the live client sends to Kafka, and writes them to Valkey for the client to read](part-2.png#center "Architecture")
 
 ## Flink Application Design
 

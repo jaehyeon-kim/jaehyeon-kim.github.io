@@ -47,7 +47,7 @@ CMAB performs well in **data streaming environments**. Integrated with platforms
 
 In this series, **Part 1** (*this post*) builds a complete **Python prototype** to validate the algorithm and simulate user behavior. [**Part 2**](/blog/2026-02-23-productionize-recommender-with-eda/) will scale this to a distributed, event-driven architecture.
 
-![Data preparation writes the data folder, which the offline policy evaluation and the local simulation read](part-1.png#center "Architecture")
+![Data generation, feature engineering and history simulation build the history; the offline policy evaluation selects LinUCB, which the local simulation trains on the history and then runs](part-1.png#center "Architecture")
 
 ## Tech Stack
 
