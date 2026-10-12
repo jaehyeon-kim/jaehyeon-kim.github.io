@@ -19,6 +19,7 @@ tags:
   - Mab2Rec
   - Benchtop
 description: A Python prototype of a contextual multi-armed bandit recommender that simulates user behaviour and validates the algorithm against cold-start users.
+math: true # This post renders maths, so it needs the KaTeX bundle.
 ---
 
 ## Overview
@@ -256,6 +257,8 @@ The main dataset (`training_log.csv`) combines *user features*, *dynamic context
 | 3        | 0.6296296 | ... | 1                     | 0          | 0          | 1          | 34         | 0        |
 | 4        | 0.4814815 | ... | 0                     | 0          | 0          | 1          | 101        | 0        |
 
+The user's 10 features and the 5 time flags, 15 numbers in all, are the **context vector** $x$ that the bandit sees for a visit. The product features are not part of it: the bandit keeps a separate model for each product instead, and only the Oracle reads the product features.
+
 ## Offline Policy Evaluation
 
 We benchmarked several policies using `Mab2Rec` on the 10,000 historical events.
@@ -266,7 +269,7 @@ We benchmarked several policies using `Mab2Rec` on the 10,000 historical events.
 *   **Popularity:** Recommends items drawn at random, each weighted by its *global* click rate.
     *   *Result:* Mediocre (AUC ~0.59). While better than random, it still fails to capture specific rules, such as "Morning Coffee" vs. "Weekend Pizza."
 *   **LinGreedy:** Disjoint Linear Regression with $\epsilon$-greedy exploration.
-*   **LinUCB (The Winner):** Disjoint Linear Regression with **Upper Confidence Bound**.
+*   **LinUCB (The Winner):** a separate (disjoint) linear regression for each product, with an **Upper Confidence Bound**.
 *   **LinTS (Thompson Sampling):** Bayesian regression that samples from a probability distribution.
 
 ### Winner: LinUCB
@@ -277,8 +280,8 @@ While **LinGreedy** achieved the highest theoretical ranking accuracy (AUC ~0.88
 
 This algorithm excels because it balances two competing goals:
 
-1.  **Exploitation:** It uses the predicted probability of a click ($x^T \theta$) to find good items.
-2.  **Exploration:** It adds a confidence interval ($\alpha \sqrt{x^T A^{-1} x}$) to the score. If the model is uncertain about a specific context (e.g., "I haven't seen a user drink Coffee at 8 PM before"), the interval widens, boosting the score and forcing the model to test that hypothesis.
+1.  **Exploitation:** It uses the predicted reward, $x^T \theta$, to find good items. $\theta = A^{-1} b$ holds the weights the model has learned, where $A$ records the contexts a product was shown in and $b$ the contexts it was clicked in.
+2.  **Exploration:** It adds an upper confidence bound, $\alpha \sqrt{x^T A^{-1} x}$, to the score. If the model is uncertain about a specific context (e.g., "I haven't seen a user drink Coffee at 8 PM before"), the bound grows, boosting the score and forcing the model to test that hypothesis. $\alpha$ is a hyperparameter that sets how much exploration counts; it is 1.0 here.
 
 This allows LinUCB to discover high-value opportunities that the conservative LinGreedy model misses.
 
@@ -312,7 +315,7 @@ Four of LinUCB's test visits:
 | 8003 | weekend evening | Dim Sims | yes | no | skipped |
 | 8024 | weekday morning | Strawberry Milkshake | yes | no | skipped |
 
-On weekend evenings LinUCB's five are mostly pizzas, and on weekday mornings they include coffees, as the hidden click formula rewards. Visit 8003 was clicked, but it does not count, because LinUCB would not have shown Dim Sims. Across the 2,000 test visits, 44 are kept and 9 of those were clicked, so LinUCB's `CTR(score)@5` is 9 / 44 = 20.5%.
+On weekend evenings LinUCB's five are mostly pizzas, and on weekday mornings they include coffees, as the Oracle rewards. Visit 8003 was clicked, but it does not count, because LinUCB would not have shown Dim Sims. Across the 2,000 test visits, 44 are kept and 9 of those were clicked, so LinUCB's `CTR(score)@5` is 9 / 44 = 20.5%.
 
 So the 20.5% is the click rate of LinUCB's own choices, measured on the visits where the random history happened to show one of them. The other policies' click rates rest on 39 to 52 kept visits each. With so few, a difference of a few points can come from chance, and a longer history would make the comparison more certain.
 
@@ -332,7 +335,7 @@ We simulate a sequence of user visits:
 2.  **Contextualize:** Inject a simulated timestamp (e.g., varying between Mon 08:00 AM and Sat 09:00 PM). This is the key "Context" the model must react to.
 3.  **Recommend:** LinUCB calculates scores for all 200 products and returns the Top 5.
 4.  **Reaction:** The `will_click` Oracle decides if the user clicks.
-5.  **Online Update:** We call `model.partial_fit()`. **This updates the matrices ($A$ and $b$) instantly.** The very next recommendation will reflect this new learning.
+5.  **Online Update:** We call `model.partial_fit()`. **This updates the product's matrix $A$ and vector $b$ instantly.** The very next recommendation will reflect this new learning.
 
 Here is a sample of 30 recommendation records from the local simulation.
 

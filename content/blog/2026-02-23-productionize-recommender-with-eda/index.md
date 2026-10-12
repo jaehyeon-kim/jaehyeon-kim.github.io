@@ -56,17 +56,17 @@ The core challenge in distributed online learning is managing state. The [`LinUC
 
 ❗The matrices are used to calculate scores for making recommendations.
 
-For each `product_id`, Flink maintains two pieces of state in RocksDB:
+Each feedback event carries the visit's context vector $x$: $d = 15$ numbers, the user's 10 features and the 5 time flags from *Part 1*. For each `product_id`, Flink maintains two pieces of state in RocksDB:
 
-1.  **Matrix $A$ ($d \times d$):** Represents the covariance of features seen so far. It tracks **Exposure**, recording how many times specific user contexts (e.g., "Morning Users" or "Weekend Users") have been seen for a specific product.
-2.  **Vector $b$ ($d \times 1$):** Represents the accumulated reward. It tracks **Success**, recording which features actually led to a click.
+1.  **Matrix $A_a$ ($d \times d$):** The sum of $x x^T$ over the contexts product $a$ was shown in, plus $\lambda I$. It tracks **Exposure**, recording how many times specific user contexts (e.g., "Morning Users" or "Weekend Users") have been seen for a specific product.
+2.  **Vector $b_a$ ($d \times 1$):** The sum of $r x$, the accumulated reward. It tracks **Success**, recording which features actually led to a click.
 
-The matrix $A$ is initialized as a scaled identity matrix $A_0 = \lambda I$ to ensure invertibility and to encode an initial prior of uniform uncertainty across feature dimensions.
+The matrix $A$ is initialized as a scaled identity matrix $A_0 = \lambda I$, with $\lambda = 1$, to ensure invertibility and to encode an initial prior of uniform uncertainty across feature dimensions.
 
-When a feedback event arrives (Context $x$, Reward $r$), Flink performs the updates:
+When a feedback event arrives for product $a$ (context $x$, reward $r$: 1 for a click, 0 for none), Flink performs the updates:
 
-*   **Update A:** $A \leftarrow A + x x^T$. The outer product $x x^T$ increases covariance along the observed feature directions. As similar contexts repeat, $A$ grows in those directions, reflecting increased confidence.
-*   **Update b:** $b \leftarrow b + r x$. If the user clicked ($r=1$), we add their feature vector to $b$, reinforcing that preference pattern.
+*   **Update A:** $A_a \leftarrow A_a + x x^T$. The outer product $x x^T$ makes $A_a$ larger along the observed feature directions. As similar contexts repeat, $A$ grows in those directions, reflecting increased confidence.
+*   **Update b:** $b_a \leftarrow b_a + r x$. If the user clicked ($r=1$), we add their feature vector to $b$, reinforcing that preference pattern.
 
 The updated $A$ and $b$ are stored immediately in **Flink keyed state (backed by RocksDB)**. With checkpointing enabled, this state is durably persisted and recovered in case of failure.
 
@@ -89,7 +89,7 @@ For a given user context vector $x$ and product $a$, the score is calculated as:
 $$ \text{Score}_a = x^T \theta_a + \alpha \sqrt{x^T A_a^{-1} x}, \quad \text{where } \theta_a = A_a^{-1} b_a $$
 
 **Prediction ($x^T \theta_a$)**  
-This is the standard Linear Regression prediction. It asks: *"Based on historical data, how likely is this user to click?"* If the user matches features stored in vector $b$ (features that previously led to clicks), this term is high.
+This is the standard Linear Regression prediction. It asks: *"Based on historical data, what reward should we expect from this user?"* It is a linear estimate, not a probability. If the user matches features stored in vector $b$ (features that previously led to clicks), this term is high.
 
 **Exploration ($\alpha \sqrt{x^T A_a^{-1} x}$)**  
 *    **Familiar User:** If we have seen this user type many times, the matrix $A$ accumulates repeated contributions of $x x^T$. This increases the magnitude of $A$ in those feature directions. Because the exploration term depends on $x^T A^{-1} x$, a larger $A$ leads to a smaller quadratic form, shrinking the confidence bound. The model therefore relies more on exploitation.

@@ -125,8 +125,9 @@ $$ \text{Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{+}} \color
 
 <div style="margin-top: 20px; font-size: 0.8em;">
 
+- **$x$**: the visit's context, 15 numbers: the user's features and the time of the visit.
 - <span style="color: cyan;">●</span> **Exploitation:** Predicted reward ($x^T \theta_a$).
-- <span style="color: orange;">●</span> **Exploration:** Uncertainty bonus (UCB).
+- <span style="color: orange;">●</span> **Exploration:** Uncertainty bonus (UCB), scaled by the hyperparameter $\alpha$.
 - **$\theta_a = A_a^{-1} b_a$**: **Model weights** estimated via Ridge Regression.
 
 </div>
@@ -169,7 +170,7 @@ $$ \text{LinUCB: Score}_a = \color{cyan}{x^T \theta_a} \mathbin{\color{white}{+}
   - Flink acts as "Online Memory".
 - **Asynchronous Updates:** 
   - **Fast Path:** Updates $A$ and $b$.
-    - ($A \leftarrow A + x x^T, b \leftarrow b + r x$)
+    - ($A_a \leftarrow A_a + x x^T, b_a \leftarrow b_a + r x$, reward $r$ = 1 for a click, 0 otherwise)
   - **Slow Path:** Every 5s, computes $A^{-1}$.
 - **Sync to Valkey:** Emits $A^{-1}$ and $b$.
     </div>
