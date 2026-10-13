@@ -16,6 +16,8 @@ tags:
   - Python
   - gRPC
 description: Batching gRPC calls in a stateless DoFn so one request covers a whole bundle, cutting the time a Beam Python pipeline spends on enrichment.
+aliases:
+  - /blog/2024-09-25-beam-examples-5/
 ---
 
 We enhance the pipeline so that a single RPC call is made for a bundle of elements, which can save a significant amount time compared to making a call for each element. In the [previous post](/blog/2024-08-15-beam-examples-4/), we developed an Apache Beam pipeline where the input data is augmented by a **Remote Procedure Call (RPC)** service. Each input element performs an RPC call and the output is enriched by the response. This is not an efficient way of accessing an external service provided that the service can accept more than one element.

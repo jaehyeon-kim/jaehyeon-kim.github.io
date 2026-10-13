@@ -17,6 +17,8 @@ tags:
   - LocalStack
   - Python
 description: Develop and test AWS applications against LocalStack, a mocking framework that runs AWS services on a local machine, demonstrated with a web service.
+aliases:
+  - /blog/2019-07-20-AWS-Local-Development-with-LocalStack/
 ---
 
 [LocalStack](https://github.com/localstack/localstack) provides an easy-to-use test/mocking framework for developing AWS applications. In this post, I'll demonstrate how to utilize LocalStack for development using a web service.
