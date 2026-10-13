@@ -2844,14 +2844,14 @@ This is the standard Linear Regression prediction. It asks: &lt;em>&amp;ldquo;Ba
 &lt;/ul>
 
 &lt;h3 id="winner-linucb" data-numberify>Winner: LinUCB&lt;a class="anchor ms-1" href="#winner-linucb" aria-label="Link to this section: Winner: LinUCB">&lt;/a>&lt;/h3>
-&lt;p>While &lt;strong>LinGreedy&lt;/strong> achieved the highest theoretical ranking accuracy (AUC ~0.88), it suffered from a low click rate (CTR ~11%) because it exploited &amp;ldquo;safe&amp;rdquo; choices too early.&lt;/p>
-&lt;p>&lt;strong>LinUCB&lt;/strong> is the practical winner. It achieved a comparable ranking accuracy (&lt;strong>AUC ~0.86&lt;/strong>) but nearly &lt;strong>double the engagement (CTR ~20.5%)&lt;/strong> to &lt;strong>LinGreedy&lt;/strong>.&lt;/p>
+&lt;p>&lt;strong>LinGreedy&lt;/strong> achieved the highest ranking accuracy (AUC ~0.88). Its click rate (CTR ~11%) rests on only about 50 test visits, so it is close to LinUCB rather than behind it.&lt;/p>
+&lt;p>&lt;strong>LinUCB&lt;/strong> is the practical winner. It ranks almost as well (&lt;strong>AUC ~0.86&lt;/strong>), and its picks are clicked about twice as often as random picks (&lt;strong>CTR ~20.5%&lt;/strong> against 10.2%).&lt;/p>
 &lt;p>This algorithm excels because it balances two competing goals:&lt;/p>
 &lt;ol>
 &lt;li>&lt;strong>Exploitation:&lt;/strong> It uses the predicted reward, $x^T \theta$, to find good items. $\theta = A^{-1} b$ holds the weights the model has learned, where $A$ records the contexts a product was shown in and $b$ the contexts it was clicked in.&lt;/li>
 &lt;li>&lt;strong>Exploration:&lt;/strong> It adds an upper confidence bound, $\alpha \sqrt{x^T A^{-1} x}$, to the score. If the model is uncertain about a specific context (e.g., &amp;ldquo;I haven&amp;rsquo;t seen a user drink Coffee at 8 PM before&amp;rdquo;), the bound grows, boosting the score and forcing the model to test that hypothesis. $\alpha$ is a hyperparameter that sets how much exploration counts; it is 1.0 here.&lt;/li>
 &lt;/ol>
-&lt;p>This allows LinUCB to discover high-value opportunities that the conservative LinGreedy model misses.&lt;/p>
+&lt;p>So LinUCB tries the products it knows least about, while LinGreedy explores by picking at random on one visit in ten.&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="ln"> 1&lt;/span>&lt;span class="cl">&lt;span class="o">(&lt;/span>venv&lt;span class="o">)&lt;/span> $ python -m recommender.run.evaluate
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 2&lt;/span>&lt;span class="cl">Running Benchmark... &lt;span class="o">(&lt;/span>This trains and scores all models automatically&lt;span class="o">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 3&lt;/span>&lt;span class="cl">--------------------------------------------------------------------------------
