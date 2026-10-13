@@ -29,7 +29,7 @@ A pipeline is easier to test when its input behaves like production: orders arri
 
 <!--more-->
 
-[**Update 2026-10-13**] dynamic-des 0.17.0 and 0.18.0 change some of what this post describes:
+[**Update 2026-10-13**] dynamic-des 0.17.0, 0.18.0 and 0.19.0 change some of what this post describes:
 
 * **Examples download with `ddes`.** `ddes examples get local --api yaml` downloads an example at the release you have installed, in place of the `curl` line below. Every example now exists as YAML, builder and low-level code.
 * **Reorganised documentation.** [First Simulation](https://jaehyeon.me/dynamic-des/latest/tutorials/first-simulation/) replaces the three tutorials, with the YAML, builder and low-level code in tabs at each step, and a new section, [How Simulation Works](https://jaehyeon.me/dynamic-des/latest/des/how-it-works/), explains discrete-event simulation, the building blocks of a model, and queues and capacity. The links to the old tutorials below lead to First Simulation.
@@ -37,6 +37,7 @@ A pipeline is easier to test when its input behaves like production: orders arri
 * **Capacity drops are exact.** Lowering a resource's capacity while it is busy no longer lets one more task start.
 * **Two smaller fixes.** A NaN or infinity inside a Pydantic model is now written as `null`, as it already was in a plain payload. The Kafka connectors no longer leave a client open each time they fail to reach the broker.
 * **API names (0.18.0).** The declarative API is now called the Builder API, and the example folders were renamed to match: `examples/declarative/` is now `examples/builder/`, `examples/imperative/` is now `examples/low-level/`, and `ddes examples get` takes `--api yaml`, `--api builder` or `--api low-level`. Nothing changes in the Python API itself.
+* **An online shop (0.19.0).** Every example now models an online shop: orders arrive, packers are the resource and packing is the service, with `sim_id: Shop`. The blueprints below are the 0.19.0 files, and the three versions of each example publish the same records.
 
 The project started as a way to change a running SimPy model from Kafka ([Building an Event-Driven Hybrid Digital Twin with dynamic-des](/blog/2026-04-28-digital-twin-dynamic-des/)). It then learned to write Parquet for model training ([One Simulation, Two Pipelines](/blog/2026-05-25-dynamic-des-parquet-support/)) and gained a declarative Python API with PostgreSQL and Redis connectors ([A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors/)). This release removes the need for Python in most simulations.
 
@@ -46,39 +47,47 @@ This file is `examples/yaml/local.yaml`. It needs no containers and prints event
 
 ```yaml
 simulation:
-  sim_id: Factory_A
+  sim_id: Shop
   factor: 1.0
+  random_seed: 42
 
 egress:
   - type: Console
 
 resources:
-  lathe: {current_cap: 2, max_cap: 5}
+  packers: {current_cap: 1, max_cap: 5}
 
 services:
-  milling: {dist: normal, mean: 3.0, std: 0.5}
+  packing: {dist: normal, mean: 3.0, std: 0.5}
 
 arrivals:
-  # Each arrival spawns one process_part task.
-  standard: {dist: exponential, rate: 1.0, spawn: process_part}
+  # Each order spawns one pack_order task.
+  orders: {dist: exponential, rate: 1.0, spawn: pack_order}
 
 tasks:
-  process_part:
-    service: milling
-    resource: lathe
-    # The value of the task's finished event. id_field adds the task id as part_id.
-    payload: {event_type: part_produced, quality: A}
-    id_field: part_id
+  pack_order:
+    service: packing
+    resource: packers
+    # The value of the task's finished event. id_field adds the task id as order_id.
+    payload: {event_type: order_packed, shipping: standard}
+    id_field: order_id
 
 telemetry:
-  # Samples the lathe every 2 simulation seconds.
+  # Samples the packers every 2 simulation seconds.
   - interval: 2.0
     publish:
-      utilization: lathe.utilization
-      queue_length: lathe.queue_length
+      packers.capacity: packers.capacity
+      packers.in_use: packers.in_use
+      packers.queue_length: packers.queue_length
+      packers.utilization: packers.utilization
+
+scenario:
+  # Three packers from 10 seconds, then two from 20 seconds.
+  - {at: 10, path: Shop.resources.packers.current_cap, value: 3}
+  - {at: 20, path: Shop.resources.packers.current_cap, value: 2}
 
 run:
-  until: 60
+  until: 30
 ```
 
 Install the package from [PyPI](https://pypi.org/project/dynamic-des/), download the file and run it:
@@ -89,7 +98,7 @@ curl -O https://raw.githubusercontent.com/jaehyeon-kim/dynamic-des/main/examples
 ddes run local.yaml
 
 # Override run.until, in seconds or as a duration such as "2 min"
-ddes run local.yaml --until 30
+ddes run local.yaml --until 10
 ```
 
 ![Downloading local.yaml, printing it and running it with ddes, with events and telemetry streaming until the run is stopped](local-yaml-run.gif)
@@ -113,7 +122,7 @@ This excerpt from `examples/yaml/backfill_live.yaml` uses three of them. It writ
 
 ```yaml
 simulation:
-  sim_id: Line_A
+  sim_id: Shop
   factor: 0.0
   random_seed: 42
   logical_start_time: -10m
@@ -138,9 +147,9 @@ Some logic is not configuration, for example an order with a random number of li
 
 ```yaml
 processes:
-  # Called as order_generator(context, arrival="customer_order", max_items=5).
+  # Called as order_generator(context, arrival="orders", max_items=5).
   - function: !python postgres_orders_logic.order_generator
-    kwargs: {arrival: customer_order, max_items: 5}
+    kwargs: {arrival: orders, max_items: 5}
 ```
 
 `!python` also works for a task payload, a telemetry function, an egress `when`, a connector class and any value under `config`, `simulation` or `run.until`. A file without it is read with PyYAML's safe loader and imports only the connector modules it names.

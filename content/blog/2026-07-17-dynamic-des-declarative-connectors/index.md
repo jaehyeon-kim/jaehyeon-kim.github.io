@@ -29,6 +29,8 @@ Here is what changed on the way to **v0.11.1**.
 
 <!--more-->
 
+[**Update 2026-10-13**] From dynamic-des 0.19.0 every example models an online shop: orders arrive, packers are the resource and packing is the service. The code and records below use those names: `Shop`, `packers`, `packing` and `orders`.
+
 ## A Declarative SimulationContext API
 
 The biggest change is how you write a simulation. Earlier versions exposed a low-level, imperative API where you wired up the environment, registry, connectors, and processes by hand. That is still available and fully supported for advanced control flows, but it is now the low-level paradigm rather than the default one.
@@ -40,14 +42,14 @@ from dynamic_des import SimulationContext, ConsoleEgress, LocalIngress
 
 # Schedule capacity to jump to 3 at t=10s, then drop to 2 at t=20s
 app = (
-    SimulationContext(sim_id="Line_A", factor=1.0, random_seed=42)
-    .add_resource("lathe", current_cap=1, max_cap=5)
-    .add_arrival("standard", dist="exponential", rate=1.0)
-    .add_service("milling", dist="normal", mean=3.0, std=0.5)
+    SimulationContext(sim_id="Shop", factor=1.0, random_seed=42)
+    .add_resource("packers", current_cap=1, max_cap=5)
+    .add_arrival("orders", dist="exponential", rate=1.0)
+    .add_service("packing", dist="normal", mean=3.0, std=0.5)
     .add_ingress(LocalIngress(
         schedule=[
-            (10.0, "Line_A.resources.lathe.current_cap", 3),
-            (20.0, "Line_A.resources.lathe.current_cap", 2),
+            (10.0, "Shop.resources.packers.current_cap", 3),
+            (20.0, "Shop.resources.packers.current_cap", 2),
         ]
     ))
     .add_egress(ConsoleEgress())
@@ -57,17 +59,17 @@ app = (
 Simulation logic is then attached with decorators, so the mechanics of queuing, resource locking, duration sampling, and telemetry emission are handled for you:
 
 ```python
-@app.arrival_loop("standard")
+@app.arrival_loop("orders")
 def arrival_process(context: SimulationContext):
     task_id = 0
     while True:
-        yield context.wait_for_arrival("standard")
-        context.spawn(work_task(task_id))
+        yield context.wait_for_arrival("orders")
+        context.spawn(pack_order(task_id))
         task_id += 1
 
-@app.task(service_id="milling", resource_id="lathe")
-def work_task(task_id: int):
-    return {"part_id": task_id}
+@app.task(service_id="packing", resource_id="packers")
+def pack_order(task_id: int):
+    return {"order_id": task_id}
 
 app.run(until=25.0)
 ```
@@ -96,7 +98,7 @@ Regardless of the backend, outbound payloads are validated with Pydantic, so ext
 ```json
 {
   "stream_type": "telemetry",
-  "path_id": "Line_A.resources.lathe.utilization",
+  "path_id": "Shop.packers.utilization",
   "value": 85.5,
   "sim_ts": 120.5,
   "timestamp": "2023-10-25T14:30:00.000Z"
@@ -112,7 +114,7 @@ Events carry discrete lifecycle transitions such as a task arriving, queuing, or
   "value": {
     "status": "finished",
     "duration": 45.2,
-    "path_id": "Line_A.service.lathe"
+    "path_id": "Shop.service.packing"
   },
   "sim_ts": 125.0,
   "timestamp": "2023-10-25T14:30:04.500Z"

@@ -70,6 +70,8 @@ Moving from a static offline script to a live, event-driven twin introduces dist
 
 A good digital twin framework must be portable. You should be able to validate your business logic locally before introducing the complexity of enterprise message brokers. `dynamic-des` achieves this by making the I/O layer entirely pluggable.
 
+[**Update 2026-10-13**] From dynamic-des 0.19.0 every example models an online shop: orders arrive, packers are the resource and packing is the service. The code below uses those names, so the resource is `packers` in the `Shop` simulation.
+
 ### Phase 1: Local Deterministic Testing
 
 Before touching Kafka, you can use `LocalIngress` to schedule mutations deterministically. This allows you to unit-test exactly how your factory floor reacts to a breakdown at a specific timestamp.
@@ -82,13 +84,13 @@ from dynamic_des import (
 
 # 1. Define the initial state
 params = SimParameter(
-    sim_id="Line_A",
-    resources={"lathe": CapacityConfig(current_cap=1, max_cap=5)},
+    sim_id="Shop",
+    resources={"packers": CapacityConfig(current_cap=1, max_cap=5)},
 )
 
 # 2. Schedule a deterministic capacity jump (1 -> 3) at t=5.0s
 ingress = LocalIngress([
-    (5.0, "Line_A.resources.lathe.current_cap", 3)
+    (5.0, "Shop.resources.packers.current_cap", 3)
 ])
 egress = ConsoleEgress()
 
@@ -98,7 +100,7 @@ env.registry.register_sim_parameter(params)
 env.setup_ingress([ingress])
 env.setup_egress([egress])
 
-res = DynamicResource(env, "Line_A", "lathe")
+res = DynamicResource(env, "Shop", "packers")
 
 env.run(until=10)
 ```
@@ -116,7 +118,7 @@ from dynamic_des import KafkaIngress, KafkaEgress
 
 # Swap connectors: no changes needed to business logic
 ingress = KafkaIngress(
-    topic="factory-config", 
+    topic="shop-config", 
     bootstrap_servers="broker.internal:9092"
 )
 
@@ -167,7 +169,7 @@ class TaskEvent(BaseModel):
 
 def work_task(env: DynamicRealtimeEnvironment, task_id: int):
     # Pass the Pydantic model directly to the framework
-    event = TaskEvent(path_id="Line_A.lathe", status="queued")
+    event = TaskEvent(path_id="Shop.packers", status="queued")
     env.publish_event(f"task-{task_id}", event)
 ```
 
