@@ -203,10 +203,11 @@ python -m recommender.run.live
 
 **Terminal 2: Trainer**
 
-Watch the Flink TaskManager logs. You will see the application reacting to the events sent to the `feedback-events` topic in real-time.
+Watch the Flink TaskManager logs. You will see the application reacting to the events sent to the `feedback-events` topic in real-time. The job's six tasks need only six of the 15 slots, so Flink may place them on two of the three TaskManagers. Count each one's writes first, then follow one with a count above 0:
 
 ```bash
-docker logs flink-taskmanager-a -f
+for tm in a b c; do echo "taskmanager-$tm: $(docker logs flink-taskmanager-$tm 2>&1 | grep -c 'Updated model')"; done
+docker logs flink-taskmanager-b -f
 ```
 
 **Result**

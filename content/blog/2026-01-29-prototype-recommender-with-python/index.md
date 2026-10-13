@@ -335,7 +335,7 @@ We simulate a sequence of user visits:
 2.  **Contextualize:** Inject a simulated timestamp (e.g., varying between Mon 08:00 AM and Sat 09:00 PM). This is the key "Context" the model must react to.
 3.  **Recommend:** LinUCB calculates scores for all 200 products and returns the Top 5.
 4.  **Reaction:** The `will_click` Oracle decides if the user clicks.
-5.  **Online Update:** We call `model.partial_fit()`. **This updates the product's matrix $A$ and vector $b$ instantly.** The very next recommendation will reflect this new learning.
+5.  **Online Update:** We call `model.partial_fit()` with the reward, 1 or 0, for one product: the clicked one, or the first one shown when nothing was clicked. **This updates that product's matrix $A$ and vector $b$ instantly.** The very next recommendation will reflect this new learning.
 
 Here is a sample of 30 recommendation records from the local simulation.
 
@@ -349,36 +349,36 @@ Here is a sample of 30 recommendation records from the local simulation.
 
 --- STARTING LIVE LOOP (30 visits) ---
 
-User 0153 (56 yo) @ Fri 00:58 -> Recs: [200, 124, 015, 058, 011] -> Clicked: 200 (❌)
-User 0909 (21 yo) @ Sat 15:53 -> Recs: [038, 040, 017, 020, 046] -> Clicked: 038 (❌)
-User 0406 (30 yo) @ Sat 05:24 -> Recs: [020, 041, 008, 055, 040] -> Clicked: 020 (✅)
-User 0317 (31 yo) @ Sat 05:38 -> Recs: [008, 055, 057, 059, 139] -> Clicked: 055 (✅)
-User 0246 (44 yo) @ Mon 02:04 -> Recs: [015, 058, 057, 011, 124] -> Clicked: 015 (❌)
-User 0974 (61 yo) @ Fri 01:16 -> Recs: [058, 073, 124, 074, 051] -> Clicked: 058 (❌)
-User 0234 (26 yo) @ Thu 12:16 -> Recs: [036, 103, 002, 186, 070] -> Clicked: 036 (❌)
-User 0360 (35 yo) @ Sat 20:23 -> Recs: [058, 051, 008, 042, 018] -> Clicked: 042 (✅)
-User 0513 (51 yo) @ Sun 05:37 -> Recs: [051, 059, 043, 014, 020] -> Clicked: 051 (✅)
-User 0640 (33 yo) @ Mon 00:49 -> Recs: [073, 124, 023, 147, 074] -> Clicked: 073 (❌)
-User 0363 (31 yo) @ Fri 23:35 -> Recs: [200, 126, 085, 058, 018] -> Clicked: 018 (✅)
-User 0718 (58 yo) @ Sat 23:05 -> Recs: [018, 036, 040, 042, 020] -> Clicked: 018 (✅)
-User 0390 (49 yo) @ Tue 00:56 -> Recs: [147, 165, 020, 089, 047] -> Clicked: 147 (❌)
-User 0425 (39 yo) @ Thu 03:59 -> Recs: [147, 165, 062, 028, 055] -> Clicked: 147 (❌)
-User 0792 (21 yo) @ Sun 23:28 -> Recs: [042, 056, 018, 043, 046] -> Clicked: 042 (✅)
-User 0190 (41 yo) @ Sat 10:54 -> Recs: [192, 139, 189, 008, 055] -> Clicked: 192 (✅)
-User 0544 (41 yo) @ Tue 20:42 -> Recs: [018, 058, 090, 043, 147] -> Clicked: 018 (❌)
-User 0192 (17 yo) @ Sat 18:38 -> Recs: [042, 056, 018, 046, 043] -> Clicked: 042 (✅)
-User 0757 (55 yo) @ Thu 16:08 -> Recs: [015, 171, 165, 037, 126] -> Clicked: 126 (✅)
-User 0904 (60 yo) @ Sat 02:07 -> Recs: [103, 041, 017, 042, 057] -> Clicked: 042 (✅)
-User 0552 (39 yo) @ Tue 11:33 -> Recs: [192, 190, 189, 194, 193] -> Clicked: 192 (✅)
-User 0540 (36 yo) @ Sat 08:56 -> Recs: [043, 041, 192, 014, 073] -> Clicked: 043 (✅)
-User 0326 (26 yo) @ Wed 13:04 -> Recs: [015, 171, 165, 023, 126] -> Clicked: 015 (❌)
-User 0834 (29 yo) @ Sat 22:58 -> Recs: [051, 002, 042, 058, 036] -> Clicked: 051 (✅)
-User 0290 (21 yo) @ Mon 19:09 -> Recs: [058, 200, 004, 018, 085] -> Clicked: 018 (✅)
-User 0275 (18 yo) @ Wed 11:10 -> Recs: [189, 002, 160, 078, 103] -> Clicked: 189 (❌)
-User 0327 (23 yo) @ Wed 19:54 -> Recs: [200, 126, 018, 085, 058] -> Clicked: 200 (❌)
-User 0144 (67 yo) @ Thu 12:31 -> Recs: [087, 126, 047, 103, 034] -> Clicked: 087 (❌)
-User 0497 (60 yo) @ Sun 08:26 -> Recs: [192, 139, 008, 189, 059] -> Clicked: 192 (✅)
-User 0508 (64 yo) @ Tue 12:41 -> Recs: [165, 087, 026, 171, 037] -> Clicked: 165 (❌)
+User 0153 (56 yo) @ Fri 00:58 -> Recs: [200, 124, 015, 058, 011] -> Clicked: None (❌), Reward: 0 on 200
+User 0909 (21 yo) @ Sat 15:53 -> Recs: [038, 040, 017, 020, 046] -> Clicked: None (❌), Reward: 0 on 038
+User 0406 (30 yo) @ Sat 05:24 -> Recs: [020, 041, 008, 055, 040] -> Clicked: 020  (✅), Reward: 1 on 020
+User 0317 (31 yo) @ Sat 05:38 -> Recs: [008, 055, 057, 059, 139] -> Clicked: 055  (✅), Reward: 1 on 055
+User 0246 (44 yo) @ Mon 02:04 -> Recs: [015, 058, 057, 011, 124] -> Clicked: None (❌), Reward: 0 on 015
+User 0974 (61 yo) @ Fri 01:16 -> Recs: [058, 073, 124, 074, 051] -> Clicked: None (❌), Reward: 0 on 058
+User 0234 (26 yo) @ Thu 12:16 -> Recs: [036, 103, 002, 186, 070] -> Clicked: None (❌), Reward: 0 on 036
+User 0360 (35 yo) @ Sat 20:23 -> Recs: [058, 051, 008, 042, 018] -> Clicked: 042  (✅), Reward: 1 on 042
+User 0513 (51 yo) @ Sun 05:37 -> Recs: [051, 059, 043, 014, 020] -> Clicked: 051  (✅), Reward: 1 on 051
+User 0640 (33 yo) @ Mon 00:49 -> Recs: [073, 124, 023, 147, 074] -> Clicked: None (❌), Reward: 0 on 073
+User 0363 (31 yo) @ Fri 23:35 -> Recs: [200, 126, 085, 058, 018] -> Clicked: 018  (✅), Reward: 1 on 018
+User 0718 (58 yo) @ Sat 23:05 -> Recs: [018, 036, 040, 042, 020] -> Clicked: 018  (✅), Reward: 1 on 018
+User 0390 (49 yo) @ Tue 00:56 -> Recs: [147, 165, 020, 089, 047] -> Clicked: None (❌), Reward: 0 on 147
+User 0425 (39 yo) @ Thu 03:59 -> Recs: [147, 165, 062, 028, 055] -> Clicked: None (❌), Reward: 0 on 147
+User 0792 (21 yo) @ Sun 23:28 -> Recs: [042, 056, 018, 043, 046] -> Clicked: 042  (✅), Reward: 1 on 042
+User 0190 (41 yo) @ Sat 10:54 -> Recs: [192, 139, 189, 008, 055] -> Clicked: 192  (✅), Reward: 1 on 192
+User 0544 (41 yo) @ Tue 20:42 -> Recs: [018, 058, 090, 043, 147] -> Clicked: None (❌), Reward: 0 on 018
+User 0192 (17 yo) @ Sat 18:38 -> Recs: [042, 056, 018, 046, 043] -> Clicked: 042  (✅), Reward: 1 on 042
+User 0757 (55 yo) @ Thu 16:08 -> Recs: [015, 171, 165, 037, 126] -> Clicked: 126  (✅), Reward: 1 on 126
+User 0904 (60 yo) @ Sat 02:07 -> Recs: [103, 041, 017, 042, 057] -> Clicked: 042  (✅), Reward: 1 on 042
+User 0552 (39 yo) @ Tue 11:33 -> Recs: [192, 190, 189, 194, 193] -> Clicked: 192  (✅), Reward: 1 on 192
+User 0540 (36 yo) @ Sat 08:56 -> Recs: [043, 041, 192, 014, 073] -> Clicked: 043  (✅), Reward: 1 on 043
+User 0326 (26 yo) @ Wed 13:04 -> Recs: [015, 171, 165, 023, 126] -> Clicked: None (❌), Reward: 0 on 015
+User 0834 (29 yo) @ Sat 22:58 -> Recs: [051, 002, 042, 058, 036] -> Clicked: 051  (✅), Reward: 1 on 051
+User 0290 (21 yo) @ Mon 19:09 -> Recs: [058, 200, 004, 018, 085] -> Clicked: 018  (✅), Reward: 1 on 018
+User 0275 (18 yo) @ Wed 11:10 -> Recs: [189, 002, 160, 078, 103] -> Clicked: None (❌), Reward: 0 on 189
+User 0327 (23 yo) @ Wed 19:54 -> Recs: [200, 126, 018, 085, 058] -> Clicked: None (❌), Reward: 0 on 200
+User 0144 (67 yo) @ Thu 12:31 -> Recs: [087, 126, 047, 103, 034] -> Clicked: None (❌), Reward: 0 on 087
+User 0497 (60 yo) @ Sun 08:26 -> Recs: [192, 139, 008, 189, 059] -> Clicked: 192  (✅), Reward: 1 on 192
+User 0508 (64 yo) @ Tue 12:41 -> Recs: [165, 087, 026, 171, 037] -> Clicked: None (❌), Reward: 0 on 165
 
 --- END LOOP ---
 ```
