@@ -274,16 +274,16 @@ We benchmarked several policies using `Mab2Rec` on the 10,000 historical events.
 
 ### Winner: LinUCB
 
-While **LinGreedy** achieved the highest theoretical ranking accuracy (AUC ~0.88), it suffered from a low click rate (CTR ~11%) because it exploited "safe" choices too early.
+**LinGreedy** achieved the highest ranking accuracy (AUC ~0.88). Its click rate (CTR ~11%) rests on only about 50 test visits, so it is close to LinUCB rather than behind it.
 
-**LinUCB** is the practical winner. It achieved a comparable ranking accuracy (**AUC ~0.86**) but nearly **double the engagement (CTR ~20.5%)** to **LinGreedy**.
+**LinUCB** is the practical winner. It ranks almost as well (**AUC ~0.86**), and its picks are clicked about twice as often as random picks (**CTR ~20.5%** against 10.2%).
 
 This algorithm excels because it balances two competing goals:
 
 1.  **Exploitation:** It uses the predicted reward, $x^T \theta$, to find good items. $\theta = A^{-1} b$ holds the weights the model has learned, where $A$ records the contexts a product was shown in and $b$ the contexts it was clicked in.
 2.  **Exploration:** It adds an upper confidence bound, $\alpha \sqrt{x^T A^{-1} x}$, to the score. If the model is uncertain about a specific context (e.g., "I haven't seen a user drink Coffee at 8 PM before"), the bound grows, boosting the score and forcing the model to test that hypothesis. $\alpha$ is a hyperparameter that sets how much exploration counts; it is 1.0 here.
 
-This allows LinUCB to discover high-value opportunities that the conservative LinGreedy model misses.
+So LinUCB tries the products it knows least about, while LinGreedy explores by picking at random on one visit in ten.
 
 ```bash
 (venv) $ python -m recommender.run.evaluate
