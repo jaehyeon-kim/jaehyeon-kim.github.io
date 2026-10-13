@@ -17,10 +17,10 @@ tags:
   - dynamic-des
   - Benchtop
 description: |
-  Small data engineering, stream processing, machine learning and MLOps projects that run on a laptop from a fresh clone, each explaining the system it builds.
+  Data engineering, stream processing, machine learning and MLOps projects that run on a laptop from a fresh clone, each explaining the system it builds.
 ---
 
-Reading about a data tool only goes so far. The hard part is getting several tools to run together and seeing how data moves between them. [Benchtop](https://github.com/jaehyeon-kim/benchtop) is a collection of small, hands-on demos for data engineering, stream processing, machine learning, AI engineering and MLOps. Each demo runs locally on the odctl stack, and works from a fresh clone of the repository, with nothing to install beforehand but Docker and uv. Each one builds a working system from open-source tools and explains the ideas behind it, so you learn a tool by running it rather than only reading about it.
+Reading about a data tool only goes so far. The hard part is getting several tools to run together and seeing how data moves between them. [Benchtop](https://github.com/jaehyeon-kim/benchtop) is a collection of hands-on demos for data engineering, stream processing, machine learning, AI engineering and MLOps. Each demo runs locally on the odctl stack, and works from a fresh clone of the repository, with nothing to install beforehand but Docker and uv. Each one builds a working system from open-source tools and explains the ideas behind it, so you learn a tool by running it rather than only reading about it.
 
 <!--more-->
 
