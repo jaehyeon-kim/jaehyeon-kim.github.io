@@ -18,7 +18,7 @@ tags:
   - Apache Airflow
   - Apache Iceberg
   - odctl
-  - dynamic-des
+  - desflow
 description: |
   Learning MLOps hands-on: the three projects from Jim Dowling's feature store book, rebuilt with open source tools that run locally.
 ---

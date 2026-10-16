@@ -12,7 +12,7 @@ categories:
   - Open Source
 tags:
   - Discrete Event Simulation
-  - dynamic-des
+  - desflow
   - SimPy
   - YAML
   - Apache Kafka

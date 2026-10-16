@@ -16,7 +16,7 @@ tags:
   - PostgreSQL
   - SeaweedFS
   - odctl
-  - dynamic-des
+  - desflow
   - Benchtop
 description: |
   Capturing every insert and update in PostgreSQL without changing the application: Debezium streams the changes to Kafka, and an S3 sink connector saves them as files.

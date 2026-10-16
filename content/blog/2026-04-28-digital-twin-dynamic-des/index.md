@@ -16,7 +16,7 @@ tags:
   - Discrete Event Simulation
   - IoT
   - Apache Kafka
-  - dynamic-des
+  - desflow
   - SimPy
   - Python
 description: |

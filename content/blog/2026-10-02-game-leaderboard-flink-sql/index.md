@@ -15,7 +15,7 @@ tags:
   - PostgreSQL
   - NiceGUI
   - odctl
-  - dynamic-des
+  - desflow
   - Benchtop
 description: |
   Keeping top 10 leaderboards up to date as game scores arrive: four Flink SQL jobs read the scores from Kafka and keep the rankings in PostgreSQL, and a web dashboard shows them as they change.

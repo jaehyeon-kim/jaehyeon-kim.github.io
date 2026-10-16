@@ -16,7 +16,7 @@ tags:
   - Data Lake
   - Apache Kafka
   - Discrete Event Simulation
-  - dynamic-des
+  - desflow
   - SimPy
   - Python
 description: |

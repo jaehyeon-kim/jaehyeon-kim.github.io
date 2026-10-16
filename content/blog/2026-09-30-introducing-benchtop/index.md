@@ -14,7 +14,7 @@ tags:
   - Apache Flink
   - MLOps
   - odctl
-  - dynamic-des
+  - desflow
   - Benchtop
 description: |
   Data engineering, stream processing, machine learning and MLOps projects that run on a laptop from a fresh clone, each explaining the system it builds.

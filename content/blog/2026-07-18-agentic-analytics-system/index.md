@@ -16,7 +16,7 @@ tags:
   - Trino
   - Apache Iceberg
   - Mem0
-  - dynamic-des
+  - desflow
   - odctl
 description: |
   Stopping a language model from inventing SQL over a lakehouse: a semantic layer between the model and Iceberg tables, built with Strands, WrenAI and Trino.

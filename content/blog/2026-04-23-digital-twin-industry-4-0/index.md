@@ -14,7 +14,7 @@ tags:
   - Digital Twin
   - Discrete Event Simulation
   - IoT
-  - dynamic-des
+  - desflow
   - SimPy
   - Python
 description: |

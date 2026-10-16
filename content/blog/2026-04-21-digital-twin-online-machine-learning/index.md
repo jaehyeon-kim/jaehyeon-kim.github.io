@@ -19,7 +19,7 @@ tags:
   - Online Machine Learning
   - Digital Twin
   - Discrete Event Simulation
-  - dynamic-des
+  - desflow
 description: |
   An Apache Flink and Kotlin streaming architecture where online machine learning detects concept drift from machinery wear, controlled by a shadow mode router.
 ---
