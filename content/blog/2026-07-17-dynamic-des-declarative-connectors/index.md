@@ -1,12 +1,12 @@
 ---
-title: "Dynamic DES: A Declarative API with Postgres and Redis Connectors"
+title: "desflow: A Declarative API with Postgres and Redis Connectors"
 date: 2026-07-17
 draft: false
 featured: false
 comment: true
 toc: true
 series:
-  - Building Real-Time Digital Twins with dynamic-des
+  - Building Real-Time Digital Twins with desflow
 categories:
   - Data Engineering
   - Open Source
@@ -29,6 +29,8 @@ Here is what changed on the way to **v0.11.1**.
 
 <!--more-->
 
+[**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
+
 [**Update 2026-10-13**] From dynamic-des 0.19.0 every example models an online shop: orders arrive, packers are the resource and packing is the service. The code and records below use those names: `Shop`, `packers`, `packing` and `orders`.
 
 ## A Declarative SimulationContext API
@@ -38,7 +40,7 @@ The biggest change is how you write a simulation. Earlier versions exposed a low
 The new **Standard API** is built around `SimulationContext`, a declarative builder that describes the whole simulation in one readable block:
 
 ```python
-from dynamic_des import SimulationContext, ConsoleEgress, LocalIngress
+from desflow import SimulationContext, ConsoleEgress, LocalIngress
 
 # Schedule capacity to jump to 3 at t=10s, then drop to 2 at t=20s
 app = (
@@ -78,7 +80,7 @@ The value here is separation of concerns. The builder declares parameters, conne
 
 ## Postgres and Redis Connectors
 
-Dynamic DES uses a **Switchboard Pattern** that decouples data sourcing from simulation logic. Background threads handle heavy I/O, a central registry flattens incoming data into dot-notation paths, and SimPy resources wake up only when the registry signals a change. Because that boundary is clean, adding a new backend is mostly a connector implementation.
+desflow uses a **Switchboard Pattern** that decouples data sourcing from simulation logic. Background threads handle heavy I/O, a central registry flattens incoming data into dot-notation paths, and SimPy resources wake up only when the registry signals a change. Because that boundary is clean, adding a new backend is mostly a connector implementation.
 
 Recent releases added two important ones, each with matching ingress and egress:
 
@@ -88,7 +90,7 @@ Recent releases added two important ones, each with matching ingress and egress:
 These sit next to the connectors that were already there, so a single simulation can now ingest from and emit to Kafka, Redis, or PostgreSQL, and export historical data to local disk, AWS S3, Google Cloud Storage, Azure Blob, or SeaweedFS through PyArrow's virtual filesystem, all with strict schema drift prevention.
 
 <div align="center">
-  <img src="dashboard-preview.gif" alt="Dynamic DES live control dashboard" width="800" />
+  <img src="dashboard-preview.gif" alt="desflow live control dashboard" width="800" />
 </div>
 
 ## Strict Data Contracts
@@ -136,14 +138,14 @@ Everything above is available now:
 
 ```bash
 # Core library
-pip install dynamic-des
+pip install desflow
 
 # Everything: Kafka, Redis, Postgres, dashboard, Avro, Parquet
-pip install "dynamic-des[all]"
+pip install "desflow[all]"
 ```
 
 The repository ships zero-setup demos for the local, Kafka, Postgres, and Redis paths in both the declarative and imperative styles.
 
-* **PyPI:** [pypi.org/project/dynamic-des](https://pypi.org/project/dynamic-des/)
-* **GitHub:** [jaehyeon-kim/dynamic-des](https://github.com/jaehyeon-kim/dynamic-des)
-* **Documentation:** [jaehyeon.me/dynamic-des](https://jaehyeon.me/dynamic-des/)
+* **PyPI:** [pypi.org/project/desflow](https://pypi.org/project/desflow/)
+* **GitHub:** [jaehyeon-kim/desflow](https://github.com/jaehyeon-kim/desflow)
+* **Documentation:** [jaehyeon.me/desflow](https://jaehyeon.me/desflow/latest/)

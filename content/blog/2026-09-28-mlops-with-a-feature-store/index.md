@@ -27,6 +27,8 @@ Learning MLOps one tool at a time leaves out the hard part: how features, traini
 
 <!--more-->
 
+[**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
+
 ## Why This Book
 
 Rather than teaching one tool, this book teaches one way to build any ML system, and applies it to classic machine learning and to systems built on large language models alike: batch predictions, real-time predictions and agents.
@@ -59,7 +61,7 @@ The book builds its projects on Hopsworks, a platform from the author's company 
 | Scheduling the pipelines | Apache Airflow |
 | Streaming features | Apache Kafka and Apache Flink |
 
-All of them run locally with [odctl](https://github.com/jaehyeon-kim/odctl), a command-line tool I built that starts an open data stack with Docker Compose, as introduced in an [earlier post](/blog/2026-07-16-odctl-open-data-stack/). The data comes from simulations built with [dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/latest/guides/backfill-then-live/)), a Python library I built for discrete-event simulations that stream their output to Kafka, files and Iceberg. So every project runs offline, and nothing needs a cloud account.
+All of them run locally with [odctl](https://github.com/jaehyeon-kim/odctl), a command-line tool I built that starts an open data stack with Docker Compose, as introduced in an [earlier post](/blog/2026-07-16-odctl-open-data-stack/). The data comes from simulations built with [desflow](https://github.com/jaehyeon-kim/desflow) ([documentation](https://jaehyeon.me/desflow/latest/guides/backfill-then-live/)), a Python library I built for discrete-event simulations that stream their output to Kafka, files and Iceberg. So every project runs offline, and nothing needs a cloud account.
 
 ## What Comes Next
 

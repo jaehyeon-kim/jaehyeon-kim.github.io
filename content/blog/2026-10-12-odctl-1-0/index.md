@@ -27,6 +27,8 @@ Trying a modern data tool on your own machine is rarely about the tool. Writing 
 
 <!--more-->
 
+[**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
+
 ![Installing odctl, previewing what flink-lite starts, starting kafka-lite, listing the containers and stopping them](odctl-1-0.gif)
 
 ## What It Runs
@@ -54,7 +56,7 @@ The services are already wired together. Kafka Connect ships with the Iceberg si
 * **Building a pipeline end to end.** Change data capture from PostgreSQL with Debezium, Kafka to Iceberg with Flink, then ClickHouse or Trino on top, all on one machine. The [Debezium](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/) and [Flink SQL leaderboard](/blog/2026-10-02-game-leaderboard-flink-sql/) posts are complete examples.
 * **Machine learning workflows.** Features in Feast, training and model serving in MLflow, scheduling in Airflow and drift reports in Evidently. The [air quality forecast](/blog/2026-09-28-mlops-with-a-feature-store/) series uses Feast, MLflow and Airflow together. For online learning, the [product recommender](/blog/2026-02-23-productionize-recommender-with-eda/) updates a model in Flink as clicks arrive on Kafka and serves it from Valkey.
 * **AI applications.** Hybrid search with pgvector and BM25 in PostgreSQL, vector search in Valkey, and Temporal for workflows that wait for a person to approve an agent's action. The [agentic analytics system](/blog/2026-07-18-agentic-analytics-system/) runs its lakehouse on odctl.
-* **Demos and tests that run anywhere.** A project can say which profiles it needs, and anyone can run it from a fresh clone. The [Benchtop](https://github.com/jaehyeon-kim/benchtop) projects and the integration tests of [dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) work this way.
+* **Demos and tests that run anywhere.** A project can say which profiles it needs, and anyone can run it from a fresh clone. The [Benchtop](https://github.com/jaehyeon-kim/benchtop) projects and the integration tests of [desflow](https://github.com/jaehyeon-kim/desflow) work this way.
 
 ## Getting Started
 

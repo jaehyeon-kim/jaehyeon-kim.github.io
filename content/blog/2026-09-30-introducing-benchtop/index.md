@@ -24,6 +24,8 @@ Reading about a data tool only goes so far. The hard part is getting several too
 
 <!--more-->
 
+[**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
+
 ## Why One Repository
 
 My earlier examples were spread across several repositories, each with its own setup. Some needed a cloud account, and some had drifted out of date with the tools they used. Benchtop brings them together under one set of rules:
@@ -39,7 +41,7 @@ Two tools of mine sit underneath almost every project.
 
 [odctl](https://github.com/jaehyeon-kim/odctl) starts an open data stack with Docker Compose, as introduced in an [earlier post](/blog/2026-07-16-odctl-open-data-stack/). Each project starts only the services it needs, such as PostgreSQL, Kafka, Flink or Valkey, with one command like `odctl up kafka-lite flink-lite postgres`. The same addresses and credentials work in every project, so there is nothing to configure.
 
-[dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/)) is a Python library for discrete-event simulations that stream their output to Kafka, PostgreSQL and Iceberg. Most projects use it to produce their data: a shop where visitors arrive, browse and buy, or a game where players join teams and score. Its parameters can change while it runs, so you can double the visitors or send the warehouse pickers home, and watch the rest of the system respond.
+[desflow](https://github.com/jaehyeon-kim/desflow) ([documentation](https://jaehyeon.me/desflow/)) is a Python library for discrete-event simulations that stream their output to Kafka, PostgreSQL and Iceberg. Most projects use it to produce their data: a shop where visitors arrive, browse and buy, or a game where players join teams and score. Its parameters can change while it runs, so you can double the visitors or send the warehouse pickers home, and watch the rest of the system respond.
 
 ## Projects
 

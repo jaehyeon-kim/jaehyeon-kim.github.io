@@ -6,7 +6,7 @@ featured: true
 comment: true
 toc: true
 series:
-  - Building Real-Time Digital Twins with dynamic-des
+  - Building Real-Time Digital Twins with desflow
 categories:
   - Data Engineering
   - Open Source
@@ -25,21 +25,23 @@ description: |
 
 A pipeline is easier to test when its input behaves like production: orders arrive at random, queues grow, a machine slows down. A simulation can produce that data, but when the simulation is a Python program, every change is a code change. Someone who only wants to double an arrival rate has to read and edit code, and a reviewer has to check that nothing else moved. A file that holds only settings is easier to read, to compare in a pull request and to run in CI.
 
-[dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) 0.16.0 adds that file. A YAML blueprint describes the whole simulation, and the `ddes` command runs it. Each of the seven examples in the repository now has a YAML version in plain YAML. The documentation was rebuilt around the three ways to write a simulation.
+[desflow](https://github.com/jaehyeon-kim/desflow) 0.16.0 (then named dynamic-des) adds that file. A YAML blueprint describes the whole simulation, and the `desflow` command runs it. Each of the seven examples in the repository now has a YAML version in plain YAML. The documentation was rebuilt around the three ways to write a simulation.
 
 <!--more-->
 
+[**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
+
 [**Update 2026-10-13**] dynamic-des 0.17.0, 0.18.0 and 0.19.0 change some of what this post describes:
 
-* **Examples download with `ddes`.** `ddes examples get local --api yaml` downloads an example at the release you have installed, in place of the `curl` line below. Every example now exists as YAML, builder and low-level code.
-* **Reorganised documentation.** [First Simulation](https://jaehyeon.me/dynamic-des/latest/tutorials/first-simulation/) replaces the three tutorials, with the YAML, builder and low-level code in tabs at each step, and a new section, [How Simulation Works](https://jaehyeon.me/dynamic-des/latest/des/how-it-works/), explains discrete-event simulation, the building blocks of a model, and queues and capacity. The links to the old tutorials below lead to First Simulation.
+* **Examples download with `desflow`.** `desflow examples get local --api yaml` downloads an example at the release you have installed, in place of the `curl` line below. Every example now exists as YAML, builder and low-level code.
+* **Reorganised documentation.** [First Simulation](https://jaehyeon.me/desflow/latest/tutorials/first-simulation/) replaces the three tutorials, with the YAML, builder and low-level code in tabs at each step, and a new section, [How Simulation Works](https://jaehyeon.me/desflow/latest/des/how-it-works/), explains discrete-event simulation, the building blocks of a model, and queues and capacity. The links to the old tutorials below lead to First Simulation.
 * **Parameters are checked.** A distribution parameter out of range is refused when the blueprint loads, with its line, and when it changes during a run. An unknown `dist` name is refused instead of running with a default. Two distributions are new: `truncated_normal` and `constant`.
 * **Capacity drops are exact.** Lowering a resource's capacity while it is busy no longer lets one more task start.
 * **Two smaller fixes.** A NaN or infinity inside a Pydantic model is now written as `null`, as it already was in a plain payload. The Kafka connectors no longer leave a client open each time they fail to reach the broker.
-* **API names (0.18.0).** The declarative API is now called the Builder API, and the example folders were renamed to match: `examples/declarative/` is now `examples/builder/`, `examples/imperative/` is now `examples/low-level/`, and `ddes examples get` takes `--api yaml`, `--api builder` or `--api low-level`. Nothing changes in the Python API itself.
+* **API names (0.18.0).** The declarative API is now called the Builder API, and the example folders were renamed to match: `examples/declarative/` is now `examples/builder/`, `examples/imperative/` is now `examples/low-level/`, and `desflow examples get` takes `--api yaml`, `--api builder` or `--api low-level`. Nothing changes in the Python API itself.
 * **An online shop (0.19.0).** Every example now models an online shop: orders arrive, packers are the resource and packing is the service, with `sim_id: Shop`. The blueprints below are the 0.19.0 files, and the three versions of each example publish the same records.
 
-The project started as a way to change a running SimPy model from Kafka ([Building an Event-Driven Hybrid Digital Twin with dynamic-des](/blog/2026-04-28-digital-twin-dynamic-des/)). It then learned to write Parquet for model training ([One Simulation, Two Pipelines](/blog/2026-05-25-dynamic-des-parquet-support/)) and gained a declarative Python API with PostgreSQL and Redis connectors ([A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors/)). This release removes the need for Python in most simulations.
+The project started as a way to change a running SimPy model from Kafka ([Building an Event-Driven Hybrid Digital Twin with desflow](/blog/2026-04-28-digital-twin-dynamic-des/)). It then learned to write Parquet for model training ([One Simulation, Two Pipelines](/blog/2026-05-25-dynamic-des-parquet-support/)) and gained a declarative Python API with PostgreSQL and Redis connectors ([A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors/)). This release removes the need for Python in most simulations.
 
 ## A Complete Blueprint
 
@@ -90,20 +92,20 @@ run:
   until: 30
 ```
 
-Install the package from [PyPI](https://pypi.org/project/dynamic-des/), download the file and run it:
+Install the package from [PyPI](https://pypi.org/project/desflow/), download the file and run it:
 
 ```bash
-pip install dynamic-des
-curl -O https://raw.githubusercontent.com/jaehyeon-kim/dynamic-des/main/examples/yaml/local.yaml
-ddes run local.yaml
+pip install desflow
+curl -O https://raw.githubusercontent.com/jaehyeon-kim/desflow/main/examples/yaml/local.yaml
+desflow run local.yaml
 
 # Override run.until, in seconds or as a duration such as "2 min"
-ddes run local.yaml --until 10
+desflow run local.yaml --until 10
 ```
 
-![Downloading local.yaml, printing it and running it with ddes, with events and telemetry streaming until the run is stopped](local-yaml-run.gif)
+![Downloading local.yaml, printing it and running it with desflow, with events and telemetry streaming until the run is stopped](local-yaml-run.gif)
 
-The [documentation](https://jaehyeon.me/dynamic-des/) has the full reference. The `ddes` command comes with the core package. Typer and PyYAML are now core dependencies, so no extra is needed to run a blueprint. From Python, `SimulationContext.from_yaml("local.yaml")` returns the same simulation as a builder you can extend.
+The [documentation](https://jaehyeon.me/desflow/) has the full reference. The `desflow` command comes with the core package. Typer and PyYAML are now core dependencies, so no extra is needed to run a blueprint. From Python, `SimulationContext.from_yaml("local.yaml")` returns the same simulation as a builder you can extend.
 
 The file is checked before the run starts. An unknown key, a task that names a missing service, or a scenario path that does not exist is reported with the file name and the line number.
 
@@ -160,23 +162,23 @@ A simulation can now be written in three ways, and all three build the same para
 
 * **Low-level API:** `DynamicRealtimeEnvironment` used directly, with SimPy processes you write yourself.
 * **Builder API:** the `SimulationContext` builder and its decorators.
-* **YAML blueprint:** the file above, run with `ddes`.
+* **YAML blueprint:** the file above, run with `desflow`.
 
 The registry paths, the records and the connectors are the same whichever you choose, so a team can start in YAML and move one part to Python when it needs to.
 
 ## Documentation Rebuilt
 
-The [documentation](https://jaehyeon.me/dynamic-des/) was reorganised around those three ways:
+The [documentation](https://jaehyeon.me/desflow/) was reorganised around those three ways:
 
-* **Tutorials in three parts.** One small factory is built three times: [with the low-level API](https://jaehyeon.me/dynamic-des/latest/tutorials/low-level/), [with the builder API](https://jaehyeon.me/dynamic-des/latest/tutorials/declarative/) and [as a YAML blueprint](https://jaehyeon.me/dynamic-des/latest/tutorials/yaml/).
-* **Core Architecture in two groups.** Writing a simulation has a page per way, starting from the [overview](https://jaehyeon.me/dynamic-des/latest/architecture/overview/). The runtime pages cover the environment, the [registry and live parameters](https://jaehyeon.me/dynamic-des/latest/architecture/registry/), time, resources, connectors, records and batching.
-* **Examples with a tab per way.** Each example page shows its versions side by side in tabs, low-level, builder and YAML where all three exist, starting with the [local example](https://jaehyeon.me/dynamic-des/latest/examples/local/).
-* **Guides grouped by topic.** Connectors, features such as [backfill then live](https://jaehyeon.me/dynamic-des/latest/guides/backfill-then-live/), and YAML, from [a first blueprint to connectors](https://jaehyeon.me/dynamic-des/latest/guides/yaml-blueprints/) to [custom logic with `!python`](https://jaehyeon.me/dynamic-des/latest/guides/yaml-advanced/). Modelling patterns such as preemptive breakdowns moved into an Advanced section.
+* **Tutorials in three parts.** One small factory is built three times: [with the low-level API](https://jaehyeon.me/desflow/latest/tutorials/low-level/), [with the builder API](https://jaehyeon.me/desflow/latest/tutorials/declarative/) and [as a YAML blueprint](https://jaehyeon.me/desflow/latest/tutorials/yaml/).
+* **Core Architecture in two groups.** Writing a simulation has a page per way, starting from the [overview](https://jaehyeon.me/desflow/latest/architecture/overview/). The runtime pages cover the environment, the [registry and live parameters](https://jaehyeon.me/desflow/latest/architecture/registry/), time, resources, connectors, records and batching.
+* **Examples with a tab per way.** Each example page shows its versions side by side in tabs, low-level, builder and YAML where all three exist, starting with the [local example](https://jaehyeon.me/desflow/latest/examples/local/).
+* **Guides grouped by topic.** Connectors, features such as [backfill then live](https://jaehyeon.me/desflow/latest/guides/backfill-then-live/), and YAML, from [a first blueprint to connectors](https://jaehyeon.me/desflow/latest/guides/yaml-blueprints/) to [custom logic with `!python`](https://jaehyeon.me/desflow/latest/guides/yaml-advanced/). Modelling patterns such as preemptive breakdowns moved into an Advanced section.
 
 ## Other Changes in This Release
 
 * **Fractional container capacity.** A capacity change on a `DynamicContainer` was rounded down to a whole number. A tank set to 62.5 now holds 62.5, also when it started at a whole number.
-* **`DynamicContainer` and `DynamicStore` exported.** Both now import from `dynamic_des`, like `DynamicResource`.
+* **`DynamicContainer` and `DynamicStore` exported.** Both now import from `desflow`, like `DynamicResource`.
 * **Live `max_cap` changes.** A change to `max_cap` used to have no effect on a running resource. It now applies at once, and a lower limit shrinks the capacity.
 * **Flat rows for files and tables.** Parquet, JSONL and Iceberg sinks with no router now write each event's value as columns and leave telemetry out. A router keeps the earlier behaviour.
 * **Time strings in time columns.** Iceberg and PostgreSQL convert ISO time strings for timestamp and date columns, using the column types of the table.
@@ -189,18 +191,18 @@ The [documentation](https://jaehyeon.me/dynamic-des/) was reorganised around tho
 * [Change Data Capture on a Simulated Online Shop with Debezium and Kafka Connect](/blog/2026-10-01-ecommerce-cdc-debezium-kafka-connect/) - a simulated shop feeding a change data capture pipeline
 * [Keeping Game Leaderboards Up to Date in Real Time with Kafka and Flink SQL](/blog/2026-10-02-game-leaderboard-flink-sql/) - a simulated mobile game feeding Flink SQL leaderboards
 * [Why Digital Twins Are Rewiring Industry 4.0](/blog/2026-04-23-digital-twin-industry-4-0/) - where a simulation like this fits in a digital twin
-* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system/) - dynamic-des filling an Iceberg lakehouse with the data an agent queries
+* [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system/) - desflow filling an Iceberg lakehouse with the data an agent queries
 
 ## Try It Out
 
 ```bash
-# Core library and the ddes command
-pip install dynamic-des
+# Core library and the desflow command
+pip install desflow
 
 # Every connector: Kafka, Redis, PostgreSQL, Avro, Parquet and Iceberg
-pip install "dynamic-des[all]"
+pip install "desflow[all]"
 ```
 
-* **GitHub:** [jaehyeon-kim/dynamic-des](https://github.com/jaehyeon-kim/dynamic-des), with the YAML examples in [`examples/yaml/`](https://github.com/jaehyeon-kim/dynamic-des/tree/main/examples/yaml)
-* **PyPI:** [pypi.org/project/dynamic-des](https://pypi.org/project/dynamic-des/)
-* **Documentation:** [jaehyeon.me/dynamic-des](https://jaehyeon.me/dynamic-des/)
+* **GitHub:** [jaehyeon-kim/desflow](https://github.com/jaehyeon-kim/desflow), with the YAML examples in [`examples/yaml/`](https://github.com/jaehyeon-kim/desflow/tree/main/examples/yaml)
+* **PyPI:** [pypi.org/project/desflow](https://pypi.org/project/desflow/)
+* **Documentation:** [jaehyeon.me/desflow](https://jaehyeon.me/desflow/)

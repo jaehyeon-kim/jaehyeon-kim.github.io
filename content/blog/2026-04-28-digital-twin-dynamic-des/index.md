@@ -1,12 +1,12 @@
 ---
-title: "Building an Event-Driven Hybrid Digital Twin with dynamic-des"
+title: "Building an Event-Driven Hybrid Digital Twin with desflow"
 date: 2026-04-29
 draft: false
 featured: false
 comment: true
 toc: true
 series:
-  - Building Real-Time Digital Twins with dynamic-des
+  - Building Real-Time Digital Twins with desflow
 categories:
   - System Architecture
   - Data Engineering
@@ -31,11 +31,11 @@ If you have ever tried to build one of these systems from scratch, you immediate
 
 Standard simulation clocks (like those in traditional SimPy implementations) are logically synchronous and not designed to handle high-frequency asynchronous I/O without explicit decoupling. They step through logical time deterministically. Real-world telemetry (like a Kafka stream or a Redis Pub/Sub channel) is asynchronous and non-deterministic in arrival timing and ordering at the system level. If you naively wire a live data feed directly into a standard simulation loop, you will stall the simulation loop while awaiting network I/O. The simulation drifts from real-world time, making your live twin useless.
 
-To solve this, the compute layer must be explicitly decoupled from the network layer. This is the exact design problem the open-source [**`dynamic-des`**](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/latest/architecture/environment/)) package addresses.
+To solve this, the compute layer must be explicitly decoupled from the network layer. This is the exact design problem the open-source [**`desflow`**](https://github.com/jaehyeon-kim/desflow) ([documentation](https://jaehyeon.me/desflow/latest/architecture/environment/)) package addresses.
 
 ## Core Architecture: Switchboard Pattern
 
-`dynamic-des` operates as a real-time control plane wrapped around a discrete-event simulation core. It bridges the asynchronous gap using the Switchboard Pattern, which isolates the network from the math:
+`desflow` operates as a real-time control plane wrapped around a discrete-event simulation core. It bridges the asynchronous gap using the Switchboard Pattern, which isolates the network from the math:
 
 1. **Connectors (I/O Layer):** Background async I/O workers handle heavy network traffic (Kafka, Redis, Postgres) entirely independently of the simulation clock.
 2. **Simulation Registry (Switchboard):** This is the central state manager. It intercepts incoming network data, safely casts types, and flattens complex system schemas into addressable paths that act as reactive state bindings, allowing any component in the simulation to subscribe to and react to state transitions.
@@ -47,7 +47,7 @@ Because the background I/O workers and the simulation clock communicate through 
 
 With the data flowing safely, the simulation objects themselves must be able to react. In a traditional DES model, resources are static. If you initialize `simpy.Resource(capacity=5)`, it stays 5 forever. In the real world, machines break, operators go on break, and routing logic shifts dynamically.
 
-Instead of polling the network, `dynamic-des` introduces mutable resources (`DynamicResource`, `DynamicContainer`, `DynamicStore`) that adapt safely:
+Instead of polling the network, `desflow` introduces mutable resources (`DynamicResource`, `DynamicContainer`, `DynamicStore`) that adapt safely:
 
   * **Growing is easy:** If capacity increases from 5 to 10, new tokens are immediately added to the pool, instantly unblocking pending requests.
   * **Shrinking is complex:** If capacity drops from 5 to 2 while 4 tasks are actively being processed, what happens? Work-In-Progress (WIP) is never destroyed. The resource enters a temporary over-capacity state. It waits for the active tasks to naturally finish, intercepting their returned tokens until the physical pool matches the new, smaller capacity limit.
@@ -56,7 +56,7 @@ Instead of polling the network, `dynamic-des` introduces mutable resources (`Dyn
 
 When running a real-time simulation, your biggest operational risk is simulation drift. If your compute layer cannot process the incoming event stream fast enough, the simulation clock will fall behind relative to event time or wall-clock time.
 
-To solve this, `dynamic-des` includes built-in observability. The egress layer automatically calculates this drift and continuously streams a `system.simulation.lag_seconds` telemetry metric. This makes it easy to set up Grafana dashboards and trigger alerts if the forecasting engine begins lagging behind reality.
+To solve this, `desflow` includes built-in observability. The egress layer automatically calculates this drift and continuously streams a `system.simulation.lag_seconds` telemetry metric. This makes it easy to set up Grafana dashboards and trigger alerts if the forecasting engine begins lagging behind reality.
 
 ## Designing for Failure Modes
 
@@ -68,7 +68,9 @@ Moving from a static offline script to a live, event-driven twin introduces dist
 
 ## Developer Journey: From Laptop to Cluster
 
-A good digital twin framework must be portable. You should be able to validate your business logic locally before introducing the complexity of enterprise message brokers. `dynamic-des` achieves this by making the I/O layer entirely pluggable.
+A good digital twin framework must be portable. You should be able to validate your business logic locally before introducing the complexity of enterprise message brokers. `desflow` achieves this by making the I/O layer entirely pluggable.
+
+[**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
 
 [**Update 2026-10-13**] From dynamic-des 0.19.0 every example models an online shop: orders arrive, packers are the resource and packing is the service. The code below uses those names, so the resource is `packers` in the `Shop` simulation.
 
@@ -77,7 +79,7 @@ A good digital twin framework must be portable. You should be able to validate y
 Before touching Kafka, you can use `LocalIngress` to schedule mutations deterministically. This allows you to unit-test exactly how your factory floor reacts to a breakdown at a specific timestamp.
 
 ```python
-from dynamic_des import (
+from desflow import (
     DynamicRealtimeEnvironment, DynamicResource, 
     LocalIngress, ConsoleEgress, SimParameter, CapacityConfig
 )
@@ -114,7 +116,7 @@ Once your logic is sound, transitioning to an operational digital twin requires 
 While this example is kept clean for readability, real production deployments will naturally require additional configurations for retries, authentication, and backpressure handling.
 
 ```python
-from dynamic_des import KafkaIngress, KafkaEgress
+from desflow import KafkaIngress, KafkaEgress
 
 # Swap connectors: no changes needed to business logic
 ingress = KafkaIngress(
@@ -136,7 +138,7 @@ env.run()
 
 ## Evolution into a State-Machine Engine
 
-Traditional Discrete-Event Simulation is strictly quantitative, focusing mostly on queue lengths, processing times, and resource capacities. However, `dynamic-des` has evolved beyond this to blend DES with reactive programming, behaving much like a state-machine engine.
+Traditional Discrete-Event Simulation is strictly quantitative, focusing mostly on queue lengths, processing times, and resource capacities. However, `desflow` has evolved beyond this to blend DES with reactive programming, behaving much like a state-machine engine.
 
 By utilizing the `variables` registry and the `wait_for_change()` observer pattern, developers can track arbitrary logical states. Instead of just yielding on time delays, simulation processes can yield on external network events. A Kafka payload no longer just updates a number. It acts as a state-transition trigger that dictates the logical flow of the entire application.
 
@@ -144,14 +146,14 @@ This flexibility means digital twins can incorporate sophisticated modeling well
 
 ### 💡 Domain-Agnostic Applications
 
-Because it behaves as a reactive state engine, `dynamic-des` is not restricted to factory floors. I am currently building out additional demo projects to highlight its versatility across entirely different domains:
+Because it behaves as a reactive state engine, `desflow` is not restricted to factory floors. I am currently building out additional demo projects to highlight its versatility across entirely different domains:
 
   * **Continuous-Time Crypto Trading Bot:** This demo proves the package can handle high-velocity financial simulations. It utilizes the variables registry to track live BTC prices and portfolio balances, while using dynamic resources to model exchange API rate limits. Concurrent processes simulate the market maker (random walk price updates), strategy monitor (moving average crossovers), and order execution (yielding realistic network latency delays).
   * **RPG Adventure Game State Machine:** This demo highlights the stochastic and time-delay strengths of the engine by modeling complex entity interactions over continuous time. Primitive game states (player HP, enemy HP, current room) live in the variables registry. Continuous processes handle room exploration with travel time delays and active combat loops. The combat process yields attack cooldown timeouts and uses the global `Sampler` for randomized damage, tracking causality back to the root encounter event.
 
 ## Enforcing Data Contracts and Routing
 
-A hybrid twin is only as useful as the data it outputs. To ensure downstream analytics systems do not break, `dynamic-des` natively enforces strict data contracts and provides granular control over serialization.
+A hybrid twin is only as useful as the data it outputs. To ensure downstream analytics systems do not break, `desflow` natively enforces strict data contracts and provides granular control over serialization.
 
 ### Type Safety and Pydantic Integration
 
@@ -161,7 +163,7 @@ On the egress side, you can yield strongly typed Pydantic models directly from y
 
 ```python
 from pydantic import BaseModel
-from dynamic_des import DynamicRealtimeEnvironment
+from desflow import DynamicRealtimeEnvironment
 
 class TaskEvent(BaseModel):
     path_id: str
@@ -177,15 +179,15 @@ def work_task(env: DynamicRealtimeEnvironment, task_id: int):
 
 In an enterprise architecture, you rarely dump all events into a single Kafka topic. You might want standard telemetry routed as lightweight JSON, while high-velocity machine learning payloads are serialized as binary Avro.
 
-`dynamic-des` handles this through pluggable topic routers and serializers. You can map specific topics to a `ConfluentAvroSerializer` or a `GlueAvroSerializer`, and any unmapped topics will safely fall back to default JSON.
+`desflow` handles this through pluggable topic routers and serializers. You can map specific topics to a `ConfluentAvroSerializer` or a `GlueAvroSerializer`, and any unmapped topics will safely fall back to default JSON.
 
 Because hardcoding Avro schemas is prone to drift, the framework natively supports `dataclasses-avroschema`. This allows you to auto-generate your schema directly from your Pydantic model and route it seamlessly:
 
 ```python
 from pydantic import Field
 from dataclasses_avroschema.pydantic import AvroBaseModel
-from dynamic_des import KafkaEgress
-from dynamic_des.connectors.egress.kafka import ConfluentAvroSerializer
+from desflow import KafkaEgress
+from desflow.connectors.egress.kafka import ConfluentAvroSerializer
 
 # 1. Define your model and auto-generate the schema
 class MLPrediction(AvroBaseModel):
@@ -194,7 +196,7 @@ class MLPrediction(AvroBaseModel):
     confidence: float = Field(...)
 
     class Meta:
-        namespace = "com.dynamic_des.ml"
+        namespace = "com.desflow.ml"
         schema_name = "PredictionEvent"
 
 # 2. Define a topic router to separate standard events from ML events
@@ -219,11 +221,11 @@ egress = KafkaEgress(
 
 ## Moving to Production
 
-By decoupling network I/O from the simulation clock, enforcing strict data schemas, and blending DES with reactive programming, `dynamic-des` provides a clean architectural pattern for modern event-driven systems.
+By decoupling network I/O from the simulation clock, enforcing strict data schemas, and blending DES with reactive programming, `desflow` provides a clean architectural pattern for modern event-driven systems.
 
 This enables a new class of systems beyond static models and passive dashboards. You can build resilient, synchronized forecasting engines that adapt to reality the moment it changes.
 
-To explore the source code, view the full API documentation, or test out the zero-setup Docker examples, check out the [**`dynamic-des` repository on GitHub**](https://github.com/jaehyeon-kim/dynamic-des).
+To explore the source code, view the full API documentation, or test out the zero-setup Docker examples, check out the [**`desflow` repository on GitHub**](https://github.com/jaehyeon-kim/desflow).
 
 ## Related posts
 

@@ -26,6 +26,8 @@ Most databases change all day: users sign up, orders are placed, and each order 
 
 <!--more-->
 
+[**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
+
 The shop's data model follows the [theLook eCommerce](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) dataset. The source code is in [benchtop/ecommerce-cdc](https://github.com/jaehyeon-kim/benchtop/tree/main/ecommerce-cdc). It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.
 
 ## What You Will Build
@@ -50,7 +52,7 @@ The data moves in one direction: a simulation writes to PostgreSQL, Debezium rea
 - **A replication slot** is PostgreSQL's record of how far a reader has got in the WAL. PostgreSQL keeps the part of the WAL the slot has not read yet, so Debezium can stop and carry on without losing a change.
 - **A publication** names the tables whose changes PostgreSQL sends. odctl's PostgreSQL has a publication, `cdc_pub`, that covers every table in the `cdc` schema.
 - **Aiven's S3 sink** is a sink connector. It reads the topics and writes their events to files in SeaweedFS, an object store with the same API as Amazon S3.
-- **dynamic-des** runs the simulation, a discrete-event model of the shop. [dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/latest/architecture/connectors/)) is a Python library for simulations that stream their output.
+- **desflow** runs the simulation, a discrete-event model of the shop. [desflow](https://github.com/jaehyeon-kim/desflow) ([documentation](https://jaehyeon.me/desflow/latest/architecture/connectors/)) is a Python library for simulations that stream their output.
 
 The simulation writes six tables in PostgreSQL's `cdc` schema:
 
@@ -99,9 +101,9 @@ The shop has three kinds of process. A process is a function that runs through s
 - **Order:** each order waits for one of the warehouse's pickers. Three pickers pack orders, one at a time each. When orders arrive faster than they are packed, they queue. An order that waits longer than its customer's patience, about two minutes, is cancelled. A packed order is shipped, delivered about a minute later, and one in ten is returned.
 - **Move:** now and then a registered user moves to a new address.
 
-dynamic-des provides each part of this model:
+desflow provides each part of this model:
 
-| Part | dynamic-des feature | Here |
+| Part | desflow feature | Here |
 |---|---|---|
 | random arrivals | `add_arrival`, `arrival_loop` | visitors, and address moves |
 | time spent on a step | `add_service` | a page view, packing, transit, patience and the time until a return |
@@ -111,7 +113,7 @@ dynamic-des provides each part of this model:
 | live changes | the registry and `KafkaIngress` | any of the above, while it runs |
 | writes | `PostgresEgress` | one per table, upserting on `id` |
 
-Every parameter is in `ecommerce/core/config.py`. Each one is added to dynamic-des's registry, a store of named parameters that the model reads each time it draws a value:
+Every parameter is in `ecommerce/core/config.py`. Each one is added to desflow's registry, a store of named parameters that the model reads each time it draws a value:
 
 ```python
 SERVICES = {  # mean and standard deviation, in seconds, lognormal
@@ -177,7 +179,7 @@ def run(minutes: float | None = None, seed: int | None = None) -> None:
     app.run(until=minutes * 60 if minutes else None)
 ```
 
-Times are stored as ISO 8601 text in UTC. dynamic-des publishes each row as JSON-friendly values, so a time reaches PostgreSQL as a string, and a timestamp column does not accept a string.
+Times are stored as ISO 8601 text in UTC. desflow publishes each row as JSON-friendly values, so a time reaches PostgreSQL as a string, and a timestamp column does not accept a string.
 
 ## Step 1: Run the Simulation
 
@@ -188,15 +190,15 @@ python -m ecommerce.simulation.run --minutes 16     # or leave out --minutes, an
 It creates the six tables if they are missing, and writes the centres, the products and 100 users. It then runs in real time. With the default parameters it places about 20 orders a minute, and each order changes three or four times over the next few minutes. Its log shows the Kafka reader and one PostgreSQL writer per table:
 
 ```
-2026-09-30 22:39:25,564 dynamic_des.core.context Building SimulationContext for 'ecommerce'...
-2026-09-30 22:39:25,565 dynamic_des.core.context Simulation engine started.
-2026-09-30 22:39:25,599 dynamic_des.connectors.ingress.kafka Connected to Kafka Ingress topic: ecommerce-control
-2026-09-30 22:39:25,966 dynamic_des.connectors.egress.postgres PostgresEgress connected to dist_centers
-2026-09-30 22:39:25,966 dynamic_des.connectors.egress.postgres PostgresEgress connected to products
-2026-09-30 22:39:25,966 dynamic_des.connectors.egress.postgres PostgresEgress connected to events
-2026-09-30 22:39:25,966 dynamic_des.connectors.egress.postgres PostgresEgress connected to order_items
-2026-09-30 22:39:25,966 dynamic_des.connectors.egress.postgres PostgresEgress connected to orders
-2026-09-30 22:39:25,967 dynamic_des.connectors.egress.postgres PostgresEgress connected to users
+2026-09-30 22:39:25,564 desflow.core.context Building SimulationContext for 'ecommerce'...
+2026-09-30 22:39:25,565 desflow.core.context Simulation engine started.
+2026-09-30 22:39:25,599 desflow.connectors.ingress.kafka Connected to Kafka Ingress topic: ecommerce-control
+2026-09-30 22:39:25,966 desflow.connectors.egress.postgres PostgresEgress connected to dist_centers
+2026-09-30 22:39:25,966 desflow.connectors.egress.postgres PostgresEgress connected to products
+2026-09-30 22:39:25,966 desflow.connectors.egress.postgres PostgresEgress connected to events
+2026-09-30 22:39:25,966 desflow.connectors.egress.postgres PostgresEgress connected to order_items
+2026-09-30 22:39:25,966 desflow.connectors.egress.postgres PostgresEgress connected to orders
+2026-09-30 22:39:25,967 desflow.connectors.egress.postgres PostgresEgress connected to users
 ```
 
 Leave it running, and use a second terminal for the next steps.
@@ -386,7 +388,7 @@ The line is shown across several lines here. `source`, `transaction` and the `ts
 
 ## Step 4: Change the Simulation While It Runs
 
-The simulation reads parameter changes from the Kafka topic `ecommerce-control`, through dynamic-des's `KafkaIngress`. It uses each new value from the next time it draws one. `control.py` sends a change. With the simulation and both connectors running, cut the pickers from three to one:
+The simulation reads parameter changes from the Kafka topic `ecommerce-control`, through desflow's `KafkaIngress`. It uses each new value from the next time it draws one. `control.py` sends a change. With the simulation and both connectors running, cut the pickers from three to one:
 
 ```bash
 python -m ecommerce.simulation.control ecommerce.resources.pickers.current_cap 1

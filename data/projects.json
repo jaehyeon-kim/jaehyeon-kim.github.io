@@ -1,11 +1,11 @@
 [
   {
-    "name": "dynamic-des",
-    "repo": "jaehyeon-kim/dynamic-des",
+    "name": "desflow",
+    "repo": "jaehyeon-kim/desflow",
     "weight": 10,
-    "url": "https://jaehyeon.me/dynamic-des/",
+    "url": "https://jaehyeon.me/desflow/",
     "description": "Real-time SimPy control plane to dynamically update parameters and stream outputs via external systems like Kafka, Redis, or Postgres. Built for event-driven digital twins.",
-    "image": "dynamic-des.png"
+    "image": "desflow.png"
   },
   {
     "name": "odctl",
@@ -43,7 +43,7 @@
     "name": "oml-digital-twin-hotrolling",
     "repo": "jaehyeon-kim/oml-digital-twin-hotrolling",
     "weight": 60,
-    "url": "/series/building-real-time-digital-twins-with-dynamic-des/",
+    "url": "/series/building-real-time-digital-twins-with-desflow/",
     "description": "A streaming Digital Twin of a steel hot rolling mill demonstrating Online Machine Learning (OML) with Apache Kafka, Apache Flink and MOA to handle real-time concept drift.",
     "image": "oml-digital-twin-hotrolling.png"
   },

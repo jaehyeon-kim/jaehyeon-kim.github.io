@@ -27,6 +27,8 @@ I built a proof of concept to explore a more disciplined approach: put a semanti
 
 <!--more-->
 
+[**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
+
 ## Why a Semantic Layer
 
 A semantic layer defines models, relationships, reusable metrics, business rules, and approved query patterns independently of the language model. That separation is the whole point. When the definition of a metric lives in a governed contract rather than in a prompt, the agent cannot quietly redefine it, and the same question produces the same number every time.
@@ -49,7 +51,7 @@ The diagram above traces a request end to end, and the table below maps each com
 | Historical Data | Trino / Apache Iceberg | Distributed SQL over an open table format |
 | Object Storage | SeaweedFS | Local S3-compatible backend for Iceberg data |
 
-The infrastructure is launched with [`odctl`](https://github.com/jaehyeon-kim/odctl), and the sample e-commerce dataset (customers, products, orders, order items, payments, returns) is generated with [`dynamic-des`](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/latest/getting-started/)) running a fast-forward clock and writing Parquet straight to SeaweedFS. Both projects earn their keep here: one stands up the platform, the other fills it with realistic data in seconds.
+The infrastructure is launched with [`odctl`](https://github.com/jaehyeon-kim/odctl), and the sample e-commerce dataset (customers, products, orders, order items, payments, returns) is generated with [`desflow`](https://github.com/jaehyeon-kim/desflow) ([documentation](https://jaehyeon.me/desflow/latest/getting-started/)) running a fast-forward clock and writing Parquet straight to SeaweedFS. Both projects earn their keep here: one stands up the platform, the other fills it with realistic data in seconds.
 
 ## Two Layers That Keep the Model Honest
 
@@ -84,7 +86,7 @@ Measuring an agent means judging both its decision-making and its safety. The re
 ## Related posts
 
 * [Running Kafka, Flink, Spark, Trino and Iceberg Locally with One CLI](/blog/2026-07-16-odctl-open-data-stack/) - the CLI that starts the local open source stack this system runs on
-* [One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES](/blog/2026-05-25-dynamic-des-parquet-support/) - generating the batch Parquet and live streaming data such a stack reads
+* [One Simulation, Two Pipelines: Batch Training and Live Inference with desflow](/blog/2026-05-25-dynamic-des-parquet-support/) - generating the batch Parquet and live streaming data such a stack reads
 * [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning/) - the real-time side that this batch-only phase leaves for later
 * [Meet the Streamhouse Trio - Paimon, Fluss, and Iceberg for Unified Data Architectures](/blog/2025-05-06-streamhouse-trio/) - compares Paimon, Fluss and Iceberg as table layers for streaming and batch
 * [Self-service Data Platform via a Multi-tenant SQL Gateway](/blog/2025-07-17-self-service-data-platform-via-sql-gateway/) - a multi-tenant SQL gateway that starts Spark, Flink and Trino engines on demand over tables like these

@@ -29,6 +29,8 @@ A data generating app is created with Python, and it ingests the [theLook eComme
 
 <!--more-->
 
+[**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
+
 ## Services
 
 ![The simulation writes to PostgreSQL, the WebSocket server sends the recent order items on /ws, and a terminal client prints them](part-1.png#center "Architecture")
@@ -76,7 +78,7 @@ CREATE TABLE IF NOT EXISTS {PARAMS_TABLE} (id SERIAL PRIMARY KEY,
 
 ### Data Generator
 
-The data generator is a [dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) simulation of the shop, and it runs in its own terminal. It connects to the PostgreSQL database with the settings in `sales/core/config.py`, and runs until it is stopped (`--minutes` stops it after that many minutes).
+The data generator is a [desflow](https://github.com/jaehyeon-kim/desflow) simulation of the shop, and it runs in its own terminal. It connects to the PostgreSQL database with the settings in `sales/core/config.py`, and runs until it is stopped (`--minutes` stops it after that many minutes).
 
 ```bash
 (.venv) $ python -m sales.simulation.run
@@ -84,11 +86,11 @@ The data generator is a [dynamic-des](https://github.com/jaehyeon-kim/dynamic-de
 
 #### Data Generator Source
 
-The *theLook eCommerce* dataset is reduced to four entities, three of which are dynamically generated. Visitors arrive at random, view a few pages, and some buy. A buyer is a new or a returning *user*, and each purchase creates an *order* with one or more *order items*. Each order waits for a warehouse picker, then ships and completes, or is cancelled when no picker comes in time. Every change of status updates the order and its items. dynamic-des's `PostgresEgress` writes each row to its table, and `PostgresIngress` applies parameter changes while the simulation runs.
+The *theLook eCommerce* dataset is reduced to four entities, three of which are dynamically generated. Visitors arrive at random, view a few pages, and some buy. A buyer is a new or a returning *user*, and each purchase creates an *order* with one or more *order items*. Each order waits for a warehouse picker, then ships and completes, or is cancelled when no picker comes in time. Every change of status updates the order and its items. desflow's `PostgresEgress` writes each row to its table, and `PostgresIngress` applies parameter changes while the simulation runs.
 
 ```python
 # live-dashboard/sales/simulation/run.py
-"""The shop as a discrete-event model in dynamic-des, run in real time into PostgreSQL.
+"""The shop as a discrete-event model in desflow, run in real time into PostgreSQL.
 
 Visitors arrive and browse, and some buy. Each order waits for a picker, ships and
 completes, or is cancelled when no picker comes in time. Every rate, time and chance is
@@ -100,7 +102,7 @@ import asyncio
 import logging
 from datetime import UTC, datetime, timedelta
 
-from dynamic_des import PostgresEgress, PostgresIngress, SimulationContext
+from desflow import PostgresEgress, PostgresIngress, SimulationContext
 
 from sales.core.config import (
     ARRIVALS,
@@ -254,12 +256,12 @@ In the following example, the simulation starts and connects to each table.
 
 ```bash
 (.venv) $ python -m sales.simulation.run
-2026-09-30 22:44:19,294 dynamic_des.core.context Building SimulationContext for 'sales'...
-2026-09-30 22:44:19,295 dynamic_des.core.context Simulation engine started.
-2026-09-30 22:44:19,627 dynamic_des.connectors.egress.postgres PostgresEgress connected to order_items
-2026-09-30 22:44:19,627 dynamic_des.connectors.egress.postgres PostgresEgress connected to users
-2026-09-30 22:44:19,627 dynamic_des.connectors.egress.postgres PostgresEgress connected to orders
-2026-09-30 22:44:19,627 dynamic_des.connectors.egress.postgres PostgresEgress connected to products
+2026-09-30 22:44:19,294 desflow.core.context Building SimulationContext for 'sales'...
+2026-09-30 22:44:19,295 desflow.core.context Simulation engine started.
+2026-09-30 22:44:19,627 desflow.connectors.egress.postgres PostgresEgress connected to order_items
+2026-09-30 22:44:19,627 desflow.connectors.egress.postgres PostgresEgress connected to users
+2026-09-30 22:44:19,627 desflow.connectors.egress.postgres PostgresEgress connected to orders
+2026-09-30 22:44:19,627 desflow.connectors.egress.postgres PostgresEgress connected to products
 ```
 
 When the data gets ingested into the database, we see the following tables are created in the *dashboard* schema.

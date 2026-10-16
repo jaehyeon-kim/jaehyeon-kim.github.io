@@ -6,7 +6,7 @@ featured: true
 comment: true
 toc: true
 series:
-  - Building Real-Time Digital Twins with dynamic-des
+  - Building Real-Time Digital Twins with desflow
 categories:
   - Data Streaming
   - Machine Learning

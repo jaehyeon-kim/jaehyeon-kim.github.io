@@ -1,12 +1,12 @@
 ---
-title: "One Simulation, Two Pipelines: Batch Training and Live Inference with Dynamic DES"
+title: "One Simulation, Two Pipelines: Batch Training and Live Inference with desflow"
 date: 2026-05-25
 draft: false
 featured: false
 comment: true
 toc: true
 series:
-  - Building Real-Time Digital Twins with dynamic-des
+  - Building Real-Time Digital Twins with desflow
 categories:
   - Data Engineering
   - Machine Learning
@@ -27,7 +27,9 @@ Training a machine learning model on simulated data is straightforward until you
 
 Maintaining two separate simulation codebases, _one for generating training data and another for streaming live events_, introduces friction, schema mismatches, and duplicated engineering effort.
 
-Dynamic DES was originally designed to solve the real-time problem by acting as a control plane for SimPy models. With the release of **v0.8.1**, it now natively handles high-performance historical data generation, allowing you to use the **exact same simulation code** for both batch training and live inference.
+desflow was originally designed to solve the real-time problem by acting as a control plane for SimPy models. With the release of **v0.8.1** (then named dynamic-des), it now natively handles high-performance historical data generation, allowing you to use the **exact same simulation code** for both batch training and live inference.
+
+[**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
 
 ## Step 1: Batch Training (Historical Fast-Forward)
 
@@ -52,8 +54,8 @@ This provides an end-to-end data engineering toolkit for simulation-based Machin
 
 ## Related posts
 
-* [Building an Event-Driven Hybrid Digital Twin with dynamic-des](/blog/2026-04-28-digital-twin-dynamic-des/) - the earlier release that turns a static SimPy model into a synchronized forecasting engine
-* [Dynamic DES: A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors/) - the later release, which adds a declarative API and native Postgres and Redis connectors
+* [Building an Event-Driven Hybrid Digital Twin with desflow](/blog/2026-04-28-digital-twin-dynamic-des/) - the earlier release that turns a static SimPy model into a synchronized forecasting engine
+* [desflow: A Declarative API with Postgres and Redis Connectors](/blog/2026-07-17-dynamic-des-declarative-connectors/) - the later release, which adds a declarative API and native Postgres and Redis connectors
 * [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](/blog/2026-04-21-digital-twin-online-machine-learning/) - the Flink pipeline that learns online from the kind of stream this simulation feeds
 * [Building an Agentic Analytics System over an Iceberg Lakehouse](/blog/2026-07-18-agentic-analytics-system/) - the fast-forward clock used to fill an Iceberg lakehouse with Parquet data that an agent queries
 
@@ -61,5 +63,5 @@ This provides an end-to-end data engineering toolkit for simulation-based Machin
 
 The v0.8.1 release and the new storage connectors are available now. You can view the source code and run the historical data generation example below.
 
-* **GitHub Repository:** [jaehyeon-kim/dynamic-des](https://github.com/jaehyeon-kim/dynamic-des)
-* **Documentation & Examples:** [Backfill Then Go Live guide](https://jaehyeon.me/dynamic-des/latest/guides/backfill-then-live/)
+* **GitHub Repository:** [jaehyeon-kim/desflow](https://github.com/jaehyeon-kim/desflow)
+* **Documentation & Examples:** [Backfill Then Go Live guide](https://jaehyeon.me/desflow/latest/guides/backfill-then-live/)

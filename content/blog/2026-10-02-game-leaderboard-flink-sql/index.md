@@ -25,6 +25,8 @@ A mobile game produces a score every time a player finishes a round, and players
 
 <!--more-->
 
+[**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
+
 The source code is in [benchtop/game-leaderboard](https://github.com/jaehyeon-kim/benchtop/tree/main/game-leaderboard). It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.
 
 ## What You Will Build
@@ -50,7 +52,7 @@ The four leaderboards:
 
 ![Architecture: a simulated game sends scores to Kafka, Flink SQL jobs keep leaderboards in PostgreSQL, and a dashboard shows them](architecture.png)
 
-1. **Events.** A simulation built with [dynamic-des](https://github.com/jaehyeon-kim/dynamic-des) ([documentation](https://jaehyeon.me/dynamic-des/latest/getting-started/)) plays the game in real time. dynamic-des is a Python library for simulations that stream their output. Each score is published to the Kafka topic `game-scores` in Avro, a compact binary format whose schema is kept in a schema registry.
+1. **Events.** A simulation built with [desflow](https://github.com/jaehyeon-kim/desflow) ([documentation](https://jaehyeon.me/desflow/latest/getting-started/)) plays the game in real time. desflow is a Python library for simulations that stream their output. Each score is published to the Kafka topic `game-scores` in Avro, a compact binary format whose schema is kept in a schema registry.
 2. **Leaderboards.** Four Flink SQL jobs, one per leaderboard, read the topic and compute the leaderboards. Flink is a stream processor. It keeps each query's result up to date as events arrive, rather than running the query once.
 3. **Storage.** Each job writes its leaderboard to a PostgreSQL table with one row per rank. When the team or player at a rank changes, Flink updates that row.
 4. **Dashboard.** A [NiceGUI](https://nicegui.io/) web page reads the four tables and redraws them every 2 seconds. NiceGUI is a Python library for web pages. The page shows the current leaderboards as soon as it opens, because the tables always hold the latest state.
@@ -59,7 +61,7 @@ The tools:
 
 | Tool | Role here |
 |---|---|
-| dynamic-des | simulates the game, publishes the events to Kafka, and reads parameter changes from Kafka while it runs |
+| desflow | simulates the game, publishes the events to Kafka, and reads parameter changes from Kafka while it runs |
 | Apache Kafka, with Karapace | carries the events; Karapace is the schema registry that holds their Avro schema |
 | Apache Flink | runs the SQL jobs that compute the leaderboards |
 | PostgreSQL | stores the leaderboards |
@@ -92,9 +94,9 @@ The web UIs:
 
 A discrete-event simulation (DES) moves a clock from one event to the next, such as a player's next round. Nothing happens between events, so the model only has to say what each event does and how long it is until the next one. Here the clock runs at the speed of real time.
 
-The model is built from dynamic-des's parts. The teams themselves are plain Python, in `leaderboard/simulation/game.py`:
+The model is built from desflow's parts. The teams themselves are plain Python, in `leaderboard/simulation/game.py`:
 
-| Part of the game | dynamic-des feature | Default |
+| Part of the game | desflow feature | Default |
 |---|---|---|
 | Players arrive at random | an arrival, `player`: exponential gaps | a player every 2 seconds |
 | A player's session | a process, one per player, started for each arrival | lasts a lognormal time, 5 minutes on average |
@@ -165,7 +167,7 @@ def _session(
     game.leave(team, player)
 ```
 
-Every parameter is a path in dynamic-des's registry, such as `game.variables.robot_share` or `game.service.round.mean`. The registry is a store of named parameters. The processes read the live value each time they draw one, so a change sent to `game-control` applies from the next arrival or round.
+Every parameter is a path in desflow's registry, such as `game.variables.robot_share` or `game.service.round.mean`. The registry is a store of named parameters. The processes read the live value each time they draw one, so a change sent to `game-control` applies from the next arrival or round.
 
 ## Step 1: Run the Simulation
 
@@ -176,9 +178,9 @@ python -m leaderboard.simulation.run     # Ctrl + C to stop
 It creates two Kafka topics if they are missing: `game-scores` for the scores, and `game-control` for parameter changes. It then plays the game in real time and sends about 27 scores a second until you stop it. The first score registers the Avro schema in Karapace, under the subject `game-scores-value`. Its log shows the simulation starting, and its Kafka writer and reader connecting:
 
 ```
-2026-09-30 22:41:07,798 dynamic_des.core.context Simulation engine started.
-2026-09-30 22:41:07,801 dynamic_des.connectors.egress.kafka Kafka Egress producer connected successfully.
-2026-09-30 22:41:07,802 dynamic_des.connectors.ingress.kafka Connected to Kafka Ingress topic: game-control
+2026-09-30 22:41:07,798 desflow.core.context Simulation engine started.
+2026-09-30 22:41:07,801 desflow.connectors.egress.kafka Kafka Egress producer connected successfully.
+2026-09-30 22:41:07,802 desflow.connectors.ingress.kafka Connected to Kafka Ingress topic: game-control
 ```
 
 In Kafka UI, the topic `game-scores` shows the scores. Each message is keyed by the player:
@@ -357,7 +359,7 @@ Open http://127.0.0.1:8091. The four charts update every 2 seconds while the sim
 
 ## Step 4: Change the Game While It Runs
 
-The simulation reads parameter changes from the topic `game-control` while it runs, through dynamic-des's Kafka ingress. For example, make every new player a robot:
+The simulation reads parameter changes from the topic `game-control` while it runs, through desflow's Kafka ingress. For example, make every new player a robot:
 
 ```bash
 python -m leaderboard.simulation.control game.variables.robot_share 1.0
