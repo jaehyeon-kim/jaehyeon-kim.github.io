@@ -29,7 +29,7 @@ A data generating app is created with Python, and it ingests the [theLook eComme
 
 <!--more-->
 
-[**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
+[**Update 2026-10-16**] dynamic-des is now desflow. The code and commands below use desflow 0.21.0: pip install desflow, import desflow and the desflow command, and the parameter table's columns are `path` and `value`, which the PostgreSQL ingress reads from 0.21.0. A table made before then has its columns renamed when the store starts.
 
 ## Services
 
@@ -71,8 +71,17 @@ CREATE TABLE IF NOT EXISTS {SCHEMA}.orders (id TEXT PRIMARY KEY, user_id TEXT,
 CREATE TABLE IF NOT EXISTS {SCHEMA}.order_items (id TEXT PRIMARY KEY, order_id TEXT,
     user_id TEXT, product_id BIGINT, status TEXT, sale_price FLOAT8, created_at TEXT);
 CREATE TABLE IF NOT EXISTS {PARAMS_TABLE} (id SERIAL PRIMARY KEY,
-    param_path VARCHAR(255) NOT NULL, param_value TEXT NOT NULL,
+    path VARCHAR(255) NOT NULL, value TEXT NOT NULL,
     is_applied BOOLEAN DEFAULT FALSE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+-- desflow 0.21.0 reads `path` and `value`; a table made before it gets its columns renamed.
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns
+               WHERE table_schema || '.' || table_name = '{PARAMS_TABLE}'
+               AND column_name = 'param_path') THEN
+        ALTER TABLE {PARAMS_TABLE} RENAME COLUMN param_path TO path;
+        ALTER TABLE {PARAMS_TABLE} RENAME COLUMN param_value TO value;
+    END IF;
+END $$;
 """
 ```
 
