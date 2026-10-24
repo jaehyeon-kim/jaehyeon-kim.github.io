@@ -20,7 +20,7 @@ description: Host the web application that calls an R machine learning model on 
 
 While the API returns a predicted admission status value given *GRE*, *GPA* and *Rank*, there is an issue if it is served within a web application: *Cross-Origin Resource Sharing (CORS)*. This post discusses how to resolve this issue by updating API configuration and the Lambda function handler with a simple web application. Also it is illustrated how to host the application in a serverless environment. In the previous posts, it is discussed how to package/deploy an [R](https://www.r-project.org/about.html) model with [AWS Lambda](https://aws.amazon.com/lambda/details/) and to expose the Lambda function via [Amazon API Gateway](https://aws.amazon.com/api-gateway/). Main benefits of **serverless architecture** is cost-effectiveness and being hassle-free from provisioning/managing servers.
 
-> **Status, September 2026.** The AWS console screens shown here have been redesigned, so the API Gateway *Enable CORS* flow under *Actions*, and the S3 and CloudFront setup pages, no longer match what the console presents. The Lambda handler change and the overall approach still apply, and an infrastructure as code tool is a better fit than clicking through the console.
+> **Status, October 2026.** The demo sites `poc.jaehyeon.me` and `web.jaehyeon.me`, and the API at `api.jaehyeon.me`, were taken down in October 2026, so the addresses on this page are examples and no longer answer. The AWS console screens shown here have been redesigned, so the API Gateway *Enable CORS* flow under *Actions*, and the S3 and CloudFront setup pages, no longer match what the console presents. The Lambda handler change and the overall approach still apply, and an infrastructure as code tool is a better fit than clicking through the console.
 
 * Backend
     * [Part I - Packaging R ML Model for Lambda](/blog/2017-04-08-serverless-data-product-1/)
@@ -258,7 +258,7 @@ In Route 53, a new record set is created and `web.jaehyeon.me` is entered in the
 
 ![Route 53 record set with an A record aliased to the CloudFront domain name](05-cloudfront-07.png#center "Route 53 record set with an A record aliased to the CloudFront domain name")
 
-Once it is ready, the application can be accessed using either [https://web.jaehyeon.me](https://web.jaehyeon.me) or [https://web.jaehyeon.me](https://web.jaehyeon.me) where HTTP is redirected to HTTPS.
+Once it is ready, the application can be accessed at `https://web.jaehyeon.me`, and a request to `http://web.jaehyeon.me` is redirected to HTTPS.
 
 ## Final thoughts
 
