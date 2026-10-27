@@ -37,6 +37,16 @@ Articles on data engineering, data streaming and machine learning, most with the
 - [Develop Batch File Reader and PiSampler using Splittable DoFn - Apache Beam Python Examples Part 9](https://jaehyeon.me/blog/2024-12-05-beam-examples-9/): Splittable DoFn in Beam Python builds a batch file reader that processes files in parallel, and a PiSampler that estimates pi by Monte Carlo runs.
 - [Develop Streaming File Reader using Splittable DoFn - Apache Beam Python Examples Part 10](https://jaehyeon.me/blog/2024-12-19-beam-examples-10/): A streaming file reader built with Splittable DoFn scans an input folder for new files repeatedly, a pattern for unbounded sources in the Python SDK.
 
+## Building Real-Time Digital Twins with desflow
+
+- [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/): An Apache Flink and Kotlin streaming architecture where online machine learning detects concept drift from machinery wear, controlled by a shadow mode router.
+- [Why Digital Twins Are Rewiring Industry 4.0](https://jaehyeon.me/blog/2026-04-23-digital-twin-industry-4-0/): Why a simulation is not a digital twin: the layers that separate an offline model, an operational twin and an event-driven hybrid of the two.
+- [Building an Event-Driven Hybrid Digital Twin with desflow](https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des/): Keeping a simulation in step with live data: change a running SimPy model's parameters from Kafka and stream its events out, so it acts as a digital twin.
+- [One Simulation, Two Pipelines: Batch Training and Live Inference with desflow](https://jaehyeon.me/blog/2026-05-25-dynamic-des-parquet-support/): One simulation that writes Parquet for model training and streams Kafka events for live inference, so training and serving use the same simulation code.
+- [desflow: A Declarative API with Postgres and Redis Connectors](https://jaehyeon.me/blog/2026-07-17-dynamic-des-declarative-connectors/): Generating test data that changes while it runs: SimPy simulations written with a declarative API that read settings from and write events to PostgreSQL and Redis.
+- [Defining Data-Streaming Simulations in YAML, Without Writing Python](https://jaehyeon.me/blog/2026-10-06-simulations-in-yaml-dynamic-des/): Test data for a streaming pipeline, from a settings file rather than a program: a plain YAML file describes a simulation, and one command runs it and sends its events to Kafka, PostgreSQL, Parquet or Iceberg.
+- [From dynamic-des to desflow: What Changed in Five Releases](https://jaehyeon.me/blog/2026-10-28-desflow-0-25-0/): dynamic-des is now desflow. A simulation of a small shop shows what five releases added: customers who give up waiting and machines that break, a check that a model makes sense before it runs, and an answer to a question such as "would a third packer cut the wait?" that accounts for chance.
+
 ## Real Time Streaming with Kafka and Flink
 
 - [Real Time Streaming with Kafka and Flink - Introduction](https://jaehyeon.me/blog/2023-10-05-real-time-streaming-with-kafka-and-flink-1/): Kafka and PyFlink replace Amazon Kinesis in a real time analytics app from an AWS workshop. The original and the new architecture are compared.
@@ -46,15 +56,6 @@ Articles on data engineering, data streaming and machine learning, most with the
 - [Clean, Aggregate, and Enrich Events with Flink - Real Time Streaming with Kafka and Flink Lab 4](https://jaehyeon.me/blog/2023-11-23-real-time-streaming-with-kafka-and-flink-5/): Aggregate taxi ride counts and trip durations by vendor over five second windows with PyFlink, then chart them in an OpenSearch dashboard.
 - [Write data to DynamoDB using Kafka Connect - Real Time Streaming with Kafka and Flink Lab 5](https://jaehyeon.me/blog/2023-11-30-real-time-streaming-with-kafka-and-flink-6/): Ingest records from a Kafka topic into a DynamoDB table using the Camel DynamoDB sink connector, defined and run on Kafka Connect.
 - [Consume data from Kafka using Lambda - Real Time Streaming with Kafka and Flink Lab 6](https://jaehyeon.me/blog/2023-12-14-real-time-streaming-with-kafka-and-flink-7/): Consume Kafka messages with an AWS Lambda function, using Amazon MSK as an event source so that Lambda polls the topic and invokes the function.
-
-## Building Real-Time Digital Twins with desflow
-
-- [Building a Real-Time Industrial Digital Twin with Apache Flink and Online Machine Learning](https://jaehyeon.me/blog/2026-04-21-digital-twin-online-machine-learning/): An Apache Flink and Kotlin streaming architecture where online machine learning detects concept drift from machinery wear, controlled by a shadow mode router.
-- [Why Digital Twins Are Rewiring Industry 4.0](https://jaehyeon.me/blog/2026-04-23-digital-twin-industry-4-0/): Why a simulation is not a digital twin: the layers that separate an offline model, an operational twin and an event-driven hybrid of the two.
-- [Building an Event-Driven Hybrid Digital Twin with desflow](https://jaehyeon.me/blog/2026-04-28-digital-twin-dynamic-des/): Keeping a simulation in step with live data: change a running SimPy model's parameters from Kafka and stream its events out, so it acts as a digital twin.
-- [One Simulation, Two Pipelines: Batch Training and Live Inference with desflow](https://jaehyeon.me/blog/2026-05-25-dynamic-des-parquet-support/): One simulation that writes Parquet for model training and streams Kafka events for live inference, so training and serving use the same simulation code.
-- [desflow: A Declarative API with Postgres and Redis Connectors](https://jaehyeon.me/blog/2026-07-17-dynamic-des-declarative-connectors/): Generating test data that changes while it runs: SimPy simulations written with a declarative API that read settings from and write events to PostgreSQL and Redis.
-- [Defining Data-Streaming Simulations in YAML, Without Writing Python](https://jaehyeon.me/blog/2026-10-06-simulations-in-yaml-dynamic-des/): Test data for a streaming pipeline, from a settings file rather than a program: a plain YAML file describes a simulation, and one command runs it and sends its events to Kafka, PostgreSQL, Parquet or Iceberg.
 
 ## dbt Pizza Shop Demo
 
