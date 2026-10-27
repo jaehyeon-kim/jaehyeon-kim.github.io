@@ -15,6 +15,8 @@ tags:
   - R
   - RServe
 description: A FastAPI web service dispatches tasks to Celery and RServe workers, with Redis as broker and store, running on Docker Compose and Kubernetes.
+aliases:
+  - /blog/2019-11-15-Distributed-Task-Queue-with-Python-and-R-Example/
 ---
 
 While I'm looking into [Apache Airflow](https://airflow.apache.org/), a workflow management tool, I thought it would be beneficial to get some understanding of how [Celery](https://www.celeryproject.org/) works. To do so, I built a simple web service that sends tasks to Celery workers and collects the results from them. [FastAPI](https://fastapi.tiangolo.com/) is used for developing the web service and [Redis](https://redis.io/) is used for the message broker and result backend. During the development, I thought it would be possible to implement similar functionality in R with [Rserve](https://www.rforge.net/Rserve/). Therefore a Rserve worker is added as an example as well. Coupling a web service with distributed task queue is beneficial on its own as it helps the service be more responsive by offloading heavyweight and long running processes to task workers.
