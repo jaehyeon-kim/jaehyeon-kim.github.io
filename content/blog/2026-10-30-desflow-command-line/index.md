@@ -1,7 +1,7 @@
 ---
 title: "desflow from the Command Line: One Model, Every Command"
 date: 2026-10-30
-draft: true
+draft: false
 featured: true
 comment: true
 toc: true
