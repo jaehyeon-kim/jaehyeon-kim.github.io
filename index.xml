@@ -1,4 +1,311 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Data Engineer | Data Streaming | Powering ML &amp; AI in Real Time</description><language>en</language><atom:link href="https://jaehyeon.me/index.xml" rel="self" type="application/rss+xml"/><lastBuildDate>Wed, 28 Oct 2026 00:00:00 +0000</lastBuildDate><item><title>From dynamic-des to desflow: What Changed in Five Releases</title><link>https://jaehyeon.me/blog/2026-10-28-desflow-0-25-0/</link><guid>https://jaehyeon.me/blog/2026-10-28-desflow-0-25-0/</guid><pubDate>Wed, 28 Oct 2026 00:00:00 +0000</pubDate><category>Discrete Event Simulation</category><category>desflow</category><category>SimPy</category><category>YAML</category><category>Queueing Theory</category><category>Python</category><description>&lt;p>A simulation is a small model of a real system that a computer plays forward in time. Take a shop that packs orders. Orders arrive at random moments, packers take one at a time, and packing takes longer for some orders than for others. When orders arrive faster than the packers can finish them, a queue forms. A simulation shows how long that queue gets and how long orders wait, without running the real shop.&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>Jaehyeon Kim</title><link>https://jaehyeon.me/</link><description>Data Engineer | Data Streaming | Powering ML &amp; AI in Real Time</description><language>en</language><atom:link href="https://jaehyeon.me/index.xml" rel="self" type="application/rss+xml"/><lastBuildDate>Fri, 30 Oct 2026 00:00:00 +0000</lastBuildDate><item><title>desflow from the Command Line: One Model, Every Command</title><link>https://jaehyeon.me/blog/2026-10-30-desflow-command-line/</link><guid>https://jaehyeon.me/blog/2026-10-30-desflow-command-line/</guid><pubDate>Fri, 30 Oct 2026 00:00:00 +0000</pubDate><category>Discrete Event Simulation</category><category>desflow</category><category>SimPy</category><category>YAML</category><category>Queueing Theory</category><category>Python</category><description>&lt;p>A simulation study answers a question about a system by building a model of it and running the model on a computer. Here the system is a shop that packs orders, and the question is whether it needs a third packer. A study goes through the same steps each time: get a model, check that it makes sense, look at what it produces, run it many times, compare the options, and base its inputs on real measurements.&lt;/p>
+&lt;p>desflow has a command for each step. The &lt;a href="https://jaehyeon.me/blog/2026-10-28-desflow-0-25-0/">previous post&lt;/a> said what changed in desflow 0.25.0. This post runs every command on one model and shows what each prints. Everything runs on your own machine, in one folder, without Docker.&lt;/p></description><content:encoded>&lt;p>A simulation study answers a question about a system by building a model of it and running the model on a computer. Here the system is a shop that packs orders, and the question is whether it needs a third packer. A study goes through the same steps each time: get a model, check that it makes sense, look at what it produces, run it many times, compare the options, and base its inputs on real measurements.&lt;/p>
+&lt;p>desflow has a command for each step. The &lt;a href="https://jaehyeon.me/blog/2026-10-28-desflow-0-25-0/">previous post&lt;/a> said what changed in desflow 0.25.0. This post runs every command on one model and shows what each prints. Everything runs on your own machine, in one folder, without Docker.&lt;/p>
+&lt;p>&lt;picture>&lt;img class="img-fluid " alt="desflow examples get, desflow explain, desflow run &amp;amp;ndash;sample and desflow run &amp;amp;ndash;replications on the shop, in one terminal" src="https://jaehyeon.me/blog/2026-10-30-desflow-command-line/command-line.gif" loading="lazy" width="1200" height="720" />
+&lt;/picture>
+
+&lt;/p>
+
+&lt;h2 id="install" data-numberify>Install&lt;a class="anchor ms-1" href="#install" aria-label="Link to this section: Install">&lt;/a>&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">pip install &lt;span class="s2">&amp;#34;desflow[fit]&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">2&lt;/span>&lt;span class="cl">desflow --version
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">0.25.0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The &lt;code>fit&lt;/code> extra adds scipy and matplotlib, which only &lt;code>desflow fit&lt;/code> needs. &lt;code>desflow&lt;/code> on its own lists the commands, and &lt;code>--help&lt;/code> after any command shows its options with examples.&lt;/p>
+
+&lt;h2 id="get-the-model" data-numberify>Get the Model&lt;a class="anchor ms-1" href="#get-the-model" aria-label="Link to this section: Get the Model">&lt;/a>&lt;/h2>
+&lt;p>desflow comes with example models. &lt;code>desflow examples list&lt;/code> lists them, with any service, such as Kafka, that an example needs:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">$ desflow examples list
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">2&lt;/span>&lt;span class="cl">local prints events and telemetry, with no container (no service)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">3&lt;/span>&lt;span class="cl">kafka takes updates from Kafka and publishes events and telemetry to Kafka (odctl up kafka-lite)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">4&lt;/span>&lt;span class="cl">parquet a week generated unpaced, written to Parquet (no service)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">5&lt;/span>&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">6&lt;/span>&lt;span class="cl">experiment two designs of the shop compared with paired replications, a check, observed waits and a report (no service)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">7&lt;/span>&lt;span class="cl">fitting the packing time fitted from 40 measured times, then loaded into the shop (no service)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">8&lt;/span>&lt;span class="cl">related-records orders and their line items, in two PostgreSQL tables (odctl up postgres)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>desflow examples get&lt;/code> downloads one into a folder named after it:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">$ desflow examples get experiment --api yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">2&lt;/span>&lt;span class="cl">wrote experiment/yaml/experiment.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">3&lt;/span>&lt;span class="cl">wrote experiment/yaml/experiment_shop.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">4&lt;/span>&lt;span class="cl">wrote experiment/observed_waits.csv
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">5&lt;/span>&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">6&lt;/span>&lt;span class="cl">Find the bottleneck, with no run: cd experiment/yaml &amp;amp;&amp;amp; desflow explain experiment_shop.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">7&lt;/span>&lt;span class="cl">Run the yaml version: cd experiment/yaml &amp;amp;&amp;amp; desflow experiment experiment.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>experiment_shop.yaml&lt;/code> is the model of the shop:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="ln"> 1&lt;/span>&lt;span class="cl">&lt;span class="nt">simulation&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 2&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">sim_id&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Shop&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 3&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">factor&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># run as fast as possible, not in real time&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 4&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">random_seed&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">42&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># the same random draws on every run&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 5&lt;/span>&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 6&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 7&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">packers&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="nt">current_cap: 2, max_cap&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">4&lt;/span>}&lt;span class="w"> &lt;/span>&lt;span class="c"># 2 packers, at most 4&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 8&lt;/span>&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 9&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">services&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">10&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">packing&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="nt">dist: gamma, shape: 4, scale&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">1&lt;/span>}&lt;span class="w"> &lt;/span>&lt;span class="c"># 4 seconds on average, varying&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">11&lt;/span>&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">12&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">arrivals&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">13&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">orders&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="nt">dist: exponential, rate: 0.4, spawn&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">pack} &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># an order every 2.5 seconds on average&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">14&lt;/span>&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">15&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">tasks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">16&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">pack&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">17&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">service&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">packing&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">18&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">resource&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">packers&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">19&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">payload&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="nt">event_type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">order_packed}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Orders arrive at random moments, every 2.5 seconds on average. Each one waits for a free packer, and packing takes 4 seconds on average, sometimes more and sometimes less. &lt;code>experiment.yaml&lt;/code> is the study that compares two packers with three, and &lt;code>observed_waits.csv&lt;/code> holds the wait measured in the real shop. The commands below run from &lt;code>experiment/yaml&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">&lt;span class="nb">cd&lt;/span> experiment/yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;h2 id="check-it-makes-sense" data-numberify>Check It Makes Sense&lt;a class="anchor ms-1" href="#check-it-makes-sense" aria-label="Link to this section: Check It Makes Sense">&lt;/a>&lt;/h2>
+&lt;p>Before running anything, it helps to know whether the packers can keep up. Queueing theory, the mathematics of waiting lines, describes a line such as the shop&amp;rsquo;s with a few numbers, each written as a letter:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>λ (lambda), the arrival rate:&lt;/strong> how many orders arrive a second. An order every 2.5 seconds is 0.4 a second.&lt;/li>
+&lt;li>&lt;strong>μ (mu), the service rate:&lt;/strong> how many orders one packer finishes a second. Packing takes 4 seconds, so one packer finishes 0.25 a second.&lt;/li>
+&lt;li>&lt;strong>c, the capacity:&lt;/strong> the number of packers, 2.&lt;/li>
+&lt;li>&lt;strong>ρ (rho), the utilisation:&lt;/strong> the share of time the packers are busy. Two packers finish c × μ = 0.5 orders a second while 0.4 arrive, so ρ = λ ÷ (c × μ) = 0.4 ÷ 0.5 = 0.8. They are busy 80% of the time.&lt;/li>
+&lt;/ul>
+&lt;p>When ρ is 1 or more, orders arrive faster than they are packed, and the queue grows for as long as the shop stays open.&lt;/p>
+&lt;p>&lt;code>desflow explain&lt;/code> works these numbers out from the model, for every resource, and prints them:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="ln"> 1&lt;/span>&lt;span class="cl">$ desflow explain experiment_shop.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 2&lt;/span>&lt;span class="cl">Shop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 3&lt;/span>&lt;span class="cl">`-- orders (arrival, rate 0.4/s)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 4&lt;/span>&lt;span class="cl"> `-- spawn -&amp;gt; pack (task, rate 0.4/s)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 5&lt;/span>&lt;span class="cl"> +-- uses packers (resource)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 6&lt;/span>&lt;span class="cl"> `-- next (share 1) -&amp;gt; exit
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 7&lt;/span>&lt;span class="cl">Resources
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 8&lt;/span>&lt;span class="cl">+---------------------------------------------------+
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 9&lt;/span>&lt;span class="cl">| resource | λ | μ | c | ρ | Wq | L | status |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">10&lt;/span>&lt;span class="cl">|----------+-----+------+---+-----+----+---+--------|
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">11&lt;/span>&lt;span class="cl">| packers | 0.4 | 0.25 | 2 | 0.8 | - | - | OK |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">12&lt;/span>&lt;span class="cl">+---------------------------------------------------+
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">13&lt;/span>&lt;span class="cl">packers by units
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">14&lt;/span>&lt;span class="cl">+-----------------------+
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">15&lt;/span>&lt;span class="cl">| c | ρ | status |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">16&lt;/span>&lt;span class="cl">|---+--------+----------|
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">17&lt;/span>&lt;span class="cl">| 1 | 1.6 | UNSTABLE |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">18&lt;/span>&lt;span class="cl">| 2 | 0.8 | OK |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">19&lt;/span>&lt;span class="cl">| 3 | 0.5333 | OK |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">20&lt;/span>&lt;span class="cl">| 4 | 0.4 | OK |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">21&lt;/span>&lt;span class="cl">+-----------------------+
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">22&lt;/span>&lt;span class="cl">Bottleneck: packers
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">23&lt;/span>&lt;span class="cl">Not estimated:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">24&lt;/span>&lt;span class="cl"> wait at packers: no closed formula for c &amp;gt; 1 with non-exponential times; run --verify to measure it
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">25&lt;/span>&lt;span class="cl">Hints for utilisation 0.85:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">26&lt;/span>&lt;span class="cl"> packers with 2 units: utilisation 0.8, at most 0.85
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">27&lt;/span>&lt;span class="cl"> packers with 2 units: utilisation 0.85 at a request every 2.35 seconds (25.5 a minute, 0.425 a second)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The output reads from the top:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Graph:&lt;/strong> each order starts a &lt;code>pack&lt;/code> task, which uses a packer and then leaves. &lt;code>rate 0.4/s&lt;/code> is λ.&lt;/li>
+&lt;li>&lt;strong>Resources:&lt;/strong> λ, μ, c and ρ for the packers, as worked out above. Wq is the average time an order waits in the queue, and L is the average number of orders in the shop, waiting or being packed. &lt;code>status&lt;/code> is &lt;code>OK&lt;/code> while ρ is below 0.85, &lt;code>CONGESTED&lt;/code> from 0.85, where the queue gets long quickly, and &lt;code>UNSTABLE&lt;/code> from 1.&lt;/li>
+&lt;li>&lt;strong>packers by units:&lt;/strong> ρ for one to four packers, which shows how many packers the shop needs. One packer gives ρ = 0.4 ÷ 0.25 = 1.6, so it is &lt;code>UNSTABLE&lt;/code>.&lt;/li>
+&lt;li>&lt;strong>Bottleneck:&lt;/strong> the resource with the highest ρ.&lt;/li>
+&lt;li>&lt;strong>Not estimated:&lt;/strong> Wq and L are blank. A formula gives them only for simpler shops, such as one with a single packer, so &lt;code>explain&lt;/code> says so rather than guess.&lt;/li>
+&lt;li>&lt;strong>Hints:&lt;/strong> 0.85 is where &lt;code>CONGESTED&lt;/code> starts. The first line says two packers are below it. The second gives the arrival rate at which they reach it, only a little faster than the order every 2.5 seconds the shop has now.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>--verify&lt;/code> runs the model to measure what no formula gave, and to check the arithmetic. Here it runs one hour of the shop ten times:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="ln"> 1&lt;/span>&lt;span class="cl">$ desflow explain experiment_shop.yaml --verify --replications 10 --until 1h
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 2&lt;/span>&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 3&lt;/span>&lt;span class="cl">Verify: 10 runs to 3600 s, seed 42
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 4&lt;/span>&lt;span class="cl">+------------------------------------------------------------------------+
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 5&lt;/span>&lt;span class="cl">| node | measure | analysis | measured | ± | result |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 6&lt;/span>&lt;span class="cl">|---------+--------------+----------+----------+----------+--------------|
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 7&lt;/span>&lt;span class="cl">| packers | utilization | 0.8 | 0.7953 | 0.01561 | agrees |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 8&lt;/span>&lt;span class="cl">| packers | queue_length | - | 1.823 | 0.2856 | not compared |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 9&lt;/span>&lt;span class="cl">| pack | wait | - | 4.505 | 0.6483 | not compared |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">10&lt;/span>&lt;span class="cl">| orders | throughput | 0.4 | 0.4002 | 0.007201 | agrees |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">11&lt;/span>&lt;span class="cl">+------------------------------------------------------------------------+
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The &lt;code>...&lt;/code> stands for the same output as before. Each row of the table is one measure of one part of the model:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>node:&lt;/strong> the part measured: the &lt;code>packers&lt;/code>, the &lt;code>pack&lt;/code> task or the &lt;code>orders&lt;/code> arrival.&lt;/li>
+&lt;li>&lt;strong>measure:&lt;/strong> what was measured. &lt;code>throughput&lt;/code> is how many orders leave the shop a second.&lt;/li>
+&lt;li>&lt;strong>analysis:&lt;/strong> the value the arithmetic gives, or &lt;code>-&lt;/code> where no formula applies.&lt;/li>
+&lt;li>&lt;strong>measured:&lt;/strong> the average over the ten runs.&lt;/li>
+&lt;li>&lt;strong>±:&lt;/strong> give or take: the true average very likely lies within this distance of the measured one (a 95% confidence interval).&lt;/li>
+&lt;li>&lt;strong>result:&lt;/strong> &lt;code>agrees&lt;/code> when the analysis lies within that range, &lt;code>differs&lt;/code> when it does not, and &lt;code>not compared&lt;/code> when there is no analysis to compare.
+The packers are as busy as the arithmetic says, and orders leave as fast as they arrive, so the model does what its settings describe. The runs also measure the wait, which the arithmetic could not give.&lt;/li>
+&lt;/ul>
+
+&lt;h2 id="look-at-what-it-produces" data-numberify>Look at What It Produces&lt;a class="anchor ms-1" href="#look-at-what-it-produces" aria-label="Link to this section: Look at What It Produces">&lt;/a>&lt;/h2>
+&lt;p>A model produces events: one record each time something happens to an order. &lt;code>desflow run --sample&lt;/code> prints the first few, without sending anything to the model&amp;rsquo;s destinations, such as Kafka or a database:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">$ desflow run experiment_shop.yaml --sample 5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">2&lt;/span>&lt;span class="cl">{&amp;#34;stream_type&amp;#34;:&amp;#34;event&amp;#34;,&amp;#34;sim_ts&amp;#34;:3.19,&amp;#34;timestamp&amp;#34;:&amp;#34;2026-10-27T01:47:34.769+00:00&amp;#34;,&amp;#34;key&amp;#34;:&amp;#34;orders-1&amp;#34;,&amp;#34;task&amp;#34;:&amp;#34;pack&amp;#34;,&amp;#34;instance&amp;#34;:0,&amp;#34;value&amp;#34;:{&amp;#34;path_id&amp;#34;:&amp;#34;Shop.service.packing&amp;#34;,&amp;#34;status&amp;#34;:&amp;#34;queued&amp;#34;}}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">3&lt;/span>&lt;span class="cl">{&amp;#34;stream_type&amp;#34;:&amp;#34;event&amp;#34;,&amp;#34;sim_ts&amp;#34;:3.19,&amp;#34;timestamp&amp;#34;:&amp;#34;2026-10-27T01:47:34.769+00:00&amp;#34;,&amp;#34;key&amp;#34;:&amp;#34;orders-1&amp;#34;,&amp;#34;task&amp;#34;:&amp;#34;pack&amp;#34;,&amp;#34;instance&amp;#34;:0,&amp;#34;value&amp;#34;:{&amp;#34;path_id&amp;#34;:&amp;#34;Shop.service.packing&amp;#34;,&amp;#34;status&amp;#34;:&amp;#34;started&amp;#34;}}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">4&lt;/span>&lt;span class="cl">{&amp;#34;stream_type&amp;#34;:&amp;#34;event&amp;#34;,&amp;#34;sim_ts&amp;#34;:3.37,&amp;#34;timestamp&amp;#34;:&amp;#34;2026-10-27T01:47:34.949+00:00&amp;#34;,&amp;#34;key&amp;#34;:&amp;#34;orders-2&amp;#34;,&amp;#34;task&amp;#34;:&amp;#34;pack&amp;#34;,&amp;#34;instance&amp;#34;:1,&amp;#34;value&amp;#34;:{&amp;#34;path_id&amp;#34;:&amp;#34;Shop.service.packing&amp;#34;,&amp;#34;status&amp;#34;:&amp;#34;queued&amp;#34;}}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">5&lt;/span>&lt;span class="cl">{&amp;#34;stream_type&amp;#34;:&amp;#34;event&amp;#34;,&amp;#34;sim_ts&amp;#34;:3.37,&amp;#34;timestamp&amp;#34;:&amp;#34;2026-10-27T01:47:34.949+00:00&amp;#34;,&amp;#34;key&amp;#34;:&amp;#34;orders-2&amp;#34;,&amp;#34;task&amp;#34;:&amp;#34;pack&amp;#34;,&amp;#34;instance&amp;#34;:1,&amp;#34;value&amp;#34;:{&amp;#34;path_id&amp;#34;:&amp;#34;Shop.service.packing&amp;#34;,&amp;#34;status&amp;#34;:&amp;#34;started&amp;#34;}}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">6&lt;/span>&lt;span class="cl">{&amp;#34;stream_type&amp;#34;:&amp;#34;event&amp;#34;,&amp;#34;sim_ts&amp;#34;:4.672,&amp;#34;timestamp&amp;#34;:&amp;#34;2026-10-27T01:47:36.250+00:00&amp;#34;,&amp;#34;key&amp;#34;:&amp;#34;orders-3&amp;#34;,&amp;#34;task&amp;#34;:&amp;#34;pack&amp;#34;,&amp;#34;instance&amp;#34;:2,&amp;#34;value&amp;#34;:{&amp;#34;path_id&amp;#34;:&amp;#34;Shop.service.packing&amp;#34;,&amp;#34;status&amp;#34;:&amp;#34;queued&amp;#34;}}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Each order is &lt;code>queued&lt;/code> when it joins the line and &lt;code>started&lt;/code> when a packer takes it. The first two orders find a packer free and start at once. &lt;code>sim_ts&lt;/code> is the time in the simulation, in seconds from the start.&lt;/p>
+&lt;p>&lt;code>--stdout&lt;/code> prints every record of a full run instead of sending it on, so it can go to a file. This line runs the shop for 20 seconds, then lets the orders still inside finish:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">desflow run experiment_shop.yaml --seed &lt;span class="m">42&lt;/span> --until &lt;span class="m">20&lt;/span> --drain --stdout &amp;gt; records.jsonl
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;h2 id="run-it-many-times" data-numberify>Run It Many Times&lt;a class="anchor ms-1" href="#run-it-many-times" aria-label="Link to this section: Run It Many Times">&lt;/a>&lt;/h2>
+&lt;p>Arrival and packing times are random, so each run gives a slightly different answer. One run is like one day in the shop: a quiet day or a busy one by chance. &lt;code>--replications&lt;/code> runs the model several times, each with different random draws, and reports the average of each measure with a range around it:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="ln"> 1&lt;/span>&lt;span class="cl">$ desflow run experiment_shop.yaml --replications 10 --seed 42 --until 1h
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 2&lt;/span>&lt;span class="cl">measure n mean half-width (95%)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 3&lt;/span>&lt;span class="cl">resources.packers.capacity 10 2 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 4&lt;/span>&lt;span class="cl">resources.packers.in_use 10 1.8 0.3016
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 5&lt;/span>&lt;span class="cl">resources.packers.queue_length 10 4 3.422
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 6&lt;/span>&lt;span class="cl">resources.packers.utilization 10 90 15.08
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 7&lt;/span>&lt;span class="cl">resources.packers.utilization_avg 10 79.53 1.561
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 8&lt;/span>&lt;span class="cl">resources.packers.queue_length_avg 10 1.823 0.2856
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 9&lt;/span>&lt;span class="cl">tasks.pack.in_progress 10 5.8 3.566
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">10&lt;/span>&lt;span class="cl">tasks.pack.finished 10 1441 25.92
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">11&lt;/span>&lt;span class="cl">tasks.pack.wait_mean 10 4.505 0.6483
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">12&lt;/span>&lt;span class="cl">tasks.pack.wait_max 10 28.84 4.347
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">13&lt;/span>&lt;span class="cl">tasks.pack.service_mean 10 3.972 0.04102
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">14&lt;/span>&lt;span class="cl">tasks.pack.service_max 10 14.64 0.8328
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">15&lt;/span>&lt;span class="cl">flows.orders.finished 10 1441 25.92
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">16&lt;/span>&lt;span class="cl">flows.orders.started 10 1446 26.78
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">17&lt;/span>&lt;span class="cl">flows.orders.in_system 10 5.8 3.566
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">18&lt;/span>&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">19&lt;/span>&lt;span class="cl">Seed 42; replication seeds: 2684470948, 4091952314, 233227757, 3276785861, 3644269654, 1206282609, 3543069911, 3479688010, 877132087, 1244265337
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">20&lt;/span>&lt;span class="cl">Repeat one replication with: desflow run experiment_shop.yaml --seed &amp;lt;its seed&amp;gt; --until 1h
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Read &lt;code>tasks.pack.wait_mean&lt;/code> as: orders wait 4.5 seconds on average, give or take 0.65. The true average is very likely within that range (a 95% confidence interval). More runs make the range narrower.&lt;/p>
+&lt;p>A measure ending in &lt;code>_avg&lt;/code> is averaged over the whole hour. One without it, such as &lt;code>utilization&lt;/code>, is a single reading at the moment the run ends. That is why its range is so much wider. The last line gives the command that repeats any one of the ten runs exactly.&lt;/p>
+
+&lt;h2 id="compare-two-options" data-numberify>Compare Two Options&lt;a class="anchor ms-1" href="#compare-two-options" aria-label="Link to this section: Compare Two Options">&lt;/a>&lt;/h2>
+&lt;p>Would a third packer keep the average wait under 2 seconds? &lt;code>desflow experiment&lt;/code> answers that from a file. It runs one hour of the shop 20 times with two packers and 20 times with three:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="ln"> 1&lt;/span>&lt;span class="cl">&lt;span class="nt">experiment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">packers&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 2&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">question&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Does a third packer keep the mean wait under 2 seconds?&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 3&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">model&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">experiment_shop.yaml&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 4&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">until&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">1&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">h&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 5&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">warmup&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">3&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">min &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># leave out the first 3 minutes, when the shop is still empty&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 6&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">replications&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">20&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 7&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">seed&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">42&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 8&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">pairing&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">common &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># both versions see the same orders&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 9&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">measures&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="l">tasks.pack.wait_mean, resources.packers.utilization_avg]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">10&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">variants&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">11&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">two&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{}&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">12&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">three&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{&lt;span class="nt">Shop.resources.packers.current_cap&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">3&lt;/span>}&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">13&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">compare&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">14&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>- {&lt;span class="nt">baseline: two, variant&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">three}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">15&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">checks&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">16&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>- {&lt;span class="nt">measure: tasks.pack.wait_mean, variant: three, max&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">2&lt;/span>}&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">17&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">observed&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">18&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">file&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">../observed_waits.csv &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># the mean wait measured in the real shop&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">19&lt;/span>&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">variant&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">two &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># the real shop has two packers&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">20&lt;/span>&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">output&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">results/packers&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">$ desflow experiment experiment.yaml --output results/packers
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">2&lt;/span>&lt;span class="cl">Wrote the artifacts and report.md to results/packers
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">3&lt;/span>&lt;span class="cl">passed: three: tasks.pack.wait_mean max 2, checked 0.5919
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Both versions see the same orders at the same times, so a difference between them comes from the third packer, not from luck. The check passes: with three packers, even the top of the range of the average wait is under 2 seconds. The report, &lt;code>report.md&lt;/code>, puts the two side by side:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Packers&lt;/th>
+&lt;th>Average wait (s)&lt;/th>
+&lt;th>Range&lt;/th>
+&lt;th>Packers busy (%)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>two&lt;/td>
+&lt;td>4.872&lt;/td>
+&lt;td>4.323 to 5.422&lt;/td>
+&lt;td>80.56&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>three&lt;/td>
+&lt;td>0.5389&lt;/td>
+&lt;td>0.4859 to 0.5919&lt;/td>
+&lt;td>53.74&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>The experiment also compares two packers with the real shop. The wait measured there falls inside the range the model gives for two packers, which is evidence that the model describes the shop well. The command fails when a check fails, so it can run in a CI pipeline. &lt;code>desflow report results/packers&lt;/code> builds the report again from the saved results, without running anything.&lt;/p>
+
+&lt;h2 id="base-the-inputs-on-measurements" data-numberify>Base the Inputs on Measurements&lt;a class="anchor ms-1" href="#base-the-inputs-on-measurements" aria-label="Link to this section: Base the Inputs on Measurements">&lt;/a>&lt;/h2>
+&lt;p>The packing time in a model should come from measured times, not a guess. Measured times vary, and the model needs the shape of that variation: a distribution. The &lt;code>fitting&lt;/code> example holds 40 packing times timed at a bench, and &lt;code>desflow fit&lt;/code> tries each kind of distribution on them:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="ln"> 1&lt;/span>&lt;span class="cl">$ desflow examples get fitting --api yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 2&lt;/span>&lt;span class="cl">$ desflow fit fitting/packing_times.csv --column packing_seconds --lower 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 3&lt;/span>&lt;span class="cl">40 rows: 40 used, 0 missing, 0 invalid
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 4&lt;/span>&lt;span class="cl">family status AIC KS stat KS p (approx.) parameters or reason
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 5&lt;/span>&lt;span class="cl">exponential rejected its std is 1.5, the data&amp;#39;s is 0.4832: more than 25% apart
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 6&lt;/span>&lt;span class="cl">normal fitted 59.33 0.157 0.2504 mean=1.5, std=0.483218 (can draw below the lower bound 0)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 7&lt;/span>&lt;span class="cl">lognormal fitted 57.33 0.09406 0.8385 mean=1.50251, std=0.511854
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 8&lt;/span>&lt;span class="cl">truncated_normal fitted 59.25 0.1558 0.2579 mean=1.49836, std=0.48579, low=0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln"> 9&lt;/span>&lt;span class="cl">constant skipped the values are not all equal
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">10&lt;/span>&lt;span class="cl">uniform fitted 59.45 0.225 0.02923 low=0.7, high=2.7
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">11&lt;/span>&lt;span class="cl">triangular * fitted 56.68 0.1258 0.511 low=0.546332, mode=1.2, high=2.83766
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">12&lt;/span>&lt;span class="cl">gamma fitted 56.79 0.1157 0.6165 shape=9.55777, scale=0.15694
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">13&lt;/span>&lt;span class="cl">weibull fitted 58.99 0.1502 0.2972 shape=3.33522, scale=1.67203
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">14&lt;/span>&lt;span class="cl">empirical fitted values: 40 numbers
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">15&lt;/span>&lt;span class="cl">* best: triangular
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Each row is one kind of distribution. AIC scores how well it fits, and lower is better. The KS p column tests whether the fit is believable at all: a value near 0, as for &lt;code>uniform&lt;/code>, means it is not. The triangular fits best, just ahead of the gamma. &lt;code>--lower 0&lt;/code> says a time cannot be negative, which is why the normal is flagged. &lt;code>--out&lt;/code> writes the best fit as a setting the model can load.&lt;/p>
+&lt;p>&lt;code>desflow dist&lt;/code> converts in the other direction. Given an average and a spread, it gives the settings a distribution needs:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">$ desflow dist gamma --mean 1.5 --std 0.4832
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">2&lt;/span>&lt;span class="cl">parameters: shape 9.63671, scale 0.155655
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">3&lt;/span>&lt;span class="cl">mean 1.5, std 0.4832
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">4&lt;/span>&lt;span class="cl">variability: low (std / mean 0.322)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">5&lt;/span>&lt;span class="cl">with no random generator, every draw is 1.5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">6&lt;/span>&lt;span class="cl">YAML: {dist: gamma, shape: 9.63671, scale: 0.155655}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">7&lt;/span>&lt;span class="cl">Python: dist=&amp;#34;gamma&amp;#34;, shape=9.63671, scale=0.155655
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The last two lines are ready to paste into a model. &lt;code>desflow dist&lt;/code> on its own lists every kind of distribution.&lt;/p>
+
+&lt;h2 id="set-up-an-editor" data-numberify>Set Up an Editor&lt;a class="anchor ms-1" href="#set-up-an-editor" aria-label="Link to this section: Set Up an Editor">&lt;/a>&lt;/h2>
+&lt;p>&lt;code>desflow schema&lt;/code> prints a description of every setting a model can have, as a JSON Schema:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">desflow schema &amp;gt; blueprint.schema.json
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>With the Red Hat YAML extension in VS Code, this line at the top of a model makes the editor suggest settings and mark a misspelt one as you type:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">&lt;span class="c"># yaml-language-server: $schema=./blueprint.schema.json&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;a href="https://jaehyeon.me/desflow/latest/guides/set-up-your-editor/">Set Up Your Editor&lt;/a> shows other ways to point the editor at it.&lt;/p>
+
+&lt;h2 id="every-command-in-one-place" data-numberify>Every Command in One Place&lt;a class="anchor ms-1" href="#every-command-in-one-place" aria-label="Link to this section: Every Command in One Place">&lt;/a>&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Command&lt;/th>
+&lt;th>What it does&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>desflow examples&lt;/code>&lt;/td>
+&lt;td>lists the example models and downloads one&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>desflow explain&lt;/code>&lt;/td>
+&lt;td>checks that a model makes sense, without running it, and with &lt;code>--verify&lt;/code> by running it&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>desflow run&lt;/code>&lt;/td>
+&lt;td>runs a model, prints its first events, or runs it many times&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>desflow experiment&lt;/code>&lt;/td>
+&lt;td>compares versions of a model and writes a report&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>desflow report&lt;/code>&lt;/td>
+&lt;td>builds an experiment&amp;rsquo;s report again from its saved results&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>desflow fit&lt;/code>&lt;/td>
+&lt;td>finds the distribution that matches measured times&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>desflow dist&lt;/code>&lt;/td>
+&lt;td>lists the distributions and converts their settings&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>desflow schema&lt;/code>&lt;/td>
+&lt;td>prints the description of every setting, for an editor&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Each command calls the same library function a Python script would, so both give the same result. &lt;a href="https://jaehyeon.me/desflow/latest/user-guide/command-line/">Command Line&lt;/a> has every option on the same shop, and &lt;a href="https://jaehyeon.me/desflow/latest/reference/cli/">CLI&lt;/a> gives the help of every command.&lt;/p>
+
+&lt;h2 id="related-posts" data-numberify>Related Posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related Posts">&lt;/a>&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-28-desflow-0-25-0/">From dynamic-des to desflow: What Changed in Five Releases&lt;/a> - what each command was added for&lt;/li>
+&lt;li>&lt;a href="https://jaehyeon.me/blog/2026-10-06-simulations-in-yaml-dynamic-des/">Defining Data-Streaming Simulations in YAML, Without Writing Python&lt;/a> - the YAML format the shop is written in&lt;/li>
+&lt;/ul>
+
+&lt;h2 id="try-it-out" data-numberify>Try It Out&lt;a class="anchor ms-1" href="#try-it-out" aria-label="Link to this section: Try It Out">&lt;/a>&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="ln">1&lt;/span>&lt;span class="cl">pip install &lt;span class="s2">&amp;#34;desflow[fit]&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">2&lt;/span>&lt;span class="cl">desflow examples get experiment --api yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="ln">3&lt;/span>&lt;span class="cl">&lt;span class="nb">cd&lt;/span> experiment/yaml &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> desflow explain experiment_shop.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>&lt;strong>GitHub:&lt;/strong> &lt;a href="https://github.com/jaehyeon-kim/desflow" target="_blank" rel="noopener noreferrer">jaehyeon-kim/desflow&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>&lt;/li>
+&lt;li>&lt;strong>PyPI:&lt;/strong> &lt;a href="https://pypi.org/project/desflow/" target="_blank" rel="noopener noreferrer">pypi.org/project/desflow&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>&lt;/li>
+&lt;li>&lt;strong>Documentation:&lt;/strong> &lt;a href="https://jaehyeon.me/desflow/">jaehyeon.me/desflow&lt;/a>&lt;/li>
+&lt;/ul></content:encoded></item><item><title>From dynamic-des to desflow: What Changed in Five Releases</title><link>https://jaehyeon.me/blog/2026-10-28-desflow-0-25-0/</link><guid>https://jaehyeon.me/blog/2026-10-28-desflow-0-25-0/</guid><pubDate>Wed, 28 Oct 2026 00:00:00 +0000</pubDate><category>Discrete Event Simulation</category><category>desflow</category><category>SimPy</category><category>YAML</category><category>Queueing Theory</category><category>Python</category><description>&lt;p>A simulation is a small model of a real system that a computer plays forward in time. Take a shop that packs orders. Orders arrive at random moments, packers take one at a time, and packing takes longer for some orders than for others. When orders arrive faster than the packers can finish them, a queue forms. A simulation shows how long that queue gets and how long orders wait, without running the real shop.&lt;/p>
 &lt;p>The &lt;a href="https://jaehyeon.me/blog/2026-10-06-simulations-in-yaml-dynamic-des/">last post&lt;/a> in this series showed such a model written as a YAML file and run with one command, with dynamic-des 0.16.0 to 0.19.0. The package is now called desflow. It still sends its events to Kafka, Redis, PostgreSQL, Parquet and Iceberg, and it can now also answer the question a simulation is usually built for, such as &amp;ldquo;would a third packer keep the wait under 2 seconds?&amp;rdquo;. Everything below runs on your own machine, without Docker.&lt;/p></description><content:encoded>&lt;p>A simulation is a small model of a real system that a computer plays forward in time. Take a shop that packs orders. Orders arrive at random moments, packers take one at a time, and packing takes longer for some orders than for others. When orders arrive faster than the packers can finish them, a queue forms. A simulation shows how long that queue gets and how long orders wait, without running the real shop.&lt;/p>
 &lt;p>The &lt;a href="https://jaehyeon.me/blog/2026-10-06-simulations-in-yaml-dynamic-des/">last post&lt;/a> in this series showed such a model written as a YAML file and run with one command, with dynamic-des 0.16.0 to 0.19.0. The package is now called desflow. It still sends its events to Kafka, Redis, PostgreSQL, Parquet and Iceberg, and it can now also answer the question a simulation is usually built for, such as &amp;ldquo;would a third packer keep the wait under 2 seconds?&amp;rdquo;. Everything below runs on your own machine, without Docker.&lt;/p>
 &lt;p>This post covers what is new since dynamic-des 0.19.0:&lt;/p>
@@ -3351,168 +3658,4 @@ This is the standard Linear Regression prediction. It asks: &lt;em>&amp;ldquo;Ba
 &lt;/ul>
 
 &lt;h2 id="conclusion" data-numberify>Conclusion&lt;a class="anchor ms-1" href="#conclusion" aria-label="Link to this section: Conclusion">&lt;/a>&lt;/h2>
-&lt;p>Working through the examples in Kotlin has been an effective way to dive deeper into Apache Flink. Translating the examples to Kotlin not only forced me to understand the concepts more thoroughly but also provided a great opportunity to get hands-on with the latest APIs and build practices. For those looking to learn Apache Flink through up-to-date examples, I hope sharing my experience and code proves helpful. It&amp;rsquo;s been a fun and effective learning journey.&lt;/p></content:encoded></item><item><title>Guide to Building Integrated Web Applications with FastAPI and NiceGUI</title><link>https://jaehyeon.me/blog/2025-11-19-fastapi-nicegui-template/</link><guid>https://jaehyeon.me/blog/2025-11-19-fastapi-nicegui-template/</guid><pubDate>Wed, 19 Nov 2025 00:00:00 +0000</pubDate><category>FastAPI</category><category>NiceGUI</category><category>Python</category><category>Software Architecture</category><category>Docker</category><category>Pydantic</category><category>PostgreSQL</category><category>SQLModel</category><description>&lt;p>The standard architecture for modern web applications involves a decoupled frontend, typically built with a JavaScript framework, and a backend API. This pattern is powerful but introduces complexity in managing two separate codebases, development environments, and the API contract between them.&lt;/p>
-&lt;p>This article explores an alternative approach: an integrated architecture where the backend API and the frontend UI are served from a single, cohesive Python application.&lt;/p></description><content:encoded>&lt;p>The standard architecture for modern web applications involves a decoupled frontend, typically built with a JavaScript framework, and a backend API. This pattern is powerful but introduces complexity in managing two separate codebases, development environments, and the API contract between them.&lt;/p>
-&lt;p>This article explores an alternative approach: an integrated architecture where the backend API and the frontend UI are served from a single, cohesive Python application.&lt;/p>
-&lt;p>We will provide a technical analysis of this architecture&amp;rsquo;s implementation by integrating FastAPI and NiceGUI, referencing the complete project template available at &lt;a href="https://github.com/jaehyeon-kim/nicegui-fastapi-template" target="_blank" rel="noopener noreferrer">jaehyeon-kim/nicegui-fastapi-template&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>.&lt;/p>
-&lt;hr>
-
-&lt;h2 id="-version-20-unified-application-architecture" data-numberify>💡 Version 2.0: Unified Application Architecture&lt;a class="anchor ms-1" href="#-version-20-unified-application-architecture" aria-label="Link to this section: 💡 Version 2.0: Unified Application Architecture">&lt;/a>&lt;/h2>
-&lt;p>The initial version was designed with a distinct separation between a FastAPI backend and a NiceGUI frontend, which communicated over HTTP. This new version consolidates the application, leveraging the fact that NiceGUI is built on top of FastAPI. The result is a more tightly integrated structure that allows the UI and API logic to coexist in the same process.&lt;/p>
-
-&lt;h3 id="key-architectural-changes" data-numberify>Key Architectural Changes&lt;a class="anchor ms-1" href="#key-architectural-changes" aria-label="Link to this section: Key Architectural Changes">&lt;/a>&lt;/h3>
-&lt;ul>
-&lt;li>&lt;strong>Single FastAPI Instance:&lt;/strong> The separate FastAPI server process has been removed. The application now operates on the single FastAPI instance provided by &lt;code>nicegui.app&lt;/code>.&lt;/li>
-&lt;li>&lt;strong>Direct Function Calls:&lt;/strong> UI event handlers no longer make HTTP requests (&lt;code>httpx&lt;/code>) to the backend. They now import and call the necessary Python functions from the repository layer directly, removing the network layer for UI-to-backend communication.&lt;/li>
-&lt;li>&lt;strong>Preserved API Endpoints:&lt;/strong> The original API, intended for external clients, is maintained. It is mounted using FastAPI&amp;rsquo;s &lt;code>APIRouter&lt;/code> onto the main NiceGUI application, ensuring that JSON endpoints remain available.&lt;/li>
-&lt;li>&lt;strong>Consolidated Codebase:&lt;/strong> The &lt;code>frontend&lt;/code> and &lt;code>backend&lt;/code> directories have been merged into a single application package (e.g., &lt;code>app&lt;/code> or &lt;code>src&lt;/code>). A &lt;code>run.py&lt;/code> script at the project root now serves as the single entry point.&lt;/li>
-&lt;li>&lt;strong>Shared Logic:&lt;/strong> Business logic, such as permission checks and database operations, has been centralized in the repository layer, where it is called by both the UI event handlers and the API endpoints.&lt;/li>
-&lt;/ul>
-&lt;p>This updated architecture provides a more direct and cohesive way to build full-stack applications where the UI and backend logic are tightly coupled.&lt;/p>
-
-&lt;h3 id="project-structure" data-numberify>Project Structure&lt;a class="anchor ms-1" href="#project-structure" aria-label="Link to this section: Project Structure">&lt;/a>&lt;/h3>
-&lt;p>The application is structured with a single entry point, &lt;strong>&lt;code>app.py&lt;/code>&lt;/strong>, at the project root, and a main source package, &lt;strong>&lt;code>src/&lt;/code>&lt;/strong>, which contains all the application&amp;rsquo;s logic. This design provides a clear separation between the runnable script and the installable source code.&lt;/p>
-&lt;ul>
-&lt;li>
-&lt;p>&lt;strong>&lt;code>app.py&lt;/code>&lt;/strong>: This script is the single entry point for the application. It is responsible for creating the main NiceGUI &lt;code>app&lt;/code> instance, including all the API routers from &lt;code>src/backend/&lt;/code>, importing the UI pages from &lt;code>src/frontend/&lt;/code> to register their routes, and starting the web server.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>&lt;code>src/&lt;/code>&lt;/strong>: This directory is the main Python package for the application. It contains all the core logic, API definitions, and UI code, organized into the following modules:&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>&lt;code>backend/&lt;/code>&lt;/strong>: Contains the code for the data-only API, intended for external clients.
-&lt;ul>
-&lt;li>&lt;code>endpoints/&lt;/code>: Each file defines a set of related API routes (e.g., for items, users, login) using FastAPI&amp;rsquo;s &lt;code>APIRouter&lt;/code>.&lt;/li>
-&lt;li>&lt;code>deps.py&lt;/code>: Manages FastAPI&amp;rsquo;s dependency injection system for the API, such as providing database sessions or the current authenticated user.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>&lt;code>core/&lt;/code>&lt;/strong>: Holds application-wide configuration (&lt;code>config.py&lt;/code>) and security-related functions like password hashing and token creation (&lt;code>security.py&lt;/code>).&lt;/li>
-&lt;li>&lt;strong>&lt;code>db/&lt;/code>&lt;/strong>: Manages all database interactions, including engine creation, session management (&lt;code>session.py&lt;/code>), and initial database setup (&lt;code>init_db.py&lt;/code>).&lt;/li>
-&lt;li>&lt;strong>&lt;code>frontend/&lt;/code>&lt;/strong>: Contains all the NiceGUI code for the user interface.
-&lt;ul>
-&lt;li>&lt;code>components/&lt;/code>: Holds reusable UI elements and utilities, such as &lt;code>header.py&lt;/code>, &lt;code>footer.py&lt;/code>, &lt;code>notifications.py&lt;/code>, and authentication helpers in &lt;code>auth_utils.py&lt;/code>.&lt;/li>
-&lt;li>&lt;code>layouts/&lt;/code>: Defines the overall page structure, like the main dashboard frame, ensuring a consistent look and feel.&lt;/li>
-&lt;li>&lt;code>pages/&lt;/code>: Each file represents a specific UI view, such as the login screen (&lt;code>login.py&lt;/code>) or the item management page (&lt;code>items.py&lt;/code>), using the &lt;code>@ui.page&lt;/code> decorator.&lt;/li>
-&lt;li>&lt;code>state.py&lt;/code>: A module for managing UI-specific state, like the user&amp;rsquo;s authentication token.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>&lt;code>models/&lt;/code>&lt;/strong>: Contains the SQLModel (and Pydantic) schemas that define database tables and data structures used across the entire application.&lt;/li>
-&lt;li>&lt;strong>&lt;code>repositories/&lt;/code>&lt;/strong>: This is the core business logic and data access layer. It abstracts all database queries and contains functions for data manipulation. In this unified architecture, its functions are now called directly by &lt;strong>both&lt;/strong> the API endpoints in &lt;code>src/backend/&lt;/code> and the UI event handlers in &lt;code>src/frontend/&lt;/code>.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;hr>
-
-&lt;h2 id="fastapi-backend" data-numberify>FastAPI Backend&lt;a class="anchor ms-1" href="#fastapi-backend" aria-label="Link to this section: FastAPI Backend">&lt;/a>&lt;/h2>
-&lt;p>FastAPI provides a robust foundation for the backend due to several key technical features:&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>ASGI Foundation:&lt;/strong> Built on the Asynchronous Server Gateway Interface (ASGI), FastAPI natively supports asynchronous operations. This allows it to handle high-concurrency, I/O-bound tasks, such as network requests and database queries, efficiently without blocking the server.&lt;/li>
-&lt;li>&lt;strong>Schema Generation and Data Validation:&lt;/strong> FastAPI uses Pydantic models for strict, type-hint-based data validation and serialization. These models automatically generate OpenAPI schemas, which power the interactive API documentation (via Swagger UI and ReDoc) and ensure that the API contract is clearly defined and enforced.&lt;/li>
-&lt;li>&lt;strong>Dependency Injection System:&lt;/strong> Its dependency injection system is a core feature that enhances modularity and testability. It allows for the management of dependencies like database sessions and authentication credentials, ensuring that resources are correctly provisioned and cleaned up for each request.&lt;/li>
-&lt;/ul>
-
-&lt;h2 id="nicegui-frontend" data-numberify>NiceGUI Frontend&lt;a class="anchor ms-1" href="#nicegui-frontend" aria-label="Link to this section: NiceGUI Frontend">&lt;/a>&lt;/h2>
-&lt;p>NiceGUI serves as the frontend component, allowing for UI development entirely within Python.&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>Pythonic Abstraction of Web Technologies:&lt;/strong> NiceGUI functions as an abstraction layer that generates the necessary HTML, CSS, and JavaScript from Python objects and methods. This allows developers to define complex user interfaces without writing client-side code directly.&lt;/li>
-&lt;li>&lt;strong>Server-Side Event Handling:&lt;/strong> The framework employs an event-driven model where UI components are bound to Python callback functions. User interactions (e.g., button clicks, form submissions) trigger these functions, which execute on the server. This creates a direct and clear link between a UI event and its corresponding backend logic.&lt;/li>
-&lt;li>&lt;strong>Server-Maintained State:&lt;/strong> Unlike JavaScript frontend frameworks that manage state on the client, NiceGUI maintains the UI state within the server&amp;rsquo;s Python process. This simplifies application logic, as there is no need for complex state synchronization mechanisms between client and server.&lt;/li>
-&lt;/ul>
-
-&lt;h2 id="architectural-advantages-and-framework-comparisons" data-numberify>Architectural Advantages and Framework Comparisons&lt;a class="anchor ms-1" href="#architectural-advantages-and-framework-comparisons" aria-label="Link to this section: Architectural Advantages and Framework Comparisons">&lt;/a>&lt;/h2>
-
-&lt;h3 id="the-integrated-server-approach" data-numberify>The Integrated Server Approach&lt;a class="anchor ms-1" href="#the-integrated-server-approach" aria-label="Link to this section: The Integrated Server Approach">&lt;/a>&lt;/h3>
-&lt;p>In this architecture, the NiceGUI application is mounted directly onto the FastAPI instance. This is typically done with a single function call, creating a unified application that serves both API endpoints and the user interface from one process.&lt;/p>
-&lt;p>The primary benefit is the ability to use shared data models (e.g., SQLModel or Pydantic) across the entire stack. A model defined once can be used to structure a database table, validate an API request payload, and define the data contract for the UI. This ensures end-to-end data consistency and reduces code duplication, as all parts of the application are built around the same data structures.&lt;/p>
-
-&lt;h3 id="nicegui-vs-javascript-frameworks-eg-react-vue" data-numberify>NiceGUI vs. JavaScript Frameworks (e.g., React, Vue)&lt;a class="anchor ms-1" href="#nicegui-vs-javascript-frameworks-eg-react-vue" aria-label="Link to this section: NiceGUI vs. JavaScript Frameworks (e.g., React, Vue)">&lt;/a>&lt;/h3>
-&lt;ul>
-&lt;li>&lt;strong>Bridging the Expertise Gap:&lt;/strong> Acquiring deep expertise in both backend Python and a modern JavaScript frontend framework is a significant undertaking. NiceGUI directly addresses this by enabling Python developers to build sophisticated user interfaces without leaving the Python ecosystem. This allows them to leverage their existing skills rather than learning a new language and its complex toolchain.&lt;/li>
-&lt;li>&lt;strong>Leveraging Mature Frontend Technologies:&lt;/strong> NiceGUI is not a proprietary UI system built from scratch. It is built on top of the robust and widely-used Vue and Quasar frameworks. This provides the best of both worlds: developers interact with a simple Pythonic API while benefiting from the power, performance, and rich component library of a mature frontend technology.&lt;/li>
-&lt;li>&lt;strong>Trade-offs:&lt;/strong> The server-side rendering approach is highly efficient for internal tools and data-heavy applications. However, because every interaction requires a round-trip to the server, it may introduce latency on highly interactive UIs compared to a client-side Single Page Application (SPA), which can handle many state changes without network requests.&lt;/li>
-&lt;/ul>
-
-&lt;h3 id="nicegui-vs-streamlit" data-numberify>NiceGUI vs. Streamlit&lt;a class="anchor ms-1" href="#nicegui-vs-streamlit" aria-label="Link to this section: NiceGUI vs. Streamlit">&lt;/a>&lt;/h3>
-&lt;ul>
-&lt;li>&lt;strong>Control and Layout:&lt;/strong> NiceGUI provides more granular control over UI component placement and application layout, using rows, columns, and grids. This makes it well-suited for building applications with a structured, traditional design. Streamlit is more opinionated, favoring a simple, top-to-bottom script execution model that is excellent for linear data narratives but offers less layout flexibility.&lt;/li>
-&lt;li>&lt;strong>Event Handling and Execution Model:&lt;/strong> Both frameworks use callbacks, but their underlying execution models differ significantly. NiceGUI uses a persistent component model where an event, such as a button click, executes a specific callback function (&lt;code>on_click=handle_click&lt;/code>). This function is the &lt;em>only&lt;/em> code that runs and is responsible for explicitly updating any UI elements. This aligns closely with traditional GUI programming paradigms. In contrast, Streamlit uses a script re-run model. While it also has an &lt;code>on_click&lt;/code> callback, this function typically modifies a session state object. After the callback completes, Streamlit &lt;strong>re-runs the entire application script from top to bottom&lt;/strong>. The UI is then re-rendered based on the new values in the session state. This model simplifies the creation of linear, data-centric apps but can be less direct and potentially less performant for managing complex, multi-state interfaces compared to NiceGUI&amp;rsquo;s explicit event-driven approach.&lt;/li>
-&lt;li>&lt;strong>Integration:&lt;/strong> NiceGUI is designed to be a component that can be integrated with standard web frameworks like FastAPI. Streamlit is generally used as a self-contained application server and is less straightforward to embed within another ASGI application.&lt;/li>
-&lt;/ul>
-
-&lt;h2 id="implementation-overview" data-numberify>Implementation Overview&lt;a class="anchor ms-1" href="#implementation-overview" aria-label="Link to this section: Implementation Overview">&lt;/a>&lt;/h2>
-&lt;p>To provide a concrete example of this architecture, the reference repository at &lt;a href="https://github.com/jaehyeon-kim/nicegui-fastapi-template" target="_blank" rel="noopener noreferrer">jaehyeon-kim/nicegui-fastapi-template&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a> contains a fully functional application. Let&amp;rsquo;s examine its structure and key components.&lt;/p>
-
-&lt;h3 id="project-structure-1" data-numberify>Project Structure&lt;a class="anchor ms-1" href="#project-structure-1" aria-label="Link to this section: Project Structure">&lt;/a>&lt;/h3>
-&lt;p>The project is organized into two main directories, ensuring a clear separation of concerns between the backend logic and the user interface:&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>&lt;code>backend/&lt;/code>&lt;/strong>: This directory contains all the FastAPI source code. It is further subdivided into modules for handling specific responsibilities:
-&lt;ul>
-&lt;li>&lt;code>api/&lt;/code>: Defines the API endpoints for resources like users and items.&lt;/li>
-&lt;li>&lt;code>db/&lt;/code>: Manages the database session and engine configuration.&lt;/li>
-&lt;li>&lt;code>models/&lt;/code>: Contains the SQLModel (and Pydantic) data schemas that define our database tables and API data structures.&lt;/li>
-&lt;li>&lt;code>repositories/&lt;/code>: Implements the data access layer, abstracting the database queries from the API endpoints.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>&lt;code>frontend/&lt;/code>&lt;/strong>: This directory holds all the NiceGUI code for the user interface, organized by function into the following subdirectories and modules:
-&lt;ul>
-&lt;li>&lt;strong>&lt;code>components/&lt;/code>&lt;/strong>: Contains reusable UI elements and helper functions. This includes visual components like &lt;code>header.py&lt;/code> and &lt;code>footer.py&lt;/code>, as well as utility modules like &lt;code>notifications.py&lt;/code> for displaying messages to the user and &lt;code>form_helpers.py&lt;/code> for handling common form logic.&lt;/li>
-&lt;li>&lt;strong>&lt;code>layouts/&lt;/code>&lt;/strong>: Defines the overall structure of the application&amp;rsquo;s pages. The &lt;code>default.py&lt;/code> file, for instance, assembles the header, drawer, and footer to ensure a consistent look and feel across different views.&lt;/li>
-&lt;li>&lt;strong>&lt;code>pages/&lt;/code>&lt;/strong>: Each file in this directory represents a specific page or view within the application, such as the login screen (&lt;code>login.py&lt;/code>), the item management page (&lt;code>items.py&lt;/code>), and the user creation form (&lt;code>create_user.py&lt;/code>).&lt;/li>
-&lt;li>&lt;strong>&lt;code>state.py&lt;/code>&lt;/strong>: A dedicated module for managing the application&amp;rsquo;s client-side state, such as user authentication status. This allows different parts of the UI to react consistently to changes in state.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>&lt;code>backend/main.py&lt;/code>&lt;/strong>: This file serves as the central integration point. It initializes the FastAPI application, includes the API routers from the &lt;code>backend/api/&lt;/code> directory, and finally, mounts the entire NiceGUI frontend. This is where the two parts of the application become one.&lt;/li>
-&lt;/ul>
-
-&lt;h3 id="application-demo" data-numberify>Application Demo&lt;a class="anchor ms-1" href="#application-demo" aria-label="Link to this section: Application Demo">&lt;/a>&lt;/h3>
-&lt;p>The repository provides a complete user and item management application that showcases role-based access control. The functionality is divided between two user roles:&lt;/p>
-&lt;ul>
-&lt;li>
-&lt;p>&lt;strong>Standard User:&lt;/strong> After logging in, a standard user has full CRUD (Create, Read, Update, Delete) permissions over their own items. They can add new items, view their list, and edit or delete them as needed.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>Superuser:&lt;/strong> A superuser has elevated privileges. In addition to managing their own items, they can also create new user accounts. Crucially, they have a global view of the system and can manage the items belonging to any user, making this role suitable for administrative purposes.&lt;/p>
-&lt;/li>
-&lt;/ul>
-&lt;p>&lt;figure class="figure mx-auto d-block">&lt;picture>&lt;img class="img-fluid figure-img" alt="Login screen, then an item card grid and a Create New Item dialog confirming the item was created" src="https://jaehyeon.me/blog/2025-11-19-fastapi-nicegui-template/demo.webp" loading="lazy" title="Logging in, then creating and managing items" width="2614" height="1794" />
-&lt;/picture>&lt;figcaption class="figure-caption">Logging in, then creating and managing items&lt;/figcaption>
-&lt;/figure>
-
-&lt;/p>
-&lt;p>The demo showcases these distinct workflows, illustrating how the NiceGUI frontend dynamically adapts to the user&amp;rsquo;s permissions, which are enforced by the FastAPI backend.&lt;/p>
-
-&lt;h3 id="automatic-api-documentation" data-numberify>Automatic API Documentation&lt;a class="anchor ms-1" href="#automatic-api-documentation" aria-label="Link to this section: Automatic API Documentation">&lt;/a>&lt;/h3>
-&lt;p>One of the most powerful features of FastAPI is its ability to automatically generate interactive API documentation from the Pydantic models and endpoint definitions. The application provides two documentation interfaces out-of-the-box:&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>Swagger UI (&lt;code>/docs&lt;/code>)&lt;/strong>: A feature-rich, interactive interface that allows developers to not only view the API endpoints but also test them directly from the browser by sending live requests.&lt;/li>
-&lt;/ul>
-&lt;p>&lt;figure class="figure mx-auto d-block">&lt;picture>&lt;img class="img-fluid figure-img" alt="Swagger UI listing login, users and items endpoints with GET, POST, PUT and DELETE routes" src="https://jaehyeon.me/blog/2025-11-19-fastapi-nicegui-template/docs.png" loading="lazy" title="Interactive API documentation served at /docs" width="1312" height="881" />
-&lt;/picture>&lt;figcaption class="figure-caption">Interactive API documentation served at /docs&lt;/figcaption>
-&lt;/figure>
-
-&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>ReDoc (&lt;code>/redoc&lt;/code>)&lt;/strong>: A clean, read-only documentation page that presents the API in a more traditional, hierarchical format. It is excellent for quickly referencing endpoints and their schemas.&lt;/li>
-&lt;/ul>
-&lt;p>&lt;figure class="figure mx-auto d-block">&lt;picture>&lt;img class="img-fluid figure-img" alt="ReDoc page for Login Access Token, with its request body fields and a 200 response sample" src="https://jaehyeon.me/blog/2025-11-19-fastapi-nicegui-template/redoc.png" loading="lazy" title="Read-only API reference served at /redoc" width="1314" height="837" />
-&lt;/picture>&lt;figcaption class="figure-caption">Read-only API reference served at /redoc&lt;/figcaption>
-&lt;/figure>
-
-&lt;/p>
-&lt;p>These auto-generated documents are invaluable for development, testing, and collaboration, and they are created without any extra effort, thanks to FastAPI&amp;rsquo;s adherence to the OpenAPI standard.&lt;/p>
-
-&lt;h2 id="related-posts" data-numberify>Related posts&lt;a class="anchor ms-1" href="#related-posts" aria-label="Link to this section: Related posts">&lt;/a>&lt;/h2>
-&lt;ul>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2025-02-18-realtime-dashboard-1/">Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1 Data Producer&lt;/a> - a FastAPI WebSocket server that queries PostgreSQL on a timer to serve live dashboards&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2019-11-29-traefik-example/">Dynamic Routing and Centralized Auth with Traefik&lt;/a> - puts Traefik in front of Python and R services for path-based routing and shared authentication&lt;/li>
-&lt;li>&lt;a href="https://jaehyeon.me/blog/2024-01-18-dbt-pizza-shop-1/">dbt Pizza Shop Demo - Part 1 Modelling on PostgreSQL&lt;/a> - models data on PostgreSQL with dbt, a source such an application can read from&lt;/li>
-&lt;/ul>
-
-&lt;h2 id="summary-and-use-cases" data-numberify>Summary and Use Cases&lt;a class="anchor ms-1" href="#summary-and-use-cases" aria-label="Link to this section: Summary and Use Cases">&lt;/a>&lt;/h2>
-&lt;p>The integration of FastAPI and NiceGUI provides a robust architecture for building web applications entirely in Python. It streamlines development by creating a unified environment, simplifies deployment to a single process, and ensures strong data consistency through the use of shared models.&lt;/p>
-&lt;p>This architecture is exceptionally well-suited for:&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>Internal Tools and Administrative Dashboards:&lt;/strong> Where rapid development and ease of maintenance are critical.&lt;/li>
-&lt;li>&lt;strong>Rapid Prototyping and MVPs:&lt;/strong> To quickly build and validate a functional application.&lt;/li>
-&lt;li>&lt;strong>Machine Learning and Data Science Demos:&lt;/strong> To create interactive interfaces for models without requiring frontend expertise.&lt;/li>
-&lt;/ul>
-&lt;p>While it may not be the optimal choice for every project, particularly those requiring complex client-side interactivity, it offers a powerful and efficient alternative for a significant class of web applications. For a practical implementation, refer to the project code at &lt;a href="https://github.com/jaehyeon-kim/nicegui-fastapi-template" target="_blank" rel="noopener noreferrer">jaehyeon-kim/nicegui-fastapi-template&lt;i class="fas fa-external-link-square-alt ms-1">&lt;/i>&lt;/a>.&lt;/p></content:encoded></item></channel></rss>
+&lt;p>Working through the examples in Kotlin has been an effective way to dive deeper into Apache Flink. Translating the examples to Kotlin not only forced me to understand the concepts more thoroughly but also provided a great opportunity to get hands-on with the latest APIs and build practices. For those looking to learn Apache Flink through up-to-date examples, I hope sharing my experience and code proves helpful. It&amp;rsquo;s been a fun and effective learning journey.&lt;/p></content:encoded></item></channel></rss>
