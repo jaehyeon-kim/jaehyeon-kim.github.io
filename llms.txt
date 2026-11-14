@@ -141,7 +141,7 @@ Articles on data engineering, data streaming and machine learning, most with the
 
 ## Realtime Dashboard with FastAPI, Streamlit and Next.js
 
-- [Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1 Data Producer](https://jaehyeon.me/blog/2025-02-18-realtime-dashboard-1/): A Python generator loads theLook eCommerce data into PostgreSQL, and a FastAPI WebSocket server queries it on a timer to serve live dashboards.
+- [Realtime Dashboard with FastAPI, Streamlit and Next.js - Part 1 Data Producer](https://jaehyeon.me/blog/2025-02-18-realtime-dashboard-1/): A desflow simulation, written in YAML, loads theLook eCommerce data into PostgreSQL, and a FastAPI WebSocket server queries it on a timer to serve live dashboards.
 - [Streamlit Dashboard - Realtime Dashboard with FastAPI, Streamlit and Next.js Part 2](https://jaehyeon.me/blog/2025-02-25-realtime-dashboard-2/): Streamlit and Apache ECharts draw a live sales dashboard that reads order counts and revenue by country from a FastAPI WebSocket server.
 - [Next.js Dashboard - Realtime Dashboard with FastAPI, Streamlit and Next.js Part 3](https://jaehyeon.me/blog/2025-03-04-realtime-dashboard-3/): Next.js and React with Apache ECharts show the same live order and revenue metrics, reading from the FastAPI WebSocket server in the browser.
 
