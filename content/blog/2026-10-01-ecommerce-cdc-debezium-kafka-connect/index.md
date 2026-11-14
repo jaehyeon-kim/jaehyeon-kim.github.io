@@ -26,6 +26,8 @@ Most databases change all day: users sign up, orders are placed, and each order 
 
 <!--more-->
 
+[**Update 2026-11-15**] The simulation is now one YAML file, `ecommerce/simulation/shop.yaml`, which desflow 1.0.0 runs with `desflow run`. It replaces `run.py`, `shop.py` and `catalogue.py`, and reads the distribution centres, products and cities from CSV files beside it. The code, commands, log and figures below show the new version.
+
 [**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
 
 The shop's data model follows the [theLook eCommerce](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) dataset. The source code is in [benchtop/ecommerce-cdc](https://github.com/jaehyeon-kim/benchtop/tree/main/ecommerce-cdc). It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.
@@ -52,7 +54,7 @@ The data moves in one direction: a simulation writes to PostgreSQL, Debezium rea
 - **A replication slot** is PostgreSQL's record of how far a reader has got in the WAL. PostgreSQL keeps the part of the WAL the slot has not read yet, so Debezium can stop and carry on without losing a change.
 - **A publication** names the tables whose changes PostgreSQL sends. odctl's PostgreSQL has a publication, `cdc_pub`, that covers every table in the `cdc` schema.
 - **Aiven's S3 sink** is a sink connector. It reads the topics and writes their events to files in SeaweedFS, an object store with the same API as Amazon S3.
-- **desflow** runs the simulation, a discrete-event model of the shop. [desflow](https://github.com/jaehyeon-kim/desflow) ([documentation](https://jaehyeon.me/desflow/latest/architecture/connectors/)) is a Python library for simulations that stream their output.
+- **desflow** runs the simulation, a discrete-event model of the shop written in one YAML file. [desflow](https://github.com/jaehyeon-kim/desflow) ([documentation](https://jaehyeon.me/desflow/latest/architecture/connectors/)) is a Python library for simulations that stream their output.
 
 The simulation writes six tables in PostgreSQL's `cdc` schema:
 
@@ -95,88 +97,140 @@ The web UIs:
 
 A discrete-event simulation (DES) moves a clock from one event to the next, such as a visitor arriving or an order being packed. Nothing happens between events, so the model only has to say what each event does and how long it is until the next one. Here the clock runs at the speed of real time.
 
-The shop has three kinds of process. A process is a function that runs through simulated time and waits between its steps:
+The model is one YAML file, `ecommerce/simulation/shop.yaml`. It has three kinds of entity. An entity, such as a visit or an order, goes through a chain of tasks, and each task names the next one:
 
 - **Visitor:** visitors arrive at random, about one a second. Each views the home page and one to four products, and spends a few seconds on each page. Six in ten are registered users. Three in ten buy: they view the cart, sign up first if they are new, and place an order of one to four products.
 - **Order:** each order waits for one of the warehouse's pickers. Three pickers pack orders, one at a time each. When orders arrive faster than they are packed, they queue. An order that waits longer than its customer's patience, about two minutes, is cancelled. A packed order is shipped, delivered about a minute later, and one in ten is returned.
 - **Move:** now and then a registered user moves to a new address.
 
-desflow provides each part of this model:
+Each part of this model is a section of the file:
 
-| Part | desflow feature | Here |
+| Part | Key in `shop.yaml` | Here |
 |---|---|---|
-| random arrivals | `add_arrival`, `arrival_loop` | visitors, and address moves |
-| time spent on a step | `add_service` | a page view, packing, transit, patience and the time until a return |
-| limited capacity | `add_resource` | the pickers, which make orders queue |
-| chances | `add_variable` | a visitor is registered, a visitor buys, an order is returned |
-| a process of its own | `spawn` | each visit and each order |
-| live changes | the registry and `KafkaIngress` | any of the above, while it runs |
-| writes | `PostgresEgress` | one per table, upserting on `id` |
+| random arrivals | `arrivals` | visitors, and address moves |
+| fixed rows at the start | `arrivals` with `initial` | the distribution centres and products, read from CSV files, and the first 100 users |
+| time spent on a step | `services` | a page view, packing, transit, patience and the time until a return |
+| limited capacity | `resources` | the pickers, which make orders queue |
+| chances | `variables` | a visitor is registered, a visitor buys, an order is returned |
+| the steps of a visit or an order | `tasks`, with `next` and `spawn` | each page of a visit, and each status of an order |
+| live changes | the registry and `ingress` | any of the above, while it runs |
+| writes | `egress` | one per table, upserting on `id` |
 
-Every parameter is in `ecommerce/core/config.py`. Each one is added to desflow's registry, a store of named parameters that the model reads each time it draws a value:
+Each parameter is added to desflow's registry, a store of named parameters that the model reads each time it draws a value. The top of the file holds the Kafka reader for live changes and the parameters:
 
-```python
-SERVICES = {  # mean and standard deviation, in seconds, lognormal
-    "page_view": (4.0, 2.0),  # time on a page before the next one
-    # how long an order waits for a picker before it is cancelled
-    "patience": (120.0, 60.0),
-    "pick": (5.0, 2.0),  # a picker packs an order
-    "transit": (60.0, 20.0),  # a shipped order reaches the customer
-    "return_after": (60.0, 30.0),  # a returned order comes back after delivery
-}
-CHANCES = {  # shares of visitors or orders, from 0 to 1
-    "returning": 0.6,  # a visitor is a registered user
-    "buy": 0.3,  # a visitor buys at the end of the visit
-    "return": 0.1,  # a delivered order is returned
-}
-PICKERS, MAX_PICKERS = 3, 10  # warehouse pickers packing orders at once
+```yaml
+# Parameter changes from ecommerce.simulation.control
+ingress:
+  - type: Kafka
+    config:
+      bootstrap_servers: "127.0.0.1:9092"
+      topic: ecommerce-control
+
+# Shares of visitors or orders, from 0 to 1
+variables:
+  returning: 0.6 # a visitor is a registered user
+  buy: 0.3 # a visitor buys at the end of the visit
+  return: 0.1 # a delivered order is returned
+
+# Warehouse pickers packing orders at once
+resources:
+  pickers: {current_cap: "${PICKERS:-3}", max_cap: 10}
+
+# Mean and standard deviation, in seconds
+services:
+  page_view: {dist: lognormal, mean: 4.0, std: 2.0} # time on a page before the next one
+  # how long an order waits for a picker before it is cancelled
+  patience: {dist: lognormal, mean: 120.0, std: 60.0}
+  pick: {dist: lognormal, mean: 5.0, std: 2.0} # a picker packs an order
+  transit: {dist: lognormal, mean: 60.0, std: 20.0} # a shipped order reaches the customer
+  return_after: {dist: lognormal, mean: 60.0, std: 30.0} # a returned order comes back
 ```
 
-The order process is in `ecommerce/simulation/run.py`. It asks for a picker and a patience timeout at once, and `picker | _wait(ctx, "patience")` resumes at whichever comes first. If the timeout comes first, the order is cancelled. Each status change is published with the same `id` as before:
+The order's tasks are in the same file. `pick_order` asks for a picker, with a patience time drawn from the `patience` service. If the order waits longer than its patience, it leaves the queue and goes to `cancel_order` (`on_renege`). Each status change sets the order's attributes, and `order_row` writes the order again with the same `id`. `items` then writes a row for each of its items and chooses the next status. `*now` is the simulated time as ISO 8601 text, defined once earlier in the file with a YAML anchor:
 
-```python
-def fulfil(
-    ctx: SimulationContext, state: Shop, order: Order, items: list[OrderItem]
-) -> Process:
-    """One order: packed by a picker or cancelled, then shipped, delivered and maybe returned."""
-    with ctx.get_resource("pickers").request() as picker:
-        got = yield picker | _wait(ctx, "patience")
-        if picker not in got:
-            _publish(ctx, *shop.advance(order, items, "Cancelled", _now(ctx, state)))
-            return
-        yield _wait(ctx, "pick")
-    order, items = shop.advance(order, items, "Shipped", _now(ctx, state))
-    _publish(ctx, order, items)
-    yield _wait(ctx, "transit")
-    order, items = shop.advance(order, items, "Delivered", _now(ctx, state))
-    _publish(ctx, order, items)
-    if _chance(ctx, "return"):
-        yield _wait(ctx, "return_after")
-        _publish(ctx, *shop.advance(order, items, "Returned", _now(ctx, state)))
+```yaml
+  # A picker packs the order and it ships, unless it waits for a picker longer than
+  # its patience and is cancelled.
+  pick_order:
+    resource: pickers
+    service: pick
+    patience: {gen: sample, service: patience}
+    on_renege: cancel_order
+    payload: null
+    set: {status: Shipped, updated_at: *now, shipped_at: *now}
+    next: order_row
+  cancel_order:
+    payload: null
+    set: {status: Cancelled, updated_at: *now, cancelled_at: *now}
+    next: order_row
+  deliver_order:
+    service: transit
+    payload: null
+    set:
+      status: Delivered
+      updated_at: *now
+      delivered_at: *now
+      sent_back: {gen: boolean, p: {gen: param, path: ecommerce.variables.return}}
+    next: order_row
+  return_order:
+    service: return_after
+    payload: null
+    set: {status: Returned, updated_at: *now, returned_at: *now}
+    next: order_row
+  # The orders row after each status change, then a row for each of its items
+  order_row:
+    payload:
+      __table__: cdc.orders
+      id: {gen: attr, name: order_id}
+      user_id: {gen: attr, name: user_id}
+      status: {gen: attr, name: status}
+      num_of_items: {gen: expr, expr: "len(attr.items)"}
+      created_at: {gen: attr, name: created_at}
+      updated_at: {gen: attr, name: updated_at}
+      shipped_at: {gen: attr, name: shipped_at}
+      delivered_at: {gen: attr, name: delivered_at}
+      cancelled_at: {gen: attr, name: cancelled_at}
+      returned_at: {gen: attr, name: returned_at}
+    next: items
+  items:
+    wait:
+      each: attr.items
+      branch: {task: item_row, args: {item: {gen: expr, expr: each.value}}}
+    payload: null
+    next:
+      when:
+        - {condition: "attr.status == 'Processing'", task: pick_order}
+        - {condition: "attr.status == 'Shipped'", task: deliver_order}
+        - {condition: "attr.status == 'Delivered' and attr.sent_back", task: return_order}
 ```
 
-The `run` function adds one PostgreSQL writer per table, each upserting on `id`. An upsert inserts a row, or updates it when a row with the same key exists. So a changed order reaches PostgreSQL as an update, and Debezium sees it as one. The same function adds the Kafka reader for live changes:
+The `egress` section has one PostgreSQL writer per table, each upserting on `id`. An upsert inserts a row, or updates it when a row with the same key exists. So a changed order reaches PostgreSQL as an update, and Debezium sees it as one. Each writer also creates its table when it is missing, from the columns its `tables` entry lists. The first writer is shown here, and the other five differ only in their table and its columns:
 
-```python
-def run(minutes: float | None = None, seed: int | None = None) -> None:
-    """
-    Runs the shop in real time, writing every row to its table and reading live changes.
+```yaml
+# A few rows a second for each table
+batching: {batch_size: 4, flush_interval: 1.0}
 
-    Args:
-        minutes (float, optional): How long to run. None runs until interrupted.
-        seed (int, optional): The seed for every random choice.
-    """
-    postgres.create_tables()
-    KafkaAdminConnector(KAFKA).create_topics([{"name": CONTROL_TOPIC}])
-    app = build(datetime.now(UTC), seed)
-    app.add_ingress(KafkaIngress(topic=CONTROL_TOPIC, bootstrap_servers=KAFKA))
-    app.with_batching(batch_size=4, flush_interval=1.0)  # a few rows a second per table
-    for table in TABLES.values():
-        app.add_egress(
-            PostgresEgress(DSN, table_name=table, upsert_keys=KEY),
-            when=lambda r, t=table: r["stream_type"] == "event" and r["key"] == t,
-        )
-    app.run(until=minutes * 60 if minutes else None)
+# One sink for each table. Each creates its table at the start when it does not exist,
+# and upserts on `id`, so a changed order or user reaches PostgreSQL as an update. Times
+# are ISO 8601 text in UTC. A row's `__table__` names the sink that writes it, and
+# `envelope: false` writes the row alone, with no record of a task being queued or
+# started, and `when` drops the record of an order that leaves the picking queue,
+# which `cancel_order` writes as a row instead.
+egress:
+  - type: Postgres
+    when: &rows {expr: "record.stream_type == 'event' and record.value.status != 'reneged'"}
+    envelope: false
+    config:
+      connection_dsn: &dsn "postgresql://user:password@127.0.0.1:5432/odctl"
+      upsert_keys: &key [id]
+      tables:
+        cdc.dist_centers:
+          primary_key: id
+          columns:
+            id: BIGINT
+            name: TEXT
+            latitude: DOUBLE PRECISION
+            longitude: DOUBLE PRECISION
 ```
 
 Times are stored as ISO 8601 text in UTC. desflow publishes each row as JSON-friendly values, so a time reaches PostgreSQL as a string, and a timestamp column does not accept a string.
@@ -184,21 +238,30 @@ Times are stored as ISO 8601 text in UTC. desflow publishes each row as JSON-fri
 ## Step 1: Run the Simulation
 
 ```bash
-python -m ecommerce.simulation.run --minutes 16     # or leave out --minutes, and stop with Ctrl + C
+desflow run ecommerce/simulation/shop.yaml --until "16 min"   # or leave out --until, and stop with Ctrl + C
 ```
 
-It creates the six tables if they are missing, and writes the centres, the products and 100 users. It then runs in real time. With the default parameters it places about 20 orders a minute, and each order changes three or four times over the next few minutes. Its log shows the Kafka reader and one PostgreSQL writer per table:
+It creates the six tables if they are missing, and writes the centres, the products and 100 users. It then runs in real time. With the default parameters it places about 18 orders a minute, and each order changes three or four times over the next few minutes. Its log shows the Kafka reader and one PostgreSQL writer per table:
 
 ```
-2026-09-30 22:39:25,564 desflow.core.context Building SimulationContext for 'ecommerce'...
-2026-09-30 22:39:25,565 desflow.core.context Simulation engine started.
-2026-09-30 22:39:25,599 desflow.connectors.ingress.kafka Connected to Kafka Ingress topic: ecommerce-control
-2026-09-30 22:39:25,966 desflow.connectors.egress.postgres PostgresEgress connected to dist_centers
-2026-09-30 22:39:25,966 desflow.connectors.egress.postgres PostgresEgress connected to products
-2026-09-30 22:39:25,966 desflow.connectors.egress.postgres PostgresEgress connected to events
-2026-09-30 22:39:25,966 desflow.connectors.egress.postgres PostgresEgress connected to order_items
-2026-09-30 22:39:25,966 desflow.connectors.egress.postgres PostgresEgress connected to orders
-2026-09-30 22:39:25,967 desflow.connectors.egress.postgres PostgresEgress connected to users
+14:40:26 [INFO] desflow.builder.context: Building SimulationContext for 'ecommerce'...
+14:40:26 [INFO] desflow.builder.context: No random_seed was given, so this run uses 1778597616. Repeat it with: desflow run ecommerce/simulation/shop.yaml --seed 1778597616 --until 13min
+14:40:26 [INFO] desflow.core.environment: PostgresEgress has envelope: false, so it skips telemetry and the queued and started records, and writes each event's value alone.
+14:40:26 [INFO] desflow.core.environment: PostgresEgress has envelope: false, so it skips telemetry and the queued and started records, and writes each event's value alone.
+14:40:26 [INFO] desflow.core.environment: PostgresEgress has envelope: false, so it skips telemetry and the queued and started records, and writes each event's value alone.
+14:40:26 [INFO] desflow.core.environment: PostgresEgress has envelope: false, so it skips telemetry and the queued and started records, and writes each event's value alone.
+14:40:26 [INFO] desflow.core.environment: PostgresEgress has envelope: false, so it skips telemetry and the queued and started records, and writes each event's value alone.
+14:40:26 [INFO] desflow.core.environment: PostgresEgress has envelope: false, so it skips telemetry and the queued and started records, and writes each event's value alone.
+14:40:26 [INFO] desflow.builder.context: Simulation engine started.
+14:40:26 [INFO] aiokafka.consumer.subscription_state: Updating subscribed topics to: frozenset({'ecommerce-control'})
+14:40:26 [INFO] aiokafka.consumer.group_coordinator: Metadata for topic has changed from {} to {'ecommerce-control': 1}. 
+14:40:26 [INFO] desflow.connectors.ingress.kafka: Connected to Kafka Ingress topic: ecommerce-control
+14:40:26 [INFO] desflow.connectors.egress.postgres: PostgresEgress connected to cdc.products
+14:40:26 [INFO] desflow.connectors.egress.postgres: PostgresEgress connected to cdc.users
+14:40:26 [INFO] desflow.connectors.egress.postgres: PostgresEgress connected to cdc.order_items
+14:40:26 [INFO] desflow.connectors.egress.postgres: PostgresEgress connected to cdc.events
+14:40:26 [INFO] desflow.connectors.egress.postgres: PostgresEgress connected to cdc.orders
+14:40:26 [INFO] desflow.connectors.egress.postgres: PostgresEgress connected to cdc.dist_centers
 ```
 
 Leave it running, and use a second terminal for the next steps.
@@ -327,7 +390,7 @@ This update shows an order moving from Processing to Shipped, with the time it s
     "returned_at": null
   },
   "source": {
-    "version": "3.5.1.Final",
+    "version": "3.7.0.Final",
     "connector": "postgresql",
     "name": "ecommerce",
     "ts_ms": 1790775541329,
@@ -388,7 +451,7 @@ The line is shown across several lines here. `source`, `transaction` and the `ts
 
 ## Step 4: Change the Simulation While It Runs
 
-The simulation reads parameter changes from the Kafka topic `ecommerce-control`, through desflow's `KafkaIngress`. It uses each new value from the next time it draws one. `control.py` sends a change. With the simulation and both connectors running, cut the pickers from three to one:
+The simulation reads parameter changes from the Kafka topic `ecommerce-control`, through the `ingress` entry of `shop.yaml`. It uses each new value from the next time it draws one. `control.py` sends a change. With the simulation and both connectors running, cut the pickers from three to one:
 
 ```bash
 python -m ecommerce.simulation.control ecommerce.resources.pickers.current_cap 1
@@ -398,24 +461,21 @@ python -m ecommerce.simulation.control ecommerce.resources.pickers.current_cap 1
 Sent ecommerce.resources.pickers.current_cap = 1.0 to ecommerce-control
 ```
 
-One picker packs about 12 orders a minute, which is fewer than the 20 or so placed, so the queue grows. The `Shipped` updates in `ecommerce.cdc.orders` fall from about 20 a minute to about 11. `Cancelled` updates appear as customers' patience runs out, which never happens with three pickers. In one run, the change was sent at 12:45:02 UTC. These are the changes per minute in `ecommerce.cdc.orders`, counted by the minute of each Debezium event:
+One picker packs about 12 orders a minute, which is fewer than the 18 or so placed, so the queue grows. The `Shipped` updates in `ecommerce.cdc.orders` fall from about 20 a minute to about 13. `Cancelled` updates appear as customers' patience runs out, which never happens with three pickers. In one run, the change was sent at 03:45:11 UTC. These are the changes per minute in `ecommerce.cdc.orders`, counted by the minute of each Debezium event:
 
 | Minute (UTC) | Pickers | New orders | Shipped | Cancelled |
 |---|---|---|---|---|
-| 12:40 | 3 | 22 | 22 | 0 |
-| 12:41 | 3 | 18 | 18 | 0 |
-| 12:42 | 3 | 23 | 22 | 0 |
-| 12:43 | 3 | 20 | 21 | 0 |
-| 12:44 | 3 | 27 | 27 | 0 |
-| 12:45 | 1 from 12:45:02 | 22 | 13 | 0 |
-| 12:46 | 1 | 18 | 10 | 3 |
-| 12:47 | 1 | 10 | 13 | 6 |
-| 12:48 | 1 | 20 | 10 | 0 |
-| 12:49 | 1 | 16 | 13 | 4 |
-| 12:50 | 1 | 24 | 12 | 7 |
-| 12:51 | 1 | 16 | 9 | 4 |
-| 12:52 | 1 | 17 | 12 | 10 |
-| 12:53 | 1 | 13 | 10 | 8 |
+| 03:41 | 3 | 16 | 20 | 0 |
+| 03:42 | 3 | 21 | 17 | 0 |
+| 03:43 | 3 | 22 | 23 | 0 |
+| 03:44 | 3 | 16 | 18 | 0 |
+| 03:46 | 1 | 26 | 12 | 0 |
+| 03:47 | 1 | 16 | 14 | 1 |
+| 03:48 | 1 | 20 | 12 | 6 |
+| 03:49 | 1 | 20 | 14 | 2 |
+| 03:50 | 1 | 19 | 13 | 4 |
+| 03:51 | 1 | 20 | 12 | 10 |
+| 03:52 | 1 | 13 | 12 | 6 |
 
 Other parameters work the same way, such as `ecommerce.arrival.visitor.rate` for visitors a second, or `ecommerce.variables.buy` for the chance a visitor buys. `python -m ecommerce.simulation.control --help` lists them all. A change lasts until the simulation stops.
 

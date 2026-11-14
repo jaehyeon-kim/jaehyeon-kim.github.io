@@ -16,10 +16,10 @@ tags:
   - Docker
   - WebSocket
   - Benchtop
-description: A Python generator loads theLook eCommerce data into PostgreSQL, and a FastAPI WebSocket server queries it on a timer to serve live dashboards.
+description: A desflow simulation, written in YAML, loads theLook eCommerce data into PostgreSQL, and a FastAPI WebSocket server queries it on a timer to serve live dashboards.
 ---
 
-A data generating app is created with Python, and it ingests the [theLook eCommerce](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) data continuously into a PostgreSQL database. A WebSocket server, built by [FastAPI](https://fastapi.tiangolo.com/), periodically queries the data to serve its clients. In this series, we develop real-time monitoring dashboard applications, and this post walks through the data generation app and backend API. The monitoring dashboards will be developed using [Streamlit](https://streamlit.io/) and [Next.js](https://nextjs.org/), with [Apache ECharts](https://echarts.apache.org/en/index.html) for visualization. They will be discussed in later posts.
+A data generating app is written as a YAML simulation that desflow runs, and it ingests the [theLook eCommerce](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) data continuously into a PostgreSQL database. A WebSocket server, built by [FastAPI](https://fastapi.tiangolo.com/), periodically queries the data to serve its clients. In this series, we develop real-time monitoring dashboard applications, and this post walks through the data generation app and backend API. The monitoring dashboards will be developed using [Streamlit](https://streamlit.io/) and [Next.js](https://nextjs.org/), with [Apache ECharts](https://echarts.apache.org/en/index.html) for visualization. They will be discussed in later posts.
 
 <!--more-->
 
@@ -29,7 +29,9 @@ A data generating app is created with Python, and it ingests the [theLook eComme
 
 <!--more-->
 
-[**Update 2026-10-16**] dynamic-des is now desflow. The code and commands below use desflow 0.21.0: pip install desflow, import desflow and the desflow command, and the parameter table's columns are `path` and `value`, which the PostgreSQL ingress reads from 0.21.0. A table made before then has its columns renamed when the store starts.
+[**Update 2026-11-15**] The data generator is now one YAML file, `model.yaml`, which desflow 1.0.0 runs with `desflow run model.yaml`. It replaces the Python modules in `sales/simulation`, apart from the control command, and it creates the tables itself. The code, commands and log below show the new version.
+
+[**Update 2026-10-16**] dynamic-des is now desflow: pip install desflow, import desflow and the desflow command. The parameter table's columns are `path` and `value`, which the PostgreSQL ingress reads from desflow 0.21.0.
 
 ## Services
 
@@ -53,224 +55,420 @@ A PostgreSQL database server is started with [odctl](https://github.com/jaehyeon
 (.venv) $ odctl up postgres
 ```
 
-The data generator creates a dedicated schema named *dashboard* and its tables when it starts.
-
-```python
-# live-dashboard/sales/stores/postgres.py
-TABLES = ("products", "users", "orders", "order_items")
-UPSERT_KEYS = {"orders": ["id"], "order_items": ["id"]}  # rows whose status changes
-
-_DDL = f"""
-CREATE SCHEMA IF NOT EXISTS {SCHEMA};
-CREATE TABLE IF NOT EXISTS {SCHEMA}.products (id BIGINT PRIMARY KEY, name TEXT,
-    category TEXT, department TEXT, retail_price FLOAT8, cost FLOAT8);
-CREATE TABLE IF NOT EXISTS {SCHEMA}.users (id TEXT PRIMARY KEY, age INT, gender TEXT,
-    country TEXT, traffic_source TEXT, created_at TEXT);
-CREATE TABLE IF NOT EXISTS {SCHEMA}.orders (id TEXT PRIMARY KEY, user_id TEXT,
-    status TEXT, num_of_item INT, created_at TEXT);
-CREATE TABLE IF NOT EXISTS {SCHEMA}.order_items (id TEXT PRIMARY KEY, order_id TEXT,
-    user_id TEXT, product_id BIGINT, status TEXT, sale_price FLOAT8, created_at TEXT);
-CREATE TABLE IF NOT EXISTS {PARAMS_TABLE} (id SERIAL PRIMARY KEY,
-    path VARCHAR(255) NOT NULL, value TEXT NOT NULL,
-    is_applied BOOLEAN DEFAULT FALSE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
--- desflow 0.21.0 reads `path` and `value`; a table made before it gets its columns renamed.
-DO $$ BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.columns
-               WHERE table_schema || '.' || table_name = '{PARAMS_TABLE}'
-               AND column_name = 'param_path') THEN
-        ALTER TABLE {PARAMS_TABLE} RENAME COLUMN param_path TO path;
-        ALTER TABLE {PARAMS_TABLE} RENAME COLUMN param_value TO value;
-    END IF;
-END $$;
-"""
-```
+The data generator creates a dedicated schema named *dashboard* and its tables when it starts. Each table's columns and primary key are set in the data generator's model file, shown below.
 
 ### Data Generator
 
-The data generator is a [desflow](https://github.com/jaehyeon-kim/desflow) simulation of the shop, and it runs in its own terminal. It connects to the PostgreSQL database with the settings in `sales/core/config.py`, and runs until it is stopped (`--minutes` stops it after that many minutes).
+The data generator is a [desflow](https://github.com/jaehyeon-kim/desflow) simulation of the shop. The simulation is one YAML file, `model.yaml`, and the `desflow` command runs it in its own terminal. The file sets the PostgreSQL address and every setting of the simulation. It runs until it is stopped (`--until '10 min'` stops it after ten minutes).
 
 ```bash
-(.venv) $ python -m sales.simulation.run
+(.venv) $ desflow run model.yaml
 ```
 
 #### Data Generator Source
 
-The *theLook eCommerce* dataset is reduced to four entities, three of which are dynamically generated. Visitors arrive at random, view a few pages, and some buy. A buyer is a new or a returning *user*, and each purchase creates an *order* with one or more *order items*. Each order waits for a warehouse picker, then ships and completes, or is cancelled when no picker comes in time. Every change of status updates the order and its items. desflow's `PostgresEgress` writes each row to its table, and `PostgresIngress` applies parameter changes while the simulation runs.
+The *theLook eCommerce* dataset is reduced to four entities, three of which are dynamically generated. Visitors arrive at random, view a few pages, and some buy. A buyer is a new or a returning *user*, and each purchase creates an *order* with one or more *order items*. Each order waits for a warehouse picker, then ships and completes, or is cancelled when no picker comes in time. Every change of status updates the order and its items. In the file, each step is a task, and a task's `payload` is the row it writes, with `__table__` naming the table. The `egress` section writes each row to its table, and the `ingress` section applies parameter changes while the simulation runs.
 
-```python
-# live-dashboard/sales/simulation/run.py
-"""The shop as a discrete-event model in desflow, run in real time into PostgreSQL.
+```yaml
+# live-dashboard/model.yaml
+# The shop, run in real time into PostgreSQL. Visitors arrive and browse, and some buy.
+# Each order waits for a picker, ships and completes, or is cancelled when no picker
+# comes in time. Every rate, time and chance is a registry parameter, so a row added to
+# dashboard.params (sales.simulation.control) changes it while the model runs.
+simulation:
+  sim_id: sales
+  factor: 1
+  logical_start_time: now
+  timezone: UTC
 
-Visitors arrive and browse, and some buy. Each order waits for a picker, ships and
-completes, or is cancelled when no picker comes in time. Every rate, time and chance is
-a registry parameter, so `sales.simulation.control` can change it while the model runs.
-"""
+# The ingress applies the rows of its parameter table that are not applied yet, every
+# two seconds
+ingress:
+  - type: Postgres
+    config:
+      connection_dsn: "${PG_DSN:-postgresql://user:password@127.0.0.1:5432/odctl}"
+      table_name: dashboard.params
 
-import argparse
-import asyncio
-import logging
-from datetime import UTC, datetime, timedelta
+# A few rows arrive a second
+batching: {batch_size: 4, flush_interval: 1.0}
 
-from desflow import PostgresEgress, PostgresIngress, SimulationContext
+# One entry per table: an entry writes the events whose __table__ names its table and
+# ignores the others. `envelope: false` writes the payload alone, so no task record
+# reaches a table, and `when` drops the record of an order that leaves the picking
+# queue, which the `cancelled` task writes as a row instead. `tables` makes the `dashboard` schema and the table at start when
+# they do not exist. Orders and their items upsert on id, because their status changes.
+egress:
+  - type: Postgres
+    when: &rows {expr: "record.stream_type == 'event' and record.value.status != 'reneged'"}
+    envelope: false
+    config:
+      connection_dsn: "${PG_DSN:-postgresql://user:password@127.0.0.1:5432/odctl}"
+      table_name: users
+      server_settings: {search_path: dashboard}
+      tables:
+        dashboard.users:
+          columns:
+            id: TEXT
+            age: INT
+            gender: TEXT
+            country: TEXT
+            traffic_source: TEXT
+            created_at: TEXT
+          primary_key: id
+  - type: Postgres
+    when: *rows
+    envelope: false
+    config:
+      connection_dsn: "${PG_DSN:-postgresql://user:password@127.0.0.1:5432/odctl}"
+      table_name: orders
+      server_settings: {search_path: dashboard}
+      upsert_keys: [id]
+      tables:
+        dashboard.orders:
+          columns:
+            id: TEXT
+            user_id: TEXT
+            status: TEXT
+            num_of_item: INT
+            created_at: TEXT
+          primary_key: id
+  - type: Postgres
+    when: *rows
+    envelope: false
+    config:
+      connection_dsn: "${PG_DSN:-postgresql://user:password@127.0.0.1:5432/odctl}"
+      table_name: order_items
+      server_settings: {search_path: dashboard}
+      upsert_keys: [id]
+      tables:
+        dashboard.order_items:
+          columns:
+            id: TEXT
+            order_id: TEXT
+            user_id: TEXT
+            product_id: BIGINT
+            status: TEXT
+            sale_price: FLOAT8
+            created_at: TEXT
+          primary_key: id
+  - type: Postgres
+    when: *rows
+    envelope: false
+    config:
+      connection_dsn: "${PG_DSN:-postgresql://user:password@127.0.0.1:5432/odctl}"
+      table_name: products
+      server_settings: {search_path: dashboard}
+      tables:
+        dashboard.products:
+          columns:
+            id: BIGINT
+            name: TEXT
+            category: TEXT
+            department: TEXT
+            retail_price: FLOAT8
+            cost: FLOAT8
+          primary_key: id
 
-from sales.core.config import (
-    ARRIVALS,
-    CHANCES,
-    DSN,
-    MAX_PICKERS,
-    PARAMS_TABLE,
-    PICKERS,
-    SCHEMA,
-    SERVICES,
-    SIM_ID,
-)
-from sales.core.models import User
-from sales.simulation.catalogue import products
-from sales.simulation.shop import basket, new_user, with_status
-from sales.stores import postgres
+# Chances that a visitor is a registered user, buys, and returns a delivered order;
+# `users` counts the users made so far
+variables: {returning: 0.6, buy: 0.3, return: 0.1, users: 0}
 
+# Mean and standard deviation in seconds
+services:
+  page_view: {dist: lognormal, mean: 4.0, std: 2.0}
+  pick: {dist: lognormal, mean: 5.0, std: 2.0}
+  transit: {dist: lognormal, mean: 60.0, std: 20.0}
+  return_after: {dist: lognormal, mean: 60.0, std: 30.0}
+  patience: {dist: lognormal, mean: 120.0, std: 60.0}
 
-def _wait(app: SimulationContext, service: str):
-    """Returns a timeout drawn from a service's live distribution."""
-    config = app.env.registry.get_config(f"{SIM_ID}.service.{service}")
-    return app.env.timeout(app.sampler.sample(config))
+# Warehouse pickers packing orders at once
+resources:
+  pickers: {current_cap: 10, max_cap: 20}
 
+arrivals:
+  # The 260 products of products.csv, written in id order when the run starts
+  catalogue: {initial: 260, spawn: product_row}
+  # Visitors a second, exponential gaps
+  visitor:
+    dist: exponential
+    rate: 4
+    spawn: catalogue_check
+    attributes:
+      n: 0
+      pages: {gen: integer, bounds: [2, 5]}
 
-def _chance(app: SimulationContext, name: str) -> bool:
-    """Returns True with the probability of a chance variable's live value."""
-    return (
-        app.sampler.rng.random()
-        < app.env.registry.get(f"{SIM_ID}.variables.{name}").value
-    )
+tasks:
+  product_row:
+    vars:
+      p: {gen: row, file: products.csv, order: sequential}
+    payload:
+      __table__: products
+      id: {gen: var, name: p, path: id}
+      name: {gen: var, name: p, path: name}
+      category: {gen: var, name: p, path: category}
+      department: {gen: var, name: p, path: department}
+      retail_price: {gen: var, name: p, path: retail_price}
+      cost: {gen: var, name: p, path: cost}
+  # A visitor is a returning user, chosen at the start of the visit from the users made
+  # so far, with the chance `returning` once a user exists
+  catalogue_check:
+    payload: null
+    next:
+      weights:
+        pick_user: "registry['sales.variables.returning'] if
+          registry['sales.variables.users'] > 0 else 0"
+        no_user: "1 - (registry['sales.variables.returning'] if
+          registry['sales.variables.users'] > 0 else 0)"
+  # An earlier user, each with the same chance; no visitor is sent here before a user
+  # exists
+  pick_user:
+    payload: null
+    set:
+      user: {gen: lookup, task: new_user, path: id}
+    next: pages
+  no_user:
+    payload: null
+    set: {user: ""}
+    next: pages
+  # Two to five page views, a loop of `next`
+  pages:
+    service_time: {gen: sample, service: page_view}
+    payload: null
+    set:
+      n: {gen: expr, expr: "attr.n + 1"}
+    next:
+      when:
+        - {condition: "attr.n < attr.pages", task: pages}
+      default: buy_choice
+  # The chance to buy is a live variable, read for each visitor
+  buy_choice:
+    payload: null
+    next:
+      weights:
+        buyer: "registry['sales.variables.buy']"
+        walk_away: "1 - registry['sales.variables.buy']"
+  walk_away:
+    payload: null
+  # A returning visitor orders for the user chosen at the start; a new user is made only
+  # here
+  buyer:
+    payload: null
+    next:
+      when:
+        - {condition: "attr.user != ''", task: returning}
+      default: new_user
+  returning:
+    payload: null
+    next: order
+  new_user:
+    on:
+      - path: sales.variables.users
+        value: {gen: expr, expr: "registry['sales.variables.users'] + 1"}
+    vars:
+      uid: {gen: uuid}
+    # the order names its user in orders.user_id
+    set:
+      user: {gen: var, name: uid}
+    payload:
+      __table__: users
+      id: {gen: var, name: uid}
+      age: {gen: integer, bounds: [12, 70]}
+      gender: {gen: one_of, choices: [F, M]}
+      country:
+        gen: weighted
+        options:
+          China: 7319934
+          Brasil: 7294477
+          South Korea: 1493470
+          France: 1458801
+          United States: 1157308
+          United Kingdom: 1024009
+      traffic_source:
+        gen: weighted
+        options:
+          Search: 0.7
+          Organic: 0.15
+          Facebook: 0.06
+          Email: 0.05
+          Display: 0.04
+      created_at: {gen: now}
+    next: order
+  # One to four items (70%, 20%, 5% and 5%), each a different product
+  order:
+    vars:
+      # the order's row and every later row of it carry this id
+      oid: {gen: uuid}
+      created: {gen: now}
+      n:
+        gen: expr
+        expr: "1 if u < 0.7 else 2 if u < 0.9 else 3 if u < 0.95 else 4"
+        names:
+          u: {gen: uniform, low: 0, high: 1}
+      ids:
+        gen: repeat
+        times: {gen: var, name: n}
+        value: {gen: uuid}
+    set:
+      order_id: {gen: var, name: oid}
+      created_at: {gen: var, name: created}
+      n: {gen: var, name: n}
+      iids: {gen: var, name: ids}
+      products:
+        gen: repeat
+        times: {gen: var, name: n}
+        value: {gen: lookup, task: product_row, distinct: true}
+    payload:
+      __table__: orders
+      id: {gen: var, name: oid}
+      user_id: {gen: attr, name: user}
+      status: Processing
+      num_of_item: {gen: var, name: n}
+      created_at: {gen: var, name: created}
+    next: items
+  items:
+    wait:
+      each: "range(attr.n)"
+      branch:
+        task: order_item
+        args:
+          i: {gen: expr, expr: each.value}
+          status: Processing
+    payload: null
+    next: pick
+  # one item row; a status change writes every item again with the same id
+  order_item:
+    vars:
+      p: {gen: expr, expr: "attr.products[arg.i]"}
+    payload:
+      __table__: order_items
+      id: {gen: expr, expr: "attr.iids[arg.i]"}
+      order_id: {gen: attr, name: order_id}
+      user_id: {gen: attr, name: user}
+      product_id: {gen: var, name: p, path: id}
+      status: {gen: expr, expr: arg.status}
+      sale_price: {gen: var, name: p, path: retail_price}
+      created_at: {gen: attr, name: created_at}
+  # An order that waits longer than its patience for a picker is cancelled
+  pick:
+    resource: pickers
+    service: pick
+    patience: {gen: sample, service: patience}
+    on_renege: cancelled
+    payload:
+      __table__: orders
+      id: {gen: attr, name: order_id}
+      user_id: {gen: attr, name: user}
+      status: Shipped
+      num_of_item: {gen: attr, name: n}
+      created_at: {gen: attr, name: created_at}
+    next: items_shipped
+  items_shipped:
+    wait:
+      each: "range(attr.n)"
+      branch:
+        task: order_item
+        args:
+          i: {gen: expr, expr: each.value}
+          status: Shipped
+    payload: null
+    next: transit
+  cancelled:
+    payload:
+      __table__: orders
+      id: {gen: attr, name: order_id}
+      user_id: {gen: attr, name: user}
+      status: Cancelled
+      num_of_item: {gen: attr, name: n}
+      created_at: {gen: attr, name: created_at}
+    next: items_cancelled
+  items_cancelled:
+    wait:
+      each: "range(attr.n)"
+      branch:
+        task: order_item
+        args:
+          i: {gen: expr, expr: each.value}
+          status: Cancelled
+    payload: null
+  transit:
+    service: transit
+    payload:
+      __table__: orders
+      id: {gen: attr, name: order_id}
+      user_id: {gen: attr, name: user}
+      status: Complete
+      num_of_item: {gen: attr, name: n}
+      created_at: {gen: attr, name: created_at}
+    next: items_complete
+  items_complete:
+    vars:
+      sent_back:
+        gen: boolean
+        p: {gen: param, path: sales.variables.return}
+    wait:
+      each: "range(attr.n)"
+      branch:
+        task: order_item
+        args:
+          i: {gen: expr, expr: each.value}
+          status: Complete
+    payload: null
+    next:
+      when:
+        - {condition: "sent_back", task: returned}
+  returned:
+    service: return_after
+    payload:
+      __table__: orders
+      id: {gen: attr, name: order_id}
+      user_id: {gen: attr, name: user}
+      status: Returned
+      num_of_item: {gen: attr, name: n}
+      created_at: {gen: attr, name: created_at}
+    next: items_returned
+  items_returned:
+    wait:
+      each: "range(attr.n)"
+      branch:
+        task: order_item
+        args:
+          i: {gen: expr, expr: each.value}
+          status: Returned
+    payload: null
 
-
-def build(seed: int | None = None, start: datetime | None = None) -> SimulationContext:
-    """
-    Builds the shop's model: its parameters, its pickers and its processes.
-
-    Args:
-        seed (int, optional): The seed for every random choice. None varies them.
-        start (datetime, optional): The simulated start time, in UTC. Defaults to now.
-
-    Returns:
-        SimulationContext: The model, ready for egress, ingress and `run`.
-    """
-    start = start or datetime.now(UTC)
-    app = SimulationContext(
-        SIM_ID,
-        factor=1.0,
-        random_seed=seed,
-        logical_start_time=start.replace(tzinfo=None),
-    )
-    for name, rate in ARRIVALS.items():
-        app.add_arrival(name, dist="exponential", rate=rate)
-    for name, (mean, std) in SERVICES.items():
-        app.add_service(name, dist="lognormal", mean=mean, std=std)
-    app.add_resource("pickers", current_cap=PICKERS, max_cap=MAX_PICKERS)
-    for name, chance in CHANCES.items():
-        app.add_variable(name, chance)
-    catalogue, users = products(), list[User]()
-
-    def now() -> str:
-        """Returns the simulated time, in UTC, as ISO 8601 text."""
-        return (start + timedelta(seconds=app.env.now)).isoformat()
-
-    def publish(rows) -> None:
-        """Writes rows to their tables."""
-        for row in rows:
-            app.env.publish_event(row.table, row.model_dump())
-
-    @app.arrival_loop("visitor")
-    def visitors(ctx):
-        """Writes the catalogue, then starts a visit at each visitor arrival."""
-        publish(catalogue)
-        while True:
-            yield ctx.wait_for_arrival("visitor")
-            ctx.spawn(visit())
-
-    def visit():
-        """One visitor: a few page views, then possibly an order."""
-        rng = app.sampler.rng
-        user = (
-            users[int(rng.integers(len(users)))]
-            if users and _chance(app, "returning")
-            else None
-        )
-        for _ in range(int(rng.integers(2, 6))):
-            yield _wait(app, "page_view")
-        if not _chance(app, "buy"):
-            return
-        if user is None:
-            user = new_user(rng, now())
-            users.append(user)
-            publish([user])
-        order, items = basket(rng, user, catalogue, now())
-        publish([order, *items])
-        app.spawn(fulfil([order, *items]))
-
-    def fulfil(rows):
-        """One order: wait for a picker or give up, then pack, ship and complete."""
-        with app.get_resource("pickers").request() as picker:
-            waited = yield picker | _wait(app, "patience")
-            if picker not in waited:
-                publish(with_status(rows, "Cancelled"))
-                return
-            yield _wait(app, "pick")
-        publish(with_status(rows, "Shipped"))
-        yield _wait(app, "transit")
-        publish(with_status(rows, "Complete"))
-        if _chance(app, "return"):
-            yield _wait(app, "return_after")
-            publish(with_status(rows, "Returned"))
-
-    return app
-
-
-def run(minutes: float | None = None, seed: int | None = None) -> None:
-    """
-    Runs the shop in real time, writing every row to PostgreSQL.
-
-    Args:
-        minutes (float, optional): How long to run. None runs until interrupted.
-        seed (int, optional): The seed for every random choice.
-    """
-    asyncio.run(postgres.create_tables())
-    app = build(seed)
-    app.add_ingress(PostgresIngress(DSN, table_name=PARAMS_TABLE))
-    app.with_batching(batch_size=4, flush_interval=1.0)  # a few rows arrive a second
-    for table in postgres.TABLES:
-        # Bare table names, found through the connection's search path.
-        egress = PostgresEgress(
-            DSN,
-            table_name=table,
-            upsert_keys=postgres.UPSERT_KEYS.get(table),
-            server_settings={"search_path": SCHEMA},
-        )
-        app.add_egress(egress, when=lambda r, t=table: r.get("key") == t)
-    app.run(until=minutes * 60 if minutes else None)
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
-    parser = argparse.ArgumentParser(description="Runs the shop in real time.")
-    parser.add_argument(
-        "--minutes", type=float, help="how long to run (default: forever)"
-    )
-    parser.add_argument("--seed", type=int, help="seed for the random choices")
-    args = parser.parse_args()
-    run(args.minutes, args.seed)
+# `desflow test model.yaml` runs each test unpaced, with no ingress and no egress, and
+# compares its statistics with these. `desflow test model.yaml --fix` writes new values
+# after a deliberate change or a desflow upgrade.
+tests:
+  # One hour at the defaults: the whole catalogue is written, about 1.2 orders arrive a
+  # second, and about four buyers in ten are new users
+  - name: an hour at the defaults
+    seed: 1
+    until: 3600
+    expect:
+      tasks.product_row.finished: 260
+      tasks.new_user.finished: 1795
+      tasks.order.finished: 4375
+      tasks.pick.finished: 4368
+      tasks.transit.finished: 4307
+      tasks.returned.finished: 441
 ```
 
-In the following example, the simulation starts and connects to each table.
+In the following example, the simulation logs the seed it drew, starts and connects to each table.
 
 ```bash
-(.venv) $ python -m sales.simulation.run
-2026-09-30 22:44:19,294 desflow.core.context Building SimulationContext for 'sales'...
-2026-09-30 22:44:19,295 desflow.core.context Simulation engine started.
-2026-09-30 22:44:19,627 desflow.connectors.egress.postgres PostgresEgress connected to order_items
-2026-09-30 22:44:19,627 desflow.connectors.egress.postgres PostgresEgress connected to users
-2026-09-30 22:44:19,627 desflow.connectors.egress.postgres PostgresEgress connected to orders
-2026-09-30 22:44:19,627 desflow.connectors.egress.postgres PostgresEgress connected to products
+(.venv) $ desflow run model.yaml
+14:36:44 [INFO] desflow.builder.context: Building SimulationContext for 'sales'...
+14:36:44 [INFO] desflow.builder.context: No random_seed was given, so this run uses 1842063416. Repeat it with: desflow run model.yaml --seed 1842063416
+14:36:44 [INFO] desflow.core.environment: PostgresEgress has envelope: false, so it skips telemetry and the queued and started records, and writes each event's value alone.
+14:36:44 [INFO] desflow.core.environment: PostgresEgress has envelope: false, so it skips telemetry and the queued and started records, and writes each event's value alone.
+14:36:44 [INFO] desflow.core.environment: PostgresEgress has envelope: false, so it skips telemetry and the queued and started records, and writes each event's value alone.
+14:36:44 [INFO] desflow.core.environment: PostgresEgress has envelope: false, so it skips telemetry and the queued and started records, and writes each event's value alone.
+14:36:44 [INFO] desflow.builder.context: Simulation engine started.
+14:36:44 [INFO] desflow.connectors.egress.postgres: PostgresEgress connected to users
+14:36:44 [INFO] desflow.connectors.egress.postgres: PostgresEgress connected to order_items
+14:36:44 [INFO] desflow.connectors.egress.postgres: PostgresEgress connected to orders
+14:36:44 [INFO] desflow.connectors.egress.postgres: PostgresEgress connected to products
 ```
 
 When the data gets ingested into the database, we see the following tables are created in the *dashboard* schema.

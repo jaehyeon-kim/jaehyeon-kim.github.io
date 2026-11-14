@@ -22,6 +22,8 @@ A real-time monitoring dashboard is developed using [Streamlit](https://streamli
 
 <!--more-->
 
+[**Update 2026-11-15**] The data generator is now one desflow YAML file, `model.yaml`, started with `desflow run model.yaml`, as [Part 1](/blog/2025-02-18-realtime-dashboard-1/) shows. The command, the architecture diagram and the dashboard screenshot below show the new version.
+
 * [Part 1 Data Producer](/blog/2025-02-18-realtime-dashboard-1/)
 * [Part 2 Streamlit Dashboard](#) (this post)
 * [Part 3 Next.js Dashboard](/blog/2025-03-04-realtime-dashboard-3/)
@@ -236,7 +238,7 @@ else:
 
 ### Data Producer and WebSocket Server
 
-As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1/), PostgreSQL is started with `odctl up postgres`, and the data generator and WebSocket server are started with `python -m sales.simulation.run` and `uvicorn sales.api.server:app --host 127.0.0.1 --port 8000`, each in its own terminal. Once started, the server can be checked with the WebSocket client of the [websockets](https://websockets.readthedocs.io/) package by executing `python -m websockets ws://127.0.0.1:8000/ws`, and its logs are printed in its terminal.
+As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1/), PostgreSQL is started with `odctl up postgres`, and the data generator and WebSocket server are started with `desflow run model.yaml` and `uvicorn sales.api.server:app --host 127.0.0.1 --port 8000`, each in its own terminal. Once started, the server can be checked with the WebSocket client of the [websockets](https://websockets.readthedocs.io/) package by executing `python -m websockets ws://127.0.0.1:8000/ws`, and its logs are printed in its terminal.
 
 The client prints each message the server sends: a list of the order items of the last five minutes, here 39 records in the first message.
 

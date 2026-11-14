@@ -25,6 +25,8 @@ A mobile game produces a score every time a player finishes a round, and players
 
 <!--more-->
 
+[**Update 2026-11-15**] The simulation is now one YAML file, `leaderboard/simulation/game.yaml`, which desflow 1.0.0 runs with `desflow run`. It replaces `run.py`, `game.py`, the score model and the serializer, and the Avro schema is now the file `score.avsc`. The code, commands, log and screenshots below show the new version, and Step 4 now says when robots reach the hot streaks.
+
 [**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
 
 The source code is in [benchtop/game-leaderboard](https://github.com/jaehyeon-kim/benchtop/tree/main/game-leaderboard). It is one of the [Benchtop](/blog/2026-09-30-introducing-benchtop/) projects, which run locally from a fresh clone.
@@ -94,93 +96,154 @@ The web UIs:
 
 A discrete-event simulation (DES) moves a clock from one event to the next, such as a player's next round. Nothing happens between events, so the model only has to say what each event does and how long it is until the next one. Here the clock runs at the speed of real time.
 
-The model is built from desflow's parts. The teams themselves are plain Python, in `leaderboard/simulation/game.py`:
+The model is one YAML file, `leaderboard/simulation/game.yaml`, built from desflow's parts. An entity is one player, and a task is one step it takes. Each task can send a record when it finishes:
 
 | Part of the game | desflow feature | Default |
 |---|---|---|
 | Players arrive at random | an arrival, `player`: exponential gaps | a player every 2 seconds |
-| A player's session | a process, one per player, started for each arrival | lasts a lognormal time, 5 minutes on average |
+| A player's session | an entity per player, which goes through the tasks `join_team`, then `tick` and `round` in turn, then `leave_team` | lasts a lognormal time, 5 minutes on average |
 | Time between rounds | a service, `round` for people and `robot_round` for robots | 6 seconds for people, 1.5 for robots |
-| A device goes offline | a service, `offline`: the score is held, then sent with the time it was earned | 7 minutes on average |
+| A device goes offline | a task, `late`, which holds the score for the service `offline`, then sends it with the time it was earned | 7 minutes on average |
 | Robots and late scores | registry variables, `robot_share` and `late_share` | 5% of players, 1% of scores |
-| Sending the scores | Kafka egress, with a serializer that sends only the score | about 27 scores a second |
+| Sending the scores | Kafka egress with `envelope: false`, which sends only the score | about 27 scores a second |
 | Changing parameters | Kafka ingress on `game-control` | none |
 
-The parameters and the arrival process are set in `build`, in `leaderboard/simulation/run.py`. When a player arrives, the arrival process decides whether they are a robot, then starts their session as a process of its own:
+The services, the Kafka writer and reader, and the arrival come after the variables. When a player arrives, the arrival decides whether they are a robot, names them `USR-` or `RBT-` with a number, and draws their session length. The Kafka writer sends each score in Avro, with the schema in `score.avsc`:
 
-```python
-def build(app: SimulationContext) -> None:
-    """
-    Adds the game's parameters and processes to a simulation.
+```yaml
+services:
+  session: {dist: lognormal, mean: 300, std: 120}   # 5 minutes
+  round: {dist: lognormal, mean: 6, std: 2}
+  robot_round: {dist: normal, mean: 1.5, std: 0.3}
+  offline: {dist: normal, mean: 420, std: 120}      # 7 minutes
 
-    Args:
-        app (SimulationContext): The simulation, before it runs.
-    """
-    app.add_arrival("player", dist="exponential", rate=0.5)  # a player every 2 s
-    app.add_service("session", dist="lognormal", mean=300, std=120)  # 5 minutes
-    app.add_service("round", dist="lognormal", mean=6, std=2)
-    app.add_service("robot_round", dist="normal", mean=1.5, std=0.3)
-    app.add_service("offline", dist="normal", mean=420, std=120)  # 7 minutes
-    app.add_variable("robot_share", 0.05)
-    app.add_variable("late_share", 0.01)
+# Flink's source table reads the score's own fields, so the Avro value is the score alone,
+# registered under the subject game-scores-value. The topic is created on first use.
+egress:
+  - type: Kafka
+    when: events
+    envelope: false
+    batch_size: 25   # about a second of scores
+    config:
+      bootstrap_servers: "${KAFKA_BROKER:-127.0.0.1:9092}"
+      event_topic: game-scores
+      serializer:
+        type: confluent_avro
+        registry_url: "${REGISTRY_URL:-http://127.0.0.1:8081}"
+        schema_file: score.avsc
 
-    @app.arrival_loop("player")
-    def players(ctx: SimulationContext) -> Iterator[Any]:
-        game = Game(ctx.sampler.rng)  # type: ignore[union-attr]
-        count = 0
-        while True:
-            yield ctx.wait_for_arrival("player")
-            count += 1
-            robot = game.rng.random() < _share(ctx, "robot_share")
-            ctx.spawn(
-                _session(ctx, game, f"{'RBT' if robot else 'USR'}-{count:06}", robot)
-            )
+# Parameter changes from `control`; the ingress creates the topic if it is missing
+ingress:
+  - type: Kafka
+    config: {bootstrap_servers: "${KAFKA_BROKER:-127.0.0.1:9092}", topic: game-control}
+
+arrivals:
+  player:
+    dist: exponential
+    rate: 0.5   # a player every 2 seconds on average
+    spawn: join_team
+    vars:
+      robot:
+        gen: boolean
+        p: {gen: param, path: game.variables.robot_share}
+    # USR- and a number for a person, RBT- for a robot
+    key:
+      gen: format
+      template: "{p}-{n:06d}"
+      names:
+        p: {gen: when, condition: robot, then: RBT, else: USR}
+        n: {gen: sequence, start: 1}
+    attributes:
+      robot: {gen: var, name: robot}
+      born: {gen: expr, expr: t}
+      session_len: {gen: sample, service: session}
+
 ```
 
-A session puts the player in a team with room, or forms a new team. A team holds up to 15 players, and one arrival in ten forms a new team anyway. The player then plays rounds until the session time is up, and each round earns a score from 0 to 20. A late score is held by a process of its own and sent minutes later, with the time it was earned. When the player leaves, they leave their team, and a team with no players left dissolves:
+A session starts with `join_team`, which puts the player in a team with room, or forms a new team. A team holds up to 15 players, and one arrival in ten forms a new team anyway. A new team takes the next 10-digit id and a free name. When no name is free, the player joins a team with room, and when no team has room either, the player is turned away. The teams playing now are registry variables, which `join_team` and `leave_team` update. The player then plays rounds until the session time is up, and each round earns a score from 0 to 20. `tick` waits one round and draws the score, and `round` sends it. A late score is sent minutes later by `late`, a task of its own, with the time it was earned. When the session ends, `leave_team` takes the player out of their team, and a team with no players left dissolves. The tasks that play the rounds:
 
-```python
-def _session(
-    ctx: SimulationContext, game: Game, player: str, robot: bool
-) -> Iterator[Any]:
-    """Plays one session: joins a team, plays rounds until the session ends, and leaves."""
-    team = game.join(player)
-    ends = ctx.env.now + _draw(ctx, "session")
-    while True:
-        yield ctx.env.timeout(_draw(ctx, "robot_round" if robot else "round"))
-        if ctx.env.now > ends:
-            break
-        earned = ctx.env.start_datetime + timedelta(seconds=ctx.env.now)
-        late = game.rng.random() < _share(ctx, "late_share")
-        event = ScoreEvent(
-            user_id=player,
-            team_id=team.team_id,
-            team_name=team.name,
-            score=int(game.rng.integers(0, 21)),
-            event_time_millis=int(earned.timestamp() * 1000),
-            event_type="late" if late else "normal",
-        )
-        if late:
-            ctx.spawn(_send_late(ctx, event))
-        else:
-            ctx.env.publish_event(player, event)
-    game.leave(team, player)
+```yaml
+  # Wait one round, then leave when the session has ended (before any score), else draw
+  # the score
+  tick:
+    service_time:
+      gen: expr
+      expr: "robot_round if attr.robot else human_round"
+      names:
+        robot_round: {gen: sample, service: robot_round}
+        human_round: {gen: sample, service: round}
+    vars:
+      is_late:
+        gen: boolean
+        p: {gen: param, path: game.variables.late_share}
+      score: {gen: integer, bounds: [0, 20]}
+      ended: {gen: expr, expr: "t - attr.born > attr.session_len"}
+    payload: null
+    set:
+      score: {gen: var, name: score}
+    # A late score is sent by its own process with the time it was earned, and the
+    # session goes on
+    spawn:
+      task: late
+      count: {gen: expr, expr: "1 if is_late and not ended else 0"}
+      args:
+        player: {gen: entity}
+        team_id: {gen: attr, name: team_id}
+        team_name: {gen: attr, name: team}
+        score: {gen: var, name: score}
+        earned_ms:
+          gen: format_time
+          format: epoch_ms
+          time: {gen: now}
+    next:
+      when:
+        - {condition: "ended", task: leave_team}
+        - {condition: "is_late", task: tick}
+      default: round
+  round:
+    payload:
+      user_id: {gen: entity}
+      team_id: {gen: attr, name: team_id}
+      team_name: {gen: attr, name: team}
+      score: {gen: attr, name: score}
+      event_time_millis:
+        gen: format_time
+        format: epoch_ms
+        time: {gen: now}
+      event_type: normal
+    next: tick
+  late:
+    service: offline
+    key: {gen: expr, expr: arg.player}
+    payload:
+      user_id: {gen: expr, expr: arg.player}
+      team_id: {gen: expr, expr: arg.team_id}
+      team_name: {gen: expr, expr: arg.team_name}
+      score: {gen: expr, expr: arg.score}
+      event_time_millis: {gen: expr, expr: arg.earned_ms}
+      event_type: late
 ```
 
-Every parameter is a path in desflow's registry, such as `game.variables.robot_share` or `game.service.round.mean`. The registry is a store of named parameters. The processes read the live value each time they draw one, so a change sent to `game-control` applies from the next arrival or round.
+Every parameter is a path in desflow's registry, such as `game.variables.robot_share` or `game.service.round.mean`. The registry is a store of named parameters. The tasks read the live value each time they draw one, so a change sent to `game-control` applies from the next arrival or round.
 
 ## Step 1: Run the Simulation
 
 ```bash
-python -m leaderboard.simulation.run     # Ctrl + C to stop
+desflow run leaderboard/simulation/game.yaml     # Ctrl + C to stop
 ```
 
-It creates two Kafka topics if they are missing: `game-scores` for the scores, and `game-control` for parameter changes. It then plays the game in real time and sends about 27 scores a second until you stop it. The first score registers the Avro schema in Karapace, under the subject `game-scores-value`. Its log shows the simulation starting, and its Kafka writer and reader connecting:
+desflow creates three Kafka topics if they are missing: `game-scores` for the scores, `game-control` for parameter changes, and `sim-telemetry`, desflow's telemetry topic, to which the game sends nothing. It then plays the game in real time and sends about 27 scores a second until you stop it. The first score registers the Avro schema in Karapace, under the subject `game-scores-value`. Its log shows the simulation starting, its Kafka writer and reader connecting, and the schema being registered:
 
 ```
-2026-09-30 22:41:07,798 desflow.core.context Simulation engine started.
-2026-09-30 22:41:07,801 desflow.connectors.egress.kafka Kafka Egress producer connected successfully.
-2026-09-30 22:41:07,802 desflow.connectors.ingress.kafka Connected to Kafka Ingress topic: game-control
+18:40:01 [INFO] desflow.builder.context: Building SimulationContext for 'game'...
+18:40:01 [INFO] desflow.builder.context: No random_seed was given, so this run uses 3968378124. Repeat it with: desflow run leaderboard/simulation/game.yaml --seed 3968378124
+18:40:01 [INFO] desflow.core.environment: KafkaEgress has envelope: false, so it skips telemetry and the queued and started records, and writes each event's value alone.
+18:40:01 [INFO] desflow.builder.context: Simulation engine started.
+18:40:01 [INFO] desflow.connectors.egress.kafka: Kafka Egress producer connected successfully.
+18:40:01 [INFO] aiokafka.consumer.subscription_state: Updating subscribed topics to: frozenset({'game-control'})
+18:40:01 [INFO] aiokafka.consumer.group_coordinator: Metadata for topic has changed from {} to {'game-control': 1}. 
+18:40:01 [INFO] desflow.connectors.ingress.kafka: Connected to Kafka Ingress topic: game-control
+18:40:15 [INFO] httpx: HTTP Request: POST http://127.0.0.1:8081/subjects/game-scores-value/versions "HTTP/1.1 200 OK"
 ```
 
 In Kafka UI, the topic `game-scores` shows the scores. Each message is keyed by the player:
@@ -423,7 +486,9 @@ The team MVPs changed the same way. All 10 of the top MVPs were robots:
 (10 rows)
 ```
 
-Set the share back with `python -m leaderboard.simulation.control game.variables.robot_share 0.05`. Other parameters work the same way. For example, `game.arrival.player.rate 2.0` brings four times as many players, and so four times as many scores. `python -m leaderboard.simulation.control --help` lists them all with their defaults.
+The hot streaks stay with people while any are still playing. A streak divides a player's average over the last 10 seconds by their average over the last minute. A robot plays 6 or 7 rounds in 10 seconds, so its short average stays close to its long one, and its ratio stays near 1. A person plays one or two rounds in 10 seconds, so one high score can double the short average. Once the last people's sessions end, about 6 minutes after the change, only robots are left, and they fill the hot streaks too.
+
+Set the share back with `python -m leaderboard.simulation.control game.variables.robot_share 0.05`. Other parameters work the same way. For example, `game.arrival.player.rate 2.0` brings four times as many players, and so four times as many scores. `python -m leaderboard.simulation.control --help` lists them all.
 
 ## Clean Up
 
@@ -433,7 +498,7 @@ Stop the simulation and the dashboard first, then:
 python -m leaderboard.stores.cleanup
 ```
 
-It cancels the four Flink jobs, deletes the two Kafka topics and the schema subject, and drops the PostgreSQL schema `game` with its tables. It leaves other projects' jobs, topics and tables alone, and the services keep running. It is safe to run again. To start over, run the steps again from Step 1.
+It cancels the four Flink jobs, deletes the three Kafka topics and the schema subject, and drops the PostgreSQL schema `game` with its tables. It leaves other projects' jobs, topics and tables alone, and the services keep running. It is safe to run again. To start over, run the steps again from Step 1.
 
 To stop the services and delete their data:
 

@@ -22,6 +22,8 @@ A real-time monitoring dashboard connects to the WebSocket server from [Part 1](
 
 <!--more-->
 
+[**Update 2026-11-15**] The data generator is now one desflow YAML file, `model.yaml`, started with `desflow run model.yaml`, as [Part 1](/blog/2025-02-18-realtime-dashboard-1/) shows. The command, the architecture diagram and the dashboard screenshot below show the new version.
+
 * [Part 1 Data Producer](/blog/2025-02-18-realtime-dashboard-1/)
 * [Part 2 Streamlit Dashboard](/blog/2025-02-25-realtime-dashboard-2/)
 * [Part 3 Next.js Dashboard](#) (this post)
@@ -72,6 +74,8 @@ export default function Metric({
     ? "$ ".concat(value.toLocaleString())
     : value.toLocaleString();
   const arrowColor = delta == 0 ? "black" : delta > 0 ? "green" : "red";
+  // The arrow points up, and turns to point down for a fall
+  const arrowTurn = delta < 0 ? "rotate(180deg)" : undefined;
   return (
     <div className="col-span-12 md:col-span-4">
       <Card>
@@ -89,6 +93,7 @@ export default function Metric({
             fill={arrowColor}
             xmlns="http://www.w3.org/2000/svg"
             color="inherit"
+            style={{ transform: arrowTurn }}
           >
             <path fill="none" d="M0 0h24v24H0V0z"></path>
             <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"></path>
@@ -255,7 +260,7 @@ export default function Home() {
 
 ### Data Producer and WebSocket Server
 
-As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1/), PostgreSQL is started with `odctl up postgres`, and the data generator and WebSocket server are started with `python -m sales.simulation.run` and `uvicorn sales.api.server:app --host 127.0.0.1 --port 8000`, each in its own terminal. Once started, the server can be checked with the WebSocket client of the [websockets](https://websockets.readthedocs.io/) package by executing `python -m websockets ws://127.0.0.1:8000/ws`, and its logs are printed in its terminal.
+As discussed in [Part 1](/blog/2025-02-18-realtime-dashboard-1/), PostgreSQL is started with `odctl up postgres`, and the data generator and WebSocket server are started with `desflow run model.yaml` and `uvicorn sales.api.server:app --host 127.0.0.1 --port 8000`, each in its own terminal. Once started, the server can be checked with the WebSocket client of the [websockets](https://websockets.readthedocs.io/) package by executing `python -m websockets ws://127.0.0.1:8000/ws`, and its logs are printed in its terminal.
 
 The client prints each message the server sends: a list of the order items of the last five minutes, here 39 records in the first message.
 

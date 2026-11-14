@@ -27,6 +27,8 @@ Trying a modern data tool on your own machine is rarely about the tool. Writing 
 
 <!--more-->
 
+[**Update 2026-11-15**] The Benchtop projects that use desflow now require desflow 1.0.0. Each of them generates its data from one desflow YAML file instead of Python code.
+
 [**Update 2026-10-16**] dynamic-des is now desflow (0.20.0). The code and commands below use the new name: pip install desflow, import desflow and the desflow command.
 
 ![Installing odctl, previewing what flink-lite starts, starting kafka-lite, listing the containers and stopping them](odctl-1-0.gif)
