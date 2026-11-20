@@ -48,7 +48,7 @@ jobs:
           tar -C "${{ runner.temp }}" -xf "${{ runner.temp }}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz"
           echo "${{ runner.temp }}/dart-sass" >> "${GITHUB_PATH}"
 
-      # Hugo 0.170.0 and later have one edition, so there is no extended build to ask for.
+      # Hugo 0.170.0 and later have no extended edition, so there is none to ask for.
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:

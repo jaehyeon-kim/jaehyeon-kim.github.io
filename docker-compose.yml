@@ -1,8 +1,8 @@
 services:
   hugo:
       # The official Hugo image, which includes Node and Go. Its Dart Sass is overridden by
-      # the version the deploy installs, placed first on PATH, because an older one warns
-      # about the deprecations the site's SCSS silences. The entrypoint runs npm install
+      # the version the deploy installs, placed first on PATH, so a local build compiles
+      # the SCSS as the deploy does. The entrypoint runs npm install
       # when node_modules is missing, then hugo with the command below.
       build:
         dockerfile_inline: |

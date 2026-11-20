@@ -13,7 +13,7 @@ tags:
   - Apache Kafka
   - Docker
   - Kpow
-  - kafka-ui
+  - Kafka UI
 description: Kafka management apps compared for local development, covering IAM access control and integration with MSK Connect and Glue Schema Registry.
 ---
 

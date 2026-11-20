@@ -31,7 +31,8 @@ taxonomies:
   # authors: authors
 
 build:
-  writeStats: true
+  buildStats:
+    enable: true
 
 # module:
   # proxy: https://goproxy.cn
@@ -79,3 +80,20 @@ outputFormats:
     baseName: "index"
     isPlainText: false
     notAlternative: true
+# Related posts match on series, tags and categories. Hugo 0.145.0 stopped giving every
+# post the site's params.keywords, which used to make every post match every other.
+# includeNewer lets a post list later posts too, so the first part of a series lists the
+# parts after it. toLower matches tags written in different letter case as one tag.
+related:
+  includeNewer: true
+  threshold: 80
+  toLower: true
+  indices:
+    - name: series
+      weight: 100
+    - name: tags
+      weight: 80
+    - name: categories
+      weight: 40
+    - name: date
+      weight: 10

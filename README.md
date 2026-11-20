@@ -8,7 +8,7 @@ Built with [Hugo](https://gohugo.io/) and [Hugo Bootstrap Theme](https://github.
 
 ## Prerequisites
 
-- Hugo 0.170.1. The deploy pins this version, so another one may render differently. Since Hugo 0.170.0 there is one edition, with no extended build.
+- Hugo 0.170.1. The deploy pins this version, so another one may render differently. Since Hugo 0.170.0 there is no extended edition.
 - Dart Sass on `PATH` as `sass`. The theme's SCSS needs it, because Hugo 0.170.0 removed LibSass.
 - Node 24. The theme ships its JavaScript and SCSS through npm.
 - Go on `PATH`. Hugo resolves the theme module with it, and the build fails without it.
@@ -65,9 +65,9 @@ The production build differs from local in one way that matters: PurgeCSS runs o
 ## Upgrading the theme
 
 ```bash
-hugo mod get github.com/razonyang/hugo-theme-bootstrap@master
+hugo mod get github.com/razonyang/hugo-theme-bootstrap@v1.13.3
 hugo mod npm pack
 npm update
 ```
 
-Then run the site locally before pushing, since the theme's partials change between releases. Some files in `layouts/`, and `assets/service-worker/config.template.ts`, `postcss.config.js` and `purgecss.config.js`, are copies of the theme's own, changed so that the build runs on current Hugo with no deprecation warnings. Each says at its top that it is a copy, what it changes and why. After an upgrade, compare each copy with the theme's new version of the file, and delete the copy once the theme makes the same change.
+Then run the site locally before pushing, since the theme's partials change between releases. Some files in `layouts/`, and `assets/service-worker/config.template.ts`, are copies of the theme's own, changed so that the build runs on current Hugo with no deprecation warnings. Each says at its top that it is a copy, what it changes and why. After an upgrade, compare each copy with the theme's new version of the file, and delete the copy once the theme makes the same change. `postcss.config.js` and `purgecss.config.js` are copies for another reason: Node's permission model stops PostCSS reading them from the theme in the module cache, so they stay in the project root whatever the theme changes. After an upgrade, compare them with the theme's new versions.

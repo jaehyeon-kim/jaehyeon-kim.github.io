@@ -1,7 +1,8 @@
 // Copy of the theme's file of the same name, at v1.13.3. Since Hugo 0.161.0, Node runs
 // with its permission model and may read only the project, the assets directories and
-// node_modules, so it cannot load this file, or the one it requires, from the theme in
-// the module cache. A copy in the project root takes precedence over the theme's.
+// node_modules, so it cannot load this file from the theme in the module cache. A copy
+// in the project root takes precedence over the theme's. One change: fs.F_OK becomes
+// fs.constants.F_OK, because Node deprecated the fs.F_OK alias.
 
 const stats = './hugo_stats.json';
 const fs = require('fs');
