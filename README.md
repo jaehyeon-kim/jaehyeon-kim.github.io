@@ -2,7 +2,7 @@
 
 Source for [jaehyeon.me](https://jaehyeon.me), a blog on data engineering, streaming, analytics and architecture, written by Jaehyeon Kim, a data engineer working on data streaming for machine learning and AI.
 
-![](./public/site-feature-image.png)
+![](./static/site-feature-image.png)
 
 Built with [Hugo](https://gohugo.io/) and [Hugo Bootstrap Theme](https://github.com/razonyang/hugo-theme-bootstrap), which is installed as a Hugo module rather than a submodule, so there is nothing to clone into `themes/`.
 
@@ -70,4 +70,4 @@ hugo mod npm pack
 npm update
 ```
 
-Then run the site locally before pushing, since the theme's partials change between releases. Some files in `layouts/`, and `assets/service-worker/config.template.ts`, are copies of the theme's own, changed so that the build runs on current Hugo with no deprecation warnings. Each says at its top that it is a copy, what it changes and why. After an upgrade, compare each copy with the theme's new version of the file, and delete the copy once the theme makes the same change. `postcss.config.js` and `purgecss.config.js` are copies for another reason: Node's permission model stops PostCSS reading them from the theme in the module cache, so they stay in the project root whatever the theme changes. After an upgrade, compare them with the theme's new versions.
+Then run the site locally before pushing, since the theme's partials change between releases. Some files in `layouts/`, `assets/service-worker/config.template.ts` and `assets/js/code/index.ts` are copies of the theme's own, changed so that the build runs on current Hugo with no deprecation warnings, or, for `index.ts`, so that code blocks get their buttons whenever the script runs. Each says at its top that it is a copy, what it changes and why. After an upgrade, compare each copy with the theme's new version of the file, and delete the copy once the theme makes the same change. `postcss.config.js` and `purgecss.config.js` are copies for another reason: Node's permission model stops PostCSS reading them from the theme in the module cache, so they stay in the project root whatever the theme changes. After an upgrade, compare them with the theme's new versions.

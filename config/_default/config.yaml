@@ -80,7 +80,8 @@ outputFormats:
     baseName: "index"
     isPlainText: false
     notAlternative: true
-# Related posts match on series, tags and categories. Hugo 0.145.0 stopped giving every
+# Related posts match on series and tags. A shared category only raises the rank of a post
+# that also shares a tag or series; on its own it scores below the threshold. Hugo 0.145.0 stopped giving every
 # post the site's params.keywords, which used to make every post match every other.
 # includeNewer lets a post list later posts too, so the first part of a series lists the
 # parts after it. toLower matches tags written in different letter case as one tag.
