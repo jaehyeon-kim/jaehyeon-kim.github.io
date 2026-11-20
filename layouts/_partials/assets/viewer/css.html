@@ -11,7 +11,16 @@
 {{- if .Site.Params.viewer }}
     {{- $outputStyle := "expanded" }}
     {{- if hugo.IsProduction }}{{ $outputStyle = "compressed" }}{{ end }}
-    {{- $options := dict "targetPath" "assets/viewer/bundle.min.css" "outputStyle" $outputStyle "includePaths" (slice "node_modules") }}
+    {{- /* The theme's index.scss loads viewerjs with @import, which Dart Sass reports as
+         deprecated on every build. The file is the theme's, so the warning is silenced
+         here rather than fixed. */}}
+    {{- $options := dict
+      "transpiler" (default "libsass" site.Params.sass_transpiler)
+      "targetPath" "assets/viewer/bundle.min.css"
+      "outputStyle" $outputStyle
+      "includePaths" (slice "node_modules")
+      "silenceDeprecations" (slice "import")
+    }}
     {{- $style := resources.Get "viewer/scss/index.scss" | toCSS $options | fingerprint }}
     <link data-precache rel="preload" as="style" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}" crossorigin="anonymous"></noscript>

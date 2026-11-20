@@ -1,0 +1,28 @@
+{{- /*
+  The theme's partials/head/assets.html at v1.13.3, changed only where it calls Hugo functions
+  that newer releases deprecate, so the build stays free of deprecation warnings. Hugo
+  0.158.0 deprecated .Language.LanguageDirection in favour of .Language.Direction. Hugo
+  0.164.0 deprecated resources.PostProcess, which assets/main/css.html used to run
+  PurgeCSS after every page is rendered, in favour of templates.Defer. A deferred block
+  cannot sit inside partialCached, so the main stylesheet is called here with partial
+  inside templates.Defer, once for the whole site. alias.html does the same. Delete this
+  file when the theme makes the same change.
+*/ -}}
+{{- partialCached "assets/google-analytics" . -}}
+{{- partialCached "assets/google-adsense" . -}}
+{{- if  eq .Site.Language.Direction "rtl" }}
+  {{- partialCached "assets/main/css-rtl" . }}
+{{- else }}
+  {{- /* Assigned first: Hugo evaluates the options inside the with block, where the dot is
+       no longer the page. */}}
+  {{- $page := . }}
+  {{- with (templates.Defer (dict "key" "main-css" "data" $page)) }}
+    {{- partial "assets/main/css" . }}
+  {{- end }}
+{{- end }}
+{{- partial "assets/math/css" . }}
+{{- partialCached "assets/viewer/css" . }}
+{{- partialCached "assets/docsearch/css" . -}}
+{{- partialCached "assets/plausible-analytics/js" . -}}
+{{- partial "assets/search/head" . }}
+{{- partial "assets/algolia/css" . }}

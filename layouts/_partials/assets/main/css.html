@@ -1,0 +1,25 @@
+{{- /*
+  The theme's partials/assets/main/css.html at v1.13.3, changed so that the build has
+  no deprecation warnings. Hugo 0.164.0 deprecated resources.PostProcess, so
+  head/assets.html defers this partial with templates.Defer instead. Dart Sass reports
+  the theme's @import rules and Bootstrap's own Sass as deprecated on every build; both
+  are third-party files, so those warnings are silenced here rather than fixed. Delete
+  this file when the theme makes the same change.
+*/ -}}
+{{- $postCSSOptions := dict "config" "postcss.config.js" }}
+{{- $outputStyle := "expanded" }}
+{{- if hugo.IsProduction }}{{ $outputStyle = "compressed" }}{{ end }}
+{{- $options := dict
+  "transpiler" (default "libsass" site.Params.sass_transpiler)
+  "targetPath" "assets/main/bundle.min.css"
+  "outputStyle" $outputStyle
+  "includePaths" (slice "node_modules")
+  "silenceDeprecations" (slice "import" "global-builtin")
+  "silenceDependencyDeprecations" true
+}}
+{{- $config := resources.Get "main/scss/_config.scss" | resources.ExecuteAsTemplate "main/scss/_config.scss" . }}
+{{- $main := resources.Get "main/scss/index.scss" }}
+{{- $styles := slice $config $main }}
+{{- $styles := $styles | resources.Concat "main/scss/main.css" | toCSS $options | css.PostCSS $postCSSOptions | fingerprint }}
+<link data-precache rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}" crossorigin="anonymous">
+{{- partial "assets/main/custom" . }}

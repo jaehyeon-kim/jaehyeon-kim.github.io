@@ -1,0 +1,29 @@
+{{- /*
+  The theme's partial of the same name, without its fallback to site.Author. Hugo
+  0.156.0 removed site.Author, so the theme's `with site.Author` stops the build on
+  every page with a sidebar. The author is set in params.author instead. Delete this
+  file once the theme drops the fallback.
+*/ -}}
+{{- $author := site.Params.author }}
+{{- with $author -}}
+<div class="profile-name fw-fold fs-lg">{{ .name }}</div>
+{{- with .bio -}}
+<div class="profile-bio">{{ . | safeHTML }}</div>
+{{- end -}}
+{{- with .company -}}
+<div class="profile-company"><i class="fas fa-fw fa-building"></i>{{ . | safeHTML }}</div>
+{{- end -}}
+{{- with .location -}}
+<div class="profile-location"><i class="fas fa-fw fa-map-marker-alt"></i>{{ . | safeHTML }}</div>
+{{- end -}}
+{{- if .about -}}
+<a class="profile-about" target="_blank" rel="noopener noreferrer" href="{{ .about }}"><i class="fas fa-fw fa-user"></i>{{ i18n "about_me" }}</a>
+{{- else -}}
+{{- with $.GetPage "about" -}}
+<a class="profile-about text-primary" href="{{ .RelPermalink }}"><i class="fas fa-fw fa-user"></i>{{ .LinkTitle }}</a>
+{{- end -}}
+{{- end -}}
+{{- with $.GetPage "contact" -}}
+<a class="profile-contact text-primary" href="{{ .RelPermalink }}"><i class="fas fa-fw fa-question-circle"></i>{{ .LinkTitle }}</a>
+{{- end -}}
+{{- end -}}

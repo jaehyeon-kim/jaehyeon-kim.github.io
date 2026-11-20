@@ -31,3 +31,11 @@ td a {
 p.text-secondary > small {
   color: #696f77;
 }
+
+// Theme 1.6.2 and later cap every code block at 360px, about 16 lines, before its script
+// runs. The script then caps only blocks longer than codeBlock.maxLines in params.yaml,
+// with an inline style and an expand button. With maxLines at 60, the 360px cap turned
+// blocks of 17 to 60 lines into small scroll boxes, so it is removed here.
+pre {
+  max-height: none;
+}

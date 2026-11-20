@@ -38,11 +38,21 @@ jobs:
         with:
           go-version: '1.27'
 
+      # Hugo 0.170.0 removed LibSass, so the theme's SCSS is compiled by the Dart Sass
+      # binary, which Hugo finds on PATH. This step follows Hugo's GitHub Pages guide.
+      - name: Install Dart Sass
+        env:
+          DART_SASS_VERSION: 1.108.2
+        run: |
+          curl -sfL --output-dir "${{ runner.temp }}" -O "https://github.com/sass/dart-sass/releases/download/${DART_SASS_VERSION}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz"
+          tar -C "${{ runner.temp }}" -xf "${{ runner.temp }}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz"
+          echo "${{ runner.temp }}/dart-sass" >> "${GITHUB_PATH}"
+
+      # Hugo 0.170.0 and later have one edition, so there is no extended build to ask for.
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: '0.123.3'
-          extended: true
+          hugo-version: '0.170.1'
 
       - name: Build
         run: hugo --minify --gc --enableGitInfo --buildFuture

@@ -7,7 +7,7 @@
   </div>
   {{ end }}
   <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-    {{ range sort site.Data.projects "weight" }}
+    {{ range sort hugo.Data.projects "weight" }}
     {{ $p := . }}
     <div class="col">
       <div class="card h-100 project-card">

@@ -1,0 +1,36 @@
+{
+  "sum": "fa229aead1969948",
+  "dependencySources": {
+    "dependencies": {
+      "@algolia/autocomplete-js": "github.com/razonyang/hugo-theme-bootstrap",
+      "@algolia/autocomplete-theme-classic": "github.com/razonyang/hugo-theme-bootstrap",
+      "@docsearch/js": "github.com/razonyang/hugo-theme-bootstrap",
+      "@fortawesome/fontawesome-svg-core": "github.com/razonyang/hugo-theme-bootstrap",
+      "@fortawesome/free-brands-svg-icons": "github.com/razonyang/hugo-theme-bootstrap",
+      "@fortawesome/free-regular-svg-icons": "github.com/razonyang/hugo-theme-bootstrap",
+      "@fortawesome/free-solid-svg-icons": "github.com/razonyang/hugo-theme-bootstrap",
+      "@fullhuman/postcss-purgecss": "github.com/razonyang/hugo-theme-bootstrap",
+      "@popperjs/core": "github.com/razonyang/hugo-theme-bootstrap",
+      "algoliasearch": "github.com/razonyang/hugo-theme-bootstrap",
+      "autoprefixer": "github.com/razonyang/hugo-theme-bootstrap",
+      "bootstrap": "github.com/razonyang/hugo-theme-bootstrap",
+      "date-fns": "github.com/razonyang/hugo-theme-bootstrap",
+      "fuse.js": "github.com/razonyang/hugo-theme-bootstrap",
+      "katex": "github.com/razonyang/hugo-theme-bootstrap",
+      "mark.js": "github.com/razonyang/hugo-theme-bootstrap",
+      "masonry-layout": "github.com/razonyang/hugo-theme-bootstrap",
+      "mermaid": "github.com/razonyang/hugo-theme-bootstrap",
+      "mustache": "github.com/razonyang/hugo-theme-bootstrap",
+      "onchange": "github.com/razonyang/hugo-theme-bootstrap",
+      "postcss-cli": "github.com/razonyang/hugo-theme-bootstrap",
+      "rtlcss": "github.com/razonyang/hugo-theme-bootstrap",
+      "viewerjs": "github.com/razonyang/hugo-theme-bootstrap",
+      "workbox-cacheable-response": "github.com/razonyang/hugo-theme-bootstrap",
+      "workbox-expiration": "github.com/razonyang/hugo-theme-bootstrap",
+      "workbox-precaching": "github.com/razonyang/hugo-theme-bootstrap",
+      "workbox-routing": "github.com/razonyang/hugo-theme-bootstrap",
+      "workbox-strategies": "github.com/razonyang/hugo-theme-bootstrap"
+    },
+    "devDependencies": {}
+  }
+}

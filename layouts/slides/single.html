@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>{{ .Title }} | {{ .Site.Title }}</title>
     {{/* This template has its own head and never calls baseof, so the canonical
-         from partials/hooks/head-end.html does not reach it. These pages are in
+         from _partials/hooks/head-end.html does not reach it. These pages are in
          the sitemap, so they need one. */}}
     <link rel="canonical" href="{{ .Permalink }}">
     {{/* Same reason as the canonical above: no baseof, so the theme's meta tags do

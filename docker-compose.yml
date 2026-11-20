@@ -1,10 +1,20 @@
 services:
   hugo:
-      image: peaceiris/hugo:v0.123.3-full
+      # The official Hugo image, which includes Node and Go. Its Dart Sass is overridden by
+      # the version the deploy installs, placed first on PATH, because an older one warns
+      # about the deprecations the site's SCSS silences. The entrypoint runs npm install
+      # when node_modules is missing, then hugo with the command below.
+      build:
+        dockerfile_inline: |
+          FROM ghcr.io/gohugoio/hugo:v0.170.1
+          ARG TARGETARCH
+          ARG DART_SASS_VERSION=1.108.2
+          ADD --chown=hugo:hugo https://github.com/sass/dart-sass/releases/download/$${DART_SASS_VERSION}/dart-sass-$${DART_SASS_VERSION}-linux-$${TARGETARCH/amd64/x64}.tar.gz /tmp/dart-sass.tar.gz
+          RUN mkdir /var/hugo/sass && tar -C /var/hugo/sass -xf /tmp/dart-sass.tar.gz
+          ENV PATH="/var/hugo/sass/dart-sass:$${PATH}"
       command: server -D -F -E --poll 700ms --bind=0.0.0.0
       container_name: hugo
       volumes:
-        - $PWD:/src
-        - /etc/ssl/certs:/etc/ssl/certs
+        - $PWD:/project
       ports:
         - "1313:1313"

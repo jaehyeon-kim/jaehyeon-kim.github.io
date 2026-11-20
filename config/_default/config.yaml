@@ -10,8 +10,9 @@ defaultContentLanguage: en
 #  - zh-cn
 #  - zh-tw
 timeout: "180s"
-paginate: 10
-# paginatePath: page
+pagination:
+  pagerSize: 10
+  # path: page
 enableRobotsTXT: true
 enableEmoji: true
 pygmentsUseClasses: true
@@ -50,7 +51,7 @@ outputs:
     - HTML
     - RSS
     # llms.txt at the site root, an index of the posts for AI assistants
-    # (llmstxt.org). Built by layouts/index.llms.txt.
+    # (llmstxt.org). Built by layouts/home.llms.txt.
     - llms
   section:
     - HTML
