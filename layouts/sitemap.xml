@@ -1,10 +1,12 @@
-{{/* Overrides Hugo's internal sitemap template to drop tag term pages, which
-     partials/head/meta/robots.html marks noindex. Categories, series and every
-     page kind other than a tag term are unchanged. */}}
+{{/* Overrides Hugo's internal sitemap template to drop every page marked
+     noindex: tag term pages, which partials/head/meta/robots.html marks, and
+     pages whose front matter sets metaRobots to noindex, such as /offline/ and
+     /search/, which Search Console reported as soft 404s. Categories, series
+     and every other page are unchanged. */}}
 {{ printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   {{ range .Data.Pages }}
-  {{- if not (and (eq .Kind "term") (eq .Data.Plural "tags")) }}
+  {{- if not (or (and (eq .Kind "term") (eq .Data.Plural "tags")) (in (lower (string .Params.metaRobots)) "noindex")) }}
   {{- if .Permalink }}
   <url>
     <loc>{{ .Permalink }}</loc>{{ if not .Lastmod.IsZero }}
