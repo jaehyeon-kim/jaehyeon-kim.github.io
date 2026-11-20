@@ -1,0 +1,25 @@
+{{- /*
+  The theme's partials/search/meta.json at v1.13.3, changed only where it calls Hugo functions
+  that newer releases deprecate, so the build stays free of deprecation warnings. Hugo
+  0.156.0 deprecated .Sites in favour of hugo.Sites. Delete this file when the theme
+  makes the same change.
+*/ -}}
+{{- $scratch := newScratch }}
+{{- $scratch.Add "authors" slice }}
+{{- $scratch.Add "categories" slice }}
+{{- $scratch.Add "series" slice }}
+{{- $scratch.Add "tags" slice }}
+{{- range hugo.Sites -}}
+  {{- range $name, $taxonomy := .Taxonomies }}
+    {{- range $key, $value := $taxonomy }}
+      {{- $scratch.Add $name (slice $value.Page.Title) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- dict
+  "authors" ($scratch.Get "authors" | uniq)
+  "categories" ($scratch.Get "categories" | uniq)
+  "series" ($scratch.Get "series" | uniq)
+  "tags" ($scratch.Get "tags"| uniq)
+ | jsonify 
+}}

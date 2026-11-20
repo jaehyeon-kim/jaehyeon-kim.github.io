@@ -6,8 +6,12 @@ mainSections:
 
 # titleSeparator: '|' # Title separator. Default to -.
 
+# Hugo 0.170.0 removed LibSass, the theme's default, so the theme must be told to use
+# Dart Sass. CI installs the sass binary before the build.
+sass_transpiler: dartsass
+
 description: Data Engineer | Data Streaming | Powering ML & AI in Real Time
-# Project documentation sites, listed first in llms.txt (layouts/index.llms.txt).
+# Project documentation sites, listed first in llms.txt (layouts/home.llms.txt).
 llmsProjects:
   - name: desflow
     url: https://jaehyeon.me/desflow/latest/
@@ -18,6 +22,28 @@ llmsProjects:
 keywords: Real-time Analytics, Data Engineering, Data Streaming, Machine Learning, Artificial Intelligence, Data Architecture, Apache Kafka, Apache Flink, Apache Spark
 images:
   - site-feature-image.png
+
+# Read by the theme as params.author. Hugo 0.156.0 removed site.Author, so the root
+# author key no longer reaches templates.
+author:
+  name: Jaehyeon Kim
+  avatar: images/profile.png # Avatar image. Default to "images/profile.webp".
+  bio: 'Data Engineer | Data Streaming | Powering ML & AI in Real Time'
+  # company: Company # HTML markup are supported, such as: <a href="https://example.com" target="_blank" rel="noopener noreferrer">Company</a>.
+  # location: Earth # HTML markup are supported, such as: <a href='https://www.openstreetmap.org/search?query=Earth'>Earth</a>.
+  # about: https://razonyang.com # The external about page. The internal about page will be used if not set.
+  params: {
+    # layout: compact
+  }
+  # See https://hbs.razonyang.com/v1/en/docs/widgets/social-links/.
+  social:
+    email: dottami@gmail.com
+    github: jaehyeon-kim
+    linkedin: jaehyeon-kim-76b93429
+    # twitter: 
+    # patreon: 
+    # paypal: dottami
+    rss: "" # Remove RSS
 
 # metaRobots: noindex, nofollow # Default value for Meta Tag robots
 # metaRobots:  # disable Meta Tag robots

@@ -1,0 +1,10 @@
+{{- /*
+  The theme's partial of the same name, without its fallback to site.Author. Hugo
+  0.156.0 removed site.Author, so the theme's `with site.Author` stops the build on
+  every page with a sidebar. The author is set in params.author instead. Delete this
+  file once the theme drops the fallback.
+*/ -}}
+{{- $author := site.Params.author }}
+{{- with $author.social -}}
+{{- partial "helpers/social-links" (dict "class" "mt-1 justify-content-around" "links" . "size" "fa-2x" "OutputFormats" $.OutputFormats "home" ($.GetPage "/") "params" $.Site.Params) -}}
+{{- end -}}

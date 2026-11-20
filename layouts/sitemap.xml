@@ -1,30 +1,26 @@
 {{/* Overrides Hugo's internal sitemap template to drop every page marked
-     noindex: tag term pages, which partials/head/meta/robots.html marks, and
+     noindex: tag term pages, which _partials/head/meta/robots.html marks, and
      pages whose front matter sets metaRobots to noindex, such as /offline/ and
      /search/, which Search Console reported as soft 404s. Categories, series
      and every other page are unchanged. */}}
 {{ printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  {{ range .Data.Pages }}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  {{ range where .Pages "Sitemap.Disable" "ne" true }}
   {{- if not (or (and (eq .Kind "term") (eq .Data.Plural "tags")) (in (lower (string .Params.metaRobots)) "noindex")) }}
-  {{- if .Permalink }}
+    {{- if .Permalink -}}
   <url>
     <loc>{{ .Permalink }}</loc>{{ if not .Lastmod.IsZero }}
     <lastmod>{{ safeHTML ( .Lastmod.Format "2006-01-02T15:04:05-07:00" ) }}</lastmod>{{ end }}{{ with .Sitemap.ChangeFreq }}
     <changefreq>{{ . }}</changefreq>{{ end }}{{ if ge .Sitemap.Priority 0.0 }}
-    <priority>{{ .Sitemap.Priority }}</priority>{{ end }}{{ if .IsTranslated }}{{ range .Translations }}
+    <priority>{{ .Sitemap.Priority }}</priority>{{ end }}{{ if .IsTranslated }}{{ range .AllTranslations }}
     <xhtml:link
                 rel="alternate"
-                hreflang="{{ .Language.LanguageCode }}"
+                hreflang="{{ .Language.Locale }}"
                 href="{{ .Permalink }}"
-                />{{ end }}
-    <xhtml:link
-                rel="alternate"
-                hreflang="{{ .Language.LanguageCode }}"
-                href="{{ .Permalink }}"
-                />{{ end }}
+                />{{ end }}{{ end }}
   </url>
-  {{- end }}
+    {{- end -}}
   {{- end }}
   {{ end }}
 </urlset>

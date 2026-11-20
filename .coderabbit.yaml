@@ -1,0 +1,6 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+reviews:
+  auto_review:
+    # Why: reviews run locally with the CodeRabbit CLI before a pull request is opened,
+    # as in desflow and odctl, so a pull request is not reviewed again on GitHub
+    enabled: false

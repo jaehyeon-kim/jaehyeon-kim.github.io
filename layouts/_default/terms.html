@@ -1,3 +1,9 @@
+{{- /*
+  Kept at the theme's own path, _default/terms.html, rather than the taxonomy.html that
+  Hugo 0.146.0 and later name it. The theme still ships _default/terms.html, and Hugo maps
+  that legacy file onto the taxonomy template after reading the project's, so a project
+  taxonomy.html is replaced by the theme's. Only a file at the same path overrides it.
+*/ -}}
 {{ define "content" }}
 <div class="{{ if default true .Params.sidebar }}col-xxl-8{{ else }}col-xxl-12{{ end }}">
   <div class="container">
@@ -54,7 +60,7 @@
       </div>
       {{- end -}}
     </div>
-    {{- partial "pagination" . -}}
+    {{- partial "wrap-pagination" . -}}
   </div>
 </div>
 {{- partial "sidebar" . -}}

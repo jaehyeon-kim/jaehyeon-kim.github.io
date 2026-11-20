@@ -10,8 +10,9 @@ defaultContentLanguage: en
 #  - zh-cn
 #  - zh-tw
 timeout: "180s"
-paginate: 10
-# paginatePath: page
+pagination:
+  pagerSize: 10
+  # path: page
 enableRobotsTXT: true
 enableEmoji: true
 pygmentsUseClasses: true
@@ -30,7 +31,8 @@ taxonomies:
   # authors: authors
 
 build:
-  writeStats: true
+  buildStats:
+    enable: true
 
 # module:
   # proxy: https://goproxy.cn
@@ -50,7 +52,7 @@ outputs:
     - HTML
     - RSS
     # llms.txt at the site root, an index of the posts for AI assistants
-    # (llmstxt.org). Built by layouts/index.llms.txt.
+    # (llmstxt.org). Built by layouts/home.llms.txt.
     - llms
   section:
     - HTML
@@ -78,3 +80,24 @@ outputFormats:
     baseName: "index"
     isPlainText: false
     notAlternative: true
+# Related posts match on series and tags. One or two shared categories on their own score
+# below the threshold, so a category only raises the rank of a post that also shares a tag or
+# series. Hugo divides the threshold by the number of matches, so three shared categories
+# would pass; no pair of posts on this site shares three categories and nothing else.
+# Hugo 0.145.0 stopped giving every post the site's params.keywords, which used to make
+# every post match every other.
+# includeNewer lets a post list later posts too, so the first part of a series lists the
+# parts after it. toLower matches tags written in different letter case as one tag.
+related:
+  includeNewer: true
+  threshold: 80
+  toLower: true
+  indices:
+    - name: series
+      weight: 100
+    - name: tags
+      weight: 80
+    - name: categories
+      weight: 40
+    - name: date
+      weight: 10

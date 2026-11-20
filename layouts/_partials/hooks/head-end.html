@@ -1,8 +1,8 @@
 {{- /*
-  Canonical URL. The theme emits none at v1.5.4, checked across a full build, so the 35
+  Canonical URL. The theme emits none at v1.13.3, checked across a full build, so the 35
   posts republished on Cevo and any future copy on dev.to or Hashnode have nothing
-  saying which URL is the original. Called from the theme's _default/baseof.html, so it
-  reaches every page that uses it.
+  saying which URL is the original. Called from baseof.html (the project's copy of
+  the theme's), so it reaches every page that uses it.
 
   .Permalink for every page except the second and later pages of a list. Alias stubs
   inherit the target page's context, so an alias correctly points at what it redirects
@@ -10,13 +10,15 @@
   /blog/page/5/ would point at /blog/; Google's pagination guidance says to give each
   page its own canonical URL instead, so they use their own. The theme's head/title.html
   calls .Paginate for every list page before this hook runs, so .Paginator here returns
-  that same paginator rather than starting a new one.
+  that same paginator rather than starting a new one. Only the list kinds ask for it,
+  because Hugo fails the build when a page that cannot paginate, such as the 404 page,
+  calls .Paginator.
 
   layouts/slides/single.html has its own <head> and never calls baseof, so it carries
   its own copy of this line.
 */ -}}
 {{- $canonical := .Permalink -}}
-{{- if not .IsPage -}}
+{{- if in (slice "home" "section" "taxonomy" "term") .Kind -}}
   {{- with .Paginator -}}
     {{- if gt .PageNumber 1 }}{{ $canonical = .URL | absURL }}{{ end -}}
   {{- end -}}

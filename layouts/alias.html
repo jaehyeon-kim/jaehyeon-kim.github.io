@@ -1,0 +1,37 @@
+{{- /*
+  The theme's alias.html at v1.13.3, changed only where it calls Hugo functions that newer
+  releases deprecate, so the build stays free of deprecation warnings. Hugo 0.156.0
+  deprecated site.Sites in favour of hugo.Sites. Hugo 0.164.0 deprecated
+  resources.PostProcess, so the main stylesheet is deferred here as in head/assets.html.
+  Delete this file when the theme makes the same change.
+*/ -}}
+<!DOCTYPE html>
+{{- $color := partialCached "functions/color" .Page }}
+<html data-bs-theme="{{ $color }}">
+  <head>
+    {{- partial "assets/init/js" .Page -}}
+    {{- $page := .Page }}
+    {{- with (templates.Defer (dict "key" "main-css" "data" $page)) }}
+      {{- partial "assets/main/css" . }}
+    {{- end }}
+    {{- $isHome := eq .Permalink (hugo.Sites.Default.Home.Permalink) }}
+    {{- if $isHome }}
+      {{- $homes := newScratch }}
+      {{- range hugo.Sites }}
+        {{- $homes.Set .Home.Lang .Home.Permalink }}
+      {{- end }}
+      {{- $opts := dict
+        "minify" hugo.IsProduction
+        "targetPath" "js/preferred-lang.js"
+        "params" (dict "homes" $homes.Values "fallback" .Permalink)
+      }}
+      {{- $js := resources.Get "js/preferred-lang/index.ts" | js.Build $opts }}
+      <script  src="{{ $js.RelPermalink }}"></script>
+    {{- end }}
+    <title>{{ .Permalink }}</title>
+    <link rel="canonical" href="{{ .Permalink }}"/>
+    <meta name="robots" content="noindex">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="refresh" content="{{ cond $isHome `5` `0` }}; url={{ .Permalink }}"/>
+  </head>
+</html>

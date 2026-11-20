@@ -2,17 +2,18 @@
 
 Source for [jaehyeon.me](https://jaehyeon.me), a blog on data engineering, streaming, analytics and architecture, written by Jaehyeon Kim, a data engineer working on data streaming for machine learning and AI.
 
-![](./public/site-feature-image.png)
+![](./static/site-feature-image.png)
 
 Built with [Hugo](https://gohugo.io/) and [Hugo Bootstrap Theme](https://github.com/razonyang/hugo-theme-bootstrap), which is installed as a Hugo module rather than a submodule, so there is nothing to clone into `themes/`.
 
 ## Prerequisites
 
-- Hugo extended 0.123.0. The deploy pins this version, so a newer one may render differently.
-- Node 20. The theme ships its JavaScript and SCSS through npm.
+- Hugo 0.170.1. The deploy pins this version, so another one may render differently. Since Hugo 0.170.0 there is no extended edition.
+- Dart Sass on `PATH` as `sass`. The theme's SCSS needs it, because Hugo 0.170.0 removed LibSass.
+- Node 24. The theme ships its JavaScript and SCSS through npm.
 - Go on `PATH`. Hugo resolves the theme module with it, and the build fails without it.
 
-Docker avoids all three: `docker compose up` runs the pinned image from `docker-compose.yml`.
+Docker avoids all four: `docker compose up` builds on the official Hugo image pinned in `docker-compose.yml`, which brings Node and Go, and adds the Dart Sass version the deploy installs.
 
 ## Running locally
 
@@ -64,9 +65,9 @@ The production build differs from local in one way that matters: PurgeCSS runs o
 ## Upgrading the theme
 
 ```bash
-hugo mod get github.com/razonyang/hugo-theme-bootstrap@master
+hugo mod get github.com/razonyang/hugo-theme-bootstrap@v1.13.3
 hugo mod npm pack
 npm update
 ```
 
-Then run the site locally before pushing, since the theme is pre-1.0 and its partials change.
+Then run the site locally before pushing, since the theme's partials change between releases. Some files in `layouts/`, `assets/service-worker/config.template.ts` and `assets/js/code/index.ts` are copies of the theme's own, changed so that the build runs on current Hugo with no deprecation warnings, or, for `index.ts`, so that code blocks get their buttons whenever the script runs. Each says at its top that it is a copy, what it changes and why. After an upgrade, compare each copy with the theme's new version of the file, and delete the copy once the theme makes the same change. `postcss.config.js` and `purgecss.config.js` are copies for another reason: Node's permission model stops PostCSS reading them from the theme in the module cache, so they stay in the project root whatever the theme changes. After an upgrade, compare them with the theme's new versions.
